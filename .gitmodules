@@ -1,0 +1,6 @@
+[submodule "tools/ai-suite"]
+	path = tools/ai-suite
+	url = https://github.com/BrDeross/medi-solutions-ai-suite.git
+[submodule "tools/tools-bundle"]
+	path = tools/tools-bundle
+	url = https://github.com/BrDeross/bundle-options.git
