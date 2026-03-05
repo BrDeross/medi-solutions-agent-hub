@@ -4,3 +4,12 @@
 [submodule "tools/tools-bundle"]
 	path = tools/tools-bundle
 	url = https://github.com/BrDeross/bundle-options.git
+[submodule "tools/bundle-options"]
+	path = tools/bundle-options
+	url = https://github.com/BrDeross/bundle-options.git
+[submodule "tools/comparison"]
+	path = tools/comparison
+	url = https://github.com/BrDeross/coverage-comparison-tool.git
+[submodule "tools/retirement-budget"]
+	path = tools/retirement-budget
+	url = https://github.com/BrDeross/retirement-budget-tool.git
