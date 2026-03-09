@@ -8,7 +8,7 @@
     :root{
       --primary:#0A4DA2;
       --primary-dark:#083b7d;
-      --accent:#dbeafe;
+      --primary-light:#eaf3ff;
       --gold:#d4af37;
       --bg:#f4f7fb;
       --card:#ffffff;
@@ -16,11 +16,16 @@
       --muted:#6b7280;
       --border:#e5e7eb;
       --shadow:0 10px 30px rgba(0,0,0,0.08);
+      --shadow-hover:0 16px 36px rgba(0,0,0,0.14);
       --radius:18px;
     }
 
     *{
       box-sizing:border-box;
+    }
+
+    html{
+      scroll-behavior:smooth;
     }
 
     body{
@@ -31,22 +36,21 @@
     }
 
     .topbar{
-      background:linear-gradient(90deg,var(--primary),var(--primary-dark));
-      color:#fff;
-      padding:14px 24px;
       position:sticky;
       top:0;
       z-index:100;
+      background:linear-gradient(90deg,var(--primary),var(--primary-dark));
       box-shadow:0 4px 18px rgba(0,0,0,0.12);
     }
 
     .topbar-inner{
       max-width:1200px;
       margin:0 auto;
+      padding:14px 20px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:20px;
+      gap:18px;
       flex-wrap:wrap;
     }
 
@@ -54,20 +58,24 @@
       display:flex;
       align-items:center;
       gap:14px;
+      min-width:0;
     }
 
     .logo{
-      height:54px;
+      height:56px;
       width:auto;
-      background:#fff;
-      border-radius:12px;
-      padding:6px;
+      max-width:180px;
       object-fit:contain;
+      border-radius:12px;
+      background:#fff;
+      padding:6px;
       box-shadow:0 4px 14px rgba(0,0,0,0.15);
+      display:block;
     }
 
     .brand-text h1{
       margin:0;
+      color:#fff;
       font-size:24px;
       line-height:1.1;
     }
@@ -92,8 +100,8 @@
       border-radius:12px;
       font-size:14px;
       font-weight:600;
-      transition:0.2s ease;
       background:rgba(255,255,255,0.08);
+      transition:0.2s ease;
     }
 
     .nav a:hover{
@@ -103,7 +111,7 @@
 
     .hero{
       max-width:1200px;
-      margin:32px auto 24px;
+      margin:30px auto 24px;
       padding:0 20px;
     }
 
@@ -125,8 +133,8 @@
       margin:0;
       color:var(--muted);
       font-size:16px;
-      line-height:1.6;
-      max-width:850px;
+      line-height:1.65;
+      max-width:900px;
     }
 
     .section{
@@ -137,21 +145,21 @@
 
     .section-header{
       display:flex;
-      align-items:center;
+      align-items:flex-end;
       justify-content:space-between;
       gap:12px;
-      margin-bottom:18px;
       flex-wrap:wrap;
+      margin-bottom:18px;
     }
 
     .section-header h3{
       margin:0;
-      font-size:22px;
+      font-size:24px;
       color:var(--primary-dark);
     }
 
     .section-header p{
-      margin:4px 0 0;
+      margin:6px 0 0;
       color:var(--muted);
       font-size:14px;
     }
@@ -163,6 +171,7 @@
     }
 
     .card{
+      display:block;
       background:var(--card);
       border:1px solid var(--border);
       border-radius:var(--radius);
@@ -175,12 +184,6 @@
       overflow:hidden;
     }
 
-    .card:hover{
-      transform:translateY(-4px);
-      box-shadow:0 16px 36px rgba(0,0,0,0.12);
-      border-color:#cbd5e1;
-    }
-
     .card::before{
       content:"";
       position:absolute;
@@ -189,6 +192,12 @@
       right:0;
       height:6px;
       background:linear-gradient(90deg,var(--primary),var(--gold));
+    }
+
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:var(--shadow-hover);
+      border-color:#cbd5e1;
     }
 
     .icon{
@@ -206,14 +215,14 @@
       margin:0 0 14px;
       color:var(--muted);
       font-size:14px;
-      line-height:1.5;
+      line-height:1.55;
     }
 
     .tag{
       display:inline-block;
       padding:6px 10px;
       border-radius:999px;
-      background:var(--accent);
+      background:var(--primary-light);
       color:var(--primary-dark);
       font-size:12px;
       font-weight:700;
@@ -221,17 +230,27 @@
 
     .quick-links{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
       gap:16px;
       margin-top:14px;
     }
 
     .mini-card{
+      display:block;
       background:#fff;
       border:1px solid var(--border);
       border-radius:16px;
       padding:18px;
       box-shadow:0 6px 16px rgba(0,0,0,0.06);
+      text-decoration:none;
+      color:inherit;
+      transition:0.2s ease;
+    }
+
+    .mini-card:hover{
+      transform:translateY(-3px);
+      box-shadow:0 12px 24px rgba(0,0,0,0.10);
+      border-color:#cbd5e1;
     }
 
     .mini-card h5{
@@ -262,13 +281,18 @@
       line-height:1.6;
     }
 
-    @media (max-width: 700px){
+    @media (max-width: 760px){
+      .topbar-inner{
+        align-items:flex-start;
+      }
+
       .brand{
         align-items:flex-start;
       }
 
       .logo{
-        height:46px;
+        height:48px;
+        max-width:140px;
       }
 
       .brand-text h1{
@@ -281,6 +305,10 @@
 
       .hero-box h2{
         font-size:24px;
+      }
+
+      .nav{
+        width:100%;
       }
     }
   </style>
@@ -300,7 +328,8 @@
       <div class="nav">
         <a href="#agent-tools">Agent Tools</a>
         <a href="#calculators">Calculators</a>
-        <a href="https://www.agencybloc.com/" target="_blank">AgencyBloc</a>
+        <a href="#quick-access">Quick Access</a>
+        <a href="https://app.agencybloc.com/" target="_blank">AgencyBloc</a>
       </div>
     </div>
   </div>
@@ -373,7 +402,7 @@
     </div>
   </div>
 
-  <div class="section">
+  <div class="section" id="quick-access">
     <div class="section-header">
       <div>
         <h3>Quick Access</h3>
@@ -382,25 +411,25 @@
     </div>
 
     <div class="quick-links">
-      <div class="mini-card">
+      <a class="mini-card" href="https://app.agencybloc.com/" target="_blank">
         <h5>AgencyBloc</h5>
-        <p>Use AgencyBloc for CRM activity, lead tracking, and pipeline management.</p>
-      </div>
+        <p>Open AgencyBloc for CRM activity, lead tracking, and pipeline management.</p>
+      </a>
 
-      <div class="mini-card">
+      <a class="mini-card" href="tools/comparison/">
         <h5>Client Education</h5>
-        <p>Use calculators and comparison tools to simplify conversations and build trust.</p>
-      </div>
+        <p>Use comparison tools to simplify conversations and build trust.</p>
+      </a>
 
-      <div class="mini-card">
+      <a class="mini-card" href="tools/ai-suite/content-engine.html">
         <h5>Marketing Support</h5>
-        <p>Use the Content Engine to create posts, captions, and outreach ideas quickly.</p>
-      </div>
+        <p>Open the Content Engine to create posts, captions, and outreach ideas quickly.</p>
+      </a>
 
-      <div class="mini-card">
+      <a class="mini-card" href="tools/ai-suite/sales-coach.html">
         <h5>Sales Readiness</h5>
-        <p>Use the Sales Coach to practice handling objections and improve consistency.</p>
-      </div>
+        <p>Open Sales Coach to practice objections and improve consistency.</p>
+      </a>
     </div>
   </div>
 
