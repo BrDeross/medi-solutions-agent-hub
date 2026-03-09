@@ -5,79 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sales One-Liners</title>
   <style>
-    body{
-      font-family:Arial, Helvetica, sans-serif;
-      background:#f4f7fb;
-      margin:0;
-      padding:30px;
-      color:#1f2937;
-    }
-    .wrap{
-      max-width:1000px;
-      margin:0 auto;
-    }
-    h1{
-      color:#0A4DA2;
-      margin-bottom:10px;
-    }
-    p{
-      color:#6b7280;
-      margin-bottom:20px;
-    }
-    input{
-      width:100%;
-      padding:14px;
-      border:1px solid #d1d5db;
-      border-radius:10px;
-      margin-bottom:20px;
-      font-size:16px;
-    }
-    .line{
-      background:white;
-      padding:16px;
-      border-radius:12px;
-      margin-bottom:12px;
-      box-shadow:0 4px 10px rgba(0,0,0,.08);
-    }
-    .line strong{
-      color:#083b7d;
-      display:block;
-      margin-bottom:6px;
-    }
-    .back{
-      display:inline-block;
-      margin-bottom:20px;
-      color:#0A4DA2;
-      text-decoration:none;
-      font-weight:bold;
-    }
+    body{font-family:Arial, Helvetica, sans-serif;background:#f4f7fb;margin:0;padding:30px;color:#1f2937}
+    .wrap{max-width:1100px;margin:0 auto}
+    h1{color:#0A4DA2;margin-bottom:10px}
+    p{color:#6b7280;margin-bottom:20px;line-height:1.6}
+    input{width:100%;padding:14px;border:1px solid #d1d5db;border-radius:10px;margin-bottom:20px;font-size:16px}
+    .line{background:white;padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+    .line strong{color:#083b7d;display:block;margin-bottom:6px}
+    .back{display:inline-block;margin-bottom:20px;color:#0A4DA2;text-decoration:none;font-weight:bold}
   </style>
 </head>
 <body>
   <div class="wrap">
     <a class="back" href="../../index.html">← Back to Agent Hub</a>
     <h1>Sales One-Liners</h1>
-    <p>Search quick lines by opening, discovery, objection, positioning, and close.</p>
+    <p>Search quick lines by call stage: opening, discovery, positioning, objection, trust-building, and close.</p>
 
-    <input type="text" id="search" placeholder="Search by call stage or phrase..." onkeyup="searchLines()">
+    <input type="text" id="search" placeholder="Search by stage, topic, or phrase..." onkeyup="searchLines()">
 
     <div id="lines">
       <div class="line"><strong>Opening</strong>Most people I speak with just want clarity.</div>
       <div class="line"><strong>Opening</strong>My job is simply to help you understand your options.</div>
+      <div class="line"><strong>Opening</strong>I’m not here to push you — I’m here to help you sort it out.</div>
+      <div class="line"><strong>Opening</strong>Let’s make this simpler than it usually sounds.</div>
+
       <div class="line"><strong>Discovery</strong>Let me ask one quick question so I point you in the right direction.</div>
       <div class="line"><strong>Discovery</strong>This only takes a minute to narrow down.</div>
+      <div class="line"><strong>Discovery</strong>Before I answer that, let me get one detail from you.</div>
+      <div class="line"><strong>Discovery</strong>The answer depends on your situation more than people think.</div>
+
       <div class="line"><strong>Positioning</strong>There’s no one-size-fits-all Medicare plan.</div>
       <div class="line"><strong>Positioning</strong>The right recommendation depends on your situation, not a generic answer.</div>
+      <div class="line"><strong>Positioning</strong>Cheapest upfront doesn’t always mean lowest total cost.</div>
+      <div class="line"><strong>Positioning</strong>What matters is how the plan works when you actually use it.</div>
+
+      <div class="line"><strong>Trust Builder</strong>There’s no obligation here — just clarity.</div>
+      <div class="line"><strong>Trust Builder</strong>I’d rather you understand it clearly than rush into the wrong decision.</div>
+      <div class="line"><strong>Trust Builder</strong>My goal is to help you avoid mistakes, not create pressure.</div>
+      <div class="line"><strong>Trust Builder</strong>You don’t need hype — you need the right information.</div>
+
       <div class="line"><strong>Objection</strong>Totally fair question — a lot of people ask that.</div>
       <div class="line"><strong>Objection</strong>That’s exactly why it helps to look at this side-by-side.</div>
       <div class="line"><strong>Objection</strong>Most people are surprised when they see how this actually works.</div>
-      <div class="line"><strong>Trust Builder</strong>There’s no obligation here — just clarity.</div>
-      <div class="line"><strong>Trust Builder</strong>I’d rather you understand it clearly than rush into the wrong decision.</div>
+      <div class="line"><strong>Objection</strong>You’re not wrong to ask that — it matters.</div>
+      <div class="line"><strong>Objection</strong>Let’s slow that down, because that’s where a lot of confusion comes from.</div>
+
       <div class="line"><strong>Transition</strong>Here’s the part most people care about.</div>
       <div class="line"><strong>Transition</strong>Let’s take a quick look at how this affects you personally.</div>
+      <div class="line"><strong>Transition</strong>Now let’s turn that into the real-world version.</div>
+      <div class="line"><strong>Transition</strong>That’s the rule — now here’s what it means for you.</div>
+
       <div class="line"><strong>Close</strong>If you'd like, we can review your situation together.</div>
       <div class="line"><strong>Close</strong>It takes about 10 minutes to confirm everything.</div>
       <div class="line"><strong>Close</strong>The next best step is just to verify the details and make sure nothing gets missed.</div>
+      <div class="line"><strong>Close</strong>If you want, we can make this easy and look at your options side-by-side.</div>
+
+      <div class="line"><strong>Medicare Specific</strong>If you’re still working, employer size matters more than people realize.</div>
+      <div class="line"><strong>Medicare Specific</strong>The biggest Medicare mistakes usually happen because someone assumed they had more time.</div>
+      <div class="line"><strong>Medicare Specific</strong>There’s a difference between being eligible and actually needing to enroll right now.</div>
+
+      <div class="line"><strong>Life Insurance Specific</strong>The best time to look at life insurance is before health changes the conversation.</div>
+      <div class="line"><strong>Life Insurance Specific</strong>Most people don’t realize cost is tied to timing more than interest.</div>
+
+      <div class="line"><strong>Annuity Specific</strong>Income planning gets easier when you separate growth from protection.</div>
+      <div class="line"><strong>Annuity Specific</strong>An annuity isn’t for everything — but in the right place, it solves a real problem.</div>
     </div>
   </div>
 
