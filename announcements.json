@@ -1,0 +1,32 @@
+{
+  "announcements": [
+    {
+      "type": "Weekly Priority",
+      "title": "Turning-65 Conversations",
+      "message": "Focus this week on turning-65 prospects, employer coverage questions, and clear Medicare education follow-up.",
+      "date": "2026-03-09",
+      "priority": "High"
+    },
+    {
+      "type": "Carrier Certifications",
+      "title": "Check Certification Deadlines",
+      "message": "Review all upcoming carrier certification deadlines and complete renewals before any lockout windows begin.",
+      "date": "2026-03-09",
+      "priority": "High"
+    },
+    {
+      "type": "Marketing Reminder",
+      "title": "Use the Content Engine",
+      "message": "Create this week’s Medicare education posts, follow-up emails, and appointment-driving content using the Content Engine.",
+      "date": "2026-03-09",
+      "priority": "Medium"
+    },
+    {
+      "type": "Operations Note",
+      "title": "AgencyBloc is the System of Record",
+      "message": "All lead activity, notes, and pipeline updates should stay in AgencyBloc. Use the Agent Hub only for tools and resources.",
+      "date": "2026-03-09",
+      "priority": "Medium"
+    }
+  ]
+}
