@@ -261,14 +261,14 @@
       line-height:1.5;
     }
 
-    .announcement-list{
+    .feed-list{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
       gap:18px;
       margin-top:14px;
     }
 
-    .announcement-card{
+    .feed-card{
       background:#fff;
       border:1px solid var(--border);
       border-radius:18px;
@@ -276,7 +276,7 @@
       box-shadow:0 8px 18px rgba(0,0,0,0.06);
     }
 
-    .announcement-type{
+    .feed-type{
       display:inline-block;
       padding:5px 10px;
       border-radius:999px;
@@ -289,20 +289,20 @@
       letter-spacing:0.4px;
     }
 
-    .announcement-card h5{
+    .feed-card h5{
       margin:0 0 8px;
       font-size:17px;
       color:var(--text);
     }
 
-    .announcement-card p{
+    .feed-card p{
       margin:0 0 10px;
       color:var(--muted);
       font-size:14px;
       line-height:1.55;
     }
 
-    .announcement-meta{
+    .feed-meta{
       font-size:12px;
       color:var(--muted);
       border-top:1px solid var(--border);
@@ -310,7 +310,7 @@
       margin-top:10px;
     }
 
-    .announcement-btn{
+    .feed-btn{
       display:inline-block;
       margin-top:12px;
       padding:10px 14px;
@@ -323,17 +323,85 @@
       transition:0.2s ease;
     }
 
-    .announcement-btn:hover{
+    .feed-btn:hover{
       background:var(--primary-dark);
       transform:translateY(-1px);
     }
 
-    .announcement-empty{
+    .empty-state{
       background:#fff;
       border:1px dashed var(--border);
       border-radius:16px;
       padding:20px;
       color:var(--muted);
+    }
+
+    .leaderboard-wrap{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:20px;
+      box-shadow:var(--shadow);
+      overflow-x:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th, td{
+      text-align:left;
+      padding:12px 10px;
+      border-bottom:1px solid var(--border);
+      font-size:14px;
+    }
+
+    th{
+      color:var(--primary-dark);
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:0.4px;
+    }
+
+    tr:last-child td{
+      border-bottom:none;
+    }
+
+    .ops-box{
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:#fff;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:var(--shadow);
+    }
+
+    .ops-box h3{
+      margin:0 0 10px;
+      font-size:28px;
+    }
+
+    .ops-box p{
+      margin:0 0 16px;
+      color:#dbeafe;
+      line-height:1.7;
+      max-width:900px;
+    }
+
+    .ops-btn{
+      display:inline-block;
+      padding:14px 18px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:700;
+      background:#fff;
+      color:var(--primary-dark);
+      transition:0.2s ease;
+    }
+
+    .ops-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:var(--shadow);
     }
 
     .footer{
@@ -377,8 +445,9 @@
       <div class="nav">
         <a href="#agent-tools">Agent Tools</a>
         <a href="#calculators">Calculators</a>
-        <a href="#quick-access">Quick Access</a>
-        <a href="#announcements">Announcements</a>
+        <a href="#updates">Updates</a>
+        <a href="#leaderboard">Leaderboard</a>
+        <a href="#operations-ai">Operations AI</a>
         <a href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc</a>
       </div>
     </div>
@@ -388,9 +457,8 @@
     <div class="hero-box">
       <h2>Welcome to the Agent Hub</h2>
       <p>
-        This is your central access point for agent-facing tools, including the Sales Coach,
-        Content Engine, Bundle Options Tool, Coverage Comparison Tool, and Retirement Budget Tool.
-        Leads and pipeline remain managed through AgencyBloc.
+        This is your central access point for agent-facing tools, calculators, updates, leaderboard visibility,
+        and operational support. Leads and pipeline remain managed through AgencyBloc.
       </p>
     </div>
   </div>
@@ -483,16 +551,42 @@
     </div>
   </div>
 
-  <div class="section" id="announcements">
+  <div class="section" id="updates">
     <div class="section-header">
       <div>
-        <h3>Announcements</h3>
-        <p>Carrier updates, deadlines, and weekly priorities</p>
+        <h3>Updates Feed</h3>
+        <p>Announcements, carrier updates, training reminders, and weekly priorities</p>
       </div>
     </div>
 
-    <div id="announcement-list" class="announcement-list">
-      <div class="announcement-empty">Loading announcements...</div>
+    <div id="feed-list" class="feed-list">
+      <div class="empty-state">Loading updates...</div>
+    </div>
+  </div>
+
+  <div class="section" id="leaderboard">
+    <div class="section-header">
+      <div>
+        <h3>Leaderboard</h3>
+        <p>Ranked by production first</p>
+      </div>
+    </div>
+
+    <div class="leaderboard-wrap">
+      <div id="leaderboard-table">
+        <div class="empty-state">Loading leaderboard...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="operations-ai">
+    <div class="ops-box">
+      <h3>Operations Assistant</h3>
+      <p>
+        Use the Operations Assistant for internal support on macros, certifications, onboarding, reporting,
+        AgencyBloc workflows, and other operational questions.
+      </p>
+      <a class="ops-btn" href="#" target="_blank" rel="noopener noreferrer">Open Operations Assistant</a>
     </div>
   </div>
 
@@ -504,47 +598,107 @@
   </div>
 
   <script>
-    async function loadAnnouncements() {
-      const container = document.getElementById('announcement-list');
+    const DATA_URL = 'https://script.google.com/macros/s/AKfycbz6ZQm5QdcvIaqPiCRt-fTvpn65m9SzCHZrEeK16m61wIJeIO6G0Q5HfpqhIQK2RbpEkg/exec';
 
+    async function loadDashboardData() {
       try {
-        const response = await fetch('./announcements.json?v=' + new Date().getTime());
-        if (!response.ok) throw new Error('Could not load announcements.json');
+        const response = await fetch(DATA_URL + '?t=' + Date.now());
+        if (!response.ok) throw new Error('Could not load dashboard data');
 
         const data = await response.json();
-        let items = Array.isArray(data.announcements) ? data.announcements : [];
-
-        items.sort((a, b) => {
-          const dateA = new Date(a.date || 0).getTime();
-          const dateB = new Date(b.date || 0).getTime();
-          return dateB - dateA;
-        });
-
-        if (!items.length) {
-          container.innerHTML = '<div class="announcement-empty">No announcements posted right now.</div>';
-          return;
-        }
-
-        container.innerHTML = items.map(item => `
-          <div class="announcement-card">
-            <div class="announcement-type">${escapeHtml(item.type || 'Update')}</div>
-            <h5>${escapeHtml(item.title || 'Announcement')}</h5>
-            <p>${escapeHtml(item.message || '')}</p>
-            ${item.buttonText && item.buttonUrl ? `
-              <a class="announcement-btn" href="${escapeAttribute(item.buttonUrl)}" target="_blank" rel="noopener noreferrer">
-                ${escapeHtml(item.buttonText)}
-              </a>
-            ` : ''}
-            <div class="announcement-meta">
-              ${item.date ? `<strong>Date:</strong> ${escapeHtml(item.date)}` : ''}
-              ${item.priority ? `${item.date ? '<br>' : ''}<strong>Priority:</strong> ${escapeHtml(item.priority)}` : ''}
-            </div>
-          </div>
-        `).join('');
+        renderFeed(data.feed || []);
+        renderLeaderboard(data.leaderboard || []);
       } catch (error) {
-        container.innerHTML = '<div class="announcement-empty">Announcements could not be loaded. Check announcements.json.</div>';
+        document.getElementById('feed-list').innerHTML =
+          '<div class="empty-state">Updates could not be loaded. Check the Google Apps Script feed.</div>';
+
+        document.getElementById('leaderboard-table').innerHTML =
+          '<div class="empty-state">Leaderboard could not be loaded. Check the Google Apps Script feed.</div>';
+
         console.error(error);
       }
+    }
+
+    function renderFeed(items) {
+      const container = document.getElementById('feed-list');
+
+      items.sort((a, b) => {
+        const dateA = new Date(a.Date || 0).getTime();
+        const dateB = new Date(b.Date || 0).getTime();
+        return dateB - dateA;
+      });
+
+      if (!items.length) {
+        container.innerHTML = '<div class="empty-state">No updates posted right now.</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="feed-card">
+          <div class="feed-type">${escapeHtml(item.Type || 'Update')}</div>
+          <h5>${escapeHtml(item.Title || 'Untitled')}</h5>
+          <p>${escapeHtml(item.Message || '')}</p>
+          ${item.ButtonText && item.ButtonURL ? `
+            <a class="feed-btn" href="${escapeAttribute(item.ButtonURL)}" target="_blank" rel="noopener noreferrer">
+              ${escapeHtml(item.ButtonText)}
+            </a>
+          ` : ''}
+          <div class="feed-meta">
+            ${item.Date ? `<strong>Date:</strong> ${escapeHtml(item.Date)}` : ''}
+            ${item.Priority ? `${item.Date ? '<br>' : ''}<strong>Priority:</strong> ${escapeHtml(item.Priority)}` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderLeaderboard(items) {
+      const container = document.getElementById('leaderboard-table');
+
+      items.sort((a, b) => Number(b.Production || 0) - Number(a.Production || 0));
+
+      if (!items.length) {
+        container.innerHTML = '<div class="empty-state">No leaderboard data available.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Agent</th>
+              <th>Production</th>
+              <th>Policies</th>
+              <th>Apps</th>
+              <th>Appointments</th>
+              <th>Month</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((item, index) => `
+              <tr>
+                <td>${escapeHtml(item.Rank || String(index + 1))}</td>
+                <td>${escapeHtml(item.AgentName || '')}</td>
+                <td>${formatCurrency(item.Production)}</td>
+                <td>${formatNumber(item.Policies)}</td>
+                <td>${formatNumber(item.AppsSubmitted)}</td>
+                <td>${formatNumber(item.Appointments)}</td>
+                <td>${escapeHtml(item.Month || '')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function formatCurrency(value) {
+      const num = Number(value || 0);
+      return '$' + num.toLocaleString();
+    }
+
+    function formatNumber(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString();
     }
 
     function escapeHtml(str) {
@@ -562,7 +716,7 @@
         .replace(/'/g, '&#039;');
     }
 
-    loadAnnouncements();
+    loadDashboardData();
   </script>
 
 </body>
