@@ -129,7 +129,7 @@
       color:var(--muted);
       font-size:16px;
       line-height:1.65;
-      max-width:900px;
+      max-width:920px;
     }
 
     .section{
@@ -438,12 +438,13 @@
         <img src="./medi-solutions-logo.png" alt="Medi-Solutions Logo" class="logo">
         <div class="brand-text">
           <h1>Medi-Solutions Agent Hub</h1>
-          <p>Agent tools, calculators, and resources</p>
+          <p>Agent tools, calculators, libraries, and resources</p>
         </div>
       </div>
 
       <div class="nav">
         <a href="#agent-tools">Agent Tools</a>
+        <a href="#libraries">Libraries</a>
         <a href="#calculators">Calculators</a>
         <a href="#updates">Updates</a>
         <a href="#leaderboard">Leaderboard</a>
@@ -457,8 +458,8 @@
     <div class="hero-box">
       <h2>Welcome to the Agent Hub</h2>
       <p>
-        This is your central access point for agent-facing tools, calculators, updates, leaderboard visibility,
-        and operational support. Leads and pipeline remain managed through AgencyBloc.
+        This is your central access point for agent-facing tools, searchable libraries, calculators,
+        updates, leaderboard visibility, and operational support. Leads and pipeline remain managed through AgencyBloc.
       </p>
     </div>
   </div>
@@ -484,6 +485,38 @@
         <h4>Content Engine</h4>
         <p>Create marketing content for social media, follow-up, and outreach.</p>
         <span class="tag">Marketing</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section" id="libraries">
+    <div class="section-header">
+      <div>
+        <h3>Agent Libraries</h3>
+        <p>Searchable knowledge tools for acronyms, hooks, and quick sales language</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <a class="card" href="tools/acronyms-library/">
+        <div class="icon">📚</div>
+        <h4>Insurance Acronyms Library</h4>
+        <p>Quick lookup for Medicare, life, annuity, and group insurance terminology.</p>
+        <span class="tag">Reference</span>
+      </a>
+
+      <a class="card" href="tools/hook-library/">
+        <div class="icon">🎣</div>
+        <h4>Content Hook Library</h4>
+        <p>Copy-and-paste hooks for Medicare, life, annuity, and retirement content.</p>
+        <span class="tag">Content</span>
+      </a>
+
+      <a class="card" href="tools/sales-one-liners/">
+        <div class="icon">⚡</div>
+        <h4>Sales One-Liners</h4>
+        <p>Catchy, practical one-liners organized by call stage and sales situation.</p>
+        <span class="tag">Calls</span>
       </a>
     </div>
   </div>
@@ -583,17 +616,17 @@
     <div class="ops-box">
       <h3>Operations Assistant</h3>
       <p>
-        Use the Operations Assistant for internal support on macros, certifications, onboarding, reporting,
-        AgencyBloc workflows, and other operational questions.
+        Use the Operations Assistant for internal support on macros, certifications, onboarding,
+        reporting, AgencyBloc workflows, and other operational questions.
       </p>
-      <a class="ops-btn" href="https://chatgpt.com/g/g-69aa068b2ebc81918af964227531aa5c-agency-operations-assistant" target="_blank" rel="noopener noreferrer">Open Operations Assistant</a>
+      <a class="ops-btn" href="#" target="_blank" rel="noopener noreferrer">Open Operations Assistant</a>
     </div>
   </div>
 
   <div class="footer">
     <div class="footer-inner">
       <strong>Medi-Solutions Agent Hub</strong><br>
-      Internal resource center for agent tools and planning calculators.
+      Internal resource center for agent tools, libraries, and planning calculators.
     </div>
   </div>
 
@@ -610,10 +643,10 @@
         renderLeaderboard(data.leaderboard || []);
       } catch (error) {
         document.getElementById('feed-list').innerHTML =
-          '<div class="empty-state">Updates could not be loaded. Check the Google Apps Script feed.</div>';
+          '<div class="empty-state">Updates could not be loaded. Check the Google feed or your published data source.</div>';
 
         document.getElementById('leaderboard-table').innerHTML =
-          '<div class="empty-state">Leaderboard could not be loaded. Check the Google Apps Script feed.</div>';
+          '<div class="empty-state">Leaderboard could not be loaded. Check the Google feed or your published data source.</div>';
 
         console.error(error);
       }
