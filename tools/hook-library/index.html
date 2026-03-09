@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Hook Library</title>
+  <style>
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f4f7fb;
+      margin:0;
+      padding:30px;
+      color:#1f2937;
+    }
+    .wrap{
+      max-width:1000px;
+      margin:0 auto;
+    }
+    h1{
+      color:#0A4DA2;
+      margin-bottom:10px;
+    }
+    p{
+      color:#6b7280;
+      margin-bottom:20px;
+    }
+    input{
+      width:100%;
+      padding:14px;
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      margin-bottom:20px;
+      font-size:16px;
+    }
+    .hook{
+      background:white;
+      padding:16px;
+      border-radius:12px;
+      margin-bottom:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+    }
+    .hook strong{
+      color:#083b7d;
+      display:block;
+      margin-bottom:6px;
+    }
+    .back{
+      display:inline-block;
+      margin-bottom:20px;
+      color:#0A4DA2;
+      text-decoration:none;
+      font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../../index.html">← Back to Agent Hub</a>
+    <h1>Content Hook Library</h1>
+    <p>Search hooks for Medicare, life insurance, annuities, retirement, and general insurance content.</p>
+
+    <input type="text" id="search" placeholder="Search hooks by topic or keyword..." onkeyup="searchHooks()">
+
+    <div id="hooks">
+      <div class="hook"><strong>Curiosity Hook</strong>Nobody explained this part of Medicare to me.</div>
+      <div class="hook"><strong>Curiosity Hook</strong>This Medicare rule surprises almost everyone.</div>
+      <div class="hook"><strong>Fear Hook</strong>This Medicare mistake can cost retirees thousands.</div>
+      <div class="hook"><strong>Question Hook</strong>Turning 65 and still working?</div>
+      <div class="hook"><strong>Question Hook</strong>Do you need Medicare if you have employer coverage?</div>
+      <div class="hook"><strong>Authority Hook</strong>After helping hundreds of retirees, here’s what I see most.</div>
+      <div class="hook"><strong>Local Hook</strong>If you live in New Jersey and are turning 65, watch this.</div>
+      <div class="hook"><strong>Life Insurance Hook</strong>Most families don’t realize how little life insurance they actually have.</div>
+      <div class="hook"><strong>Life Insurance Hook</strong>This is why waiting on life insurance gets expensive fast.</div>
+      <div class="hook"><strong>Annuity Hook</strong>Most people misunderstand what an annuity is supposed to do.</div>
+      <div class="hook"><strong>Annuity Hook</strong>If you want protected income, start with this question.</div>
+      <div class="hook"><strong>Retirement Hook</strong>The biggest retirement budgeting mistake has nothing to do with investments.</div>
+      <div class="hook"><strong>Retirement Hook</strong>Most retirees underestimate healthcare costs. Here’s why.</div>
+      <div class="hook"><strong>Short-Form Video Hook</strong>Here’s what most people miss in the first 60 seconds of a Medicare conversation.</div>
+      <div class="hook"><strong>Short-Form Video Hook</strong>Before you enroll in Medicare, know this first.</div>
+      <div class="hook"><strong>Short-Form Video Hook</strong>Here’s the part of Medicare no one explained clearly.</div>
+    </div>
+  </div>
+
+  <script>
+    function searchHooks(){
+      let input = document.getElementById("search").value.toLowerCase();
+      let hooks = document.getElementsByClassName("hook");
+
+      for(let i = 0; i < hooks.length; i++){
+        if(hooks[i].innerText.toLowerCase().includes(input)){
+          hooks[i].style.display = "block";
+        } else {
+          hooks[i].style.display = "none";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
