@@ -20,13 +20,8 @@
       --radius:18px;
     }
 
-    *{
-      box-sizing:border-box;
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
 
     body{
       margin:0;
@@ -312,6 +307,25 @@
       color:var(--muted);
       border-top:1px solid var(--border);
       padding-top:10px;
+      margin-top:10px;
+    }
+
+    .announcement-btn{
+      display:inline-block;
+      margin-top:12px;
+      padding:10px 14px;
+      border-radius:12px;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:700;
+      background:var(--primary);
+      color:#fff;
+      transition:0.2s ease;
+    }
+
+    .announcement-btn:hover{
+      background:var(--primary-dark);
+      transform:translateY(-1px);
     }
 
     .announcement-empty{
@@ -338,34 +352,13 @@
     }
 
     @media (max-width: 760px){
-      .topbar-inner{
-        align-items:flex-start;
-      }
-
-      .brand{
-        align-items:flex-start;
-      }
-
-      .logo{
-        height:48px;
-        max-width:140px;
-      }
-
-      .brand-text h1{
-        font-size:20px;
-      }
-
-      .hero-box{
-        padding:22px;
-      }
-
-      .hero-box h2{
-        font-size:24px;
-      }
-
-      .nav{
-        width:100%;
-      }
+      .topbar-inner{align-items:flex-start}
+      .brand{align-items:flex-start}
+      .logo{height:48px;max-width:140px}
+      .brand-text h1{font-size:20px}
+      .hero-box{padding:22px}
+      .hero-box h2{font-size:24px}
+      .nav{width:100%}
     }
   </style>
 </head>
@@ -516,12 +509,16 @@
 
       try {
         const response = await fetch('./announcements.json?v=' + new Date().getTime());
-        if (!response.ok) {
-          throw new Error('Could not load announcements.json');
-        }
+        if (!response.ok) throw new Error('Could not load announcements.json');
 
         const data = await response.json();
-        const items = Array.isArray(data.announcements) ? data.announcements : [];
+        let items = Array.isArray(data.announcements) ? data.announcements : [];
+
+        items.sort((a, b) => {
+          const dateA = new Date(a.date || 0).getTime();
+          const dateB = new Date(b.date || 0).getTime();
+          return dateB - dateA;
+        });
 
         if (!items.length) {
           container.innerHTML = '<div class="announcement-empty">No announcements posted right now.</div>';
@@ -533,6 +530,11 @@
             <div class="announcement-type">${escapeHtml(item.type || 'Update')}</div>
             <h5>${escapeHtml(item.title || 'Announcement')}</h5>
             <p>${escapeHtml(item.message || '')}</p>
+            ${item.buttonText && item.buttonUrl ? `
+              <a class="announcement-btn" href="${escapeAttribute(item.buttonUrl)}" target="_blank" rel="noopener noreferrer">
+                ${escapeHtml(item.buttonText)}
+              </a>
+            ` : ''}
             <div class="announcement-meta">
               ${item.date ? `<strong>Date:</strong> ${escapeHtml(item.date)}` : ''}
               ${item.priority ? `${item.date ? '<br>' : ''}<strong>Priority:</strong> ${escapeHtml(item.priority)}` : ''}
@@ -550,6 +552,12 @@
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttribute(str) {
+      return String(str)
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
