@@ -1,115 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Medi-Solutions Agent Hub</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medi-Solutions Agent Hub</title>
+  <style>
+    :root{
+      --primary:#0A4DA2;
+      --primary-dark:#083b7d;
+      --accent:#dbeafe;
+      --gold:#d4af37;
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow:0 10px 30px rgba(0,0,0,0.08);
+      --radius:18px;
+    }
 
-<style>
+    *{
+      box-sizing:border-box;
+    }
 
-body{
-    font-family: Arial, Helvetica, sans-serif;
-    background:#f4f7fb;
-    margin:0;
-    padding:0;
-}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-.header{
-    background:#0A4DA2;
-    color:white;
-    padding:25px;
-    text-align:center;
-}
+    .topbar{
+      background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+      color:#fff;
+      padding:14px 24px;
+      position:sticky;
+      top:0;
+      z-index:100;
+      box-shadow:0 4px 18px rgba(0,0,0,0.12);
+    }
 
-.header img{
-    height:60px;
-    margin-bottom:10px;
-}
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+    }
 
-.container{
-    max-width:1000px;
-    margin:40px auto;
-    padding:20px;
-}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-}
+    .logo{
+      height:54px;
+      width:auto;
+      background:#fff;
+      border-radius:12px;
+      padding:6px;
+      object-fit:contain;
+      box-shadow:0 4px 14px rgba(0,0,0,0.15);
+    }
 
-.card{
-    background:white;
-    padding:25px;
-    border-radius:10px;
-    text-decoration:none;
-    color:#222;
-    box-shadow:0 4px 10px rgba(0,0,0,0.08);
-    transition:0.2s;
-}
+    .brand-text h1{
+      margin:0;
+      font-size:24px;
+      line-height:1.1;
+    }
 
-.card:hover{
-    transform:translateY(-4px);
-    box-shadow:0 10px 20px rgba(0,0,0,0.12);
-}
+    .brand-text p{
+      margin:4px 0 0;
+      color:#dbeafe;
+      font-size:14px;
+    }
 
-.title{
-    font-size:18px;
-    font-weight:bold;
-}
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.desc{
-    font-size:14px;
-    margin-top:8px;
-    color:#555;
-}
+    .nav a{
+      color:#fff;
+      text-decoration:none;
+      padding:10px 14px;
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:12px;
+      font-size:14px;
+      font-weight:600;
+      transition:0.2s ease;
+      background:rgba(255,255,255,0.08);
+    }
 
-</style>
+    .nav a:hover{
+      background:rgba(255,255,255,0.18);
+      transform:translateY(-1px);
+    }
+
+    .hero{
+      max-width:1200px;
+      margin:32px auto 24px;
+      padding:0 20px;
+    }
+
+    .hero-box{
+      background:linear-gradient(135deg,#ffffff,#eff6ff);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:30px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero-box h2{
+      margin:0 0 10px;
+      font-size:30px;
+      color:var(--primary-dark);
+    }
+
+    .hero-box p{
+      margin:0;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.6;
+      max-width:850px;
+    }
+
+    .section{
+      max-width:1200px;
+      margin:0 auto 40px;
+      padding:0 20px;
+    }
+
+    .section-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .section-header h3{
+      margin:0;
+      font-size:22px;
+      color:var(--primary-dark);
+    }
+
+    .section-header p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:20px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:22px;
+      text-decoration:none;
+      color:inherit;
+      box-shadow:var(--shadow);
+      transition:0.22s ease;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 16px 36px rgba(0,0,0,0.12);
+      border-color:#cbd5e1;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:6px;
+      background:linear-gradient(90deg,var(--primary),var(--gold));
+    }
+
+    .icon{
+      font-size:34px;
+      margin-bottom:12px;
+    }
+
+    .card h4{
+      margin:0 0 8px;
+      font-size:19px;
+      color:var(--text);
+    }
+
+    .card p{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--accent);
+      color:var(--primary-dark);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .quick-links{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:16px;
+      margin-top:14px;
+    }
+
+    .mini-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    .mini-card h5{
+      margin:0 0 8px;
+      font-size:16px;
+      color:var(--primary-dark);
+    }
+
+    .mini-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .footer{
+      background:#ffffff;
+      border-top:1px solid var(--border);
+      padding:24px 20px;
+      margin-top:40px;
+    }
+
+    .footer-inner{
+      max-width:1200px;
+      margin:0 auto;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    @media (max-width: 700px){
+      .brand{
+        align-items:flex-start;
+      }
+
+      .logo{
+        height:46px;
+      }
+
+      .brand-text h1{
+        font-size:20px;
+      }
+
+      .hero-box{
+        padding:22px;
+      }
+
+      .hero-box h2{
+        font-size:24px;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="header">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="./medi-solutions-logo.png" alt="Medi-Solutions Logo" class="logo">
+        <div class="brand-text">
+          <h1>Medi-Solutions Agent Hub</h1>
+          <p>Agent tools, calculators, and resources</p>
+        </div>
+      </div>
 
-<img src="medi-solutions-logo.png" alt="Medi-Solutions">
+      <div class="nav">
+        <a href="#agent-tools">Agent Tools</a>
+        <a href="#calculators">Calculators</a>
+        <a href="https://www.agencybloc.com/" target="_blank">AgencyBloc</a>
+      </div>
+    </div>
+  </div>
 
-<h1>Medi-Solutions Agent Hub</h1>
-<p>Agent Tools & Resources</p>
+  <div class="hero">
+    <div class="hero-box">
+      <h2>Welcome to the Agent Hub</h2>
+      <p>
+        This is your central access point for agent-facing tools, including the Sales Coach,
+        Content Engine, Bundle Options Tool, Coverage Comparison Tool, and Retirement Budget Tool.
+        Leads and pipeline remain managed through AgencyBloc.
+      </p>
+    </div>
+  </div>
 
-</div>
+  <div class="section" id="agent-tools">
+    <div class="section-header">
+      <div>
+        <h3>Agent Tools</h3>
+        <p>Coaching and marketing resources for agents</p>
+      </div>
+    </div>
 
-<div class="container">
+    <div class="grid">
+      <a class="card" href="tools/ai-suite/sales-coach.html">
+        <div class="icon">🎯</div>
+        <h4>Sales Coach</h4>
+        <p>Practice objections, sharpen scripts, and improve call flow.</p>
+        <span class="tag">Coaching</span>
+      </a>
 
-<div class="grid">
+      <a class="card" href="tools/ai-suite/content-engine.html">
+        <div class="icon">📝</div>
+        <h4>Content Engine</h4>
+        <p>Create marketing content for social media, follow-up, and outreach.</p>
+        <span class="tag">Marketing</span>
+      </a>
+    </div>
+  </div>
 
-<a class="card" href="tools/ai-suite/sales-coach.html">
-<div class="title">Sales Coach</div>
-<div class="desc">Practice objections, scripts, and call flows.</div>
-</a>
+  <div class="section" id="calculators">
+    <div class="section-header">
+      <div>
+        <h3>Calculators & Client Tools</h3>
+        <p>Quick-access planning and comparison tools</p>
+      </div>
+    </div>
 
-<a class="card" href="tools/ai-suite/content-engine.html">
-<div class="title">Content Engine</div>
-<div class="desc">Generate social media posts and marketing content.</div>
-</a>
+    <div class="grid">
+      <a class="card" href="tools/bundle-options/">
+        <div class="icon">📦</div>
+        <h4>Bundle Options Tool</h4>
+        <p>Create bundled coverage scenarios and review option groupings.</p>
+        <span class="tag">Quoting</span>
+      </a>
 
-<a class="card" href="tools/bundle-options/">
-<div class="title">Bundle Options Tool</div>
-<div class="desc">Create bundled coverage scenarios.</div>
-</a>
+      <a class="card" href="tools/comparison/">
+        <div class="icon">⚖️</div>
+        <h4>Coverage Comparison Tool</h4>
+        <p>Compare Medicare against employer or workplace coverage options.</p>
+        <span class="tag">Comparison</span>
+      </a>
 
-<a class="card" href="tools/comparison/">
-<div class="title">Coverage Comparison Tool</div>
-<div class="desc">Compare Medicare vs workplace coverage.</div>
-</a>
+      <a class="card" href="tools/retirement-budget/">
+        <div class="icon">💰</div>
+        <h4>Retirement Budget Tool</h4>
+        <p>Help clients estimate retirement income and expenses clearly.</p>
+        <span class="tag">Planning</span>
+      </a>
+    </div>
+  </div>
 
-<a class="card" href="tools/retirement-budget/">
-<div class="title">Retirement Budget Tool</div>
-<div class="desc">Help clients plan retirement income and expenses.</div>
-</a>
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <h3>Quick Access</h3>
+        <p>Common destinations agents may need</p>
+      </div>
+    </div>
 
-</div>
+    <div class="quick-links">
+      <div class="mini-card">
+        <h5>AgencyBloc</h5>
+        <p>Use AgencyBloc for CRM activity, lead tracking, and pipeline management.</p>
+      </div>
 
-</div>
+      <div class="mini-card">
+        <h5>Client Education</h5>
+        <p>Use calculators and comparison tools to simplify conversations and build trust.</p>
+      </div>
+
+      <div class="mini-card">
+        <h5>Marketing Support</h5>
+        <p>Use the Content Engine to create posts, captions, and outreach ideas quickly.</p>
+      </div>
+
+      <div class="mini-card">
+        <h5>Sales Readiness</h5>
+        <p>Use the Sales Coach to practice handling objections and improve consistency.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-inner">
+      <strong>Medi-Solutions Agent Hub</strong><br>
+      Internal resource center for agent tools and planning calculators.
+    </div>
+  </div>
 
 </body>
 </html>
