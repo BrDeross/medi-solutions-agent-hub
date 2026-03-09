@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales One-Liners</title>
+  <style>
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f4f7fb;
+      margin:0;
+      padding:30px;
+      color:#1f2937;
+    }
+    .wrap{
+      max-width:1000px;
+      margin:0 auto;
+    }
+    h1{
+      color:#0A4DA2;
+      margin-bottom:10px;
+    }
+    p{
+      color:#6b7280;
+      margin-bottom:20px;
+    }
+    input{
+      width:100%;
+      padding:14px;
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      margin-bottom:20px;
+      font-size:16px;
+    }
+    .line{
+      background:white;
+      padding:16px;
+      border-radius:12px;
+      margin-bottom:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+    }
+    .line strong{
+      color:#083b7d;
+      display:block;
+      margin-bottom:6px;
+    }
+    .back{
+      display:inline-block;
+      margin-bottom:20px;
+      color:#0A4DA2;
+      text-decoration:none;
+      font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../../index.html">← Back to Agent Hub</a>
+    <h1>Sales One-Liners</h1>
+    <p>Search quick lines by opening, discovery, objection, positioning, and close.</p>
+
+    <input type="text" id="search" placeholder="Search by call stage or phrase..." onkeyup="searchLines()">
+
+    <div id="lines">
+      <div class="line"><strong>Opening</strong>Most people I speak with just want clarity.</div>
+      <div class="line"><strong>Opening</strong>My job is simply to help you understand your options.</div>
+      <div class="line"><strong>Discovery</strong>Let me ask one quick question so I point you in the right direction.</div>
+      <div class="line"><strong>Discovery</strong>This only takes a minute to narrow down.</div>
+      <div class="line"><strong>Positioning</strong>There’s no one-size-fits-all Medicare plan.</div>
+      <div class="line"><strong>Positioning</strong>The right recommendation depends on your situation, not a generic answer.</div>
+      <div class="line"><strong>Objection</strong>Totally fair question — a lot of people ask that.</div>
+      <div class="line"><strong>Objection</strong>That’s exactly why it helps to look at this side-by-side.</div>
+      <div class="line"><strong>Objection</strong>Most people are surprised when they see how this actually works.</div>
+      <div class="line"><strong>Trust Builder</strong>There’s no obligation here — just clarity.</div>
+      <div class="line"><strong>Trust Builder</strong>I’d rather you understand it clearly than rush into the wrong decision.</div>
+      <div class="line"><strong>Transition</strong>Here’s the part most people care about.</div>
+      <div class="line"><strong>Transition</strong>Let’s take a quick look at how this affects you personally.</div>
+      <div class="line"><strong>Close</strong>If you'd like, we can review your situation together.</div>
+      <div class="line"><strong>Close</strong>It takes about 10 minutes to confirm everything.</div>
+      <div class="line"><strong>Close</strong>The next best step is just to verify the details and make sure nothing gets missed.</div>
+    </div>
+  </div>
+
+  <script>
+    function searchLines(){
+      let input = document.getElementById("search").value.toLowerCase();
+      let lines = document.getElementsByClassName("line");
+
+      for(let i = 0; i < lines.length; i++){
+        if(lines[i].innerText.toLowerCase().includes(input)){
+          lines[i].style.display = "block";
+        } else {
+          lines[i].style.display = "none";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
