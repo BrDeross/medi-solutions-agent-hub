@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insurance Acronyms Library</title>
+  <style>
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f4f7fb;
+      margin:0;
+      padding:30px;
+      color:#1f2937;
+    }
+    .wrap{
+      max-width:1000px;
+      margin:0 auto;
+    }
+    h1{
+      color:#0A4DA2;
+      margin-bottom:10px;
+    }
+    p{
+      color:#6b7280;
+      margin-bottom:20px;
+    }
+    input{
+      width:100%;
+      padding:14px;
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      margin-bottom:20px;
+      font-size:16px;
+    }
+    .term{
+      background:white;
+      padding:16px;
+      border-radius:12px;
+      margin-bottom:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+    }
+    .term strong{
+      font-size:18px;
+      color:#083b7d;
+    }
+    .back{
+      display:inline-block;
+      margin-bottom:20px;
+      color:#0A4DA2;
+      text-decoration:none;
+      font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../../index.html">← Back to Agent Hub</a>
+    <h1>Insurance Acronyms Library</h1>
+    <p>Search Medicare, life insurance, annuity, and group insurance acronyms.</p>
+
+    <input type="text" id="search" placeholder="Search acronym or keyword..." onkeyup="searchTerms()">
+
+    <div id="terms">
+      <div class="term"><strong>AEP</strong><br>Annual Election Period — Oct 15 to Dec 7 Medicare plan change window.</div>
+      <div class="term"><strong>IEP</strong><br>Initial Enrollment Period — 7-month window around turning 65.</div>
+      <div class="term"><strong>SEP</strong><br>Special Enrollment Period — triggered by qualifying life events.</div>
+      <div class="term"><strong>IRMAA</strong><br>Income Related Monthly Adjustment Amount — income-based Medicare premium surcharge.</div>
+      <div class="term"><strong>LIS</strong><br>Low Income Subsidy — extra help for Part D drug costs.</div>
+      <div class="term"><strong>MOOP</strong><br>Maximum Out of Pocket — spending cap on Medicare Advantage plans.</div>
+      <div class="term"><strong>PDP</strong><br>Prescription Drug Plan — stand-alone Medicare Part D drug coverage.</div>
+      <div class="term"><strong>MAPD</strong><br>Medicare Advantage Prescription Drug plan.</div>
+      <div class="term"><strong>SNP</strong><br>Special Needs Plan — Medicare Advantage plan for certain groups.</div>
+      <div class="term"><strong>HMO</strong><br>Health Maintenance Organization.</div>
+      <div class="term"><strong>PPO</strong><br>Preferred Provider Organization.</div>
+      <div class="term"><strong>WL</strong><br>Whole Life insurance.</div>
+      <div class="term"><strong>UL</strong><br>Universal Life insurance.</div>
+      <div class="term"><strong>IUL</strong><br>Indexed Universal Life insurance.</div>
+      <div class="term"><strong>VUL</strong><br>Variable Universal Life insurance.</div>
+      <div class="term"><strong>AD&D</strong><br>Accidental Death and Dismemberment insurance.</div>
+      <div class="term"><strong>ROP</strong><br>Return of Premium.</div>
+      <div class="term"><strong>FIA</strong><br>Fixed Indexed Annuity.</div>
+      <div class="term"><strong>MYGA</strong><br>Multi-Year Guaranteed Annuity.</div>
+      <div class="term"><strong>SPIA</strong><br>Single Premium Immediate Annuity.</div>
+      <div class="term"><strong>DIA</strong><br>Deferred Income Annuity.</div>
+      <div class="term"><strong>RMD</strong><br>Required Minimum Distribution.</div>
+      <div class="term"><strong>ACA</strong><br>Affordable Care Act.</div>
+      <div class="term"><strong>MEC</strong><br>Minimum Essential Coverage.</div>
+      <div class="term"><strong>SBC</strong><br>Summary of Benefits and Coverage.</div>
+      <div class="term"><strong>ERISA</strong><br>Employee Retirement Income Security Act.</div>
+      <div class="term"><strong>FPL</strong><br>Federal Poverty Level.</div>
+    </div>
+  </div>
+
+  <script>
+    function searchTerms(){
+      let input = document.getElementById("search").value.toLowerCase();
+      let terms = document.getElementsByClassName("term");
+
+      for(let i = 0; i < terms.length; i++){
+        if(terms[i].innerText.toLowerCase().includes(input)){
+          terms[i].style.display = "block";
+        } else {
+          terms[i].style.display = "none";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
