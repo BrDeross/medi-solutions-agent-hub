@@ -5,79 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Content Hook Library</title>
   <style>
-    body{
-      font-family:Arial, Helvetica, sans-serif;
-      background:#f4f7fb;
-      margin:0;
-      padding:30px;
-      color:#1f2937;
-    }
-    .wrap{
-      max-width:1000px;
-      margin:0 auto;
-    }
-    h1{
-      color:#0A4DA2;
-      margin-bottom:10px;
-    }
-    p{
-      color:#6b7280;
-      margin-bottom:20px;
-    }
-    input{
-      width:100%;
-      padding:14px;
-      border:1px solid #d1d5db;
-      border-radius:10px;
-      margin-bottom:20px;
-      font-size:16px;
-    }
-    .hook{
-      background:white;
-      padding:16px;
-      border-radius:12px;
-      margin-bottom:12px;
-      box-shadow:0 4px 10px rgba(0,0,0,.08);
-    }
-    .hook strong{
-      color:#083b7d;
-      display:block;
-      margin-bottom:6px;
-    }
-    .back{
-      display:inline-block;
-      margin-bottom:20px;
-      color:#0A4DA2;
-      text-decoration:none;
-      font-weight:bold;
-    }
+    body{font-family:Arial, Helvetica, sans-serif;background:#f4f7fb;margin:0;padding:30px;color:#1f2937}
+    .wrap{max-width:1100px;margin:0 auto}
+    h1{color:#0A4DA2;margin-bottom:10px}
+    p{color:#6b7280;margin-bottom:20px;line-height:1.6}
+    input{width:100%;padding:14px;border:1px solid #d1d5db;border-radius:10px;margin-bottom:20px;font-size:16px}
+    .hook{background:white;padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+    .hook strong{color:#083b7d;display:block;margin-bottom:6px}
+    .back{display:inline-block;margin-bottom:20px;color:#0A4DA2;text-decoration:none;font-weight:bold}
   </style>
 </head>
 <body>
   <div class="wrap">
     <a class="back" href="../../index.html">← Back to Agent Hub</a>
     <h1>Content Hook Library</h1>
-    <p>Search hooks for Medicare, life insurance, annuities, retirement, and general insurance content.</p>
+    <p>Search hooks for Medicare, life, annuities, retirement, and insurance content. Built for posts, reels, short-form video, and email subject ideas.</p>
 
     <input type="text" id="search" placeholder="Search hooks by topic or keyword..." onkeyup="searchHooks()">
 
     <div id="hooks">
-      <div class="hook"><strong>Curiosity Hook</strong>Nobody explained this part of Medicare to me.</div>
-      <div class="hook"><strong>Curiosity Hook</strong>This Medicare rule surprises almost everyone.</div>
-      <div class="hook"><strong>Fear Hook</strong>This Medicare mistake can cost retirees thousands.</div>
-      <div class="hook"><strong>Question Hook</strong>Turning 65 and still working?</div>
-      <div class="hook"><strong>Question Hook</strong>Do you need Medicare if you have employer coverage?</div>
-      <div class="hook"><strong>Authority Hook</strong>After helping hundreds of retirees, here’s what I see most.</div>
-      <div class="hook"><strong>Local Hook</strong>If you live in New Jersey and are turning 65, watch this.</div>
-      <div class="hook"><strong>Life Insurance Hook</strong>Most families don’t realize how little life insurance they actually have.</div>
-      <div class="hook"><strong>Life Insurance Hook</strong>This is why waiting on life insurance gets expensive fast.</div>
-      <div class="hook"><strong>Annuity Hook</strong>Most people misunderstand what an annuity is supposed to do.</div>
-      <div class="hook"><strong>Annuity Hook</strong>If you want protected income, start with this question.</div>
-      <div class="hook"><strong>Retirement Hook</strong>The biggest retirement budgeting mistake has nothing to do with investments.</div>
-      <div class="hook"><strong>Retirement Hook</strong>Most retirees underestimate healthcare costs. Here’s why.</div>
-      <div class="hook"><strong>Short-Form Video Hook</strong>Here’s what most people miss in the first 60 seconds of a Medicare conversation.</div>
-      <div class="hook"><strong>Short-Form Video Hook</strong>Before you enroll in Medicare, know this first.</div>
-      <div class="hook"><strong>Short-Form Video Hook</strong>Here’s the part of Medicare no one explained clearly.</div>
+      <div class="hook"><strong>Medicare / Curiosity</strong>Nobody explained this part of Medicare to me.</div>
+      <div class="hook"><strong>Medicare / Curiosity</strong>This Medicare rule surprises almost everyone.</div>
+      <div class="hook"><strong>Medicare / Curiosity</strong>Here’s what most people miss before turning 65.</div>
+      <div class="hook"><strong>Medicare / Fear</strong>This Medicare mistake can cost retirees thousands.</div>
+      <div class="hook"><strong>Medicare / Fear</strong>Don’t enroll in Medicare until you understand this.</div>
+      <div class="hook"><strong>Medicare / Fear</strong>One wrong Medicare decision can follow you for years.</div>
+      <div class="hook"><strong>Medicare / Question</strong>Turning 65 and still working?</div>
+      <div class="hook"><strong>Medicare / Question</strong>Do you need Medicare if you have employer coverage?</div>
+      <div class="hook"><strong>Medicare / Question</strong>Can you delay Medicare without a penalty?</div>
+      <div class="hook"><strong>Medicare / Authority</strong>After helping hundreds of retirees, here’s what I see most.</div>
+      <div class="hook"><strong>Medicare / Authority</strong>Here’s what most people wish they knew before enrolling.</div>
+      <div class="hook"><strong>Medicare / Local</strong>If you live in New Jersey and are turning 65, watch this.</div>
+      <div class="hook"><strong>Medicare / Short Video</strong>Before you enroll in Medicare, know this first.</div>
+      <div class="hook"><strong>Medicare / Short Video</strong>Here’s the part of Medicare no one explained clearly.</div>
+      <div class="hook"><strong>Medicare / Short Video</strong>Here’s what most people get wrong in the first 60 seconds.</div>
+
+      <div class="hook"><strong>Life Insurance / Curiosity</strong>Most families don’t realize how little life insurance they actually have.</div>
+      <div class="hook"><strong>Life Insurance / Curiosity</strong>This is the life insurance question nobody asks soon enough.</div>
+      <div class="hook"><strong>Life Insurance / Fear</strong>Waiting on life insurance usually gets expensive fast.</div>
+      <div class="hook"><strong>Life Insurance / Fear</strong>The worst time to think about life insurance is when you suddenly need it.</div>
+      <div class="hook"><strong>Life Insurance / Question</strong>How much life insurance is actually enough?</div>
+      <div class="hook"><strong>Life Insurance / Authority</strong>Here’s what I look at first when someone asks about life insurance.</div>
+
+      <div class="hook"><strong>Annuity / Curiosity</strong>Most people misunderstand what an annuity is supposed to do.</div>
+      <div class="hook"><strong>Annuity / Curiosity</strong>This is where annuities make more sense than people realize.</div>
+      <div class="hook"><strong>Annuity / Fear</strong>Retirement income gaps are usually bigger than expected.</div>
+      <div class="hook"><strong>Annuity / Question</strong>If you want protected income, start with this question.</div>
+      <div class="hook"><strong>Annuity / Authority</strong>Here’s how I explain annuities without the jargon.</div>
+
+      <div class="hook"><strong>Retirement / Curiosity</strong>The biggest retirement budgeting mistake has nothing to do with investments.</div>
+      <div class="hook"><strong>Retirement / Curiosity</strong>Most retirees underestimate healthcare costs. Here’s why.</div>
+      <div class="hook"><strong>Retirement / Fear</strong>Retirement planning falls apart when people ignore this one category.</div>
+      <div class="hook"><strong>Retirement / Question</strong>Do you know what your retirement will actually cost each month?</div>
+      <div class="hook"><strong>Retirement / Authority</strong>Here’s what I would review before anyone retires.</div>
+
+      <div class="hook"><strong>General Insurance / Question</strong>Are you overinsured, underinsured, or just paying for the wrong thing?</div>
+      <div class="hook"><strong>General Insurance / Curiosity</strong>Here’s what people think insurance does versus what it actually does.</div>
+      <div class="hook"><strong>General Insurance / Authority</strong>If I had to simplify insurance advice into one sentence, it would be this.</div>
     </div>
   </div>
 
