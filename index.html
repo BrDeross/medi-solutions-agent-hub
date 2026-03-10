@@ -1,756 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Medi-Solutions Agent Hub</title>
-  <style>
-    :root{
-      --primary:#0A4DA2;
-      --primary-dark:#083b7d;
-      --primary-light:#eaf3ff;
-      --gold:#d4af37;
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --shadow:0 10px 30px rgba(0,0,0,0.08);
-      --shadow-hover:0 16px 36px rgba(0,0,0,0.14);
-      --radius:18px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medi-Solutions Agent Hub</title>
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+<style>
 
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+:root{
+--primary:#0A4DA2;
+--primary-dark:#083b7d;
+--gold:#d4af37;
+--bg:#f4f7fb;
+--card:#ffffff;
+--text:#1f2937;
+--muted:#6b7280;
+--border:#e5e7eb;
+--shadow:0 10px 30px rgba(0,0,0,0.08);
+}
 
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:100;
-      background:linear-gradient(90deg,var(--primary),var(--primary-dark));
-      box-shadow:0 4px 18px rgba(0,0,0,0.12);
-    }
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:var(--bg);
+color:var(--text);
+}
 
-    .topbar-inner{
-      max-width:1200px;
-      margin:0 auto;
-      padding:14px 20px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:18px;
-      flex-wrap:wrap;
-    }
+.topbar{
+background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+color:white;
+padding:16px 20px;
+}
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      min-width:0;
-    }
+.topbar-inner{
+max-width:1200px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+}
 
-    .logo{
-      height:56px;
-      width:auto;
-      max-width:180px;
-      object-fit:contain;
-      border-radius:12px;
-      background:#fff;
-      padding:6px;
-      box-shadow:0 4px 14px rgba(0,0,0,0.15);
-      display:block;
-    }
+.brand{
+display:flex;
+align-items:center;
+gap:12px;
+}
 
-    .brand-text h1{
-      margin:0;
-      color:#fff;
-      font-size:24px;
-      line-height:1.1;
-    }
+.logo{
+height:50px;
+background:white;
+padding:5px;
+border-radius:8px;
+}
 
-    .brand-text p{
-      margin:4px 0 0;
-      color:#dbeafe;
-      font-size:14px;
-    }
+.nav a{
+color:white;
+margin-left:12px;
+text-decoration:none;
+font-weight:600;
+}
 
-    .nav{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
+.section{
+max-width:1200px;
+margin:auto;
+padding:40px 20px;
+}
 
-    .nav a{
-      color:#fff;
-      text-decoration:none;
-      padding:10px 14px;
-      border:1px solid rgba(255,255,255,0.18);
-      border-radius:12px;
-      font-size:14px;
-      font-weight:600;
-      background:rgba(255,255,255,0.08);
-      transition:0.2s ease;
-    }
+.section h2{
+margin-bottom:20px;
+color:var(--primary-dark);
+}
 
-    .nav a:hover{
-      background:rgba(255,255,255,0.18);
-      transform:translateY(-1px);
-    }
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+}
 
-    .hero{
-      max-width:1200px;
-      margin:30px auto 24px;
-      padding:0 20px;
-    }
+.card{
+background:var(--card);
+padding:22px;
+border-radius:16px;
+box-shadow:var(--shadow);
+text-decoration:none;
+color:inherit;
+transition:.2s;
+border:1px solid var(--border);
+}
 
-    .hero-box{
-      background:linear-gradient(135deg,#ffffff,#eff6ff);
-      border:1px solid var(--border);
-      border-radius:24px;
-      padding:30px;
-      box-shadow:var(--shadow);
-    }
+.card:hover{
+transform:translateY(-4px);
+}
 
-    .hero-box h2{
-      margin:0 0 10px;
-      font-size:30px;
-      color:var(--primary-dark);
-    }
+.icon{
+font-size:32px;
+margin-bottom:10px;
+}
 
-    .hero-box p{
-      margin:0;
-      color:var(--muted);
-      font-size:16px;
-      line-height:1.65;
-      max-width:920px;
-    }
+.card h4{
+margin:0 0 8px;
+}
 
-    .section{
-      max-width:1200px;
-      margin:0 auto 40px;
-      padding:0 20px;
-    }
+.card p{
+margin:0;
+font-size:14px;
+color:var(--muted);
+}
 
-    .section-header{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-    }
+.ops{
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+color:white;
+border-radius:20px;
+padding:30px;
+}
 
-    .section-header h3{
-      margin:0;
-      font-size:24px;
-      color:var(--primary-dark);
-    }
+.ops a{
+display:inline-block;
+margin-top:16px;
+background:white;
+color:var(--primary-dark);
+padding:14px 18px;
+border-radius:12px;
+text-decoration:none;
+font-weight:700;
+}
 
-    .section-header p{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:14px;
-    }
+.footer{
+margin-top:40px;
+padding:20px;
+text-align:center;
+font-size:13px;
+color:var(--muted);
+border-top:1px solid var(--border);
+}
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-      gap:20px;
-    }
-
-    .card{
-      display:block;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:22px;
-      text-decoration:none;
-      color:inherit;
-      box-shadow:var(--shadow);
-      transition:0.22s ease;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .card::before{
-      content:"";
-      position:absolute;
-      top:0;
-      left:0;
-      right:0;
-      height:6px;
-      background:linear-gradient(90deg,var(--primary),var(--gold));
-    }
-
-    .card:hover{
-      transform:translateY(-4px);
-      box-shadow:var(--shadow-hover);
-      border-color:#cbd5e1;
-    }
-
-    .icon{
-      font-size:34px;
-      margin-bottom:12px;
-    }
-
-    .card h4{
-      margin:0 0 8px;
-      font-size:19px;
-      color:var(--text);
-    }
-
-    .card p{
-      margin:0 0 14px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-    }
-
-    .tag{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background:var(--primary-light);
-      color:var(--primary-dark);
-      font-size:12px;
-      font-weight:700;
-    }
-
-    .quick-links{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:16px;
-      margin-top:14px;
-    }
-
-    .mini-card{
-      display:block;
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px;
-      box-shadow:0 6px 16px rgba(0,0,0,0.06);
-      text-decoration:none;
-      color:inherit;
-      transition:0.2s ease;
-    }
-
-    .mini-card:hover{
-      transform:translateY(-3px);
-      box-shadow:0 12px 24px rgba(0,0,0,0.10);
-      border-color:#cbd5e1;
-    }
-
-    .mini-card h5{
-      margin:0 0 8px;
-      font-size:16px;
-      color:var(--primary-dark);
-    }
-
-    .mini-card p{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
-    }
-
-    .feed-list{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-      gap:18px;
-      margin-top:14px;
-    }
-
-    .feed-card{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 8px 18px rgba(0,0,0,0.06);
-    }
-
-    .feed-type{
-      display:inline-block;
-      padding:5px 10px;
-      border-radius:999px;
-      background:var(--primary-light);
-      color:var(--primary-dark);
-      font-size:11px;
-      font-weight:700;
-      margin-bottom:10px;
-      text-transform:uppercase;
-      letter-spacing:0.4px;
-    }
-
-    .feed-card h5{
-      margin:0 0 8px;
-      font-size:17px;
-      color:var(--text);
-    }
-
-    .feed-card p{
-      margin:0 0 10px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-    }
-
-    .feed-meta{
-      font-size:12px;
-      color:var(--muted);
-      border-top:1px solid var(--border);
-      padding-top:10px;
-      margin-top:10px;
-    }
-
-    .feed-btn{
-      display:inline-block;
-      margin-top:12px;
-      padding:10px 14px;
-      border-radius:12px;
-      text-decoration:none;
-      font-size:13px;
-      font-weight:700;
-      background:var(--primary);
-      color:#fff;
-      transition:0.2s ease;
-    }
-
-    .feed-btn:hover{
-      background:var(--primary-dark);
-      transform:translateY(-1px);
-    }
-
-    .empty-state{
-      background:#fff;
-      border:1px dashed var(--border);
-      border-radius:16px;
-      padding:20px;
-      color:var(--muted);
-    }
-
-    .leaderboard-wrap{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:20px;
-      padding:20px;
-      box-shadow:var(--shadow);
-      overflow-x:auto;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-    }
-
-    th, td{
-      text-align:left;
-      padding:12px 10px;
-      border-bottom:1px solid var(--border);
-      font-size:14px;
-    }
-
-    th{
-      color:var(--primary-dark);
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:0.4px;
-    }
-
-    tr:last-child td{
-      border-bottom:none;
-    }
-
-    .ops-box{
-      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-      color:#fff;
-      border-radius:24px;
-      padding:28px;
-      box-shadow:var(--shadow);
-    }
-
-    .ops-box h3{
-      margin:0 0 10px;
-      font-size:28px;
-    }
-
-    .ops-box p{
-      margin:0 0 16px;
-      color:#dbeafe;
-      line-height:1.7;
-      max-width:900px;
-    }
-
-    .ops-btn{
-      display:inline-block;
-      padding:14px 18px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:700;
-      background:#fff;
-      color:var(--primary-dark);
-      transition:0.2s ease;
-    }
-
-    .ops-btn:hover{
-      transform:translateY(-2px);
-      box-shadow:var(--shadow);
-    }
-
-    .footer{
-      background:#ffffff;
-      border-top:1px solid var(--border);
-      padding:24px 20px;
-      margin-top:40px;
-    }
-
-    .footer-inner{
-      max-width:1200px;
-      margin:0 auto;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.6;
-    }
-
-    @media (max-width: 760px){
-      .topbar-inner{align-items:flex-start}
-      .brand{align-items:flex-start}
-      .logo{height:48px;max-width:140px}
-      .brand-text h1{font-size:20px}
-      .hero-box{padding:22px}
-      .hero-box h2{font-size:24px}
-      .nav{width:100%}
-    }
-  </style>
+</style>
 </head>
+
 <body>
 
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <img src="./medi-solutions-logo.png" alt="Medi-Solutions Logo" class="logo">
-        <div class="brand-text">
-          <h1>Medi-Solutions Agent Hub</h1>
-          <p>Agent tools, calculators, libraries, and resources</p>
-        </div>
-      </div>
+<div class="topbar">
+<div class="topbar-inner">
 
-      <div class="nav">
-        <a href="#agent-tools">Agent Tools</a>
-        <a href="#libraries">Libraries</a>
-        <a href="#calculators">Calculators</a>
-        <a href="#updates">Updates</a>
-        <a href="#leaderboard">Leaderboard</a>
-        <a href="#operations-ai">Operations AI</a>
-        <a href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc</a>
-      </div>
-    </div>
-  </div>
+<div class="brand">
+<img src="medi-solutions-logo.png" class="logo">
+<div>
+<strong>Medi-Solutions Agent Hub</strong><br>
+<span style="font-size:13px">Agent tools & resources</span>
+</div>
+</div>
 
-  <div class="hero">
-    <div class="hero-box">
-      <h2>Welcome to the Agent Hub</h2>
-      <p>
-        This is your central access point for agent-facing tools, searchable libraries, calculators,
-        updates, leaderboard visibility, and operational support. Leads and pipeline remain managed through AgencyBloc.
-      </p>
-    </div>
-  </div>
+<div class="nav">
+<a href="#tools">Tools</a>
+<a href="#libraries">Libraries</a>
+<a href="#operations">Operations</a>
+<a href="https://app.agencybloc.com/" target="_blank">AgencyBloc</a>
+</div>
 
-  <div class="section" id="agent-tools">
-    <div class="section-header">
-      <div>
-        <h3>Agent Tools</h3>
-        <p>Coaching and marketing resources for agents</p>
-      </div>
-    </div>
+</div>
+</div>
 
-    <div class="grid">
-      <a class="card" href="tools/ai-suite/sales-coach.html">
-        <div class="icon">🎯</div>
-        <h4>Sales Coach</h4>
-        <p>Practice objections, sharpen scripts, and improve call flow.</p>
-        <span class="tag">Coaching</span>
-      </a>
 
-      <a class="card" href="tools/ai-suite/content-engine.html">
-        <div class="icon">📝</div>
-        <h4>Content Engine</h4>
-        <p>Create marketing content for social media, follow-up, and outreach.</p>
-        <span class="tag">Marketing</span>
-      </a>
-    </div>
-  </div>
+<div class="section" id="tools">
+<h2>Agent Tools</h2>
 
-  <div class="section" id="libraries">
-    <div class="section-header">
-      <div>
-        <h3>Agent Libraries</h3>
-        <p>Searchable knowledge tools for acronyms, hooks, and quick sales language</p>
-      </div>
-    </div>
+<div class="grid">
 
-    <div class="grid">
-      <a class="card" href="tools/acronyms-library/">
-        <div class="icon">📚</div>
-        <h4>Insurance Acronyms Library</h4>
-        <p>Quick lookup for Medicare, life, annuity, and group insurance terminology.</p>
-        <span class="tag">Reference</span>
-      </a>
+<a class="card" href="tools/ai-suite/sales-coach.html">
+<div class="icon">🎯</div>
+<h4>Sales Coach</h4>
+<p>Practice objections and improve call conversations.</p>
+</a>
 
-      <a class="card" href="tools/hook-library/">
-        <div class="icon">🎣</div>
-        <h4>Content Hook Library</h4>
-        <p>Copy-and-paste hooks for Medicare, life, annuity, and retirement content.</p>
-        <span class="tag">Content</span>
-      </a>
+<a class="card" href="tools/ai-suite/content-engine.html">
+<div class="icon">📝</div>
+<h4>Content Engine</h4>
+<p>Create social posts and marketing content.</p>
+</a>
 
-      <a class="card" href="tools/sales-one-liners/">
-        <div class="icon">⚡</div>
-        <h4>Sales One-Liners</h4>
-        <p>Catchy, practical one-liners organized by call stage and sales situation.</p>
-        <span class="tag">Calls</span>
-      </a>
-    </div>
-  </div>
+<a class="card" href="tools/comparison/">
+<div class="icon">⚖️</div>
+<h4>Coverage Comparison</h4>
+<p>Compare Medicare vs employer coverage.</p>
+</a>
 
-  <div class="section" id="calculators">
-    <div class="section-header">
-      <div>
-        <h3>Calculators & Client Tools</h3>
-        <p>Quick-access planning and comparison tools</p>
-      </div>
-    </div>
+<a class="card" href="tools/retirement-budget/">
+<div class="icon">💰</div>
+<h4>Retirement Budget Tool</h4>
+<p>Help clients visualize retirement expenses.</p>
+</a>
 
-    <div class="grid">
-      <a class="card" href="tools/bundle-options/">
-        <div class="icon">📦</div>
-        <h4>Bundle Options Tool</h4>
-        <p>Create bundled coverage scenarios and review option groupings.</p>
-        <span class="tag">Quoting</span>
-      </a>
+</div>
+</div>
 
-      <a class="card" href="tools/comparison/">
-        <div class="icon">⚖️</div>
-        <h4>Coverage Comparison Tool</h4>
-        <p>Compare Medicare against employer or workplace coverage options.</p>
-        <span class="tag">Comparison</span>
-      </a>
 
-      <a class="card" href="tools/retirement-budget/">
-        <div class="icon">💰</div>
-        <h4>Retirement Budget Tool</h4>
-        <p>Help clients estimate retirement income and expenses clearly.</p>
-        <span class="tag">Planning</span>
-      </a>
-    </div>
-  </div>
+<div class="section" id="libraries">
+<h2>Agent Libraries</h2>
 
-  <div class="section" id="quick-access">
-    <div class="section-header">
-      <div>
-        <h3>Quick Access</h3>
-        <p>Common destinations agents may need</p>
-      </div>
-    </div>
+<div class="grid">
 
-    <div class="quick-links">
-      <a class="mini-card" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">
-        <h5>AgencyBloc</h5>
-        <p>Open AgencyBloc for CRM activity, lead tracking, and pipeline management.</p>
-      </a>
+<a class="card" href="tools/acronyms-library/">
+<div class="icon">📚</div>
+<h4>Insurance Acronyms</h4>
+<p>Quick lookup for Medicare and insurance terminology.</p>
+</a>
 
-      <a class="mini-card" href="tools/comparison/">
-        <h5>Client Education</h5>
-        <p>Use comparison tools to simplify conversations and build trust.</p>
-      </a>
+<a class="card" href="tools/hook-library/">
+<div class="icon">🎣</div>
+<h4>Content Hook Library</h4>
+<p>Hooks for social posts and videos.</p>
+</a>
 
-      <a class="mini-card" href="tools/ai-suite/content-engine.html">
-        <h5>Marketing Support</h5>
-        <p>Open the Content Engine to create posts, captions, and outreach ideas quickly.</p>
-      </a>
+<a class="card" href="tools/sales-one-liners/">
+<div class="icon">⚡</div>
+<h4>Sales One-Liners</h4>
+<p>Short phrases that move conversations forward.</p>
+</a>
 
-      <a class="mini-card" href="tools/ai-suite/sales-coach.html">
-        <h5>Sales Readiness</h5>
-        <p>Open Sales Coach to practice objections and improve consistency.</p>
-      </a>
-    </div>
-  </div>
+</div>
+</div>
 
-  <div class="section" id="updates">
-    <div class="section-header">
-      <div>
-        <h3>Updates Feed</h3>
-        <p>Announcements, carrier updates, training reminders, and weekly priorities</p>
-      </div>
-    </div>
 
-    <div id="feed-list" class="feed-list">
-      <div class="empty-state">Loading updates...</div>
-    </div>
-  </div>
+<div class="section" id="operations">
 
-  <div class="section" id="leaderboard">
-    <div class="section-header">
-      <div>
-        <h3>Leaderboard</h3>
-        <p>Ranked by production first</p>
-      </div>
-    </div>
+<div class="ops">
 
-    <div class="leaderboard-wrap">
-      <div id="leaderboard-table">
-        <div class="empty-state">Loading leaderboard...</div>
-      </div>
-    </div>
-  </div>
+<h2>Operations Assistant</h2>
 
-  <div class="section" id="operations-ai">
-    <div class="ops-box">
-      <h3>Operations Assistant</h3>
-      <p>
-        Use the Operations Assistant for internal support on macros, certifications, onboarding,
-        reporting, AgencyBloc workflows, and other operational questions.
-      </p>
-      <a class="ops-btn" href="#" target="_blank" rel="noopener noreferrer">Open Operations Assistant</a>
-    </div>
-  </div>
+<p>
+Need help with Excel macros, certifications, contracting, AgencyBloc questions, or workflows?
+Use ChatGPT as your operations assistant.
+</p>
 
-  <div class="footer">
-    <div class="footer-inner">
-      <strong>Medi-Solutions Agent Hub</strong><br>
-      Internal resource center for agent tools, libraries, and planning calculators.
-    </div>
-  </div>
+<a href="https://chat.openai.com" target="_blank">
+Open ChatGPT
+</a>
 
-  <script>
-    const DATA_URL = 'https://script.google.com/macros/s/AKfycbz6ZQm5QdcvIaqPiCRt-fTvpn65m9SzCHZrEeK16m61wIJeIO6G0Q5HfpqhIQK2RbpEkg/exec';
+</div>
 
-    async function loadDashboardData() {
-      try {
-        const response = await fetch(DATA_URL + '?t=' + Date.now());
-        if (!response.ok) throw new Error('Could not load dashboard data');
+</div>
 
-        const data = await response.json();
-        renderFeed(data.feed || []);
-        renderLeaderboard(data.leaderboard || []);
-      } catch (error) {
-        document.getElementById('feed-list').innerHTML =
-          '<div class="empty-state">Updates could not be loaded. Check the Google feed or your published data source.</div>';
 
-        document.getElementById('leaderboard-table').innerHTML =
-          '<div class="empty-state">Leaderboard could not be loaded. Check the Google feed or your published data source.</div>';
-
-        console.error(error);
-      }
-    }
-
-    function renderFeed(items) {
-      const container = document.getElementById('feed-list');
-
-      items.sort((a, b) => {
-        const dateA = new Date(a.Date || 0).getTime();
-        const dateB = new Date(b.Date || 0).getTime();
-        return dateB - dateA;
-      });
-
-      if (!items.length) {
-        container.innerHTML = '<div class="empty-state">No updates posted right now.</div>';
-        return;
-      }
-
-      container.innerHTML = items.map(item => `
-        <div class="feed-card">
-          <div class="feed-type">${escapeHtml(item.Type || 'Update')}</div>
-          <h5>${escapeHtml(item.Title || 'Untitled')}</h5>
-          <p>${escapeHtml(item.Message || '')}</p>
-          ${item.ButtonText && item.ButtonURL ? `
-            <a class="feed-btn" href="${escapeAttribute(item.ButtonURL)}" target="_blank" rel="noopener noreferrer">
-              ${escapeHtml(item.ButtonText)}
-            </a>
-          ` : ''}
-          <div class="feed-meta">
-            ${item.Date ? `<strong>Date:</strong> ${escapeHtml(item.Date)}` : ''}
-            ${item.Priority ? `${item.Date ? '<br>' : ''}<strong>Priority:</strong> ${escapeHtml(item.Priority)}` : ''}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderLeaderboard(items) {
-      const container = document.getElementById('leaderboard-table');
-
-      items.sort((a, b) => Number(b.Production || 0) - Number(a.Production || 0));
-
-      if (!items.length) {
-        container.innerHTML = '<div class="empty-state">No leaderboard data available.</div>';
-        return;
-      }
-
-      container.innerHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Agent</th>
-              <th>Production</th>
-              <th>Policies</th>
-              <th>Apps</th>
-              <th>Appointments</th>
-              <th>Month</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${items.map((item, index) => `
-              <tr>
-                <td>${escapeHtml(item.Rank || String(index + 1))}</td>
-                <td>${escapeHtml(item.AgentName || '')}</td>
-                <td>${formatCurrency(item.Production)}</td>
-                <td>${formatNumber(item.Policies)}</td>
-                <td>${formatNumber(item.AppsSubmitted)}</td>
-                <td>${formatNumber(item.Appointments)}</td>
-                <td>${escapeHtml(item.Month || '')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
-    function formatCurrency(value) {
-      const num = Number(value || 0);
-      return '$' + num.toLocaleString();
-    }
-
-    function formatNumber(value) {
-      const num = Number(value || 0);
-      return num.toLocaleString();
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function escapeAttribute(str) {
-      return String(str)
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    loadDashboardData();
-  </script>
+<div class="footer">
+Medi-Solutions Agent Hub — Internal Agent Resources
+</div>
 
 </body>
 </html>
