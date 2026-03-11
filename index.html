@@ -1571,6 +1571,13 @@
       grid-template-columns: 1fr 1fr;
       gap: 28px;
       margin-top: 8px;
+      align-items: start;
+    }
+
+    .snu-left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     /* ── LEFT: Leaderboard ── */
@@ -1920,31 +1927,171 @@
       margin-top: 10px; display: none;
     }
 
-    /* Admin trigger button (small, subtle) */
+    /* Admin trigger button — lives in topbar live strip */
     .admin-trigger {
-      position: fixed;
-      bottom: 28px; left: 28px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 14px;
-      color: var(--muted);
-      font-size: 11px; font-weight: 600;
+      background: rgba(251,191,36,.12);
+      border: 1px solid rgba(251,191,36,.25);
+      border-radius: 8px;
+      padding: 6px 13px;
+      color: var(--gold);
+      font-size: 11.5px; font-weight: 700;
       cursor: pointer;
-      z-index: 900;
-      display: flex; align-items: center; gap: 6px;
-      transition: background .15s, color .15s;
+      display: flex; align-items: center; gap: 5px;
+      transition: background .15s, color .15s, box-shadow .15s;
       font-family: 'Plus Jakarta Sans', sans-serif;
+      white-space: nowrap;
+      letter-spacing: .2px;
     }
-    .admin-trigger:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .admin-trigger:hover {
+      background: rgba(251,191,36,.22);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(251,191,36,.25);
+    }
 
     @media (max-width: 860px) {
       .snu-grid { grid-template-columns: 1fr; }
+      .snu-left-col { gap: 16px; }
     }
     @media (max-width: 540px) {
       .admin-row { grid-template-columns: 1fr 1fr; }
       .admin-row .admin-remove-btn { display: none; }
       .admin-week-row { grid-template-columns: 1fr; }
+    }
+
+
+    /* ── CSV DROP ZONE ── */
+    .csv-drop-zone {
+      border: 2px dashed var(--border-2);
+      border-radius: 12px;
+      padding: 22px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: rgba(255,255,255,.03);
+      margin-bottom: 10px;
+    }
+    .csv-drop-zone:hover, .csv-drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(59,130,246,.07);
+    }
+    .csv-drop-zone.drag-over { border-color: var(--teal); background: rgba(45,212,191,.07); }
+    .csv-drop-icon { font-size: 26px; margin-bottom: 6px; }
+    .csv-drop-text { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    .csv-drop-text span { color: var(--accent-2); text-decoration: underline; }
+    .csv-drop-hint { font-size: 11px; color: var(--muted-2); }
+    .csv-drop-hint code {
+      background: rgba(255,255,255,.08);
+      border-radius: 4px; padding: 1px 5px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+      color: var(--gold);
+    }
+    .csv-status {
+      font-size: 12px; font-weight: 600;
+      margin-bottom: 12px; min-height: 18px;
+      padding: 0 2px;
+    }
+    .csv-status.ok  { color: var(--green); }
+    .csv-status.err { color: var(--rose); }
+
+
+    /* ── CONSECUTIVE EXECUTIVES ── */
+    .snu-exec-card {
+      background: linear-gradient(160deg, rgba(167,139,250,.08) 0%, rgba(255,255,255,.02) 100%);
+      border: 1px solid rgba(167,139,250,.25);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
+
+    .snu-exec-header {
+      background: linear-gradient(90deg, rgba(167,139,250,.18), rgba(167,139,250,.05));
+      border-bottom: 1px solid rgba(167,139,250,.2);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .snu-exec-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: #a78bfa;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .snu-exec-subtitle {
+      font-size: 11px; color: var(--muted-2);
+      font-style: italic;
+    }
+
+    .snu-exec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      padding: 16px 20px;
+    }
+
+    .snu-exec-chip {
+      background: rgba(167,139,250,.1);
+      border: 1px solid rgba(167,139,250,.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background .2s, transform .2s, box-shadow .2s;
+    }
+    .snu-exec-chip:hover {
+      background: rgba(167,139,250,.18);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(167,139,250,.15);
+    }
+
+    .snu-exec-avatar {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(167,139,250,.3), rgba(167,139,250,.1));
+      border: 1px solid rgba(167,139,250,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .snu-exec-info { min-width: 0; }
+
+    .snu-exec-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 700;
+      color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .snu-exec-streak {
+      font-size: 11px; color: #a78bfa;
+      font-weight: 600; margin-top: 2px;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .snu-exec-empty {
+      padding: 28px 24px;
+      text-align: center;
+      color: var(--muted-2);
+      font-size: 13px;
+      font-style: italic;
+      grid-column: 1 / -1;
+    }
+
+    /* Admin exec rows */
+    .admin-exec-row {
+      display: grid;
+      grid-template-columns: 1fr 120px auto;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: end;
+    }
+
+    @media (max-width: 600px) {
+      .snu-exec-grid { grid-template-columns: 1fr 1fr; }
+      .admin-exec-row { grid-template-columns: 1fr 90px auto; }
     }
 
   </style>
@@ -2008,6 +2155,8 @@
           </div>
         </div>
         <div class="topbar-live-right">
+          <button class="admin-trigger" onclick="openAdmin()">⚙️ SNU Admin</button>
+          <div class="infobar-divider"></div>
           <div class="live-clock" id="liveClock">--:-- --</div>
         </div>
       </div>
@@ -2203,18 +2352,33 @@
 
         <div class="snu-grid">
 
-          <!-- Left: Leaderboard -->
-          <div class="snu-lb-card">
-            <div class="snu-lb-header">
-              <div class="snu-lb-title">🥇 Weekly Top Producers</div>
-              <span class="snu-week-badge" id="snuWeekBadge">WEEK —</span>
+          <!-- Left col: Leaderboard + Consecutive Executives stacked -->
+          <div class="snu-left-col">
+
+            <div class="snu-lb-card">
+              <div class="snu-lb-header">
+                <div class="snu-lb-title">🥇 Weekly Top Producers</div>
+                <span class="snu-week-badge" id="snuWeekBadge">WEEK —</span>
+              </div>
+              <div class="snu-lb-list" id="snuLbList">
+                <div class="snu-empty">No data yet — admin can add weekly results below.</div>
+              </div>
             </div>
-            <div class="snu-lb-list" id="snuLbList">
-              <div class="snu-empty">No data yet — admin can add weekly results below.</div>
+
+            <!-- Consecutive Executives — directly below leaderboard -->
+            <div class="snu-exec-card">
+              <div class="snu-exec-header">
+                <div class="snu-exec-title">⭐ Consecutive Executives</div>
+                <span class="snu-exec-subtitle">Top 7 multiple weeks in a row</span>
+              </div>
+              <div class="snu-exec-grid" id="snuExecGrid">
+                <div class="snu-exec-empty">No consecutive executives yet.</div>
+              </div>
             </div>
+
           </div>
 
-          <!-- Right: Article -->
+          <!-- Right col: Article -->
           <div class="snu-article-card">
             <div class="snu-article-header">
               <div class="snu-article-title-bar">📰 Industry Spotlight</div>
@@ -2229,11 +2393,10 @@
           </div>
 
         </div>
+
       </div>
     </section>
 
-    <!-- ADMIN TRIGGER -->
-    <button class="admin-trigger" onclick="openAdmin()">⚙️ SNU Admin</button>
 
     <!-- ADMIN OVERLAY -->
     <div class="admin-overlay" id="adminOverlay" onclick="closeAdmin()"></div>
@@ -2280,8 +2443,24 @@
 
           <hr class="admin-divider">
           <div class="admin-section-title">🥇 Top Producers</div>
+
+          <!-- CSV / Excel Drop Zone -->
+          <div class="csv-drop-zone" id="csvDropZone" onclick="document.getElementById('csvFileInput').click()">
+            <div class="csv-drop-icon">📂</div>
+            <div class="csv-drop-text">Drop CSV or Excel file here, or <span>click to browse</span></div>
+            <div class="csv-drop-hint">Columns needed: <code>Name</code> and <code>Production</code> — order doesn't matter</div>
+            <input type="file" id="csvFileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCsvFile(this.files[0])">
+          </div>
+          <div class="csv-status" id="csvStatus"></div>
+
           <div id="adminAgentRows"></div>
-          <button class="admin-add-btn" onclick="addAgentRow()">+ Add Producer</button>
+          <button class="admin-add-btn" onclick="addAgentRow()">+ Add Row Manually</button>
+
+          <hr class="admin-divider">
+          <div class="admin-section-title">⭐ Consecutive Executives</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:12px;">Agents who have been in the Top 7 for multiple consecutive weeks.</p>
+          <div id="adminExecRows"></div>
+          <button class="admin-add-btn" onclick="addExecRow()">+ Add Consecutive Executive</button>
 
           <hr class="admin-divider">
           <button class="admin-save-btn" onclick="saveSnuData()">💾 Save &amp; Publish</button>
@@ -3136,7 +3315,30 @@ When answering:
     try {
       const data = JSON.parse(raw);
       renderSnuLeaderboard(data);
+      renderSnuExecs(data);
     } catch(e) { console.warn('SNU data parse error', e); }
+  }
+
+  function renderSnuExecs(data) {
+    const grid = document.getElementById('snuExecGrid');
+    if (!grid) return;
+    const execs = data.execs || [];
+    if (!execs.length) {
+      grid.innerHTML = '<div class="snu-exec-empty">No consecutive executives yet — admin can update below.</div>';
+      return;
+    }
+    // Sort by weeks desc
+    const sorted = [...execs].sort((a,b) => (b.weeks||0)-(a.weeks||0));
+    const emoji = ['👑','⭐','🔥','💎','🏅','🎯','✨'];
+    grid.innerHTML = sorted.map((e, i) => `
+      <div class="snu-exec-chip">
+        <div class="snu-exec-avatar">${emoji[i % emoji.length]}</div>
+        <div class="snu-exec-info">
+          <div class="snu-exec-name">${esc(e.name)}</div>
+          <div class="snu-exec-streak">🔁 ${e.weeks || '?'} week${(e.weeks||0) !== 1 ? 's' : ''} straight</div>
+        </div>
+      </div>
+    `).join('');
   }
 
   function renderSnuLeaderboard(data) {
@@ -3301,6 +3503,14 @@ When answering:
     rows.innerHTML = '';
     const agents = data.agents?.length ? data.agents : [{}];
     agents.forEach(a => addAgentRow(a));
+
+    // Load exec rows
+    const execRows = document.getElementById('adminExecRows');
+    if (execRows) {
+      execRows.innerHTML = '';
+      const execs = data.execs?.length ? data.execs : [{}];
+      execs.forEach(e => addExecRow(e));
+    }
   }
 
   function addAgentRow(a) {
@@ -3322,6 +3532,25 @@ When answering:
     rows.appendChild(div);
   }
 
+  function addExecRow(e) {
+    e = e || {};
+    const rows = document.getElementById('adminExecRows');
+    const div = document.createElement('div');
+    div.className = 'admin-exec-row';
+    div.innerHTML = `
+      <div class="admin-field">
+        <label>Agent Name</label>
+        <input class="admin-input exec-name-input" value="${esc(e.name||'')}" placeholder="Jane Smith">
+      </div>
+      <div class="admin-field">
+        <label>Weeks in a Row</label>
+        <input class="admin-input exec-weeks-input" type="number" min="1" value="${e.weeks||''}" placeholder="3">
+      </div>
+      <button class="admin-remove-btn" onclick="this.closest('.admin-exec-row').remove()" title="Remove">✕</button>
+    `;
+    rows.appendChild(div);
+  }
+
   function saveSnuData() {
     const weekLabel = document.getElementById('adminWeekLabel').value.trim();
     const dateRange = document.getElementById('adminDateRange').value.trim();
@@ -3334,9 +3563,19 @@ When answering:
     });
     // Sort by production desc
     agents.sort((a, b) => (b.production || 0) - (a.production || 0));
-    const data = { weekLabel, dateRange, agents, savedAt: new Date().toISOString() };
+    // Collect exec rows
+    const execDivs = document.querySelectorAll('#adminExecRows .admin-exec-row');
+    const execs = [];
+    execDivs.forEach(row => {
+      const name  = row.querySelector('.exec-name-input')?.value.trim();
+      const weeks = parseInt(row.querySelector('.exec-weeks-input')?.value) || null;
+      if (name) execs.push({ name, weeks });
+    });
+
+    const data = { weekLabel, dateRange, agents, execs, savedAt: new Date().toISOString() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     renderSnuLeaderboard(data);
+    renderSnuExecs(data);
     closeAdmin();
     // Show confirmation toast
     showSnuToast('✓ SNU data published!');
@@ -3357,6 +3596,134 @@ When answering:
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAdmin(); });
+  </script>
+
+
+  <script id="csv-script">
+  // ── DRAG & DROP wiring ─────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const zone = document.getElementById('csvDropZone');
+    if (!zone) return;
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) handleCsvFile(file);
+    });
+  });
+
+  // ── FILE HANDLER ───────────────────────────────────────────────────────────
+  function handleCsvFile(file) {
+    if (!file) return;
+    const name = file.name.toLowerCase();
+    const status = document.getElementById('csvStatus');
+
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      // Use SheetJS (loaded from CDN if available, else fallback message)
+      if (typeof XLSX === 'undefined') {
+        // Dynamically load SheetJS
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+        s.onload = () => parseExcel(file);
+        s.onerror = () => {
+          if (status) { status.textContent = '✗ Could not load Excel parser. Try saving as CSV instead.'; status.className = 'csv-status err'; }
+        };
+        document.head.appendChild(s);
+      } else {
+        parseExcel(file);
+      }
+    } else if (name.endsWith('.csv')) {
+      parseCsv(file);
+    } else {
+      if (status) { status.textContent = '✗ Please upload a .csv, .xlsx, or .xls file.'; status.className = 'csv-status err'; }
+    }
+  }
+
+  function parseCsv(file) {
+    const reader = new FileReader();
+    reader.onload = e => processRawText(e.target.result);
+    reader.onerror = () => setStatusErr('Could not read file.');
+    reader.readAsText(file);
+  }
+
+  function parseExcel(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const csv = XLSX.utils.sheet_to_csv(ws);
+        processRawText(csv);
+      } catch(err) { setStatusErr('Could not parse Excel file: ' + err.message); }
+    };
+    reader.onerror = () => setStatusErr('Could not read file.');
+    reader.readAsArrayBuffer(file);
+  }
+
+  function processRawText(raw) {
+    const status = document.getElementById('csvStatus');
+    try {
+      // Parse CSV rows
+      const lines = raw.trim().split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) { setStatusErr('File appears empty or has only a header row.'); return; }
+
+      // Detect header row & column indices
+      const header = lines[0].split(',').map(h => h.replace(/"/g,'').trim().toLowerCase());
+      const nameIdx = header.findIndex(h => h.includes('name') || h.includes('agent'));
+      const prodIdx = header.findIndex(h => h.includes('production') || h.includes('prod') || h.includes('amount') || h.includes('sales') || h.includes('premium'));
+
+      if (nameIdx === -1) { setStatusErr('✗ Could not find a "Name" or "Agent" column. Check your headers.'); return; }
+      if (prodIdx === -1) { setStatusErr('✗ Could not find a "Production" or "Amount" column. Check your headers.'); return; }
+
+      // Parse data rows
+      const agents = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = smartSplitCsv(lines[i]);
+        const name = (cols[nameIdx] || '').replace(/"/g,'').trim();
+        const rawProd = (cols[prodIdx] || '').replace(/"/g,'').replace(/[$,\s]/g,'').trim();
+        const prod = parseFloat(rawProd) || 0;
+        if (name) agents.push({ name, production: prod || null });
+      }
+
+      if (!agents.length) { setStatusErr('✗ No valid rows found. Make sure Name column has values.'); return; }
+
+      // Sort by production desc
+      agents.sort((a, b) => (b.production || 0) - (a.production || 0));
+
+      // Populate the admin rows
+      const rows = document.getElementById('adminAgentRows');
+      rows.innerHTML = '';
+      agents.forEach(a => addAgentRow(a));
+
+      if (status) {
+        status.textContent = `✓ Loaded ${agents.length} producer${agents.length !== 1 ? 's' : ''} — review below, then Save & Publish.`;
+        status.className = 'csv-status ok';
+      }
+    } catch(err) {
+      setStatusErr('Parse error: ' + err.message);
+    }
+  }
+
+  function smartSplitCsv(line) {
+    // Handle quoted fields with commas inside
+    const result = [];
+    let cur = '', inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQuote = !inQuote; }
+      else if (c === ',' && !inQuote) { result.push(cur); cur = ''; }
+      else { cur += c; }
+    }
+    result.push(cur);
+    return result;
+  }
+
+  function setStatusErr(msg) {
+    const status = document.getElementById('csvStatus');
+    if (status) { status.textContent = msg; status.className = 'csv-status err'; }
+  }
   </script>
 
 </body>
