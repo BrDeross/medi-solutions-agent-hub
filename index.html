@@ -2094,6 +2094,338 @@
       .admin-exec-row { grid-template-columns: 1fr 90px auto; }
     }
 
+
+    /* ══════════════════════════════════════════════
+       SNU PRINT / VIEW MODAL  — dark hub theme
+    ══════════════════════════════════════════════ */
+
+    .snu-print-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.82);
+      backdrop-filter: blur(14px);
+      z-index: 3000;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+      overflow-y: auto;
+      padding: 32px 20px 60px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .snu-print-overlay.open { opacity: 1; pointer-events: all; }
+
+    .snu-print-modal {
+      background: var(--ink);
+      border: 1px solid var(--border-2);
+      border-radius: 20px;
+      width: min(920px, 100%);
+      box-shadow: 0 40px 100px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.05);
+      overflow: hidden;
+      transform: translateY(24px);
+      transition: transform .35s cubic-bezier(.22,1,.36,1);
+      position: relative;
+    }
+    .snu-print-overlay.open .snu-print-modal { transform: translateY(0); }
+
+    /* ── Sticky action bar ── */
+    .snu-print-actions {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(30,61,114,.97);
+      backdrop-filter: blur(16px);
+      padding: 14px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .snu-print-action-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .snu-print-btn-row { display: flex; gap: 8px; }
+    .snu-print-btn {
+      padding: 9px 20px; border-radius: 9px;
+      font-size: 12.5px; font-weight: 700;
+      cursor: pointer; border: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: opacity .15s, transform .1s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .snu-print-btn:hover { opacity: .85; transform: translateY(-1px); }
+    .snu-print-btn.primary { background: var(--accent); color: #fff; box-shadow: 0 0 18px rgba(59,130,246,.4); }
+    .snu-print-btn.ghost   { background: rgba(255,255,255,.08); color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── Masthead ── */
+    .snu-print-masthead {
+      background: linear-gradient(135deg, #162847 0%, #1e3d72 45%, #254d8a 100%);
+      padding: 40px 48px 32px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .snu-print-masthead::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(135deg,transparent,transparent 40px,rgba(255,255,255,.025) 40px,rgba(255,255,255,.025) 41px);
+      pointer-events: none;
+    }
+    /* Glow orbs */
+    .snu-print-masthead::after {
+      content: '';
+      position: absolute; top: -80px; right: -60px;
+      width: 380px; height: 380px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,170,255,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .snu-print-masthead-inner { position: relative; z-index: 1; }
+
+    .snu-print-logo-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .snu-print-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 600;
+      color: var(--muted-2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .snu-print-issue {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px; color: var(--muted);
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 11px;
+      letter-spacing: .5px;
+    }
+
+    .snu-print-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 72px; font-weight: 900;
+      letter-spacing: -4px; line-height: .9;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-2) 60%, #a78bfa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .snu-print-tagline {
+      font-size: 13px; color: var(--muted-2);
+      font-weight: 500; letter-spacing: .5px;
+      margin-bottom: 20px;
+    }
+
+    .snu-print-meta-row {
+      display: flex; gap: 0; align-items: stretch;
+      flex-wrap: wrap;
+      background: rgba(0,0,0,.2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      width: fit-content;
+    }
+    .snu-print-meta-item {
+      font-size: 12px; color: var(--muted);
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 18px;
+      border-right: 1px solid var(--border);
+    }
+    .snu-print-meta-item:last-child { border-right: none; }
+    .snu-print-meta-item strong { color: #fff; font-weight: 700; }
+
+    /* ── Body ── */
+    .snu-print-body {
+      padding: 32px 40px;
+      background: var(--ink);
+    }
+
+    .snu-print-section-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--muted-2);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .snu-print-section-label::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* ── Two-col row ── */
+    .snu-print-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    /* ── Leaderboard card ── */
+    .snu-print-lb-wrap {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .snu-print-lb-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .snu-print-lb-table th {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      color: var(--muted-2); padding: 11px 16px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+    .snu-print-lb-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: 13px;
+    }
+    .snu-print-lb-table tr:last-child td { border-bottom: none; }
+    .snu-print-lb-table tbody tr { transition: background .15s; }
+    .snu-print-lb-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+
+    .snu-print-rank {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px;
+    }
+    .snu-print-rank.gold   { background: rgba(251,191,36,.18); color: var(--gold); border: 1px solid rgba(251,191,36,.3); }
+    .snu-print-rank.silver { background: rgba(148,163,184,.1);  color: #94a3b8;    border: 1px solid rgba(148,163,184,.2); }
+    .snu-print-rank.bronze { background: rgba(205,124,74,.12);  color: #cd7c4a;    border: 1px solid rgba(205,124,74,.25); }
+    .snu-print-rank.other  { background: rgba(59,130,246,.1);   color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
+
+    .snu-print-agent-name { font-weight: 700; color: #fff; }
+    .snu-print-prod {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 600; color: var(--green);
+    }
+
+    /* ── Exec card ── */
+    .snu-print-exec-wrap {
+      background: rgba(167,139,250,.05);
+      border: 1px solid rgba(167,139,250,.2);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .snu-print-exec-list { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .snu-print-exec-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(167,139,250,.08);
+      border: 1px solid rgba(167,139,250,.15);
+      border-radius: 10px;
+      transition: background .15s;
+    }
+    .snu-print-exec-row:hover { background: rgba(167,139,250,.14); }
+    .snu-print-exec-emoji { font-size: 17px; }
+    .snu-print-exec-name { font-weight: 700; font-size: 13px; color: #fff; flex: 1; }
+    .snu-print-exec-streak {
+      font-size: 11px; font-weight: 700; color: #a78bfa;
+      background: rgba(167,139,250,.15);
+      border: 1px solid rgba(167,139,250,.25);
+      border-radius: 6px; padding: 2px 9px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Article ── */
+    .snu-print-article-wrap {
+      background: rgba(59,130,246,.04);
+      border: 1px solid rgba(59,130,246,.15);
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+    .snu-print-article-cat {
+      display: inline-flex; align-items: center;
+      font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1px;
+      padding: 3px 11px; border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    .snu-print-article-cat.health   { background: rgba(52,211,153,.15);  color: #34d399; border: 1px solid rgba(52,211,153,.25); }
+    .snu-print-article-cat.life     { background: rgba(167,139,250,.15); color: #a78bfa; border: 1px solid rgba(167,139,250,.25); }
+    .snu-print-article-cat.annuity  { background: rgba(251,191,36,.15);  color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+    .snu-print-article-cat.industry { background: rgba(59,130,246,.15);  color: var(--accent-2); border: 1px solid rgba(59,130,246,.25); }
+
+    .snu-print-article-headline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px; font-weight: 800;
+      color: #fff; line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .snu-print-article-text {
+      font-size: 14px; line-height: 1.85; color: var(--muted);
+    }
+    .snu-print-article-text p { margin-bottom: 14px; }
+    .snu-print-article-text p:last-child { margin-bottom: 0; }
+
+    /* ── Footer ── */
+    .snu-print-footer {
+      background: var(--ink-2);
+      border-top: 1px solid var(--border);
+      padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .snu-print-footer-text { font-size: 10.5px; color: var(--muted-2); font-style: italic; }
+    .snu-print-footer-brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700; color: var(--muted);
+    }
+
+    /* ── View button in section head ── */
+    .snu-view-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(59,130,246,.12);
+      border: 1px solid rgba(59,130,246,.3);
+      border-radius: 9px;
+      padding: 8px 16px;
+      color: var(--accent-2);
+      font-size: 12px; font-weight: 700;
+      cursor: pointer;
+      transition: background .15s, box-shadow .15s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      white-space: nowrap;
+    }
+    .snu-view-btn:hover {
+      background: rgba(59,130,246,.22);
+      box-shadow: 0 0 18px rgba(59,130,246,.25);
+    }
+
+    /* ── Print-to-paper styles ── */
+    @media print {
+      body > *:not(.snu-print-overlay) { display: none !important; }
+      .snu-print-overlay {
+        position: static !important; opacity: 1 !important;
+        pointer-events: all !important; background: none !important;
+        padding: 0 !important; display: block !important;
+        overflow: visible !important;
+      }
+      .snu-print-modal {
+        box-shadow: none !important; border-radius: 0 !important;
+        width: 100% !important; border: none !important;
+        background: #fff !important;
+      }
+      .snu-print-masthead { background: #1e3d72 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .snu-print-body { background: #fff !important; }
+      .snu-print-body * { color: #0f172a !important; }
+      .snu-print-agent-name { color: #0f172a !important; }
+      .snu-print-prod { color: #059669 !important; }
+      .snu-print-actions { display: none !important; }
+      .snu-print-footer { background: #f8fafc !important; }
+    }
+
+    @media (max-width: 680px) {
+      .snu-print-body { padding: 20px 18px; }
+      .snu-print-masthead { padding: 28px 20px 24px; }
+      .snu-print-two-col { grid-template-columns: 1fr; }
+      .snu-print-title { font-size: 48px; letter-spacing: -2px; }
+      .snu-print-footer { padding: 14px 20px; }
+    }
+
   </style>
 </head>
 <body>
@@ -2348,6 +2680,7 @@
               <p>Weekly production leaders &amp; industry news</p>
             </div>
           </div>
+          <button class="snu-view-btn" onclick="openSnuPrint()">🗞️ View / Print Full SNU</button>
         </div>
 
         <div class="snu-grid">
@@ -2469,6 +2802,90 @@
 
     </div>
 
+
+    <!-- SNU PRINT MODAL -->
+    <div class="snu-print-overlay" id="snuPrintOverlay" onclick="handlePrintOverlayClick(event)">
+      <div class="snu-print-modal" id="snuPrintModal">
+
+        <!-- Sticky action bar -->
+        <div class="snu-print-actions">
+          <span class="snu-print-action-title">🗞️ SNU — Show N Up Newsletter</span>
+          <div class="snu-print-btn-row">
+            <button class="snu-print-btn ghost" onclick="closeSnuPrint()">✕ Close</button>
+            <button class="snu-print-btn primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+          </div>
+        </div>
+
+        <!-- Masthead -->
+        <div class="snu-print-masthead">
+          <div class="snu-print-masthead-inner">
+            <div class="snu-print-logo-row">
+              <span class="snu-print-brand">Medi-Solutions Insurance Agency, LLC</span>
+              <span class="snu-print-issue" id="printIssueLabel">CURRENT ISSUE</span>
+            </div>
+            <div class="snu-print-title">SNU</div>
+            <div class="snu-print-tagline">Show N Up — Weekly Agent Performance &amp; Industry News</div>
+            <div class="snu-print-meta-row">
+              <span class="snu-print-meta-item">📅 <strong id="printDateLabel">—</strong></span>
+              <span class="snu-print-meta-item">🏆 <strong id="printAgentCount">—</strong> producers</span>
+              <span class="snu-print-meta-item">⭐ <strong id="printExecCount">—</strong> consecutive execs</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="snu-print-body">
+
+          <!-- Two-col: Leaderboard + Execs -->
+          <div class="snu-print-two-col">
+
+            <div>
+              <div class="snu-print-section-label">🥇 Weekly Top Producers</div>
+              <div class="snu-print-lb-wrap">
+                <table class="snu-print-lb-table">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Agent</th>
+                      <th>Production</th>
+                    </tr>
+                  </thead>
+                  <tbody id="printLbBody">
+                    <tr><td colspan="3" style="color:var(--muted-2);font-style:italic;font-size:12px;padding:20px 16px;text-align:center;">No data yet — save from SNU Admin.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <div class="snu-print-section-label">⭐ Consecutive Executives</div>
+              <div class="snu-print-exec-wrap">
+                <div class="snu-print-exec-list" id="printExecList">
+                  <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:16px;">No consecutive executives yet.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Article -->
+          <div class="snu-print-section-label">📰 Industry Spotlight</div>
+          <div class="snu-print-article-wrap">
+            <span class="snu-print-article-cat industry" id="printArticleCat">Industry</span>
+            <div class="snu-print-article-headline" id="printArticleHeadline">Loading article…</div>
+            <div class="snu-print-article-text" id="printArticleText"></div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="snu-print-footer">
+          <span class="snu-print-footer-text">For internal agent use only. All figures should be independently verified.</span>
+          <span class="snu-print-footer-brand">Medi-Solutions Agent Hub</span>
+        </div>
+
+      </div>
+    </div>
 
     <!-- OPS AI -->
     <section class="section" id="operations-ai" style="padding-bottom:0;">
@@ -3303,6 +3720,9 @@ When answering:
   const STORAGE_KEY  = 'snu_data_v1';
   const ARTICLE_KEY  = 'snu_article_v1';
 
+  // ── Global in-memory state — single source of truth for both dashboard + print ──
+  window._snuState = { data: {}, article: null };
+
   // ── LOAD & RENDER on page load ─────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
     renderSnuFromStorage();
@@ -3310,13 +3730,18 @@ When answering:
   });
 
   function renderSnuFromStorage() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
     try {
-      const data = JSON.parse(raw);
-      renderSnuLeaderboard(data);
-      renderSnuExecs(data);
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        window._snuState.data = JSON.parse(raw);
+        renderSnuLeaderboard(window._snuState.data);
+        renderSnuExecs(window._snuState.data);
+      }
     } catch(e) { console.warn('SNU data parse error', e); }
+    try {
+      const artRaw = localStorage.getItem(ARTICLE_KEY);
+      if (artRaw) window._snuState.article = JSON.parse(artRaw);
+    } catch(e) { console.warn('SNU article parse error', e); }
   }
 
   function renderSnuExecs(data) {
@@ -3436,6 +3861,7 @@ When answering:
   }
 
   function renderArticle(a) {
+    window._snuState.article = a;
     const body  = document.getElementById('snuArticleBody');
     const tagEl = document.getElementById('snuArticleTag');
     if (!body) return;
@@ -3574,6 +4000,7 @@ When answering:
 
     const data = { weekLabel, dateRange, agents, execs, savedAt: new Date().toISOString() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    window._snuState.data = data;
     renderSnuLeaderboard(data);
     renderSnuExecs(data);
     closeAdmin();
@@ -3724,6 +4151,83 @@ When answering:
     const status = document.getElementById('csvStatus');
     if (status) { status.textContent = msg; status.className = 'csv-status err'; }
   }
+  </script>
+
+
+  <script id="snu-print-script">
+  function openSnuPrint() {
+    // Use global in-memory state — always in sync with dashboard
+    const data    = window._snuState?.data    || {};
+    const article = window._snuState?.article || null;
+
+    const agents = Array.isArray(data.agents) ? data.agents : [];
+    const execs  = Array.isArray(data.execs)  ? data.execs  : [];
+    console.log('[SNU Print] agents:', agents.length, '| execs:', execs.length, '| article:', !!article);
+
+    // ── Meta row ──
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+    const el = id => document.getElementById(id);
+
+    el('printIssueLabel').textContent  = data.weekLabel ? data.weekLabel.toUpperCase() : 'CURRENT ISSUE';
+    el('printDateLabel').textContent   = data.dateRange || dateStr;
+    el('printAgentCount').textContent  = agents.length;
+    el('printExecCount').textContent   = execs.length;
+
+    // ── Leaderboard table ──
+    const rankClass = i => ['gold','silver','bronze','other'][Math.min(i,3)];
+    const rankLabel = i => i < 3 ? ['🥇','🥈','🥉'][i] : String(i+1);
+    el('printLbBody').innerHTML = agents.length
+      ? agents.map((a, i) => `
+          <tr>
+            <td><span class="snu-print-rank ${rankClass(i)}">${rankLabel(i)}</span></td>
+            <td class="snu-print-agent-name">${pesc(a.name || '—')}</td>
+            <td class="snu-print-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</td>
+          </tr>`).join('')
+      : '<tr><td colspan="3" style="color:#94a3b8;font-style:italic;font-size:12px;padding:16px 10px;">No leaderboard data yet.</td></tr>';
+
+    // ── Consecutive Execs ──
+    const execEmoji = ['👑','⭐','🔥','💎','🏅','🎯','✨'];
+    const sortedExecs = [...execs].sort((a,b) => (b.weeks||0)-(a.weeks||0));
+    el('printExecList').innerHTML = sortedExecs.length
+      ? sortedExecs.map((e, i) => `
+          <div class="snu-print-exec-row">
+            <span class="snu-print-exec-emoji">${execEmoji[i % execEmoji.length]}</span>
+            <span class="snu-print-exec-name">${pesc(e.name)}</span>
+            <span class="snu-print-exec-streak">${e.weeks || '?'} wk${(e.weeks||0)!==1?'s':''}</span>
+          </div>`).join('')
+      : '<div style="color:#94a3b8;font-style:italic;font-size:12px;padding:8px 0;">No consecutive executives yet.</div>';
+
+    // ── Article ──
+    if (article) {
+      el('printArticleCat').textContent  = article.tag || article.category || 'Industry';
+      el('printArticleCat').className    = 'snu-print-article-cat ' + (article.category || 'industry');
+      el('printArticleHeadline').textContent = article.headline || '';
+      el('printArticleText').innerHTML   = (article.body || []).map(p => `<p>${pesc(p)}</p>`).join('');
+    } else {
+      el('printArticleHeadline').textContent = 'No article loaded yet.';
+      el('printArticleText').innerHTML = '<p style="color:#94a3b8;font-style:italic;">Visit the dashboard to load this week\'s industry spotlight.</p>';
+    }
+
+    // ── Open overlay ──
+    el('snuPrintOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSnuPrint() {
+    document.getElementById('snuPrintOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handlePrintOverlayClick(e) {
+    if (e.target === document.getElementById('snuPrintOverlay')) closeSnuPrint();
+  }
+
+  function pesc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSnuPrint(); });
   </script>
 
 </body>
