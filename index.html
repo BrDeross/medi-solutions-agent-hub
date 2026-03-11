@@ -8,16 +8,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ink:         #162847;
-      --ink-2:       #1c3154;
-      --ink-3:       #243d65;
-      --surface:     #1f3860;
-      --surface-2:   #263f6b;
-      --border:      rgba(255,255,255,.14);
-      --border-2:    rgba(255,255,255,.24);
+      --ink:         #1e3a6e;
+      --ink-2:       #264880;
+      --ink-3:       #2e5490;
+      --surface:     #2a4f88;
+      --surface-2:   #305898;
+      --border:      rgba(255,255,255,.18);
+      --border-2:    rgba(255,255,255,.30);
       --text:        #f0f6ff;
-      --muted:       #a8c4de;
-      --muted-2:     #5d7fa0;
+      --muted:       #b8d4ee;
+      --muted-2:     #8ab0d0;
       --accent:      #3b82f6;
       --accent-2:    #7dd3fc;
       --accent-glow: rgba(59,130,246,.4);
@@ -44,15 +44,7 @@
     }
 
     /* grain overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: .03;
-      pointer-events: none;
-      z-index: 9999;
-    }
+    /* grain overlay removed */
 
     /* ambient glows */
     .bg-glow {
@@ -65,24 +57,24 @@
     .bg-glow-1 {
       width: 800px; height: 800px;
       top: -250px; right: -180px;
-      background: radial-gradient(circle, rgba(59,130,246,.35) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(99,170,255,.45) 0%, transparent 70%);
     }
     .bg-glow-2 {
       width: 600px; height: 600px;
       bottom: 20%; left: -180px;
-      background: radial-gradient(circle, rgba(251,191,36,.20) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(251,191,36,.28) 0%, transparent 70%);
     }
     .bg-glow-3 {
       width: 500px; height: 500px;
       top: 55%; right: -120px;
-      background: radial-gradient(circle, rgba(167,139,250,.18) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(167,139,250,.28) 0%, transparent 70%);
     }
 
     /* ── TOPBAR ── */
     .topbar {
       position: sticky;
       top: 0; z-index: 500;
-      background: rgba(22,40,71,.95);
+      background: rgba(28,56,106,.96);
       backdrop-filter: blur(24px) saturate(180%);
       border-bottom: 1px solid var(--border-2);
       box-shadow: 0 4px 32px rgba(0,0,0,.35);
@@ -236,7 +228,7 @@
     .hero { padding: 52px 0 0; }
 
     .hero-inner {
-      background: linear-gradient(140deg, #1a3560 0%, #1e3d72 50%, #173060 100%);
+      background: linear-gradient(140deg, #1e3d72 0%, #2a5298 50%, #1a3870 100%);
       border: 1px solid var(--border-2);
       border-radius: var(--r-xl);
       padding: 56px 60px;
@@ -247,12 +239,15 @@
 
     .hero-grid-bg {
       position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
-      background-size: 44px 44px;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 28px,
+        rgba(255,255,255,.018) 28px,
+        rgba(255,255,255,.018) 29px
+      );
       border-radius: var(--r-xl);
-      mask-image: linear-gradient(to right, transparent 0%, black 25%, black 75%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
     }
 
     .hero-inner::after {
@@ -332,9 +327,20 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      transition: background .2s, border-color .2s;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, transform .2s, box-shadow .2s;
+      /* fix anchor tag defaults */
+      color: inherit;
+      -webkit-tap-highlight-color: transparent;
     }
-    .hstat:hover { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.32); }
+    .hstat:hover {
+      background: rgba(255,255,255,.15);
+      border-color: var(--accent-2);
+      transform: translateX(5px);
+      box-shadow: 0 4px 24px rgba(59,130,246,.3);
+    }
+    .hstat:active { transform: translateX(3px) scale(.98); }
 
     .hstat-val {
       font-family: 'Space Grotesk', sans-serif;
@@ -346,6 +352,22 @@
       font-size: 10.5px; color: var(--muted);
       font-weight: 700; text-transform: uppercase;
       letter-spacing: .8px; text-align: right;
+      transition: color .2s;
+    }
+    .hstat:hover .hstat-lbl { color: var(--accent-2); }
+    /* Small arrow indicator */
+    .hstat::after {
+      content: '→';
+      font-size: 14px;
+      color: rgba(255,255,255,.25);
+      margin-left: auto;
+      padding-left: 8px;
+      transition: color .2s, transform .2s;
+      flex-shrink: 0;
+    }
+    .hstat:hover::after {
+      color: var(--accent-2);
+      transform: translateX(3px);
     }
 
     /* ── SECTION ── */
@@ -686,7 +708,7 @@
 
     /* ── OPS BLOCK ── */
     .ops-block {
-      background: linear-gradient(140deg, #1e3d72 0%, #213f7a 100%);
+      background: linear-gradient(140deg, #254d8a 0%, #2a5598 100%);
       border: none;
       border-radius: var(--r-xl);
       padding: 52px 56px;
@@ -830,7 +852,7 @@
     footer {
       margin-top: 80px;
       border-top: 1px solid var(--border);
-      padding: 30px 32px;
+      padding: 30px 32px 0;
       background: var(--ink-2);
     }
 
@@ -847,6 +869,29 @@
     }
 
     .footer-note { font-size: 12px; color: var(--muted-2); margin-top: 3px; }
+
+    .footer-disclaimer {
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding: 14px 0 18px;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .footer-disclaimer p {
+      font-size: 11px;
+      color: var(--muted-2);
+      line-height: 1.7;
+      text-align: center;
+      opacity: .85;
+    }
+
+    .footer-disclaimer strong {
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      font-size: 10px;
+    }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
@@ -1002,16 +1047,25 @@
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      cursor: pointer;
+      cursor: grab;
       z-index: 1000;
       display: flex;
       align-items: flex-end;
       justify-content: center;
       filter: drop-shadow(0 8px 24px rgba(59,130,246,.5));
-      transition: transform .3s cubic-bezier(.22,1,.36,1), filter .3s;
+      transition: filter .3s, transform .15s;
+      user-select: none;
+      touch-action: none;
     }
 
-    .chat-launcher:hover {
+    .chat-launcher.dragging {
+      cursor: grabbing;
+      transform: scale(1.08);
+      filter: drop-shadow(0 14px 36px rgba(59,130,246,.8));
+      transition: none;
+    }
+
+    .chat-launcher:not(.dragging):hover {
       transform: scale(1.12) translateY(-4px);
       filter: drop-shadow(0 12px 32px rgba(59,130,246,.7));
     }
@@ -1118,7 +1172,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 18px;
-      background: linear-gradient(135deg, #1a3560, #1e3d72);
+      background: linear-gradient(135deg, #1e3d72, #2a5298);
       border-bottom: 1px solid rgba(255,255,255,.1);
       flex-shrink: 0;
     }
@@ -1275,7 +1329,7 @@
     }
 
     .hero-inner {
-      background: linear-gradient(-45deg, #1a3460, #234582, #163170, #253e75, #1a3060) !important;
+      background: linear-gradient(-45deg, #1e3d72, #2a5298, #1a3870, #2e5a9e, #1e3d72) !important;
       background-size: 400% 400% !important;
       animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both, heroShift 10s ease infinite !important;
     }
@@ -1290,7 +1344,7 @@
     .hero-orb-1 {
       width: 280px; height: 280px;
       top: -60px; right: 80px;
-      background: radial-gradient(circle, rgba(59,130,246,.35) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(99,170,255,.45) 0%, transparent 70%);
       animation: floatOrb1 8s ease-in-out infinite;
     }
     .hero-orb-2 {
@@ -1319,31 +1373,24 @@
       50%       { transform: translate(-15px, 30px) scale(.9); }
     }
 
-    /* Sparkle stars */
-    .sparkle {
+    /* Animated corner accent lines on hero */
+    .hero-inner .hero-corner {
       position: absolute;
+      width: 60px; height: 60px;
       pointer-events: none;
       z-index: 3;
+      opacity: .4;
     }
-    .sparkle::before, .sparkle::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      background: #fff;
-      animation: sparklePop 3s ease-in-out infinite;
-    }
-    .sparkle::before { width: 4px; height: 4px; opacity: .7; }
-    .sparkle::after  { width: 2px; height: 2px; opacity: .4; top: 8px; left: 10px; animation-delay: 1s; }
+    .hero-corner-tl { top: 18px; left: 18px;
+      border-top: 2px solid var(--accent-2); border-left: 2px solid var(--accent-2);
+      border-radius: 4px 0 0 0; animation: cornerFade 4s ease-in-out infinite; }
+    .hero-corner-br { bottom: 18px; right: 18px;
+      border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold);
+      border-radius: 0 0 4px 0; animation: cornerFade 4s ease-in-out infinite 2s; }
 
-    .sp1  { top: 18%; left: 12%; }
-    .sp2  { top: 35%; right: 22%; animation-delay: .7s; }
-    .sp3  { bottom: 25%; left: 35%; animation-delay: 1.4s; }
-    .sp4  { top: 12%; right: 38%; animation-delay: 2s; }
-    .sp5  { bottom: 15%; right: 15%; animation-delay: .4s; }
-
-    @keyframes sparklePop {
-      0%, 100% { transform: scale(0); opacity: 0; }
-      50%       { transform: scale(1); opacity: 1; }
+    @keyframes cornerFade {
+      0%, 100% { opacity: .25; }
+      50%       { opacity: .6; }
     }
 
     /* Hero headline shimmer */
@@ -1493,7 +1540,7 @@
       position: absolute;
       inset: 2px;
       border-radius: calc(var(--r-xl));
-      background: linear-gradient(140deg, #1e3d72 0%, #213f7a 100%);
+      background: linear-gradient(140deg, #254d8a 0%, #2a5598 100%);
     }
     @keyframes borderRotate {
       0%   { background-position: 0% 50%; }
@@ -1506,20 +1553,8 @@
       position: relative;
     }
 
-    /* Page-wide diagonal line texture */
-    .page::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: repeating-linear-gradient(
-        135deg,
-        transparent,
-        transparent 40px,
-        rgba(255,255,255,.012) 40px,
-        rgba(255,255,255,.012) 41px
-      );
-      pointer-events: none;
-      z-index: 0;
+    /* Page-wide aurora shimmer — smooth flowing color bands */
+      to   { transform: rotate(360deg); }
     }
 
   
@@ -1607,14 +1642,11 @@
       <div class="wrap">
         <div class="hero-inner">
           <div class="hero-grid-bg"></div>
+          <div class="hero-corner hero-corner-tl"></div>
+          <div class="hero-corner hero-corner-br"></div>
           <div class="hero-orb hero-orb-1"></div>
           <div class="hero-orb hero-orb-2"></div>
           <div class="hero-orb hero-orb-3"></div>
-          <div class="sparkle sp1"></div>
-          <div class="sparkle sp2"></div>
-          <div class="sparkle sp3"></div>
-          <div class="sparkle sp4"></div>
-          <div class="sparkle sp5"></div>
           <div class="hero-layout">
             <div>
               <div class="eyebrow">
@@ -1625,18 +1657,18 @@
               <p>Access tools, searchable libraries, calculators, leaderboard visibility, and operations support — all in one place. Leads and pipeline live in AgencyBloc.</p>
             </div>
             <div class="hero-stats">
-              <div class="hstat">
+              <a class="hstat" href="#agent-tools">
                 <div class="hstat-val">6</div>
-                <div class="hstat-lbl">Core Tools</div>
-              </div>
-              <div class="hstat">
+                <div class="hstat-lbl">Core Tools ↓</div>
+              </a>
+              <a class="hstat" href="#libraries">
                 <div class="hstat-val">3</div>
-                <div class="hstat-lbl">Libraries</div>
-              </div>
-              <div class="hstat">
+                <div class="hstat-lbl">Libraries ↓</div>
+              </a>
+              <a class="hstat" href="#operations-ai">
                 <div class="hstat-val">Live</div>
-                <div class="hstat-lbl">Ops AI</div>
-              </div>
+                <div class="hstat-lbl">Ops AI ↓</div>
+              </a>
             </div>
           </div>
         </div>
@@ -1844,6 +1876,15 @@ When answering:
           <div class="footer-brand">Medi-Solutions Agent Hub</div>
           <div class="footer-note">Internal resource center for agent tools, libraries, and planning calculators.</div>
         </div>
+        <div style="font-size:11px;color:var(--muted-2);">© 2025 Medi-Solutions Insurance Agency, LLC</div>
+      </div>
+      <div class="footer-disclaimer">
+        <p>
+          <strong>⚠ Agent Use Only</strong> &nbsp;·&nbsp;
+          This hub is intended for licensed insurance agent use only. All information, tools, and resources provided should be independently validated by the agent before use with clients.
+          The <strong>Agent Assistant AI</strong> tool is provided for general assistance and guidance purposes only — responses are not guaranteed to be 100% accurate, complete, or current.
+          Agents are solely responsible for verifying information and ensuring compliance with applicable laws, carrier guidelines, and CMS regulations.
+        </p>
       </div>
     </footer>
 
@@ -1995,6 +2036,72 @@ When answering:
       document.getElementById('chatOverlay').classList.remove('open');
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChat(); });
+
+    // ── DRAGGABLE CHAT LAUNCHER ──────────────────────────────────────────
+    (function initDrag() {
+      const el = document.getElementById('chatLauncher');
+      if (!el) return;
+
+      // Set initial position (bottom-right corner)
+      function setInitialPos() {
+        const size = 72;
+        const pad  = 28;
+        el.style.right  = null;
+        el.style.bottom = null;
+        el.style.left   = (window.innerWidth  - size - pad) + 'px';
+        el.style.top    = (window.innerHeight - size - pad) + 'px';
+      }
+      setInitialPos();
+      window.addEventListener('resize', setInitialPos);
+
+      let startX, startY, startLeft, startTop, dragged = false;
+
+      function onStart(e) {
+        const touch = e.touches ? e.touches[0] : e;
+        startX    = touch.clientX;
+        startY    = touch.clientY;
+        startLeft = parseInt(el.style.left)  || (window.innerWidth  - 100);
+        startTop  = parseInt(el.style.top)   || (window.innerHeight - 100);
+        dragged   = false;
+        el.classList.add('dragging');
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup',   onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend',  onEnd);
+        e.preventDefault();
+      }
+
+      function onMove(e) {
+        const touch = e.touches ? e.touches[0] : e;
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragged = true;
+
+        // Clamp to viewport
+        const pad  = 8;
+        const size = 72;
+        const newLeft = Math.min(Math.max(startLeft + dx, pad), window.innerWidth  - size - pad);
+        const newTop  = Math.min(Math.max(startTop  + dy, pad), window.innerHeight - size - pad);
+        el.style.left = newLeft + 'px';
+        el.style.top  = newTop  + 'px';
+        if (e.cancelable) e.preventDefault();
+      }
+
+      function onEnd(e) {
+        el.classList.remove('dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup',   onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend',  onEnd);
+        // If barely moved, treat as a click (open chat)
+        if (!dragged) openChat();
+      }
+
+      // Replace onclick with drag handler
+      el.removeAttribute('onclick');
+      el.addEventListener('mousedown',  onStart);
+      el.addEventListener('touchstart', onStart, { passive: false });
+    })();
   </script>
 
 
