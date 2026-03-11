@@ -1561,6 +1561,392 @@
 
     
 
+
+    /* ══════════════════════════════════════════════
+       SNU — SHOW N UP NEWSLETTER
+    ══════════════════════════════════════════════ */
+
+    .snu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 8px;
+    }
+
+    /* ── LEFT: Leaderboard ── */
+    .snu-lb-card {
+      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
+
+    .snu-lb-header {
+      background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
+      border-bottom: 1px solid rgba(251,191,36,.2);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .snu-lb-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--gold);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .snu-week-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 600;
+      color: var(--muted);
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      letter-spacing: .5px;
+    }
+
+    .snu-lb-list { padding: 12px 0; }
+
+    .snu-lb-row {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 24px;
+      transition: background .15s;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .snu-lb-row:last-child { border-bottom: none; }
+    .snu-lb-row:hover { background: rgba(255,255,255,.03); }
+
+    .snu-rank {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .snu-rank.gold   { background: rgba(251,191,36,.18); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 12px rgba(251,191,36,.2); }
+    .snu-rank.silver { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+    .snu-rank.bronze { background: rgba(205,124,74,.12); color: #cd7c4a; border: 1px solid rgba(205,124,74,.25); }
+    .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
+
+    .snu-agent-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+    .snu-agent-sub {
+      font-size: 11px; color: var(--muted-2); margin-top: 1px;
+    }
+
+    .snu-prod {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 600;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .snu-empty {
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted-2);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    /* ── RIGHT: Article ── */
+    .snu-article-card {
+      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .snu-article-header {
+      background: linear-gradient(90deg, rgba(59,130,246,.15), rgba(59,130,246,.04));
+      border-bottom: 1px solid rgba(59,130,246,.2);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .snu-article-title-bar {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--accent-2);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .snu-article-tag {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      padding: 3px 9px; border-radius: 6px;
+      background: rgba(59,130,246,.18);
+      color: var(--accent-2);
+      border: 1px solid rgba(59,130,246,.3);
+    }
+
+    .snu-article-body { padding: 22px 24px; flex: 1; }
+
+    .snu-article-headline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 700;
+      color: #fff; line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .snu-article-meta {
+      display: flex; gap: 12px; align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .snu-article-date {
+      font-size: 11px; color: var(--muted-2);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .snu-article-category {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .7px;
+      padding: 2px 8px; border-radius: 5px;
+    }
+    .snu-article-category.health   { background: rgba(52,211,153,.15); color: #34d399; border: 1px solid rgba(52,211,153,.25); }
+    .snu-article-category.life     { background: rgba(167,139,250,.15); color: #a78bfa; border: 1px solid rgba(167,139,250,.25); }
+    .snu-article-category.annuity  { background: rgba(251,191,36,.15); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+    .snu-article-category.industry { background: rgba(59,130,246,.15); color: var(--accent-2); border: 1px solid rgba(59,130,246,.25); }
+
+    .snu-article-text {
+      font-size: 13.5px; line-height: 1.75;
+      color: var(--muted);
+    }
+
+    .snu-article-text p { margin-bottom: 10px; }
+    .snu-article-text p:last-child { margin-bottom: 0; }
+
+    .snu-article-loading {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; padding: 40px 24px;
+      color: var(--muted-2); font-size: 13px;
+    }
+
+    .snu-spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent-2);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .snu-source-link {
+      font-size: 11px; color: var(--accent-2);
+      text-decoration: none; opacity: .75;
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-top: 12px;
+    }
+    .snu-source-link:hover { opacity: 1; }
+
+    /* ── ADMIN MODAL ── */
+    .admin-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .admin-overlay.open { opacity: 1; pointer-events: all; }
+
+    .admin-modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(.95);
+      width: min(700px, 95vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: linear-gradient(160deg, #1e3d72, #213f7a);
+      border: 1px solid var(--border-2);
+      border-radius: 20px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+      z-index: 2001;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      scrollbar-width: thin;
+    }
+    .admin-modal.open {
+      opacity: 1; pointer-events: all;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .admin-modal-header {
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .admin-modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .admin-close {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, color .15s;
+    }
+    .admin-close:hover { background: rgba(255,255,255,.14); color: #fff; }
+
+    .admin-body { padding: 24px 28px; }
+
+    .admin-section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      color: var(--gold);
+      margin-bottom: 14px; margin-top: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .admin-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: end;
+    }
+
+    .admin-field { display: flex; flex-direction: column; gap: 5px; }
+    .admin-field label {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .5px;
+      color: var(--muted-2);
+    }
+
+    .admin-input {
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: #fff;
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      outline: none;
+      transition: border-color .15s, background .15s;
+      width: 100%;
+    }
+    .admin-input:focus {
+      border-color: var(--accent);
+      background: rgba(255,255,255,.1);
+    }
+
+    .admin-remove-btn {
+      width: 32px; height: 36px;
+      background: rgba(251,113,133,.1);
+      border: 1px solid rgba(251,113,133,.2);
+      border-radius: 8px;
+      color: var(--rose);
+      font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .admin-remove-btn:hover { background: rgba(251,113,133,.2); }
+
+    .admin-add-btn {
+      background: rgba(255,255,255,.06);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 9px;
+      color: var(--muted);
+      font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background .15s, color .15s;
+      margin-bottom: 20px;
+    }
+    .admin-add-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    .admin-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    .admin-week-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .admin-save-btn {
+      background: var(--accent);
+      border: none; border-radius: 10px;
+      padding: 12px 28px;
+      color: #fff; font-size: 14px; font-weight: 700;
+      cursor: pointer; width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background .15s, transform .1s;
+      box-shadow: 0 0 24px rgba(59,130,246,.4);
+    }
+    .admin-save-btn:hover { background: #2563eb; transform: translateY(-1px); }
+    .admin-save-btn:active { transform: translateY(0); }
+
+    /* Login gate */
+    .admin-login {
+      padding: 32px 28px;
+      text-align: center;
+    }
+    .admin-login h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 700; color: #fff;
+      margin-bottom: 6px;
+    }
+    .admin-login p { font-size: 13px; color: var(--muted-2); margin-bottom: 20px; }
+    .admin-login-row { display: flex; gap: 10px; }
+    .admin-login-err {
+      font-size: 12px; color: var(--rose);
+      margin-top: 10px; display: none;
+    }
+
+    /* Admin trigger button (small, subtle) */
+    .admin-trigger {
+      position: fixed;
+      bottom: 28px; left: 28px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 14px;
+      color: var(--muted);
+      font-size: 11px; font-weight: 600;
+      cursor: pointer;
+      z-index: 900;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .15s, color .15s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .admin-trigger:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+    @media (max-width: 860px) {
+      .snu-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 540px) {
+      .admin-row { grid-template-columns: 1fr 1fr; }
+      .admin-row .admin-remove-btn { display: none; }
+      .admin-week-row { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body>
@@ -1802,25 +2188,108 @@
       </div>
     </section>
 
-    <!-- LEADERBOARD -->
+    <!-- SNU — SHOW N UP NEWSLETTER -->
     <section class="section" id="leaderboard">
       <div class="wrap">
         <div class="section-head">
           <div class="sh-left">
-            <div class="sh-icon purple">🏆</div>
+            <div class="sh-icon gold">🏆</div>
             <div>
-              <h2>Leaderboard</h2>
-              <p>Ranked by production</p>
+              <h2>SNU<span style="color:var(--muted-2);font-weight:400;font-size:.55em;margin-left:12px;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.5px;">Show N Up</span></h2>
+              <p>Weekly production leaders &amp; industry news</p>
             </div>
           </div>
         </div>
-        <div class="lb-shell">
-          <div id="leaderboard-table">
-            <div class="empty" style="border:none;border-radius:0;">Loading leaderboard…</div>
+
+        <div class="snu-grid">
+
+          <!-- Left: Leaderboard -->
+          <div class="snu-lb-card">
+            <div class="snu-lb-header">
+              <div class="snu-lb-title">🥇 Weekly Top Producers</div>
+              <span class="snu-week-badge" id="snuWeekBadge">WEEK —</span>
+            </div>
+            <div class="snu-lb-list" id="snuLbList">
+              <div class="snu-empty">No data yet — admin can add weekly results below.</div>
+            </div>
           </div>
+
+          <!-- Right: Article -->
+          <div class="snu-article-card">
+            <div class="snu-article-header">
+              <div class="snu-article-title-bar">📰 Industry Spotlight</div>
+              <span class="snu-article-tag" id="snuArticleTag">Weekly</span>
+            </div>
+            <div class="snu-article-body" id="snuArticleBody">
+              <div class="snu-article-loading">
+                <div class="snu-spinner"></div>
+                <span>Fetching this week's article…</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
+
+    <!-- ADMIN TRIGGER -->
+    <button class="admin-trigger" onclick="openAdmin()">⚙️ SNU Admin</button>
+
+    <!-- ADMIN OVERLAY -->
+    <div class="admin-overlay" id="adminOverlay" onclick="closeAdmin()"></div>
+
+    <!-- ADMIN MODAL -->
+    <div class="admin-modal" id="adminModal">
+
+      <!-- Login Gate -->
+      <div id="adminLoginGate">
+        <div class="admin-modal-header">
+          <div class="admin-modal-title">🔒 SNU Admin Login</div>
+          <button class="admin-close" onclick="closeAdmin()">✕</button>
+        </div>
+        <div class="admin-login">
+          <h3>Admin Access Required</h3>
+          <p>Enter your password to update the weekly SNU data.</p>
+          <div class="admin-login-row">
+            <input class="admin-input" type="password" id="adminPwInput" placeholder="Password…" onkeydown="if(event.key==='Enter')checkAdminPw()">
+            <button class="admin-save-btn" style="width:auto;padding:9px 20px;" onclick="checkAdminPw()">Login</button>
+          </div>
+          <div class="admin-login-err" id="adminLoginErr">Incorrect password. Try again.</div>
+        </div>
+      </div>
+
+      <!-- Admin Form (shown after login) -->
+      <div id="adminForm" style="display:none;">
+        <div class="admin-modal-header">
+          <div class="admin-modal-title">📋 Update SNU — Show N Up</div>
+          <button class="admin-close" onclick="closeAdmin()">✕</button>
+        </div>
+        <div class="admin-body">
+
+          <div class="admin-section-title">📅 Week Info</div>
+          <div class="admin-week-row">
+            <div class="admin-field">
+              <label>Week Label (e.g. Week 12 · Mar 2025)</label>
+              <input class="admin-input" id="adminWeekLabel" placeholder="Week 12 · Mar 2025">
+            </div>
+            <div class="admin-field">
+              <label>Date Range</label>
+              <input class="admin-input" id="adminDateRange" placeholder="Mar 17–21, 2025">
+            </div>
+          </div>
+
+          <hr class="admin-divider">
+          <div class="admin-section-title">🥇 Top Producers</div>
+          <div id="adminAgentRows"></div>
+          <button class="admin-add-btn" onclick="addAgentRow()">+ Add Producer</button>
+
+          <hr class="admin-divider">
+          <button class="admin-save-btn" onclick="saveSnuData()">💾 Save &amp; Publish</button>
+        </div>
+      </div>
+
+    </div>
+
 
     <!-- OPS AI -->
     <section class="section" id="operations-ai" style="padding-bottom:0;">
@@ -1899,7 +2368,6 @@ When answering:
         if (!r.ok) throw new Error('fetch failed');
         const d = await r.json();
         renderFeed(d.feed || []);
-        renderLeaderboard(d.leaderboard || []);
       } catch (e) {
         console.error(e);
         q('feed-list').innerHTML  = '<div class="empty">Updates unavailable — check your data source.</div>';
@@ -2647,6 +3115,248 @@ When answering:
 
       loadWeatherInner();
     })();
+  </script>
+
+
+  <script id="snu-script">
+  // ── SNU CONFIG ─────────────────────────────────────────────────────────────
+  const SNU_PW       = 'showNup2025';   // change this password!
+  const STORAGE_KEY  = 'snu_data_v1';
+  const ARTICLE_KEY  = 'snu_article_v1';
+
+  // ── LOAD & RENDER on page load ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    renderSnuFromStorage();
+    loadWeeklyArticle();
+  });
+
+  function renderSnuFromStorage() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      renderSnuLeaderboard(data);
+    } catch(e) { console.warn('SNU data parse error', e); }
+  }
+
+  function renderSnuLeaderboard(data) {
+    // Week badge
+    const badge = document.getElementById('snuWeekBadge');
+    if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
+
+    // Leaderboard list
+    const list = document.getElementById('snuLbList');
+    if (!list) return;
+    const agents = data.agents || [];
+    if (!agents.length) {
+      list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
+      return;
+    }
+    const rankClass = i => ['gold','silver','bronze','other','other','other','other','other','other','other'][i] || 'other';
+    const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
+    list.innerHTML = agents.map((a, i) => `
+      <div class="snu-lb-row">
+        <div class="snu-rank ${rankClass(i)}">${i < 3 ? rankEmoji(i) : i+1}</div>
+        <div>
+          <div class="snu-agent-name">${esc(a.name || '—')}</div>
+          ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
+        </div>
+        <div class="snu-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
+      </div>
+    `).join('');
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── WEEKLY ARTICLE ─────────────────────────────────────────────────────────
+  async function loadWeeklyArticle() {
+    const body   = document.getElementById('snuArticleBody');
+    const tagEl  = document.getElementById('snuArticleTag');
+    if (!body) return;
+
+    // Check cache — only re-fetch once per week
+    const weekNum = getWeekNumber();
+    const cached  = localStorage.getItem(ARTICLE_KEY);
+    if (cached) {
+      try {
+        const c = JSON.parse(cached);
+        if (c.week === weekNum) { renderArticle(c); return; }
+      } catch(e) {}
+    }
+
+    // Pick topic by week rotation
+    const topics = [
+      { category: 'health',   tag: 'Medicare / Health', prompt: 'Write a 200-word educational article for Medicare insurance agents about a current topic in Medicare Advantage, AEP strategy, or CMS regulations. Make it practical and actionable. Include a key takeaway for agents.' },
+      { category: 'life',     tag: 'Life Insurance',    prompt: 'Write a 200-word educational article for insurance agents about a relevant topic in life insurance — such as term vs whole life trends, IUL strategies, or underwriting tips. Make it practical for agents talking to clients.' },
+      { category: 'annuity',  tag: 'Annuities',         prompt: 'Write a 200-word educational article for insurance agents about annuities — such as FIA trends, MYGA rates, or how to position annuities for retirement income. Keep it practical and client-focused.' },
+      { category: 'industry', tag: 'Industry Trends',   prompt: 'Write a 200-word article for insurance agents about a current trend or development in the insurance industry — technology, regulation, market trends, or agent best practices. Keep it insightful and forward-looking.' },
+    ];
+    const topic = topics[weekNum % topics.length];
+    if (tagEl) tagEl.textContent = topic.tag;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 600,
+          system: 'You are a knowledgeable insurance industry writer. Write concise, practical articles for licensed insurance agents. Format your response as JSON with keys: headline (string), category (string), body (array of 2-3 paragraph strings). No markdown, no backticks, just valid JSON.',
+          messages: [{ role: 'user', content: topic.prompt + ' Respond with ONLY valid JSON, no preamble.' }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.map(b => b.text || '').join('') || '';
+      const clean = text.replace(/```json|```/g, '').trim();
+      const article = JSON.parse(clean);
+      const cacheObj = { week: weekNum, category: topic.category, tag: topic.tag, ...article };
+      localStorage.setItem(ARTICLE_KEY, JSON.stringify(cacheObj));
+      renderArticle(cacheObj);
+    } catch(e) {
+      console.warn('Article fetch failed:', e);
+      // Fallback static article
+      const fallback = {
+        week: weekNum,
+        category: topic.category,
+        tag: topic.tag,
+        headline: 'Staying Ahead: Key Strategies for Insurance Agents in 2025',
+        body: [
+          'The insurance landscape continues to evolve rapidly. Agents who stay informed about regulatory changes, carrier updates, and client needs will have a significant competitive advantage this year.',
+          'Focus on deepening relationships with existing clients through annual reviews and proactive outreach. A client who hears from you first is far less likely to switch carriers or work with another agent.',
+          'Key takeaway: Consistency beats intensity. A steady cadence of client touchpoints, continued education, and process improvement compounds over time into a thriving book of business.'
+        ]
+      };
+      localStorage.setItem(ARTICLE_KEY, JSON.stringify(fallback));
+      renderArticle(fallback);
+    }
+  }
+
+  function renderArticle(a) {
+    const body  = document.getElementById('snuArticleBody');
+    const tagEl = document.getElementById('snuArticleTag');
+    if (!body) return;
+    if (tagEl && a.tag) tagEl.textContent = a.tag;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    body.innerHTML = `
+      <div class="snu-article-headline">${esc(a.headline || '')}</div>
+      <div class="snu-article-meta">
+        <span class="snu-article-date">Week of ${dateStr}</span>
+        <span class="snu-article-category ${a.category || 'industry'}">${esc(a.tag || a.category || 'Industry')}</span>
+      </div>
+      <div class="snu-article-text">
+        ${(a.body || []).map(p => `<p>${esc(p)}</p>`).join('')}
+      </div>
+    `;
+  }
+
+  function getWeekNumber() {
+    const d = new Date();
+    const start = new Date(d.getFullYear(), 0, 1);
+    return Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
+  }
+
+  // ── ADMIN MODAL ────────────────────────────────────────────────────────────
+  let adminUnlocked = false;
+
+  function openAdmin() {
+    document.getElementById('adminOverlay').classList.add('open');
+    document.getElementById('adminModal').classList.add('open');
+    if (!adminUnlocked) {
+      document.getElementById('adminLoginGate').style.display = '';
+      document.getElementById('adminForm').style.display = 'none';
+      setTimeout(() => document.getElementById('adminPwInput')?.focus(), 100);
+    }
+  }
+
+  function closeAdmin() {
+    document.getElementById('adminOverlay').classList.remove('open');
+    document.getElementById('adminModal').classList.remove('open');
+  }
+
+  function checkAdminPw() {
+    const val = document.getElementById('adminPwInput')?.value || '';
+    if (val === SNU_PW) {
+      adminUnlocked = true;
+      document.getElementById('adminLoginGate').style.display = 'none';
+      document.getElementById('adminForm').style.display = '';
+      loadAdminForm();
+    } else {
+      const err = document.getElementById('adminLoginErr');
+      if (err) { err.style.display = 'block'; }
+    }
+  }
+
+  function loadAdminForm() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    let data = { weekLabel: '', dateRange: '', agents: [] };
+    if (raw) { try { data = JSON.parse(raw); } catch(e) {} }
+
+    document.getElementById('adminWeekLabel').value = data.weekLabel || '';
+    document.getElementById('adminDateRange').value  = data.dateRange  || '';
+
+    const rows = document.getElementById('adminAgentRows');
+    rows.innerHTML = '';
+    const agents = data.agents?.length ? data.agents : [{}];
+    agents.forEach(a => addAgentRow(a));
+  }
+
+  function addAgentRow(a) {
+    a = a || {};
+    const rows = document.getElementById('adminAgentRows');
+    const div = document.createElement('div');
+    div.className = 'admin-row';
+    div.innerHTML = `
+      <div class="admin-field">
+        <label>Agent Name</label>
+        <input class="admin-input agent-name-input" value="${esc(a.name||'')}" placeholder="Jane Smith">
+      </div>
+      <div class="admin-field">
+        <label>Production ($)</label>
+        <input class="admin-input agent-prod-input" type="number" value="${a.production||''}" placeholder="12500">
+      </div>
+      <button class="admin-remove-btn" onclick="this.closest('.admin-row').remove()" title="Remove">✕</button>
+    `;
+    rows.appendChild(div);
+  }
+
+  function saveSnuData() {
+    const weekLabel = document.getElementById('adminWeekLabel').value.trim();
+    const dateRange = document.getElementById('adminDateRange').value.trim();
+    const agentRows = document.querySelectorAll('#adminAgentRows .admin-row');
+    const agents = [];
+    agentRows.forEach(row => {
+      const name = row.querySelector('.agent-name-input')?.value.trim();
+      const prod = row.querySelector('.agent-prod-input')?.value.trim();
+      if (name) agents.push({ name, production: prod ? Number(prod) : null });
+    });
+    // Sort by production desc
+    agents.sort((a, b) => (b.production || 0) - (a.production || 0));
+    const data = { weekLabel, dateRange, agents, savedAt: new Date().toISOString() };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    renderSnuLeaderboard(data);
+    closeAdmin();
+    // Show confirmation toast
+    showSnuToast('✓ SNU data published!');
+  }
+
+  function showSnuToast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    Object.assign(t.style, {
+      position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
+      background:'var(--accent)', color:'#fff', padding:'10px 22px',
+      borderRadius:'10px', fontWeight:'700', fontSize:'13px',
+      zIndex:'3000', boxShadow:'0 8px 24px rgba(59,130,246,.4)',
+      transition:'opacity .3s'
+    });
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAdmin(); });
   </script>
 
 </body>
