@@ -3027,6 +3027,48 @@
     }
     .industry-teaser-arrow { font-size: 14px; transition: transform .15s; }
     .industry-teaser-card:hover .industry-teaser-arrow { transform: translateX(3px); }
+
+    /* ── Admin updates list items ── */
+    .admin-update-item {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+    .admin-update-item:last-child { margin-bottom: 0; }
+    .admin-update-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 700; color: #fff;
+      margin-bottom: 2px;
+    }
+    .admin-update-meta {
+      font-size: 11px; color: var(--muted-2);
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;
+    }
+    .admin-update-type {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      color: var(--accent-2);
+      background: rgba(59,130,246,.12);
+      border: 1px solid rgba(59,130,246,.2);
+      border-radius: 4px; padding: 1px 7px;
+    }
+    .admin-update-del {
+      background: rgba(239,68,68,.15);
+      border: 1px solid rgba(239,68,68,.25);
+      color: #f87171;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background .15s;
+    }
+    .admin-update-del:hover { background: rgba(239,68,68,.28); }
   </style>
 </head>
 <body>
@@ -3357,6 +3399,7 @@
           <button class="admin-tab active" onclick="switchAdminTab('snu',this)">🏆 SNU Data</button>
           <button class="admin-tab" onclick="switchAdminTab('spotlight',this)">⭐ Agent Spotlight</button>
           <button class="admin-tab" onclick="switchAdminTab('aom',this)">🗓️ Agent of Month</button>
+          <button class="admin-tab" onclick="switchAdminTab('updates',this)">📡 Updates Feed</button>
         </div>
 
         <!-- ── Tab: SNU Data ── -->
@@ -3578,6 +3621,80 @@
 
         </div>
         </div><!-- /adminTabAom -->
+        <!-- ── Tab: Updates Feed ── -->
+        <div id="adminTabUpdates" class="admin-tab-panel">
+        <div class="admin-body">
+
+          <div class="admin-section-title">📡 Updates Feed</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add announcements, carrier updates, training reminders, or weekly priorities. They appear instantly on the dashboard.</p>
+
+          <!-- New update form -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:12px;padding:16px;margin-bottom:16px;">
+            <div class="admin-section-title" style="margin-bottom:10px;font-size:11px;">➕ New Update</div>
+
+            <div class="admin-week-row" style="margin-bottom:10px;">
+              <div class="admin-field">
+                <label>Title</label>
+                <input class="admin-input" id="updTitle" placeholder="Q2 Carrier Bonus Update">
+              </div>
+              <div class="admin-field">
+                <label>Type</label>
+                <select class="admin-input" id="updType">
+                  <option>Announcement</option>
+                  <option>Carrier Update</option>
+                  <option>Training</option>
+                  <option>Reminder</option>
+                  <option>Priority</option>
+                  <option>Incentive</option>
+                  <option>Event</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="admin-field" style="margin-bottom:10px;">
+              <label>Message</label>
+              <textarea class="admin-input" id="updMessage" rows="3" placeholder="Details about this update…" style="resize:vertical;min-height:66px;"></textarea>
+            </div>
+
+            <div class="admin-week-row" style="margin-bottom:10px;">
+              <div class="admin-field">
+                <label>Date (optional)</label>
+                <input class="admin-input" id="updDate" type="date">
+              </div>
+              <div class="admin-field">
+                <label>Priority</label>
+                <select class="admin-input" id="updPriority">
+                  <option value="">None</option>
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="admin-week-row" style="margin-bottom:14px;">
+              <div class="admin-field">
+                <label>Button Label (optional)</label>
+                <input class="admin-input" id="updBtnText" placeholder="Learn More">
+              </div>
+              <div class="admin-field">
+                <label>Button URL (optional)</label>
+                <input class="admin-input" id="updBtnUrl" placeholder="https://...">
+              </div>
+            </div>
+
+            <button class="admin-save-btn" style="width:auto;padding:10px 24px;background:var(--accent);" onclick="addUpdate()">➕ Add Update</button>
+          </div>
+
+          <!-- Existing updates list -->
+          <div class="admin-section-title" style="margin-top:4px;">📋 Current Updates <span id="updCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+          <div id="adminUpdatesList">
+            <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No updates yet.</div>
+          </div>
+
+        </div>
+        </div><!-- /adminTabUpdates -->
+
 
 
       </div>
@@ -3985,16 +4102,9 @@ When answering:
     const DATA_URL = 'https://script.google.com/macros/s/AKfycbz6ZQm5QdcvIaqPiCRt-fTvpn65m9SzCHZrEeK16m61wIJeIO6G0Q5HfpqhIQK2RbpEkg/exec';
 
     async function loadData() {
-      try {
-        const r = await fetch(DATA_URL + '?t=' + Date.now());
-        if (!r.ok) throw new Error('fetch failed');
-        const d = await r.json();
-        renderFeed(d.feed || []);
-      } catch (e) {
-        console.error(e);
-        q('feed-list').innerHTML  = '<div class="empty">Updates unavailable — check your data source.</div>';
-        q('leaderboard-table').innerHTML = '<div class="empty" style="border:none;border-radius:0">Leaderboard unavailable — check your data source.</div>';
-      }
+      // Feed is now managed via SNU Admin — no external fetch needed
+      // (Legacy Google Script fetch kept as fallback but localStorage takes priority)
+      if (typeof initUpdates === 'function') return; // handled by updates-script
     }
 
     function renderFeed(items) {
@@ -5709,6 +5819,122 @@ When answering:
     if (zone)    zone.classList.remove('has-photo');
     showSnuToast('🗑 ' + AOM_MONTHS[_aomEditingMonth] + ' cleared.');
   }
+  </script>
+
+
+  <script id="updates-script">
+  const UPDATES_KEY = 'snu_updates_v1';
+  let _updates = [];
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+  function initUpdates() {
+    try {
+      const raw = localStorage.getItem(UPDATES_KEY);
+      _updates = raw ? JSON.parse(raw) : [];
+    } catch(e) { _updates = []; }
+    renderFeedFromStorage();
+    refreshAdminUpdatesList();
+  }
+
+  // ── Render the dashboard feed from localStorage ──────────────────────────
+  function renderFeedFromStorage() {
+    const items = [..._updates].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    const el    = document.getElementById('feed-list');
+    const badge = document.getElementById('feed-count');
+    if (!el) return;
+    if (badge) badge.textContent = items.length + (items.length === 1 ? ' update' : ' updates');
+    if (!items.length) {
+      el.innerHTML = '<div class="empty">No updates right now — add some via SNU Admin.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const xa   = s => String(s||'').replace(/"/g,'&quot;');
+    el.innerHTML = items.map(i => `
+      <div class="feed-card">
+        <span class="feed-type">${pesc(i.type || 'Update')}</span>
+        <h4>${pesc(i.title || 'Untitled')}</h4>
+        <p>${pesc(i.message || '')}</p>
+        ${i.btnText && i.btnUrl ? `<a class="feed-btn" href="${xa(i.btnUrl)}" target="_blank" rel="noopener noreferrer">${pesc(i.btnText)} ↗</a>` : ''}
+        <div class="feed-meta">
+          ${i.date    ? `<span>📅 ${pesc(i.date)}</span>`         : ''}
+          ${i.priority ? `<span>🚦 ${pesc(i.priority)}</span>`    : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  // ── Refresh admin list ────────────────────────────────────────────────────
+  function refreshAdminUpdatesList() {
+    const el    = document.getElementById('adminUpdatesList');
+    const count = document.getElementById('updCount');
+    if (!el) return;
+    if (count) count.textContent = '(' + _updates.length + ')';
+    if (!_updates.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No updates yet.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // Show newest first
+    const sorted = [..._updates].map((u,i) => ({...u, _i: i})).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
+    el.innerHTML = sorted.map(u => `
+      <div class="admin-update-item">
+        <div>
+          <div class="admin-update-title">${pesc(u.title || 'Untitled')}</div>
+          <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(u.message || '')}</div>
+          <div class="admin-update-meta">
+            <span class="admin-update-type">${pesc(u.type || 'Update')}</span>
+            ${u.date     ? `<span>📅 ${pesc(u.date)}</span>`      : ''}
+            ${u.priority ? `<span>🚦 ${pesc(u.priority)}</span>`  : ''}
+            ${u.btnText  ? `<span>🔗 ${pesc(u.btnText)}</span>`   : ''}
+          </div>
+        </div>
+        <button class="admin-update-del" onclick="deleteUpdate(${u._i})">🗑 Delete</button>
+      </div>`).join('');
+  }
+
+  // ── Add a new update ──────────────────────────────────────────────────────
+  function addUpdate() {
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const title = gv('updTitle');
+    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
+
+    const update = {
+      id:       Date.now(),
+      title,
+      type:     gv('updType')     || 'Announcement',
+      message:  gv('updMessage'),
+      date:     gv('updDate'),
+      priority: gv('updPriority'),
+      btnText:  gv('updBtnText'),
+      btnUrl:   gv('updBtnUrl'),
+    };
+
+    _updates.unshift(update);
+    localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
+    renderFeedFromStorage();
+    refreshAdminUpdatesList();
+
+    // Clear form
+    ['updTitle','updMessage','updDate','updBtnText','updBtnUrl'].forEach(id => {
+      const e = document.getElementById(id); if (e) e.value = '';
+    });
+    ['updType','updPriority'].forEach(id => {
+      const e = document.getElementById(id); if (e) e.selectedIndex = 0;
+    });
+
+    showSnuToast('✓ Update published!');
+  }
+
+  // ── Delete an update ──────────────────────────────────────────────────────
+  function deleteUpdate(idx) {
+    _updates.splice(idx, 1);
+    localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
+    renderFeedFromStorage();
+    refreshAdminUpdatesList();
+    showSnuToast('🗑 Update removed.');
+  }
+
+  // ── Init on load + refresh admin list when admin opens ───────────────────
+  document.addEventListener('DOMContentLoaded', initUpdates);
   </script>
 
 </body>
