@@ -3112,12 +3112,6 @@
       transition: background .15s;
     }
     .admin-update-del:hover { background: rgba(239,68,68,.28); }
-/* ============================================================
-   MEDI HUB — CSS PATCH  (paste just before closing </style>)
-   ============================================================ */
-
-
-/* ── FIX 1: WEEKLY TOP PRODUCERS — darker background ──────── */
 
 .snu-lb-card {
   background: linear-gradient(160deg, rgba(10,20,45,.97) 0%, rgba(16,30,58,.97) 100%) !important;
@@ -6162,7 +6156,18 @@ When answering:
     clone.style.cssText = 'transform:none!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;width:100%!important;overflow:visible!important;';
     printWrap.appendChild(clone);
     document.body.classList.add('snu-printing');
-    window.print();
+    onclick="if(document.getElementById('snuPrintOverlay').classList.contains('open')){window.print();}"
+```
+
+---
+
+**For the patch info on the main page — search for:**
+```
+patch
+```
+or
+```
+v2026-03-12window.print();
     document.body.classList.remove('snu-printing');
     printWrap.innerHTML = '';
   }
