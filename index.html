@@ -3232,7 +3232,7 @@
               <p>Coaching, marketing, and planning resources</p>
             </div>
           </div>
-          <span class="count-chip">6 tools</span>
+          <span class="count-chip">5 tools</span>
         </div>
         <div class="card-grid">
           <a class="card" data-color="blue" href="tools/ai-suite/sales-coach.html">
@@ -3275,14 +3275,7 @@
             <p>Create bundled coverage scenarios and review option groupings for clients.</p>
             <span class="card-tag">Quoting</span>
           </a>
-          <a class="card" data-color="rose" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">
-            <span class="card-arrow">↗</span>
-            <div class="card-shimmer"></div>
-            <div class="card-icon-wrap">🗂️</div>
-            <h3>AgencyBloc</h3>
-            <p>Jump straight into your CRM, pipeline, and activity management dashboard.</p>
-            <span class="card-tag">CRM</span>
-          </a>
+
         </div>
       </div>
     </section>
@@ -3298,9 +3291,18 @@
               <p>Direct links to your key portals and platforms</p>
             </div>
           </div>
-          <span class="count-chip">5 portals</span>
+          <span class="count-chip">6 portals</span>
         </div>
         <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+
+          <a class="card" data-color="rose" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">🗂️</div>
+            <h3>AgencyBloc</h3>
+            <p>Jump straight into your CRM, pipeline, and activity management dashboard.</p>
+            <span class="card-tag">CRM</span>
+          </a>
 
           <a class="card" data-color="blue" href="https://www.insurancetoolsportal.com/" target="_blank" rel="noopener noreferrer">
             <span class="card-arrow">↗</span>
@@ -3505,6 +3507,14 @@
         <!-- ── Tab: SNU Data ── -->
         <div id="adminTabSnu" class="admin-tab-panel active">
         <div class="admin-body">
+        <!-- ☁️ Sync All Banner -->
+        <div style="background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(59,130,246,.05));border:1px solid rgba(59,130,246,.25);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;">☁️ Cloud Sync</div>
+            <div style="font-size:11px;color:var(--muted-2);">Push ALL data to cloud so every device sees it</div>
+          </div>
+          <button onclick="syncAllToCloud()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🔄 Sync All Now</button>
+        </div>
 
           <div class="admin-section-title">📅 Week Info</div>
           <div class="admin-week-row">
@@ -4213,119 +4223,161 @@ When answering:
 
   <script id="jsonbin-sync">
   // ═══════════════════════════════════════════════════════════════
-  //  MY MEDI — JSONBin Cloud Sync Layer
-  //  All admin saves write to JSONBin + localStorage (as cache).
-  //  All page loads read from JSONBin (falls back to localStorage).
+  //  MY MEDI — JSONBin Cloud Sync Layer v2
+  //  Main bin  : text data (no photos)
+  //  Photo bin : compressed photos (auto-created on first sync)
   // ═══════════════════════════════════════════════════════════════
-  const JB_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
-  const JB_BIN_ID_KEY = 'mymedi_jb_bin_id';
-  const JB_BIN_ID_HARDCODED = '69b2cd77aa77b81da9dbc6e6'; // My Medi Hub bin
-  const JB_BASE        = 'https://api.jsonbin.io/v3';
+  const JB_MASTER_KEY    = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
+  const JB_BASE          = 'https://api.jsonbin.io/v3';
+  const JB_MAIN_BIN      = '69b2cd77aa77b81da9dbc6e6';
+  const JB_PHOTO_BIN_KEY = 'mymedi_jb_photo_bin_id';
+  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[] };
 
-  const JB_EMPTY = {
-    snu_data:     {},
-    snu_article:  {},
-    snu_spotlight:{},
-    snu_aom:      {},
-    snu_updates:  []
-  };
-
-  // ── Low-level helpers ──────────────────────────────────────────
-  async function jbGetBinId() {
-    // Always use the hardcoded bin ID — same bin for every device
-    localStorage.setItem(JB_BIN_ID_KEY, JB_BIN_ID_HARDCODED);
-    return JB_BIN_ID_HARDCODED;
-  }
-
-  async function jbRead() {
-    const id = await jbGetBinId();
-    if (!id) return null;
+  // ── Generic bin helpers ────────────────────────────────────────
+  async function jbReadBin(id) {
     try {
-      const res  = await fetch(JB_BASE + '/b/' + id + '/latest', {
-        headers: { 'X-Master-Key': JB_MASTER_KEY }
-      });
-      const data = await res.json();
-      return data?.record || null;
-    } catch(e) { console.warn('[JB] Read failed:', e); return null; }
+      const res = await fetch(`${JB_BASE}/b/${id}/latest`, { headers:{ 'X-Master-Key': JB_MASTER_KEY } });
+      return (await res.json())?.record || null;
+    } catch(e) { return null; }
   }
-
-  async function jbWrite(record) {
-    const id = await jbGetBinId();
-    if (!id) return false;
+  async function jbWriteBin(id, record) {
     try {
-      await fetch(JB_BASE + '/b/' + id, {
-        method:  'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': JB_MASTER_KEY
-        },
+      const res = await fetch(`${JB_BASE}/b/${id}`, {
+        method:'PUT', headers:{ 'Content-Type':'application/json', 'X-Master-Key': JB_MASTER_KEY },
         body: JSON.stringify(record)
       });
-      return true;
-    } catch(e) { console.warn('[JB] Write failed:', e); return false; }
+      return res.ok;
+    } catch(e) { return false; }
+  }
+  async function jbCreateBin(name, data) {
+    try {
+      const res = await fetch(`${JB_BASE}/b`, {
+        method:'POST', headers:{ 'Content-Type':'application/json', 'X-Master-Key': JB_MASTER_KEY, 'X-Bin-Name': name, 'X-Private':'true' },
+        body: JSON.stringify(data)
+      });
+      return (await res.json())?.metadata?.id || null;
+    } catch(e) { return null; }
   }
 
-  // ── In-memory cache of the full cloud record ───────────────────
+  // ── Photo bin ─────────────────────────────────────────────────
+  async function jbGetPhotoBinId() {
+    let id = localStorage.getItem(JB_PHOTO_BIN_KEY);
+    if (id) return id;
+    id = await jbCreateBin('my-medi-photos', { spotlight: null, aom: {} });
+    if (id) localStorage.setItem(JB_PHOTO_BIN_KEY, id);
+    return id;
+  }
+
+  // ── Compress image to max 400px wide, JPEG 0.75 ───────────────
+  function compressPhoto(base64, maxW = 400) {
+    return new Promise(resolve => {
+      if (!base64 || !base64.startsWith('data:image')) { resolve(base64); return; }
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * scale);
+        c.height = Math.round(img.height * scale);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL('image/jpeg', 0.75));
+      };
+      img.onerror = () => resolve(base64);
+      img.src = base64;
+    });
+  }
+
+  // ── Save photos to photo bin ──────────────────────────────────
+  async function jbSavePhotos(spPhoto, aomData) {
+    const id = await jbGetPhotoBinId();
+    if (!id) return false;
+    const aomPhotos = {};
+    if (aomData) for (const k in aomData) {
+      if (aomData[k]?.photo) aomPhotos[k] = await compressPhoto(aomData[k].photo);
+    }
+    return jbWriteBin(id, { spotlight: spPhoto ? await compressPhoto(spPhoto) : null, aom: aomPhotos });
+  }
+
+  // ── Load photos from photo bin ────────────────────────────────
+  async function jbLoadPhotos() {
+    const id = localStorage.getItem(JB_PHOTO_BIN_KEY);
+    if (!id) return null;
+    return jbReadBin(id);
+  }
+
+  // ── Strip photos from record before saving to main bin ────────
+  function jbStripPhotos(r) {
+    const c = JSON.parse(JSON.stringify(r));
+    if (c.snu_spotlight?.photo) c.snu_spotlight.photo = null;
+    if (c.snu_aom) for (const k in c.snu_aom) { if (c.snu_aom[k]) c.snu_aom[k].photo = null; }
+    if (Array.isArray(c.snu_updates)) c.snu_updates = c.snu_updates.map(u => ({...u, attachBase64:null}));
+    return c;
+  }
+
   window._jbRecord = null;
 
-  // ── Load everything from cloud on page init ────────────────────
+  // ── Init: load main + photos in parallel, merge, render ───────
   window.jbInit = async function() {
-    const record = await jbRead();
-    if (!record) {
-      console.warn('[JB] Using localStorage fallback');
-      return;
+    const [record, photos] = await Promise.all([ jbReadBin(JB_MAIN_BIN), jbLoadPhotos() ]);
+    if (!record) { console.warn('[JB] No cloud data'); return; }
+
+    if (photos) {
+      if (photos.spotlight && record.snu_spotlight) record.snu_spotlight.photo = photos.spotlight;
+      if (photos.aom && record.snu_aom) for (const k in photos.aom) {
+        if (record.snu_aom[k]) record.snu_aom[k].photo = photos.aom[k];
+      }
     }
     window._jbRecord = record;
 
-    // Push cloud data into localStorage
-    if (record.snu_data     && Object.keys(record.snu_data).length)
-      localStorage.setItem('snu_data_v1',      JSON.stringify(record.snu_data));
-    if (record.snu_article  && Object.keys(record.snu_article).length)
-      localStorage.setItem('snu_article_v1',   JSON.stringify(record.snu_article));
-    if (record.snu_spotlight && Object.keys(record.snu_spotlight).length)
-      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
-    if (record.snu_aom      && Object.keys(record.snu_aom).length)
-      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
-    if (Array.isArray(record.snu_updates) && record.snu_updates.length)
-      localStorage.setItem('snu_updates_v1',   JSON.stringify(record.snu_updates));
+    if (record.snu_data     && Object.keys(record.snu_data).length)    localStorage.setItem('snu_data_v1',      JSON.stringify(record.snu_data));
+    if (record.snu_article  && Object.keys(record.snu_article).length)  localStorage.setItem('snu_article_v1',   JSON.stringify(record.snu_article));
+    if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
+    if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
+    if (Array.isArray(record.snu_updates) && record.snu_updates.length) localStorage.setItem('snu_updates_v1',  JSON.stringify(record.snu_updates));
 
-    // Re-render spotlight directly with cloud data
-    if (record.snu_spotlight && Object.keys(record.snu_spotlight).length) {
-      if (typeof renderSpotlightCard === 'function') renderSpotlightCard(record.snu_spotlight);
-    }
-
-    // Stage updates override for the init sequence to pick up
-    if (Array.isArray(record.snu_updates) && record.snu_updates.length) {
-      window._jb_updates_override = record.snu_updates;
-    }
+    if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
+    if (typeof renderAllAomCards    === 'function') renderAllAomCards();
+    if (typeof renderSpotlightCard  === 'function') renderSpotlightCard(record.snu_spotlight?.name ? record.snu_spotlight : undefined);
+    if (Array.isArray(record.snu_updates) && record.snu_updates.length) window._jb_updates_override = record.snu_updates;
 
     if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cloud!');
   };
 
-  // ── Save a specific field to cloud ────────────────────────────
+  // ── Save a field ──────────────────────────────────────────────
   window.jbSave = async function(field, value) {
-    // Update localStorage immediately (instant UI)
-    const lsKey = {
-      snu_data:     'snu_data_v1',
-      snu_article:  'snu_article_v1',
-      snu_spotlight:'snu_spotlight_v1',
-      snu_aom:      'snu_aom_v1',
-      snu_updates:  'snu_updates_v1'
-    }[field];
-    if (lsKey) {
-      try { localStorage.setItem(lsKey, JSON.stringify(value)); } catch(e) {}
+    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1' };
+    if (lsMap[field]) { try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {} }
+
+    // Save photos to photo bin
+    if (field === 'snu_spotlight') {
+      const aom = (() => { try { return JSON.parse(localStorage.getItem('snu_aom_v1')||'{}'); } catch(e){return{};} })();
+      jbSavePhotos(value?.photo||null, aom);
     }
-    // Merge with latest cloud record and write back
-    const latest = (await jbRead()) || { ...JB_EMPTY };
+    if (field === 'snu_aom') {
+      const sp = (() => { try { return JSON.parse(localStorage.getItem('snu_spotlight_v1')||'{}'); } catch(e){return{};} })();
+      jbSavePhotos(sp?.photo||null, value);
+    }
+
+    const latest = (await jbReadBin(JB_MAIN_BIN)) || {...JB_EMPTY};
     latest[field] = value;
     window._jbRecord = latest;
-    const ok = await jbWrite(latest);
-    if (ok) {
-      if (typeof showSnuToast === 'function') showSnuToast('☁️ Synced to cloud!');
-    } else {
-      if (typeof showSnuToast === 'function') showSnuToast('⚠️ Cloud sync failed — saved locally only.');
-    }
+    const ok = await jbWriteBin(JB_MAIN_BIN, jbStripPhotos(latest));
+    if (typeof showSnuToast === 'function') showSnuToast(ok ? '☁️ Synced to cloud!' : '⚠️ Cloud sync failed — saved locally only.');
     return ok;
+  };
+
+  // ── Sync everything at once ───────────────────────────────────
+  window.syncAllToCloud = async function() {
+    const btn = document.querySelector('[onclick="syncAllToCloud()"]');
+    if (btn) { btn.textContent = '⏳ Syncing…'; btn.disabled = true; }
+    const g = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
+    const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[] };
+    const [ok] = await Promise.all([
+      jbWriteBin(JB_MAIN_BIN, jbStripPhotos(record)),
+      jbSavePhotos(record.snu_spotlight?.photo||null, record.snu_aom)
+    ]);
+    window._jbRecord = record;
+    if (btn) { btn.textContent = '🔄 Sync All Now'; btn.disabled = false; }
+    if (typeof showSnuToast === 'function') showSnuToast(ok ? '☁️ All data + photos synced!' : '⚠️ Sync failed.');
   };
 
   </script>
