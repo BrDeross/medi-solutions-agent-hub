@@ -4357,6 +4357,13 @@ When answering:
 
     const latest = (await jbReadBin(JB_MAIN_BIN)) || {...JB_EMPTY};
     latest[field] = value;
+    // Keep photos in _jbRecord so print modal can access them
+    if (field === 'snu_spotlight' && value?.photo) {
+      latest.snu_spotlight = { ...value };
+    }
+    if (field === 'snu_aom') {
+      latest.snu_aom = { ...value };
+    }
     window._jbRecord = latest;
     const ok = await jbWriteBin(JB_MAIN_BIN, jbStripPhotos(latest));
     if (typeof showSnuToast === 'function') showSnuToast(ok ? '☁️ Synced to cloud!' : '⚠️ Cloud sync failed — saved locally only.');
@@ -5690,6 +5697,47 @@ When answering:
               <span class="mag-exec-streak">${e.weeks || '?'}wk</span>
             </div>`).join('')
         : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:8px 0;">No consecutive executives entered yet.</div>';
+    }
+
+    // ── Agent Spotlight ──
+    const spotEl = g('magSpotlightSpread');
+    if (spotEl) {
+      let sp = null;
+      // Try window._jbRecord first (has photos injected from cloud)
+      if (window._jbRecord && window._jbRecord.snu_spotlight && window._jbRecord.snu_spotlight.name) {
+        sp = window._jbRecord.snu_spotlight;
+      } else {
+        try { sp = JSON.parse(localStorage.getItem('snu_spotlight_v1') || 'null'); } catch(e) {}
+      }
+      if (sp && sp.name) {
+        const stats = Array.isArray(sp.stats) ? sp.stats.filter(s => s.label && s.value) : [];
+        spotEl.innerHTML = `
+          <div style="display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:start;">
+            <div>
+              ${sp.photo
+                ? `<img src="${sp.photo}" alt="${pesc(sp.name)}" style="width:100%;height:260px;object-fit:cover;object-position:top center;border-radius:12px;display:block;">`
+                : `<div style="width:100%;height:260px;border-radius:12px;background:linear-gradient(135deg,#1e3a6e,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:64px;">⭐</div>`
+              }
+              ${sp.award ? `<div style="margin-top:10px;text-align:center;font-size:12px;font-weight:700;color:#f59e0b;letter-spacing:.06em;text-transform:uppercase;">${pesc(sp.award)}</div>` : ''}
+            </div>
+            <div>
+              <div style="font-size:22px;font-weight:800;color:#1e3a6e;margin-bottom:2px;">${pesc(sp.name)}</div>
+              ${sp.title ? `<div style="font-size:13px;color:#64748b;margin-bottom:14px;">${pesc(sp.title)}</div>` : ''}
+              ${stats.length ? `
+                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+                  ${stats.map(s => `
+                    <div style="background:#f1f5f9;border-radius:8px;padding:10px 16px;min-width:80px;text-align:center;">
+                      <div style="font-size:16px;font-weight:800;color:#1e3a6e;">${pesc(s.value)}</div>
+                      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">${pesc(s.label)}</div>
+                    </div>`).join('')}
+                </div>` : ''}
+              ${sp.bio  ? `<p style="font-size:13px;color:#334155;line-height:1.65;margin-bottom:12px;">${pesc(sp.bio)}</p>` : ''}
+              ${sp.quote ? `<blockquote style="border-left:3px solid #f59e0b;margin:0;padding:8px 14px;font-style:italic;font-size:13px;color:#475569;">"${pesc(sp.quote)}"</blockquote>` : ''}
+            </div>
+          </div>`;
+      } else {
+        spotEl.innerHTML = `<div style="color:#94a3b8;font-style:italic;font-size:13px;text-align:center;padding:24px 0;">No spotlight set — feature an agent via SNU Admin.</div>`;
+      }
     }
 
     // ── Article ──
