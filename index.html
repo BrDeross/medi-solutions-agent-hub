@@ -2,6 +2,7 @@
 <html lang="en"><!-- My Medi Hub v2026-03-12 14:27 -->
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -4230,7 +4231,8 @@ When answering:
   const JB_MASTER_KEY    = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
   const JB_BASE          = 'https://api.jsonbin.io/v3';
   const JB_MAIN_BIN      = '69b2cd77aa77b81da9dbc6e6';
-  const JB_PHOTO_BIN_KEY = 'mymedi_jb_photo_bin_id';
+  const JB_PHOTO_BIN_KEY          = 'mymedi_jb_photo_bin_id';
+  const JB_PHOTO_BIN_HARDCODED = '69b2da94c3097a1dd51cd2cf';
   const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[] };
 
   // ── Generic bin helpers ────────────────────────────────────────
@@ -4261,11 +4263,9 @@ When answering:
 
   // ── Photo bin ─────────────────────────────────────────────────
   async function jbGetPhotoBinId() {
-    let id = localStorage.getItem(JB_PHOTO_BIN_KEY);
-    if (id) return id;
-    id = await jbCreateBin('my-medi-photos', { spotlight: null, aom: {} });
-    if (id) localStorage.setItem(JB_PHOTO_BIN_KEY, id);
-    return id;
+    // Always use hardcoded bin — same for every device
+    localStorage.setItem(JB_PHOTO_BIN_KEY, JB_PHOTO_BIN_HARDCODED);
+    return JB_PHOTO_BIN_HARDCODED;
   }
 
   // ── Compress image to max 400px wide, JPEG 0.75 ───────────────
@@ -4299,9 +4299,7 @@ When answering:
 
   // ── Load photos from photo bin ────────────────────────────────
   async function jbLoadPhotos() {
-    const id = localStorage.getItem(JB_PHOTO_BIN_KEY);
-    if (!id) return null;
-    return jbReadBin(id);
+    return jbReadBin(JB_PHOTO_BIN_HARDCODED);
   }
 
   // ── Strip photos from record before saving to main bin ────────
