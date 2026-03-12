@@ -6051,6 +6051,8 @@ When answering:
     }
     initUpdates();
   });
+
+  function initUpdates() {
     try {
       const raw = localStorage.getItem(UPDATES_KEY);
       _updates = raw ? JSON.parse(raw) : [];
