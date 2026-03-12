@@ -1500,17 +1500,6 @@
       border-left-color: var(--accent-2);
       transform: translateX(4px);
     }
-    /* Starred / pinned feed card */
-    .feed-card-starred {
-      border-left-color: #fbbf24 !important;
-      border-left-width: 4px !important;
-      background: rgba(251,191,36,.07) !important;
-      box-shadow: 0 0 0 1px rgba(251,191,36,.18);
-    }
-    .feed-card-starred:hover {
-      border-left-width: 6px !important;
-      border-left-color: #fbbf24 !important;
-    }
 
     /* Leaderboard rank badge glow */
     .rank-badge.r1 { animation: goldGlow 2s ease-in-out infinite; }
@@ -1597,15 +1586,15 @@
 
     /* ── LEFT: Leaderboard ── */
     .snu-lb-card {
-      background: #dbeafe;
-      border: 1px solid #93c5fd;
+      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
+      border: 1px solid var(--border-2);
       border-radius: var(--r-xl);
       overflow: hidden;
     }
 
     .snu-lb-header {
-      background: linear-gradient(90deg, #bfdbfe, #dbeafe);
-      border-bottom: 1px solid #93c5fd;
+      background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
+      border-bottom: 1px solid rgba(251,191,36,.2);
       padding: 18px 24px;
       display: flex;
       align-items: center;
@@ -1615,22 +1604,22 @@
     .snu-lb-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 15px; font-weight: 700;
-      color: #1e3a8a;
+      color: var(--gold);
       display: flex; align-items: center; gap: 8px;
     }
 
     .snu-week-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px; font-weight: 600;
-      color: #1e40af;
-      background: rgba(255,255,255,.6);
-      border: 1px solid #93c5fd;
+      color: var(--muted);
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
       border-radius: 6px;
       padding: 3px 8px;
       letter-spacing: .5px;
     }
 
-    .snu-lb-list { padding: 12px 0; background: #dbeafe; }
+    .snu-lb-list { padding: 12px 0; }
 
     .snu-lb-row {
       display: grid;
@@ -1639,10 +1628,10 @@
       gap: 12px;
       padding: 10px 24px;
       transition: background .15s;
-      border-bottom: 1px solid rgba(147,197,253,.5);
+      border-bottom: 1px solid rgba(255,255,255,.04);
     }
     .snu-lb-row:last-child { border-bottom: none; }
-    .snu-lb-row:hover { background: rgba(191,219,254,.6); }
+    .snu-lb-row:hover { background: rgba(255,255,255,.03); }
 
     .snu-rank {
       width: 36px; height: 36px;
@@ -1652,23 +1641,23 @@
       font-size: 15px; font-weight: 800;
       flex-shrink: 0;
     }
-    .snu-rank.gold   { background: rgba(251,191,36,.3); color: #92400e; border: 1px solid rgba(251,191,36,.6); box-shadow: 0 0 12px rgba(251,191,36,.2); }
-    .snu-rank.silver { background: rgba(148,163,184,.25); color: #334155; border: 1px solid rgba(148,163,184,.5); }
-    .snu-rank.bronze { background: rgba(205,124,74,.2); color: #7c2d12; border: 1px solid rgba(205,124,74,.4); }
-    .snu-rank.other  { background: rgba(59,130,246,.18); color: #1e3a8a; border: 1px solid rgba(59,130,246,.35); }
+    .snu-rank.gold   { background: rgba(251,191,36,.18); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 12px rgba(251,191,36,.2); }
+    .snu-rank.silver { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+    .snu-rank.bronze { background: rgba(205,124,74,.12); color: #cd7c4a; border: 1px solid rgba(205,124,74,.25); }
+    .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
 
     .snu-agent-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px; font-weight: 700; color: #1e293b;
+      font-size: 14px; font-weight: 700; color: #fff;
     }
     .snu-agent-sub {
-      font-size: 11px; color: #64748b; margin-top: 1px;
+      font-size: 11px; color: var(--muted-2); margin-top: 1px;
     }
 
     .snu-prod {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px; font-weight: 600;
-      color: #166534;
+      color: var(--green);
       white-space: nowrap;
     }
 
@@ -1873,15 +1862,6 @@
     .admin-input:focus {
       border-color: var(--accent);
       background: rgba(255,255,255,.1);
-    }
-    /* Fix select dropdown option text color */
-    .admin-input option {
-      background: #1e3d72;
-      color: #000;
-    }
-    select.admin-input option {
-      background: #ffffff;
-      color: #000000;
     }
 
     .admin-remove-btn {
@@ -2133,28 +2113,12 @@
       opacity: 0; pointer-events: none;
       transition: opacity .35s;
       overflow-y: auto;
-      padding: 64px 16px 60px;
+      padding: 28px 16px 60px;
       display: flex;
       align-items: flex-start;
       justify-content: center;
     }
     .snu-print-overlay.open { opacity: 1; pointer-events: all; }
-
-    /* Fixed action bar sits at top of the overlay viewport */
-    .snu-print-actions {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 3100;
-      background: #fff;
-      padding: 10px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid #e2e8f0;
-      box-shadow: 0 2px 12px rgba(0,0,0,.12);
-      pointer-events: all;
-      opacity: 0;
-      transition: opacity .2s;
-    }
-    .snu-print-overlay.open .snu-print-actions { opacity: 1; }
 
     .snu-print-modal {
       width: min(980px, 100%);
@@ -2164,9 +2128,18 @@
       box-shadow: 0 50px 120px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.07);
       transform: translateY(32px) scale(.98);
       transition: transform .4s cubic-bezier(.22,1,.36,1);
-      position: relative;
     }
     .snu-print-overlay.open .snu-print-modal { transform: translateY(0) scale(1); }
+
+    /* ── Action bar ── */
+    .snu-print-actions {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(20px);
+      padding: 12px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,.08);
+    }
     .snu-print-action-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px; font-weight: 700; color: #64748b;
@@ -2511,35 +2484,28 @@
 
     /* ── Print ── */
     @media print {
-      /* ── When NOT printing SNU: normal print ── */
-      body:not(.snu-printing) .snu-print-overlay { display: none !important; }
-
-      /* ── When printing SNU: hide the entire page, show only print content ── */
-      body.snu-printing > *                    { display: none !important; }
-      body.snu-printing > #snuPrintContent     { display: block !important; }
-
-      #snuPrintContent {
-        display: none; /* hidden by default, shown only during print */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      /* Hide the entire page when printing SNU */
+      body.snu-printing > * { display: none !important; }
+      /* Show only the clean print container — no overlay, no backdrop, no dark bg */
+      body.snu-printing > #snuPrintContent {
+        display: block !important;
         position: static !important;
-        width: 100% !important;
-        margin: 0 !important; padding: 0 !important;
         background: #f0f4f8 !important;
-        overflow: visible !important;
-      }
-      #snuPrintContent .snu-print-modal {
-        box-shadow: none !important;
-        border-radius: 0 !important;
         width: 100% !important;
-        max-width: 100% !important;
-        transform: none !important;
-        opacity: 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
         overflow: visible !important;
-        background: #f0f4f8 !important;
       }
       #snuPrintContent .snu-print-actions { display: none !important; }
-      .mag-cover { height: 320px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      .mag-body, .mag-two-col, .mag-col { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      #snuPrintContent .snu-print-modal {
+        transform: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        overflow: visible !important;
+        background: #f0f4f8 !important;
+      }
     }
 
     @media (max-width: 680px) {
@@ -2686,49 +2652,22 @@
     /* Bio */
     .spotlight-bio {
       font-size:14px;line-height:1.8;color:var(--muted);
-      margin-bottom:18px;
+      margin-bottom:24px;
       flex:1;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 12px;
-      padding: 16px 18px;
-      position: relative;
-    }
-    .spotlight-bio::before {
-      content: '📋 Bio';
-      display: block;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--accent-2);
-      margin-bottom: 8px;
-      font-style: normal;
     }
 
     /* Quote */
     .spotlight-quote {
-      border: 1px solid rgba(251,191,36,.35);
-      padding: 18px 20px 14px;
-      background: rgba(251,191,36,.08);
-      border-radius: 12px;
-      font-size: 15px; font-style: italic;
-      color: rgba(255,255,255,.88); line-height:1.65;
-      margin-bottom: 20px;
-      position: relative;
+      border-left:3px solid var(--gold);
+      padding:12px 18px;
+      background:rgba(251,191,36,.06);
+      border-radius:0 8px 8px 0;
+      font-size:14px;font-style:italic;
+      color:rgba(255,255,255,.7);line-height:1.6;
+      margin-bottom:24px;
     }
-    .spotlight-quote::before {
-      content: '"';
-      position: absolute;
-      top: -14px; left: 16px;
-      font-size: 52px;
-      line-height: 1;
-      color: var(--gold);
-      font-style: normal;
-      font-family: Georgia, serif;
-      opacity: .9;
-    }
-    .spotlight-quote::after { content: none; }
+    .spotlight-quote::before{content:'"';color:var(--gold);font-size:22px;line-height:0;vertical-align:-.3em;margin-right:4px;}
+    .spotlight-quote::after{content:'"';color:var(--gold);font-size:22px;line-height:0;vertical-align:-.3em;margin-left:2px;}
 
     /* Footer row */
     .spotlight-footer-row {
@@ -2900,7 +2839,7 @@
       border-radius: 12px;
       overflow: hidden;
       height: 160px;
-      background: #1a2e4a;
+      background: linear-gradient(160deg, rgba(30,61,114,.6), rgba(10,15,26,.8));
       position: relative;
       display: flex; align-items: center; justify-content: center;
     }
@@ -2908,10 +2847,9 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      object-fit: contain;
-      object-position: center center;
+      object-fit: cover; object-position: top center;
       display: block;
-      filter: brightness(.92) saturate(1.05);
+      filter: brightness(.88) saturate(1.08);
       transition: transform 5s ease, filter .3s;
       z-index: 0;
     }
@@ -3444,7 +3382,7 @@
               <p>Searchable knowledge tools for quick reference</p>
             </div>
           </div>
-          <span class="count-chip">4 libraries</span>
+          <span class="count-chip">3 libraries</span>
         </div>
         <div class="card-grid">
           <a class="card" data-color="blue" href="tools/acronyms-library/">
@@ -3471,33 +3409,6 @@
             <p>Catchy, practical one-liners organized by call stage and sales situation.</p>
             <span class="card-tag">Calls</span>
           </a>
-          <a class="card" data-color="purple" href="#training-videos">
-            <span class="card-arrow">↗</span>
-            <div class="card-shimmer"></div>
-            <div class="card-icon-wrap">🎥</div>
-            <h3>Training Videos</h3>
-            <p>Step-by-step video walkthroughs for carriers, systems, compliance, and sales skills.</p>
-            <span class="card-tag">Training</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- TRAINING VIDEOS -->
-    <section class="section" id="training-videos">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="sh-left">
-            <div class="sh-icon purple" style="background:rgba(167,139,250,.15);color:#a78bfa;">🎥</div>
-            <div>
-              <h2>Training Videos</h2>
-              <p>Carrier training, sales skills, compliance, and onboarding walkthroughs</p>
-            </div>
-          </div>
-          <span class="count-chip" id="tv-count">0 videos</span>
-        </div>
-        <div id="tv-grid" class="card-grid">
-          <div class="empty" style="grid-column:1/-1;">No training videos yet — add some via Admin → Training Videos.</div>
         </div>
       </div>
     </section>
@@ -3609,7 +3520,6 @@
           <button class="admin-tab" onclick="switchAdminTab('spotlight',this)">⭐ Agent Spotlight</button>
           <button class="admin-tab" onclick="switchAdminTab('aom',this)">🗓️ Agent of Month</button>
           <button class="admin-tab" onclick="switchAdminTab('updates',this)">📡 Updates Feed</button>
-          <button class="admin-tab" onclick="switchAdminTab('training',this)">🎥 Training Videos</button>
         </div>
 
         <!-- ── Tab: SNU Data ── -->
@@ -3653,10 +3563,9 @@
 
           <hr class="admin-divider">
           <div class="admin-section-title">⭐ Consecutive Executives</div>
-          <p style="font-size:12px;color:var(--muted-2);margin-bottom:8px;">Agents who have been in the Top 7 for multiple consecutive weeks.</p>
-          <button class="admin-add-btn" style="margin-bottom:10px;background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.3);color:#c4b5fd;" onclick="autoFillExecs()">✨ Auto-Fill from Top 7 Producers</button>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:12px;">Agents who have been in the Top 7 for multiple consecutive weeks.</p>
           <div id="adminExecRows"></div>
-          <button class="admin-add-btn" onclick="addExecRow()">+ Add Consecutive Executive Manually</button>
+          <button class="admin-add-btn" onclick="addExecRow()">+ Add Consecutive Executive</button>
 
           <hr class="admin-divider">
           <button class="admin-save-btn" onclick="saveSnuData()">💾 Save &amp; Publish SNU</button>
@@ -3927,69 +3836,6 @@
         </div>
         </div><!-- /adminTabUpdates -->
 
-        <!-- ══ TRAINING VIDEOS TAB ══ -->
-        <div id="adminTabTraining" class="admin-tab-panel">
-        <div class="admin-body">
-
-          <div class="admin-section-title">🎥 Training Videos</div>
-          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add training videos by URL (YouTube, Vimeo, or direct link). Give each a title and short description, then publish. Videos appear in the Training Videos library on the hub.</p>
-
-          <!-- Add video form -->
-          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div class="admin-section-title" style="margin-bottom:10px;font-size:11px;">➕ Add Video</div>
-
-            <!-- Drag & drop zone -->
-            <div id="tvDropZone" style="border:2px dashed var(--border-2);border-radius:10px;padding:20px;text-align:center;margin-bottom:12px;cursor:pointer;transition:border-color .2s,background .2s;" 
-              ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='rgba(59,130,246,.07)'"
-              ondragleave="this.style.borderColor='var(--border-2)';this.style.background=''"
-              ondrop="handleTvDrop(event)">
-              <div style="font-size:28px;margin-bottom:6px;">🎬</div>
-              <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">Drag a video file here, or paste a URL below</div>
-              <div style="font-size:11px;color:var(--muted-2);">MP4, YouTube, or Vimeo links accepted</div>
-            </div>
-
-            <div class="admin-field" style="margin-bottom:10px;">
-              <label>Video URL <span style="color:var(--muted-2);font-weight:400;">(YouTube, Vimeo, or direct .mp4)</span></label>
-              <input class="admin-input" id="tvUrl" placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
-            </div>
-
-            <div class="admin-week-row" style="margin-bottom:10px;">
-              <div class="admin-field">
-                <label>Title</label>
-                <input class="admin-input" id="tvTitle" placeholder="Medicare Basics Overview">
-              </div>
-              <div class="admin-field">
-                <label>Category</label>
-                <select class="admin-input" id="tvCategory">
-                  <option>Carrier Training</option>
-                  <option>Medicare</option>
-                  <option>Sales Skills</option>
-                  <option>Compliance</option>
-                  <option>Systems & Tools</option>
-                  <option>Onboarding</option>
-                  <option>Product Knowledge</option>
-                  <option>General</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="admin-field" style="margin-bottom:14px;">
-              <label>Short Description</label>
-              <textarea class="admin-input" id="tvDesc" rows="2" placeholder="What agents will learn from this video…" style="resize:vertical;min-height:52px;"></textarea>
-            </div>
-
-            <button class="admin-save-btn" style="width:auto;padding:10px 24px;background:var(--accent);" onclick="addTrainingVideo()">➕ Add Video</button>
-          </div>
-
-          <!-- Published videos list -->
-          <div class="admin-section-title" style="margin-top:4px;">📋 Published Videos <span id="tvCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
-          <div id="adminVideosList">
-            <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>
-          </div>
-
-        </div>
-        </div><!-- /adminTabTraining -->
-
 
 
       </div>
@@ -3999,17 +3845,16 @@
 
     <!-- SNU PRINT MODAL — Magazine Edition -->
     <div class="snu-print-overlay" id="snuPrintOverlay" onclick="handlePrintOverlayClick(event)">
-
-      <!-- Action bar: fixed at top of screen when overlay is open -->
-      <div class="snu-print-actions" onclick="event.stopPropagation()">
-        <span class="snu-print-action-title">🗞 SNU · Show N Up</span>
-        <div class="snu-print-btn-row">
-          <button class="snu-print-btn ghost" onclick="closeSnuPrint()">✕ Close</button>
-          <button class="snu-print-btn primary" onclick="triggerSnuPrint()">🖨️ Print / Save PDF</button>
-        </div>
-      </div>
-
       <div class="snu-print-modal" id="snuPrintModal">
+
+        <!-- Action bar -->
+        <div class="snu-print-actions">
+          <span class="snu-print-action-title">🗞 SNU · Show N Up</span>
+          <div class="snu-print-btn-row">
+            <button class="snu-print-btn ghost" onclick="closeSnuPrint()">✕ Close</button>
+            <button class="snu-print-btn primary" onclick="triggerSnuPrint()">🖨️ Print / Save PDF</button>
+          </div>
+        </div>
 
         <!-- ══ COVER ══ -->
         <div class="mag-cover">
@@ -4117,7 +3962,7 @@
       </div>
     </div>
 
-    <!-- Print-only content container — populated by triggerSnuPrint(), never visible on screen -->
+    <!-- Hidden print container: cloned into here by triggerSnuPrint(), never shown on screen -->
     <div id="snuPrintContent" style="display:none;"></div>
 
 
@@ -4505,25 +4350,7 @@ When answering:
     if (record.snu_article  && Object.keys(record.snu_article).length)  localStorage.setItem('snu_article_v1',   JSON.stringify(record.snu_article));
     if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
-    if (Array.isArray(record.snu_updates) && record.snu_updates.length) {
-      // Merge: preserve local attachments (cloud strips them to save space)
-      try {
-        const localRaw = localStorage.getItem('snu_updates_v1');
-        const localUpdates = localRaw ? JSON.parse(localRaw) : [];
-        const localMap = {};
-        localUpdates.forEach(u => { if (u.id) localMap[u.id] = u; });
-        const merged = record.snu_updates.map(u => {
-          const local = localMap[u.id];
-          if (local && local.attachBase64) {
-            return { ...u, attachBase64: local.attachBase64, attachType: local.attachType, attachName: local.attachName };
-          }
-          return u;
-        });
-        localStorage.setItem('snu_updates_v1', JSON.stringify(merged));
-      } catch(e) {
-        localStorage.setItem('snu_updates_v1', JSON.stringify(record.snu_updates));
-      }
-    }
+    if (Array.isArray(record.snu_updates) && record.snu_updates.length) localStorage.setItem('snu_updates_v1',  JSON.stringify(record.snu_updates));
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
@@ -5350,13 +5177,9 @@ When answering:
       // Then fetch from cloud and re-render with latest data
       if (typeof jbInit === 'function') {
         await jbInit();
-        // Re-run updates with cloud data if available (jbInit already merged attachments into localStorage)
+        // Re-run updates with cloud data if available
         if (window._jb_updates_override && typeof _updates !== 'undefined') {
-          // Re-read from localStorage to get the merged version with attachments
-          try {
-            const merged = JSON.parse(localStorage.getItem('snu_updates_v1') || '[]');
-            _updates = merged.length ? merged : window._jb_updates_override;
-          } catch(e) { _updates = window._jb_updates_override; }
+          _updates = window._jb_updates_override;
           if (typeof renderFeedFromStorage === 'function') renderFeedFromStorage();
         }
       }
@@ -5406,12 +5229,6 @@ When answering:
     `).join('');
   }
 
-  function getPointsColor(points) {
-    if (!points || points < 5000)  return 'color:#dc2626;font-weight:700;'; // Red under 5000
-    if (points <= 9999)            return 'color:#16a34a;font-weight:700;'; // Green 5001-9999
-    return 'color:#1d4ed8;font-weight:900;font-size:15px;'; // Bold Royal Blue 10000+
-  }
-
   function renderSnuLeaderboard(data) {
     // Week badge
     const badge = document.getElementById('snuWeekBadge');
@@ -5427,20 +5244,16 @@ When answering:
     }
     const rankClass = i => ['gold','silver','bronze','other','other','other','other','other','other','other'][i] || 'other';
     const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
-    list.innerHTML = agents.map((a, i) => {
-      const pts = a.production ? Number(a.production) : null;
-      const clr = getPointsColor(pts);
-      const ptsStr = pts ? Number(pts).toLocaleString() + ' pts' : '—';
-      return `
+    list.innerHTML = agents.map((a, i) => `
       <div class="snu-lb-row">
         <div class="snu-rank ${rankClass(i)}">${i < 3 ? rankEmoji(i) : i+1}</div>
         <div>
-          <div class="snu-agent-name" style="${clr}">${esc(a.name || '—')}</div>
+          <div class="snu-agent-name">${esc(a.name || '—')}</div>
           ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
         </div>
-        <div class="snu-prod" style="${clr}">${ptsStr}</div>
+        <div class="snu-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
       </div>
-    `}).join('');
+    `).join('');
   }
 
   function esc(s) {
@@ -5626,7 +5439,7 @@ When answering:
         <input class="admin-input agent-name-input" value="${esc(a.name||'')}" placeholder="Jane Smith">
       </div>
       <div class="admin-field">
-        <label>Production (pts)</label>
+        <label>Production ($)</label>
         <input class="admin-input agent-prod-input" type="number" value="${a.production||''}" placeholder="12500">
       </div>
       <button class="admin-remove-btn" onclick="this.closest('.admin-row').remove()" title="Remove">✕</button>
@@ -5697,38 +5510,6 @@ When answering:
     });
     document.body.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
-  }
-
-  function autoFillExecs() {
-    // Read current agent rows (top 7)
-    const agentRows = document.querySelectorAll('#adminAgentRows .admin-row');
-    const agents = [];
-    agentRows.forEach(row => {
-      const name = row.querySelector('.agent-name-input')?.value.trim();
-      const prod = row.querySelector('.agent-prod-input')?.value.trim();
-      if (name) agents.push({ name, production: prod ? Number(prod) : null });
-    });
-    // Sort and take top 7
-    agents.sort((a, b) => (b.production || 0) - (a.production || 0));
-    const top7 = agents.slice(0, 7);
-    if (!top7.length) { showSnuToast('⚠ Add agents to the leaderboard first.'); return; }
-
-    // Load existing exec data so we can preserve or increment weeks
-    const execRows = document.getElementById('adminExecRows');
-    const existingExecs = {};
-    document.querySelectorAll('#adminExecRows .admin-exec-row').forEach(row => {
-      const n = row.querySelector('.exec-name-input')?.value.trim();
-      const w = parseInt(row.querySelector('.exec-weeks-input')?.value) || 1;
-      if (n) existingExecs[n.toLowerCase()] = w;
-    });
-
-    // Build new exec list: keep existing weeks for returning top-7 agents, set 1 for new
-    execRows.innerHTML = '';
-    top7.forEach(a => {
-      const prevWeeks = existingExecs[a.name.toLowerCase()] || 0;
-      addExecRow({ name: a.name, weeks: prevWeeks + 1 });
-    });
-    showSnuToast('✓ Auto-filled Top 7 as Consecutive Executives. Adjust weeks if needed, then Save & Publish.');
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAdmin(); });
@@ -5885,9 +5666,9 @@ When answering:
     // ── Rotating cover + article images ──
     const coverImgs = [
       'https://images.unsplash.com/photo-1568992687947-868a62a9f521?w=1200&q=80&fit=crop&crop=center',
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80&fit=crop&crop=center',
-      'https://images.unsplash.com/photo-1560264280-88b68371db39?w=1200&q=80&fit=crop&crop=center',
-      'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&q=80&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80&fit=crop',
     ];
     const articleImgs = [
       'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80&fit=crop',
@@ -5911,26 +5692,15 @@ When answering:
     // ── Leaderboard ──
     const rankClass = i => ['gold','silver','bronze','other'][Math.min(i, 3)];
     const rankLabel = i => i < 3 ? ['🥇','🥈','🥉'][i] : String(i + 1);
-    const printPointsColor = pts => {
-      if (!pts || pts < 5000)  return '#ef4444';
-      if (pts <= 9999)         return '#16a34a';
-      return '#1d4ed8';
-    };
-    const printPointsWeight = pts => pts >= 10000 ? '800' : '700';
     const lbEl = g('magLbList');
     if (lbEl) {
       lbEl.innerHTML = agents.length
-        ? agents.map((a, i) => {
-            const pts = a.production ? Number(a.production) : null;
-            const clr = printPointsColor(pts);
-            const fw  = printPointsWeight(pts);
-            return `
+        ? agents.map((a, i) => `
             <div class="mag-lb-row">
               <div class="mag-rank ${rankClass(i)}">${rankLabel(i)}</div>
-              <div><div class="mag-agent-name" style="color:${clr}">${pesc(a.name || '—')}</div></div>
-              <div class="mag-prod" style="color:${clr};font-weight:${fw}">${pts ? Number(pts).toLocaleString() + ' pts' : '—'}</div>
-            </div>`;
-          }).join('')
+              <div><div class="mag-agent-name">${pesc(a.name || '—')}</div></div>
+              <div class="mag-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
+            </div>`).join('')
         : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:16px 0 8px;">No leaderboard data yet — enter producers in SNU Admin and Save &amp; Publish.</div>';
     }
 
@@ -6011,23 +5781,19 @@ When answering:
   }
 
   function triggerSnuPrint() {
-    const modal = document.getElementById('snuPrintModal');
+    const modal     = document.getElementById('snuPrintModal');
     const printWrap = document.getElementById('snuPrintContent');
-    if (!modal || !printWrap) { alert('Print content not found.'); return; }
+    if (!modal || !printWrap) { window.print(); return; }
 
-    // Clone modal into the clean print container (no overlay, no backdrop, no dark bg)
+    // Clone the modal into the clean, overlay-free print container
     printWrap.innerHTML = '';
     const clone = modal.cloneNode(true);
-    // Make clone fully visible
-    clone.style.cssText = 'transform:none;opacity:1;border-radius:0;box-shadow:none;width:100%;overflow:visible;';
+    clone.style.cssText = 'transform:none!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;width:100%!important;overflow:visible!important;';
     printWrap.appendChild(clone);
 
-    // Add body class — @media print shows ONLY #snuPrintContent when this class is present
+    // body.snu-printing tells @media print to show ONLY #snuPrintContent
     document.body.classList.add('snu-printing');
-
     window.print();
-
-    // Clean up immediately after print dialog closes
     document.body.classList.remove('snu-printing');
     printWrap.innerHTML = '';
   }
@@ -6292,8 +6058,7 @@ When answering:
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
     photo.innerHTML = d.photo
-      ? `<img class="aom-photo" src="${d.photo}" alt="${pesc(d.name)}"
-           style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:center center;display:block;z-index:0;">
+      ? `<img class="aom-photo" src="${d.photo}" alt="${pesc(d.name)}">
          <div class="aom-photo-gradient"></div>
          <div class="aom-badge">🏆 Agent of the Month</div>
          <div class="aom-name-on-photo">
@@ -6504,13 +6269,7 @@ When answering:
 
   // ── Render the dashboard feed from localStorage ──────────────────────────
   function renderFeedFromStorage() {
-    // Sort: starred first (by star time desc), then by date desc
-    const items = [..._updates].sort((a, b) => {
-      if (a.starred && !b.starred) return -1;
-      if (!a.starred && b.starred) return 1;
-      if (a.starred && b.starred) return (b.starredAt || 0) - (a.starredAt || 0);
-      return new Date(b.date || 0) - new Date(a.date || 0);
-    });
+    const items = [..._updates].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
     const el    = document.getElementById('feed-list');
     const badge = document.getElementById('feed-count');
     if (!el) return;
@@ -6536,13 +6295,9 @@ When answering:
           </a>`;
         }
       }
-      const isStarred = !!i.starred;
       return `
-        <div class="feed-card${isStarred ? ' feed-card-starred' : ''}" data-update-id="${i.id}">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <span class="feed-type">${pesc(i.type || 'Update')}</span>
-            ${isStarred ? `<span style="font-size:13px;color:#fbbf24;font-weight:700;">📌 Pinned</span>` : ''}
-          </div>
+        <div class="feed-card">
+          <span class="feed-type">${pesc(i.type || 'Update')}</span>
           <h4>${pesc(i.title || 'Untitled')}</h4>
           <p>${pesc(i.message || '')}</p>
           ${attachHtml}
@@ -6566,17 +6321,12 @@ When answering:
       return;
     }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    // Show starred first, then newest
-    const sorted = [..._updates].map((u,i) => ({...u, _i: i}))
-      .sort((a,b) => {
-        if (a.starred && !b.starred) return -1;
-        if (!a.starred && b.starred) return 1;
-        return new Date(b.date||0) - new Date(a.date||0);
-      });
+    // Show newest first
+    const sorted = [..._updates].map((u,i) => ({...u, _i: i})).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
     el.innerHTML = sorted.map(u => `
-      <div class="admin-update-item" style="${u.starred ? 'border-left:3px solid #f59e0b;background:rgba(245,158,11,.07);' : ''}">
-        <div style="flex:1;min-width:0;">
-          <div class="admin-update-title">${u.starred ? '📌 ' : ''}${pesc(u.title || 'Untitled')}</div>
+      <div class="admin-update-item">
+        <div>
+          <div class="admin-update-title">${pesc(u.title || 'Untitled')}</div>
           <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(u.message || '')}</div>
           <div class="admin-update-meta">
             <span class="admin-update-type">${pesc(u.type || 'Update')}</span>
@@ -6585,24 +6335,8 @@ When answering:
             ${u.btnText  ? `<span>🔗 ${pesc(u.btnText)}</span>`   : ''}
           </div>
         </div>
-        <div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">
-          <button onclick="adminToggleStar(${u._i})" title="${u.starred ? 'Unpin from top' : 'Pin to top'}"
-            style="background:${u.starred ? 'rgba(245,158,11,.18)' : 'rgba(255,255,255,.06)'};border:1px solid ${u.starred ? '#f59e0b' : 'var(--border-2)'};color:${u.starred ? '#f59e0b' : 'var(--muted-2)'};border-radius:7px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;">
-            ${u.starred ? '📌 Pinned' : '☆ Pin'}
-          </button>
-          <button class="admin-update-del" onclick="deleteUpdate(${u._i})">🗑 Delete</button>
-        </div>
+        <button class="admin-update-del" onclick="deleteUpdate(${u._i})">🗑 Delete</button>
       </div>`).join('');
-  }
-
-  function adminToggleStar(idx) {
-    if (idx < 0 || idx >= _updates.length) return;
-    _updates[idx].starred   = !_updates[idx].starred;
-    _updates[idx].starredAt = _updates[idx].starred ? Date.now() : null;
-    try { localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates)); } catch(e) {}
-    renderFeedFromStorage();
-    refreshAdminUpdatesList();
-    showSnuToast(_updates[idx].starred ? '📌 Update pinned to top of feed.' : '✓ Update unpinned.');
   }
 
   // ── Add a new update ──────────────────────────────────────────────────────
@@ -6668,164 +6402,6 @@ When answering:
     showSnuToast('🗑 Update removed.');
   }
 
-  </script>
-
-  <script id="training-video-script">
-  const TV_KEY = 'medi_training_videos_v1';
-  let _tvVideos = [];
-
-  // ── Load from localStorage ────────────────────────────────────────────────
-  (function initTv() {
-    try { _tvVideos = JSON.parse(localStorage.getItem(TV_KEY) || '[]'); } catch(e) { _tvVideos = []; }
-    renderTvHub();
-    refreshAdminVideosList();
-  })();
-
-  // ── Convert any YouTube/Vimeo URL to embeddable URL ──────────────────────
-  function toEmbedUrl(url) {
-    if (!url) return null;
-    url = url.trim();
-    // YouTube full: youtube.com/watch?v=ID
-    let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-    if (m) return 'https://www.youtube.com/embed/' + m[1];
-    // YouTube already embed
-    if (url.includes('youtube.com/embed/')) return url;
-    // Vimeo
-    m = url.match(/vimeo\.com\/(\d+)/);
-    if (m) return 'https://player.vimeo.com/video/' + m[1];
-    // Direct URL (mp4 etc) — return as-is for <video> tag
-    return url;
-  }
-
-  function isEmbedUrl(url) {
-    return url && (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com/'));
-  }
-
-  // ── Drag & drop handler ───────────────────────────────────────────────────
-  function handleTvDrop(event) {
-    event.preventDefault();
-    const zone = document.getElementById('tvDropZone');
-    if (zone) { zone.style.borderColor = 'var(--border-2)'; zone.style.background = ''; }
-    // If a file was dropped, create a local object URL
-    const file = event.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('video/')) {
-      const objUrl = URL.createObjectURL(file);
-      const urlInput = document.getElementById('tvUrl');
-      if (urlInput) urlInput.value = objUrl;
-      if (!document.getElementById('tvTitle').value) {
-        document.getElementById('tvTitle').value = file.name.replace(/\.[^.]+$/, '');
-      }
-      showSnuToast('🎬 Video file loaded — add a title and description, then click Add Video.');
-      return;
-    }
-    // If text/URL was dropped
-    const text = event.dataTransfer.getData('text/plain') || event.dataTransfer.getData('text/uri-list');
-    if (text) {
-      const urlInput = document.getElementById('tvUrl');
-      if (urlInput) urlInput.value = text.trim();
-      showSnuToast('🔗 URL pasted — fill in the title and description, then click Add Video.');
-    }
-  }
-
-  // ── Add video ─────────────────────────────────────────────────────────────
-  function addTrainingVideo() {
-    const gv = id => document.getElementById(id)?.value?.trim() || '';
-    const url   = gv('tvUrl');
-    const title = gv('tvTitle');
-    if (!url)   { showSnuToast('⚠ Please enter a video URL.'); return; }
-    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
-
-    const embed = toEmbedUrl(url);
-    const video = {
-      id:       Date.now(),
-      url,
-      embed,
-      title,
-      category: gv('tvCategory') || 'General',
-      desc:     gv('tvDesc'),
-      addedAt:  new Date().toISOString(),
-    };
-
-    _tvVideos.unshift(video);
-    try { localStorage.setItem(TV_KEY, JSON.stringify(_tvVideos)); } catch(e) {}
-
-    renderTvHub();
-    refreshAdminVideosList();
-
-    // Reset fields
-    ['tvUrl','tvTitle','tvDesc'].forEach(id => { const e = document.getElementById(id); if(e) e.value = ''; });
-    const cat = document.getElementById('tvCategory'); if (cat) cat.selectedIndex = 0;
-    showSnuToast('✓ Training video added and published.');
-  }
-
-  // ── Delete video ──────────────────────────────────────────────────────────
-  function deleteTrainingVideo(id) {
-    _tvVideos = _tvVideos.filter(v => v.id !== id);
-    try { localStorage.setItem(TV_KEY, JSON.stringify(_tvVideos)); } catch(e) {}
-    renderTvHub();
-    refreshAdminVideosList();
-    showSnuToast('🗑 Video removed.');
-  }
-
-  // ── Render hub grid ───────────────────────────────────────────────────────
-  function renderTvHub() {
-    const grid  = document.getElementById('tv-grid');
-    const badge = document.getElementById('tv-count');
-    if (!grid) return;
-    if (badge) badge.textContent = _tvVideos.length + ' video' + (_tvVideos.length === 1 ? '' : 's');
-    if (!_tvVideos.length) {
-      grid.innerHTML = '<div class="empty" style="grid-column:1/-1;">No training videos yet — add some via Admin → Training Videos.</div>';
-      return;
-    }
-    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    grid.innerHTML = _tvVideos.map(v => {
-      const embedUrl = v.embed || toEmbedUrl(v.url);
-      let mediaHtml;
-      if (isEmbedUrl(embedUrl)) {
-        mediaHtml = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px 10px 0 0;background:#000;">
-          <iframe src="${embedUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen loading="lazy"></iframe>
-        </div>`;
-      } else {
-        mediaHtml = `<video controls style="width:100%;border-radius:10px 10px 0 0;display:block;background:#000;max-height:200px;">
-          <source src="${v.url}">Your browser doesn't support video.
-        </video>`;
-      }
-      return `
-        <div class="card" data-color="purple" style="padding:0;overflow:hidden;cursor:default;" onclick="">
-          ${mediaHtml}
-          <div style="padding:16px 18px 18px;">
-            <span style="font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#a78bfa;display:block;margin-bottom:4px;">${pesc(v.category)}</span>
-            <h3 style="font-size:15px;font-weight:700;margin:0 0 6px;color:var(--text);">${pesc(v.title)}</h3>
-            ${v.desc ? `<p style="font-size:13px;color:var(--muted);margin:0;line-height:1.5;">${pesc(v.desc)}</p>` : ''}
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  // ── Refresh admin list ────────────────────────────────────────────────────
-  function refreshAdminVideosList() {
-    const el    = document.getElementById('adminVideosList');
-    const count = document.getElementById('tvCount');
-    if (!el) return;
-    if (count) count.textContent = '(' + _tvVideos.length + ')';
-    if (!_tvVideos.length) {
-      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>';
-      return;
-    }
-    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    el.innerHTML = _tvVideos.map(v => `
-      <div class="admin-update-item">
-        <div style="flex:1;min-width:0;">
-          <div class="admin-update-title">🎥 ${pesc(v.title)}</div>
-          <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(v.desc || '')}</div>
-          <div class="admin-update-meta">
-            <span class="admin-update-type">${pesc(v.category)}</span>
-            <span style="word-break:break-all;max-width:240px;overflow:hidden;text-overflow:ellipsis;display:inline-block;">${pesc(v.url)}</span>
-          </div>
-        </div>
-        <button class="admin-update-del" onclick="deleteTrainingVideo(${v.id})">🗑 Delete</button>
-      </div>`).join('');
-  }
   </script>
 
 </body>
