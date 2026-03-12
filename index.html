@@ -2511,27 +2511,22 @@
 
     /* ── Print ── */
     @media print {
-      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      /* Hide everything — then selectively show only what we need */
-      body > * { display: none !important; }
-      /* Show the overlay wrapper but strip ALL visual chrome */
-      body > .snu-print-overlay {
-        display: block !important;
+      /* ── When NOT printing SNU: normal print ── */
+      body:not(.snu-printing) .snu-print-overlay { display: none !important; }
+
+      /* ── When printing SNU: hide the entire page, show only print content ── */
+      body.snu-printing > *                    { display: none !important; }
+      body.snu-printing > #snuPrintContent     { display: block !important; }
+
+      #snuPrintContent {
+        display: none; /* hidden by default, shown only during print */
         position: static !important;
-        opacity: 1 !important;
-        background: transparent !important;
-        background-color: transparent !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        overflow: visible !important;
         width: 100% !important;
+        margin: 0 !important; padding: 0 !important;
+        background: #f0f4f8 !important;
+        overflow: visible !important;
       }
-      /* Hide the fixed action bar */
-      .snu-print-actions { display: none !important; }
-      /* Strip modal chrome */
-      .snu-print-modal {
+      #snuPrintContent .snu-print-modal {
         box-shadow: none !important;
         border-radius: 0 !important;
         width: 100% !important;
@@ -2541,9 +2536,10 @@
         overflow: visible !important;
         background: #f0f4f8 !important;
       }
-      .mag-cover { height: 320px !important; }
-      .chat-launcher, .chat-overlay, .chat-modal, .bg-glow,
-      .admin-overlay, .admin-modal, #snuAdminPanel { display: none !important; }
+      #snuPrintContent .snu-print-actions { display: none !important; }
+      .mag-cover { height: 320px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .mag-body, .mag-two-col, .mag-col { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
 
     @media (max-width: 680px) {
@@ -4018,7 +4014,7 @@
         <!-- ══ COVER ══ -->
         <div class="mag-cover">
           <img class="mag-cover-img" id="magCoverImg"
-            src="https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=1200&q=80&fit=crop&crop=center"
+            src="https://images.unsplash.com/photo-1568992687947-868a62a9f521?w=1200&q=80&fit=crop&crop=center"
             alt="Cover">
           <div class="mag-cover-gradient"></div>
           <div class="mag-cover-gradient-left"></div>
@@ -4120,6 +4116,9 @@
 
       </div>
     </div>
+
+    <!-- Print-only content container — populated by triggerSnuPrint(), never visible on screen -->
+    <div id="snuPrintContent" style="display:none;"></div>
 
 
     <!-- ══ AGENT SPOTLIGHT DASHBOARD ══ -->
@@ -5885,9 +5884,9 @@ When answering:
 
     // ── Rotating cover + article images ──
     const coverImgs = [
-      'https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=1200&q=80&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1568992687947-868a62a9f521?w=1200&q=80&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80&fit=crop&crop=center',
       'https://images.unsplash.com/photo-1560264280-88b68371db39?w=1200&q=80&fit=crop&crop=center',
-      'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80&fit=crop&crop=center',
       'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&q=80&fit=crop&crop=center',
     ];
     const articleImgs = [
@@ -6012,10 +6011,25 @@ When answering:
   }
 
   function triggerSnuPrint() {
-    // The @media print CSS already hides everything except .snu-print-overlay.open
-    // The overlay already has .open on it (since the modal is visible).
-    // Just call window.print() — the browser does the rest.
+    const modal = document.getElementById('snuPrintModal');
+    const printWrap = document.getElementById('snuPrintContent');
+    if (!modal || !printWrap) { alert('Print content not found.'); return; }
+
+    // Clone modal into the clean print container (no overlay, no backdrop, no dark bg)
+    printWrap.innerHTML = '';
+    const clone = modal.cloneNode(true);
+    // Make clone fully visible
+    clone.style.cssText = 'transform:none;opacity:1;border-radius:0;box-shadow:none;width:100%;overflow:visible;';
+    printWrap.appendChild(clone);
+
+    // Add body class — @media print shows ONLY #snuPrintContent when this class is present
+    document.body.classList.add('snu-printing');
+
     window.print();
+
+    // Clean up immediately after print dialog closes
+    document.body.classList.remove('snu-printing');
+    printWrap.innerHTML = '';
   }
 
   function closeSnuPrint() {
