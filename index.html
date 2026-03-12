@@ -4211,17 +4211,29 @@ When answering:
     }
     window._jbRecord = record;
 
-    // Push cloud data into localStorage so existing render functions pick it up
+    // Push cloud data into localStorage
     if (record.snu_data     && Object.keys(record.snu_data).length)
-      localStorage.setItem('snu_data_v1',     JSON.stringify(record.snu_data));
+      localStorage.setItem('snu_data_v1',      JSON.stringify(record.snu_data));
     if (record.snu_article  && Object.keys(record.snu_article).length)
-      localStorage.setItem('snu_article_v1',  JSON.stringify(record.snu_article));
+      localStorage.setItem('snu_article_v1',   JSON.stringify(record.snu_article));
     if (record.snu_spotlight && Object.keys(record.snu_spotlight).length)
-      localStorage.setItem('snu_spotlight_v1',JSON.stringify(record.snu_spotlight));
+      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)
-      localStorage.setItem('snu_aom_v1',      JSON.stringify(record.snu_aom));
+      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
     if (Array.isArray(record.snu_updates) && record.snu_updates.length)
-      localStorage.setItem('snu_updates_v1',  JSON.stringify(record.snu_updates));
+      localStorage.setItem('snu_updates_v1',   JSON.stringify(record.snu_updates));
+
+    // Re-render spotlight directly with cloud data
+    if (record.snu_spotlight && Object.keys(record.snu_spotlight).length) {
+      if (typeof renderSpotlightCard === 'function') renderSpotlightCard(record.snu_spotlight);
+    }
+
+    // Stage updates override for the init sequence to pick up
+    if (Array.isArray(record.snu_updates) && record.snu_updates.length) {
+      window._jb_updates_override = record.snu_updates;
+    }
+
+    if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cloud!');
   };
 
   // ── Save a specific field to cloud ────────────────────────────
@@ -5014,14 +5026,20 @@ When answering:
   document.addEventListener('DOMContentLoaded', () => {
     // Load from cloud first, then render everything
     (async () => {
-      if (typeof jbInit === 'function') {
-        if (typeof showSnuToast === 'function') showSnuToast('☁️ Loading from cloud…');
-        await jbInit();
-      }
+      // First render from localStorage (instant)
       renderSnuFromStorage();
-      if (typeof initUpdates       === 'function') initUpdates();
-      if (typeof renderAllAomCards === 'function') renderAllAomCards();
-      if (typeof renderSpotlight   === 'function') renderSpotlight();
+      if (typeof renderAllAomCards    === 'function') renderAllAomCards();
+      if (typeof renderSpotlightCard  === 'function') renderSpotlightCard();
+      if (typeof initUpdates          === 'function') initUpdates();
+      // Then fetch from cloud and re-render with latest data
+      if (typeof jbInit === 'function') {
+        await jbInit();
+        // Re-run updates with cloud data if available
+        if (window._jb_updates_override && typeof _updates !== 'undefined') {
+          _updates = window._jb_updates_override;
+          if (typeof renderFeedFromStorage === 'function') renderFeedFromStorage();
+        }
+      }
     })();
     loadWeeklyArticle();
   });
