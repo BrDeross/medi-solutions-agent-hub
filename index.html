@@ -10,462 +10,7 @@
   <title>My Medi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-/* Main card background — deep navy instead of translucent white */
-.snu-lb-card {
-  background: linear-gradient(160deg, rgba(14, 28, 54, 0.97) 0%, rgba(20, 38, 70, 0.97) 100%) !important;
-  border: 1px solid rgba(251, 191, 36, 0.25) !important;
-}
-
-/* Header band */
-.snu-lb-header {
-  background: linear-gradient(90deg, rgba(251,191,36,.22), rgba(251,191,36,.08)) !important;
-  border-bottom: 1px solid rgba(251,191,36,.3) !important;
-}
-
-/* Row backgrounds — alternating for readability */
-.snu-lb-row {
-  background: rgba(255,255,255,.02);
-  border-bottom: 1px solid rgba(255,255,255,.06) !important;
-}
-.snu-lb-row:nth-child(even) {
-  background: rgba(255,255,255,.045);
-}
-.snu-lb-row:hover {
-  background: rgba(59,130,246,.09) !important;
-}
-
-/* Color-coded rank badges — more vivid */
-.snu-rank.gold   {
-  background: rgba(251,191,36,.25) !important;
-  color: #fbbf24 !important;
-  border: 1px solid rgba(251,191,36,.55) !important;
-  box-shadow: 0 0 14px rgba(251,191,36,.35) !important;
-  font-size: 17px !important;
-}
-.snu-rank.silver {
-  background: rgba(148,163,184,.18) !important;
-  color: #cbd5e1 !important;
-  border: 1px solid rgba(148,163,184,.4) !important;
-}
-.snu-rank.bronze {
-  background: rgba(205,124,74,.18) !important;
-  color: #e8935a !important;
-  border: 1px solid rgba(205,124,74,.4) !important;
-}
-.snu-rank.other {
-  background: rgba(59,130,246,.14) !important;
-  color: #7dd3fc !important;
-  border: 1px solid rgba(59,130,246,.3) !important;
-}
-
-/* Agent names — bright white, bold */
-.snu-agent-name {
-  color: #ffffff !important;
-  font-weight: 800 !important;
-  font-size: 14.5px !important;
-  text-shadow: 0 1px 8px rgba(0,0,0,.5);
-}
-
-/* Sub-label (office/team) */
-.snu-agent-sub {
-  color: #93c5fd !important;
-  font-size: 11.5px !important;
-}
-
-/* Points / production value — vivid green */
-.snu-prod {
-  color: #34d399 !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  text-shadow: 0 0 10px rgba(52,211,153,.4);
-}
-
-/* Gold row highlight for #1 */
-.snu-lb-row:first-child {
-  background: rgba(251,191,36,.06) !important;
-}
-.snu-lb-row:first-child .snu-agent-name {
-  color: #fde68a !important;
-}
-.snu-lb-row:first-child .snu-prod {
-  color: #fbbf24 !important;
-  text-shadow: 0 0 12px rgba(251,191,36,.5);
-}
-
-
-/* ──────────────────────────────────────────────────────────
-   FIX 2 — AGENT OF THE MONTH PHOTOS
-   Auto-fit photos to their container without cropping
-   ────────────────────────────────────────────────────────── */
-
-/* Target any photo inside agent-of-month / aom sections */
-.aom-photo,
-.aom-img,
-.agent-month-photo,
-.agent-month-img,
-.aom-card img,
-.aom-photo-wrap img,
-.agent-of-month img,
-[class*="aom"] img,
-[class*="agent-month"] img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;   /* show full photo, no crop */
-  object-position: center top !important;
-  display: block !important;
-  max-width: 100% !important;
-}
-
-/* Photo wrapper — give it a fixed aspect ratio so "contain" works well */
-.aom-photo-wrap,
-.aom-img-wrap,
-.agent-month-photo-wrap,
-[class*="aom"][class*="wrap"],
-[class*="aom"][class*="photo"] {
-  aspect-ratio: 3 / 4 !important;  /* portrait — adjust if landscape */
-  overflow: hidden !important;
-  border-radius: 14px !important;
-  background: rgba(14,28,54,.8) !important; /* dark fill behind uncropped area */
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-
-/* ──────────────────────────────────────────────────────────
-   FIX 3 — AGENT HIGHLIGHT — framed bio & quote box
-   ────────────────────────────────────────────────────────── */
-
-/* Bio frame */
-.agent-highlight-bio,
-.highlight-bio,
-[class*="highlight"] .bio,
-[class*="highlight"] [class*="bio"] {
-  background: rgba(14, 28, 54, 0.75) !important;
-  border: 1px solid rgba(59,130,246,.35) !important;
-  border-left: 4px solid #3b82f6 !important;
-  border-radius: 14px !important;
-  padding: 20px 24px !important;
-  color: #c7ddf5 !important;
-  font-size: 14px !important;
-  line-height: 1.75 !important;
-  box-shadow: 0 4px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.06) !important;
-  margin-bottom: 16px !important;
-}
-
-/* Quote frame — styled like a pull-quote */
-.agent-highlight-quote,
-.highlight-quote,
-[class*="highlight"] .quote,
-[class*="highlight"] [class*="quote"] {
-  background: rgba(251,191,36,.07) !important;
-  border: 1px solid rgba(251,191,36,.3) !important;
-  border-left: 4px solid #fbbf24 !important;
-  border-radius: 14px !important;
-  padding: 18px 24px 18px 28px !important;
-  position: relative !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,.25) !important;
-}
-
-/* Big decorative quotation mark */
-.agent-highlight-quote::before,
-.highlight-quote::before,
-[class*="highlight"] .quote::before,
-[class*="highlight"] [class*="quote"]::before {
-  content: '\201C' !important;
-  position: absolute !important;
-  top: -10px !important; left: 14px !important;
-  font-size: 64px !important;
-  line-height: 1 !important;
-  color: rgba(251,191,36,.35) !important;
-  font-family: Georgia, serif !important;
-  pointer-events: none !important;
-}
-
-/* Quote text */
-.agent-highlight-quote p,
-.highlight-quote p,
-[class*="highlight"] .quote p,
-[class*="highlight"] [class*="quote"] p {
-  font-size: 15px !important;
-  font-style: italic !important;
-  color: #e2eefc !important;
-  line-height: 1.7 !important;
-  margin: 0 !important;
-}
-
-/* Quote attribution */
-.agent-highlight-quote cite,
-.highlight-quote cite,
-[class*="highlight"] .quote cite {
-  display: block !important;
-  margin-top: 10px !important;
-  font-size: 12px !important;
-  font-style: normal !important;
-  font-weight: 700 !important;
-  color: #fbbf24 !important;
-  letter-spacing: .4px !important;
-  text-transform: uppercase !important;
-}
-
-
-/* ──────────────────────────────────────────────────────────
-   FIX 4 — VIDEO LIBRARY ADMIN PANEL
-   Styling for the video upload/manage admin section
-   ────────────────────────────────────────────────────────── */
-
-/* Video library grid */
-.video-library-grid,
-.vid-grid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-  gap: 20px !important;
-}
-
-/* Individual video card */
-.vid-card {
-  background: rgba(14,28,54,.9) !important;
-  border: 1px solid rgba(255,255,255,.12) !important;
-  border-radius: 18px !important;
-  overflow: hidden !important;
-  transition: transform .25s, border-color .25s, box-shadow .25s !important;
-}
-.vid-card:hover {
-  transform: translateY(-4px) !important;
-  border-color: rgba(59,130,246,.45) !important;
-  box-shadow: 0 12px 36px rgba(0,0,0,.45) !important;
-}
-
-/* Thumbnail area */
-.vid-thumb {
-  position: relative !important;
-  width: 100% !important;
-  aspect-ratio: 16 / 9 !important;
-  background: rgba(20,38,70,.95) !important;
-  overflow: hidden !important;
-}
-.vid-thumb iframe,
-.vid-thumb video,
-.vid-thumb img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-}
-
-/* Play overlay badge */
-.vid-thumb::after {
-  content: '▶' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 28px !important;
-  color: rgba(255,255,255,.7) !important;
-  background: rgba(0,0,0,.3) !important;
-  opacity: 0 !important;
-  transition: opacity .2s !important;
-}
-.vid-card:hover .vid-thumb::after { opacity: 1 !important; }
-
-/* Video info */
-.vid-info {
-  padding: 16px 18px !important;
-}
-.vid-label {
-  font-family: 'Space Grotesk', sans-serif !important;
-  font-size: 14.5px !important;
-  font-weight: 700 !important;
-  color: #fff !important;
-  margin-bottom: 5px !important;
-  line-height: 1.3 !important;
-}
-.vid-desc {
-  font-size: 12.5px !important;
-  color: #93aec8 !important;
-  line-height: 1.6 !important;
-}
-.vid-tag {
-  display: inline-flex !important;
-  margin-top: 10px !important;
-  padding: 3px 10px !important;
-  border-radius: 6px !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  text-transform: uppercase !important;
-  letter-spacing: .5px !important;
-  background: rgba(59,130,246,.15) !important;
-  color: #7dd3fc !important;
-  border: 1px solid rgba(59,130,246,.25) !important;
-}
-
-/* Admin-only controls on each video card */
-.vid-admin-bar {
-  display: none; /* hidden from regular users */
-  padding: 10px 18px 14px !important;
-  gap: 8px !important;
-  border-top: 1px solid rgba(255,255,255,.07) !important;
-}
-body.admin-mode .vid-admin-bar {
-  display: flex !important;
-}
-.vid-edit-btn,
-.vid-delete-btn {
-  padding: 6px 14px !important;
-  border-radius: 8px !important;
-  font-size: 11.5px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  border: none !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  transition: background .15s !important;
-}
-.vid-edit-btn {
-  background: rgba(59,130,246,.18) !important;
-  color: #7dd3fc !important;
-  border: 1px solid rgba(59,130,246,.3) !important;
-}
-.vid-edit-btn:hover { background: rgba(59,130,246,.3) !important; }
-.vid-delete-btn {
-  background: rgba(251,113,133,.12) !important;
-  color: #fb7185 !important;
-  border: 1px solid rgba(251,113,133,.25) !important;
-}
-.vid-delete-btn:hover { background: rgba(251,113,133,.25) !important; }
-
-/* "Add Video" button — admin mode only */
-.vid-add-btn {
-  display: none;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 11px 20px !important;
-  background: var(--accent) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 12px !important;
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  box-shadow: 0 4px 18px rgba(59,130,246,.35) !important;
-  transition: background .15s, transform .15s !important;
-}
-body.admin-mode .vid-add-btn {
-  display: inline-flex !important;
-}
-.vid-add-btn:hover { background: #2563eb !important; transform: translateY(-1px) !important; }
-
-/* Video admin modal — add/edit form */
-.vid-admin-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.75);
-  backdrop-filter: blur(8px);
-  z-index: 3000;
-  opacity: 0; pointer-events: none;
-  transition: opacity .25s;
-}
-.vid-admin-overlay.open { opacity: 1 !important; pointer-events: all !important; }
-
-.vid-admin-modal {
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) scale(.95);
-  width: min(560px, 94vw);
-  background: linear-gradient(160deg, #1a3464, #1e3d72);
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 20px;
-  box-shadow: 0 32px 80px rgba(0,0,0,.65);
-  z-index: 3001;
-  opacity: 0; pointer-events: none;
-  transition: opacity .25s, transform .25s;
-  overflow: hidden;
-}
-.vid-admin-modal.open {
-  opacity: 1 !important; pointer-events: all !important;
-  transform: translate(-50%, -50%) scale(1) !important;
-}
-
-.vid-admin-modal-header {
-  padding: 22px 26px 18px;
-  border-bottom: 1px solid rgba(255,255,255,.1);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.vid-admin-modal-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 17px; font-weight: 700; color: #fff;
-  display: flex; align-items: center; gap: 8px;
-}
-.vid-admin-modal-body {
-  padding: 22px 26px 26px;
-  display: flex; flex-direction: column; gap: 14px;
-}
-.vid-field { display: flex; flex-direction: column; gap: 5px; }
-.vid-field label {
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .6px;
-  color: #93aec8;
-}
-.vid-field input,
-.vid-field textarea,
-.vid-field select {
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 9px;
-  padding: 10px 13px;
-  color: #fff;
-  font-size: 13.5px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  outline: none;
-  width: 100%;
-  transition: border-color .15s, background .15s;
-}
-.vid-field input:focus,
-.vid-field textarea:focus,
-.vid-field select:focus {
-  border-color: rgba(59,130,246,.6);
-  background: rgba(255,255,255,.1);
-}
-.vid-field textarea { min-height: 80px; resize: vertical; }
-.vid-field select option { background: #1e3d72; }
-
-.vid-admin-save {
-  background: var(--accent);
-  border: none; border-radius: 10px;
-  padding: 12px 24px;
-  color: #fff; font-size: 14px; font-weight: 700;
-  cursor: pointer; width: 100%;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  box-shadow: 0 4px 20px rgba(59,130,246,.4);
-  transition: background .15s, transform .1s;
-  margin-top: 4px;
-}
-.vid-admin-save:hover { background: #2563eb; transform: translateY(-1px); }
-
-/* Drop zone for video URL or file */
-.vid-drop-zone {
-  border: 2px dashed rgba(59,130,246,.35);
-  border-radius: 12px;
-  padding: 28px 20px;
-  text-align: center;
-  cursor: pointer;
-  background: rgba(59,130,246,.04);
-  transition: border-color .2s, background .2s;
-}
-.vid-drop-zone:hover,
-.vid-drop-zone.drag-over {
-  border-color: rgba(59,130,246,.7) !important;
-  background: rgba(59,130,246,.1) !important;
-}
-.vid-drop-icon { font-size: 28px; margin-bottom: 8px; }
-.vid-drop-text {
-  font-size: 13px; color: #93aec8; line-height: 1.5;
-}
-.vid-drop-text strong { color: #7dd3fc; }
-
-/* ── END OF PATCH ── */
- <style>
+  <style>
     :root {
       --ink:         #1e3a6e;
       --ink-2:       #264880;
@@ -3567,6 +3112,307 @@ body.admin-mode .vid-add-btn {
       transition: background .15s;
     }
     .admin-update-del:hover { background: rgba(239,68,68,.28); }
+/* ============================================================
+   MEDI HUB — CSS PATCH  (paste just before closing </style>)
+   ============================================================ */
+
+
+/* ── FIX 1: WEEKLY TOP PRODUCERS — darker background ──────── */
+
+.snu-lb-card {
+  background: linear-gradient(160deg, rgba(10,20,45,.97) 0%, rgba(16,30,58,.97) 100%) !important;
+  border: 1px solid rgba(251,191,36,.3) !important;
+}
+.snu-lb-header {
+  background: linear-gradient(90deg, rgba(251,191,36,.22), rgba(251,191,36,.06)) !important;
+  border-bottom: 1px solid rgba(251,191,36,.35) !important;
+}
+.snu-lb-row {
+  background: rgba(255,255,255,.025);
+  border-bottom: 1px solid rgba(255,255,255,.06) !important;
+}
+.snu-lb-row:nth-child(even) { background: rgba(255,255,255,.05); }
+.snu-lb-row:hover            { background: rgba(59,130,246,.1) !important; }
+
+/* #1 row — gold tint */
+.snu-lb-row:first-child { background: rgba(251,191,36,.07) !important; }
+.snu-lb-row:first-child .snu-agent-name { color: #fde68a !important; }
+.snu-lb-row:first-child .snu-prod       { color: #fbbf24 !important; text-shadow: 0 0 12px rgba(251,191,36,.5); }
+
+/* Rank badges — more vivid */
+.snu-rank.gold   { background: rgba(251,191,36,.28) !important; color: #fbbf24 !important; border-color: rgba(251,191,36,.6) !important; box-shadow: 0 0 14px rgba(251,191,36,.35) !important; }
+.snu-rank.silver { background: rgba(148,163,184,.2)  !important; color: #e2e8f0 !important; border-color: rgba(148,163,184,.45) !important; }
+.snu-rank.bronze { background: rgba(205,124,74,.2)   !important; color: #f0a876 !important; border-color: rgba(205,124,74,.45) !important; }
+.snu-rank.other  { background: rgba(59,130,246,.18)  !important; color: #93c5fd !important; border-color: rgba(59,130,246,.4)  !important; }
+
+/* Names bright white, points vivid green */
+.snu-agent-name { color: #ffffff !important; font-weight: 800 !important; }
+.snu-agent-sub  { color: #93c5fd !important; }
+.snu-prod       { color: #34d399 !important; font-size: 14px !important; font-weight: 700 !important; text-shadow: 0 0 8px rgba(52,211,153,.35); }
+
+
+/* ── FIX 2: AGENT OF THE MONTH PHOTOS — no crop ─────────── */
+
+/* The photo wrapper already has height:160px — we keep that
+   but switch object-fit from cover to contain               */
+.aom-photo-wrap {
+  background: rgba(10,20,45,.9) !important; /* dark fill behind contained photo */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.aom-photo-wrap img,
+.aom-photo {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;      /* show full photo, no crop */
+  object-position: center top !important;
+}
+
+/* Same fix for the big Spotlight card photo */
+.spotlight-photo {
+  object-fit: contain !important;
+  object-position: center top !important;
+  background: #0d1826;
+}
+.spotlight-photo-col {
+  background: #0d1826 !important; /* dark fill behind contained photo */
+}
+
+
+/* ── FIX 3: AGENT HIGHLIGHT — framed bio & quote ─────────── */
+
+/* Bio box */
+.spotlight-bio {
+  background: rgba(10,20,45,.75) !important;
+  border: 1px solid rgba(59,130,246,.35) !important;
+  border-left: 4px solid #3b82f6 !important;
+  border-radius: 12px !important;
+  padding: 18px 22px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  color: #c7ddf5 !important;
+  line-height: 1.8 !important;
+}
+
+/* Quote box */
+.spotlight-quote {
+  background: rgba(251,191,36,.07) !important;
+  border: 1px solid rgba(251,191,36,.35) !important;
+  border-left: 4px solid #fbbf24 !important;
+  border-radius: 0 12px 12px 0 !important;
+  padding: 16px 20px 16px 24px !important;
+  box-shadow: 0 4px 18px rgba(0,0,0,.25) !important;
+  font-size: 14.5px !important;
+  color: rgba(255,255,255,.82) !important;
+  position: relative !important;
+}
+
+/* Big decorative opening quote mark */
+.spotlight-quote::before {
+  content: '\201C' !important;
+  position: absolute !important;
+  top: -14px !important; left: 12px !important;
+  font-size: 60px !important;
+  line-height: 1 !important;
+  color: rgba(251,191,36,.3) !important;
+  font-family: Georgia, serif !important;
+  pointer-events: none !important;
+}
+/* Override the inline ::after that adds the closing " inline */
+.spotlight-quote::after {
+  content: '\201D' !important;
+  color: var(--gold) !important;
+  font-size: 22px !important;
+  line-height: 0 !important;
+  vertical-align: -.3em !important;
+  margin-left: 2px !important;
+  position: static !important;
+}
+
+
+/* ── FIX 4: VIDEO LIBRARY — card grid & admin controls ────── */
+
+/* Video grid */
+.video-library-grid,
+.vid-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 20px !important;
+}
+
+/* Individual card */
+.vid-card {
+  background: rgba(10,20,45,.9) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  transition: transform .25s, border-color .25s, box-shadow .25s !important;
+}
+.vid-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(59,130,246,.45) !important;
+  box-shadow: 0 12px 36px rgba(0,0,0,.45) !important;
+}
+
+/* 16:9 thumbnail */
+.vid-thumb {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 16 / 9 !important;
+  background: rgba(16,30,58,.95) !important;
+  overflow: hidden !important;
+}
+.vid-thumb iframe,
+.vid-thumb video,
+.vid-thumb img {
+  width: 100% !important; height: 100% !important;
+  object-fit: cover !important; display: block !important;
+}
+
+/* Video info area */
+.vid-info { padding: 16px 18px !important; }
+.vid-label {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 14.5px !important; font-weight: 700 !important;
+  color: #fff !important; margin-bottom: 5px !important; line-height: 1.3 !important;
+}
+.vid-desc { font-size: 12.5px !important; color: #93aec8 !important; line-height: 1.6 !important; }
+.vid-tag {
+  display: inline-flex !important; margin-top: 10px !important;
+  padding: 3px 10px !important; border-radius: 6px !important;
+  font-size: 10px !important; font-weight: 800 !important;
+  text-transform: uppercase !important; letter-spacing: .5px !important;
+  background: rgba(59,130,246,.15) !important; color: #7dd3fc !important;
+  border: 1px solid rgba(59,130,246,.25) !important;
+}
+
+/* Admin bar on each card — hidden from regular users */
+.vid-admin-bar {
+  display: none;
+  padding: 10px 18px 14px !important;
+  gap: 8px !important;
+  border-top: 1px solid rgba(255,255,255,.07) !important;
+}
+body.admin-mode .vid-admin-bar { display: flex !important; }
+
+.vid-edit-btn, .vid-delete-btn {
+  padding: 6px 14px !important; border-radius: 8px !important;
+  font-size: 11.5px !important; font-weight: 700 !important;
+  cursor: pointer !important; border: none !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  transition: background .15s !important;
+}
+.vid-edit-btn   { background: rgba(59,130,246,.18) !important; color: #7dd3fc !important; border: 1px solid rgba(59,130,246,.3) !important; }
+.vid-edit-btn:hover   { background: rgba(59,130,246,.3) !important; }
+.vid-delete-btn { background: rgba(251,113,133,.12) !important; color: #fb7185 !important; border: 1px solid rgba(251,113,133,.25) !important; }
+.vid-delete-btn:hover { background: rgba(251,113,133,.25) !important; }
+
+/* "Add Video" button — visible only in admin mode */
+.vid-add-btn {
+  display: none;
+  align-items: center !important; gap: 8px !important;
+  padding: 11px 20px !important;
+  background: var(--accent) !important; color: #fff !important;
+  border: none !important; border-radius: 12px !important;
+  font-size: 13.5px !important; font-weight: 700 !important;
+  cursor: pointer !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  box-shadow: 0 4px 18px rgba(59,130,246,.35) !important;
+  transition: background .15s, transform .15s !important;
+}
+body.admin-mode .vid-add-btn { display: inline-flex !important; }
+.vid-add-btn:hover { background: #2563eb !important; transform: translateY(-1px) !important; }
+
+/* Add/Edit Video modal */
+.vid-admin-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(8px);
+  z-index: 3000;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.vid-admin-overlay.open { opacity: 1; pointer-events: all; }
+
+.vid-admin-modal {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(.95);
+  width: min(560px, 94vw);
+  background: linear-gradient(160deg,#1a3464,#1e3d72);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 20px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.65);
+  z-index: 3001;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  overflow: hidden;
+}
+.vid-admin-modal.open {
+  opacity: 1; pointer-events: all;
+  transform: translate(-50%,-50%) scale(1);
+}
+.vid-admin-modal-header {
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.vid-admin-modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.vid-admin-modal-body {
+  padding: 22px 26px 26px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.vid-field { display: flex; flex-direction: column; gap: 5px; }
+.vid-field label {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .6px; color: #93aec8;
+}
+.vid-field input,
+.vid-field textarea,
+.vid-field select {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 9px; padding: 10px 13px;
+  color: #fff; font-size: 13.5px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  outline: none; width: 100%;
+  transition: border-color .15s, background .15s;
+}
+.vid-field input:focus,
+.vid-field textarea:focus,
+.vid-field select:focus { border-color: rgba(59,130,246,.6); background: rgba(255,255,255,.1); }
+.vid-field textarea { min-height: 80px; resize: vertical; }
+.vid-field select option { background: #1e3d72; }
+
+.vid-drop-zone {
+  border: 2px dashed rgba(59,130,246,.35);
+  border-radius: 12px; padding: 28px 20px;
+  text-align: center; cursor: pointer;
+  background: rgba(59,130,246,.04);
+  transition: border-color .2s, background .2s;
+}
+.vid-drop-zone:hover, .vid-drop-zone.drag-over {
+  border-color: rgba(59,130,246,.7) !important;
+  background: rgba(59,130,246,.1) !important;
+}
+.vid-drop-icon { font-size: 28px; margin-bottom: 8px; }
+.vid-drop-text { font-size: 13px; color: #93aec8; line-height: 1.5; }
+.vid-drop-text strong { color: #7dd3fc; }
+
+.vid-admin-save {
+  background: var(--accent); border: none; border-radius: 10px;
+  padding: 12px 24px; color: #fff;
+  font-size: 14px; font-weight: 700; cursor: pointer; width: 100%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 4px 20px rgba(59,130,246,.4);
+  transition: background .15s, transform .1s; margin-top: 4px;
+}
+.vid-admin-save:hover { background: #2563eb; transform: translateY(-1px); }
+
+/* ── END OF PATCH ── */
   </style>
 </head>
 <body>
