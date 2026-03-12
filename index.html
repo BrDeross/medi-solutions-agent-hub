@@ -1597,15 +1597,15 @@
 
     /* ── LEFT: Leaderboard ── */
     .snu-lb-card {
-      background: linear-gradient(160deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.09) 100%);
-      border: 1px solid var(--border-2);
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
       border-radius: var(--r-xl);
       overflow: hidden;
     }
 
     .snu-lb-header {
-      background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
-      border-bottom: 1px solid rgba(251,191,36,.2);
+      background: linear-gradient(90deg, #bfdbfe, #dbeafe);
+      border-bottom: 1px solid #93c5fd;
       padding: 18px 24px;
       display: flex;
       align-items: center;
@@ -1615,22 +1615,22 @@
     .snu-lb-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 15px; font-weight: 700;
-      color: var(--gold);
+      color: #1e3a8a;
       display: flex; align-items: center; gap: 8px;
     }
 
     .snu-week-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px; font-weight: 600;
-      color: var(--muted);
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border);
+      color: #1e40af;
+      background: rgba(255,255,255,.6);
+      border: 1px solid #93c5fd;
       border-radius: 6px;
       padding: 3px 8px;
       letter-spacing: .5px;
     }
 
-    .snu-lb-list { padding: 12px 0; }
+    .snu-lb-list { padding: 12px 0; background: #dbeafe; }
 
     .snu-lb-row {
       display: grid;
@@ -1639,10 +1639,10 @@
       gap: 12px;
       padding: 10px 24px;
       transition: background .15s;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(147,197,253,.5);
     }
     .snu-lb-row:last-child { border-bottom: none; }
-    .snu-lb-row:hover { background: rgba(255,255,255,.08); }
+    .snu-lb-row:hover { background: rgba(191,219,254,.6); }
 
     .snu-rank {
       width: 36px; height: 36px;
@@ -1652,23 +1652,23 @@
       font-size: 15px; font-weight: 800;
       flex-shrink: 0;
     }
-    .snu-rank.gold   { background: rgba(251,191,36,.18); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 12px rgba(251,191,36,.2); }
-    .snu-rank.silver { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
-    .snu-rank.bronze { background: rgba(205,124,74,.12); color: #cd7c4a; border: 1px solid rgba(205,124,74,.25); }
-    .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
+    .snu-rank.gold   { background: rgba(251,191,36,.3); color: #92400e; border: 1px solid rgba(251,191,36,.6); box-shadow: 0 0 12px rgba(251,191,36,.2); }
+    .snu-rank.silver { background: rgba(148,163,184,.25); color: #334155; border: 1px solid rgba(148,163,184,.5); }
+    .snu-rank.bronze { background: rgba(205,124,74,.2); color: #7c2d12; border: 1px solid rgba(205,124,74,.4); }
+    .snu-rank.other  { background: rgba(59,130,246,.18); color: #1e3a8a; border: 1px solid rgba(59,130,246,.35); }
 
     .snu-agent-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px; font-weight: 700; color: #fff;
+      font-size: 14px; font-weight: 700; color: #1e293b;
     }
     .snu-agent-sub {
-      font-size: 11px; color: var(--muted-2); margin-top: 1px;
+      font-size: 11px; color: #64748b; margin-top: 1px;
     }
 
     .snu-prod {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px; font-weight: 600;
-      color: var(--green);
+      color: #166534;
       white-space: nowrap;
     }
 
@@ -2862,7 +2862,7 @@
       border-radius: 12px;
       overflow: hidden;
       height: 160px;
-      background: linear-gradient(160deg, rgba(30,61,114,.6), rgba(10,15,26,.8));
+      background: #1a2e4a;
       position: relative;
       display: flex; align-items: center; justify-content: center;
     }
@@ -2870,10 +2870,10 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      object-fit: cover;
-      object-position: center 20%;
+      object-fit: contain;
+      object-position: center center;
       display: block;
-      filter: brightness(.88) saturate(1.08);
+      filter: brightness(.92) saturate(1.05);
       transition: transform 5s ease, filter .3s;
       z-index: 0;
     }
@@ -5274,9 +5274,9 @@ When answering:
   }
 
   function getPointsColor(points) {
-    if (!points || points < 5000)  return 'color:#ef4444;'; // Red under 5000
-    if (points <= 9999)            return 'color:#22c55e;'; // Green 5001-9999
-    return 'color:#1d4ed8;font-weight:800;'; // Bold Blue 10000+
+    if (!points || points < 5000)  return 'color:#dc2626;font-weight:700;'; // Red under 5000
+    if (points <= 9999)            return 'color:#16a34a;font-weight:700;'; // Green 5001-9999
+    return 'color:#1d4ed8;font-weight:900;font-size:15px;'; // Bold Royal Blue 10000+
   }
 
   function renderSnuLeaderboard(data) {
@@ -5879,51 +5879,68 @@ When answering:
 
   function triggerSnuPrint() {
     const modal = document.getElementById('snuPrintModal');
-    if (!modal) { window.print(); return; }
+    if (!modal) { alert('SNU print modal not found.'); return; }
 
-    // Build a full standalone print page
-    const printHtml = `<!DOCTYPE html>
+    // Gather all <style> blocks from the parent document
+    const allStyles = Array.from(document.querySelectorAll('style'))
+      .map(s => s.textContent).join('\n');
+
+    // Build standalone page with all CSS embedded + modal HTML
+    const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SNU — Show N Up</title>
+<title>SNU — Show N Up Weekly</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; color: #1e293b; }
-  @media print {
-    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; color: #1e293b; }
+img { max-width: 100%; display: block; }
+
+/* ── All parent styles (for class references in modal) ── */
+${allStyles}
+
+/* ── Print overrides ── */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: #f0f4f8 !important; }
+  .snu-print-actions { display: none !important; }
+}
+
+/* ── Screen: make modal fill the window ── */
+@media screen {
+  body { padding: 0; margin: 0; }
+  .snu-print-modal { border-radius: 0 !important; box-shadow: none !important; width: 100% !important; transform: none !important; opacity: 1 !important; }
+  .snu-print-actions { position: sticky; top: 0; z-index: 100; }
+}
 </style>
 </head>
 <body>
+<div class="snu-print-modal" style="opacity:1;transform:none;border-radius:0;box-shadow:none;width:100%;overflow:visible;">
 ${modal.innerHTML}
+</div>
 </body>
 </html>`;
 
-    const win = window.open('', '_blank', 'width=1100,height=800,scrollbars=yes');
+    const win = window.open('', '_blank');
     if (!win) {
-      // Popup blocked — fallback to inline print
+      // Fallback: try direct window.print() with overlay forced visible
       const overlay = document.getElementById('snuPrintOverlay');
-      if (overlay) { overlay.style.cssText += ';opacity:1!important;pointer-events:all!important;'; }
-      const m = document.getElementById('snuPrintModal');
-      if (m) { m.style.cssText += ';opacity:1!important;transform:none!important;'; }
-      setTimeout(() => window.print(), 300);
+      const mod     = document.getElementById('snuPrintModal');
+      if (overlay) { overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;opacity:1;pointer-events:all;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:28px 16px 60px;'; }
+      if (mod)     { mod.style.cssText = 'opacity:1;transform:none;width:min(980px,100%);background:#f0f4f8;border-radius:20px;'; }
+      setTimeout(() => window.print(), 200);
       return;
     }
-    win.document.open();
-    win.document.write(printHtml);
+    win.document.write(html);
     win.document.close();
-    // Copy all stylesheets from parent
-    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'));
-    styles.forEach(s => {
-      win.document.head.appendChild(s.cloneNode(true));
-    });
     win.focus();
-    setTimeout(() => {
-      win.print();
-    }, 800);
+    // Give fonts/images time to load, then print
+    win.onload = () => setTimeout(() => win.print(), 500);
+    // Fallback if onload doesn't fire
+    setTimeout(() => { if (!win.closed) win.print(); }, 1500);
   }
 
   function closeSnuPrint() {
@@ -6186,7 +6203,8 @@ ${modal.innerHTML}
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
     photo.innerHTML = d.photo
-      ? `<div class="aom-photo" style="background-image:url('${d.photo}');background-size:cover;background-position:center 20%;position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+      ? `<img class="aom-photo" src="${d.photo}" alt="${pesc(d.name)}"
+           style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:center center;display:block;z-index:0;">
          <div class="aom-photo-gradient"></div>
          <div class="aom-badge">🏆 Agent of the Month</div>
          <div class="aom-name-on-photo">
