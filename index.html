@@ -3412,7 +3412,7 @@
               <p>Searchable knowledge tools for quick reference</p>
             </div>
           </div>
-          <span class="count-chip">3 libraries</span>
+          <span class="count-chip">4 libraries</span>
         </div>
         <div class="card-grid">
           <a class="card" data-color="blue" href="tools/acronyms-library/">
@@ -3438,6 +3438,14 @@
             <h3>Sales One-Liners</h3>
             <p>Catchy, practical one-liners organized by call stage and sales situation.</p>
             <span class="card-tag">Calls</span>
+          </a>
+          <a class="card" data-color="purple" href="tools/training-videos/">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">🎥</div>
+            <h3>Training Videos</h3>
+            <p>Step-by-step video walkthroughs for carriers, systems, compliance, and sales skills.</p>
+            <span class="card-tag">Training</span>
           </a>
         </div>
       </div>
@@ -3891,7 +3899,7 @@
         <!-- ══ COVER ══ -->
         <div class="mag-cover">
           <img class="mag-cover-img" id="magCoverImg"
-            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200&q=80&fit=crop&crop=center"
+            src="https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=1200&q=80&fit=crop&crop=center"
             alt="Cover">
           <div class="mag-cover-gradient"></div>
           <div class="mag-cover-gradient-left"></div>
@@ -5758,10 +5766,10 @@ When answering:
 
     // ── Rotating cover + article images ──
     const coverImgs = [
-      'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200&q=80&fit=crop&crop=center',
-      'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=1200&q=80&fit=crop&crop=center',
-      'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=1200&q=80&fit=crop&crop=center',
-      'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=1200&q=80&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1560264280-88b68371db39?w=1200&q=80&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&q=80&fit=crop&crop=center',
     ];
     const articleImgs = [
       'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80&fit=crop',
@@ -5888,60 +5896,66 @@ When answering:
     const modal = document.getElementById('snuPrintModal');
     if (!modal) { alert('Print modal not found.'); return; }
 
-    // Collect all CSS text from every <style> tag, safely escaped
+    // Collect all <style> tag text; strip any literal </style> so they can't break the block
     const cssText = Array.from(document.querySelectorAll('style'))
-      .map(s => s.textContent || '').join('\n')
-      // Remove any nested </style> tags that would break the block
-      .replace(/<\/style>/gi, '');
+      .map(s => s.textContent || '')
+      .join('\n')
+      .replace(/<\/style\s*>/gi, '/* end-style */');
 
     const bodyHtml = modal.innerHTML;
 
-    const page = [
-      '<!DOCTYPE html>',
-      '<html lang="en"><head>',
-      '<meta charset="UTF-8">',
-      '<meta name="viewport" content="width=device-width,initial-scale=1">',
-      '<title>SNU — Show N Up Weekly</title>',
-      '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">',
-      '<style>',
-      '*, *::before, *::after { box-sizing: border-box; }',
-      'body { margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; background: #f0f4f8; color: #1e293b; }',
-      cssText,
-      '/* ── Screen: unwrap modal ── */',
-      '.snu-print-modal { transform: none !important; border-radius: 0 !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; opacity: 1 !important; }',
-      '.snu-print-actions { display: none !important; }',
-      '/* ── Print ── */',
-      '@media print {',
-      '  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }',
-      '  .snu-print-actions { display: none !important; }',
-      '}',
-      '</style>',
-      '</head><body>',
-      '<div class="snu-print-modal" style="transform:none;border-radius:0;box-shadow:none;width:100%;opacity:1;">',
-      bodyHtml,
-      '</div>',
-      '</body></html>'
-    ].join('\n');
+    const page = '<!DOCTYPE html>\n<html lang="en"><head>'
+      + '<meta charset="UTF-8">'
+      + '<meta name="viewport" content="width=device-width,initial-scale=1">'
+      + '<title>SNU \u2014 Show N Up Weekly</title>'
+      + '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800'
+      + '&family=Space+Grotesk:wght@400;500;600;700;800'
+      + '&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">'
+      + '<style>'
+      + cssText
+      + '\n.snu-print-overlay{display:block!important;position:static!important;opacity:1!important;pointer-events:all!important;background:none!important;padding:0!important;}'
+      + '\n.snu-print-modal{transform:none!important;border-radius:0!important;box-shadow:none!important;width:100%!important;max-width:100%!important;opacity:1!important;overflow:visible!important;}'
+      + '\n.snu-print-actions{display:none!important;}'
+      + '\n@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}.snu-print-actions{display:none!important;}}'
+      + '</style></head><body style="margin:0;padding:0;background:#f0f4f8;">'
+      + '<div class="snu-print-modal" style="transform:none;border-radius:0;box-shadow:none;width:100%;opacity:1;overflow:visible;">'
+      + bodyHtml
+      + '</div></body></html>';
 
-    // Use a Blob URL — avoids popup blockers and document.write issues
-    const blob = new Blob([page], { type: 'text/html' });
-    const url  = URL.createObjectURL(blob);
-    const win  = window.open(url, '_blank');
+    // Remove any old print iframe
+    const old = document.getElementById('_snuPrintFrame');
+    if (old) old.remove();
 
-    if (!win) {
-      // Popup blocked — download the HTML file instead
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'SNU-Weekly.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-      alert('Popup was blocked. An HTML file has been downloaded — open it and print from your browser.');
-      return;
-    }
+    const iframe = document.createElement('iframe');
+    iframe.id = '_snuPrintFrame';
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
+    document.body.appendChild(iframe);
 
-    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(page);
+    doc.close();
+
+    // Wait for fonts/images to settle, then print
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        } catch(e) {
+          // Last resort: open new tab
+          const blob = new Blob([page], {type:'text/html'});
+          const url  = URL.createObjectURL(blob);
+          const w = window.open(url, '_blank');
+          if (!w) { alert('Please allow popups for this site to print, or right-click the page and choose Print.'); }
+          setTimeout(() => URL.revokeObjectURL(url), 20000);
+        }
+      }, 600);
+    };
+    // Fallback if onload never fires
+    setTimeout(() => {
+      try { iframe.contentWindow.print(); } catch(e) {}
+    }, 2000);
   }
 
   function closeSnuPrint() {
@@ -6453,35 +6467,18 @@ When answering:
         <div class="feed-card${isStarred ? ' feed-card-starred' : ''}" data-update-id="${i.id}">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <span class="feed-type">${pesc(i.type || 'Update')}</span>
-            <button onclick="toggleStarUpdate(${i.id})" title="${isStarred ? 'Unpin' : 'Pin to top'}"
-              style="background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:2px 4px;
-              color:${isStarred ? '#fbbf24' : 'rgba(255,255,255,.25)'};transition:color .2s;flex-shrink:0;"
-              onmouseover="this.style.color='#fbbf24'" onmouseout="this.style.color='${isStarred ? '#fbbf24' : 'rgba(255,255,255,.25)'}'">
-              ${isStarred ? '⭐' : '☆'}
-            </button>
+            ${isStarred ? `<span style="font-size:13px;color:#fbbf24;font-weight:700;">📌 Pinned</span>` : ''}
           </div>
           <h4>${pesc(i.title || 'Untitled')}</h4>
           <p>${pesc(i.message || '')}</p>
           ${attachHtml}
           ${i.btnText && i.btnUrl ? `<a class="feed-btn" href="${xa(i.btnUrl)}" target="_blank" rel="noopener noreferrer">${pesc(i.btnText)} ↗</a>` : ''}
           <div class="feed-meta">
-            ${i.starred ? `<span>📌 Pinned</span>` : ''}
             ${i.date     ? `<span>📅 ${pesc(i.date)}</span>`      : ''}
             ${i.priority ? `<span>🚦 ${pesc(i.priority)}</span>`  : ''}
           </div>
         </div>`;
     }).join('');
-  }
-
-  // ── Toggle star on an update ──────────────────────────────────────────────
-  function toggleStarUpdate(id) {
-    const idx = _updates.findIndex(u => u.id === id);
-    if (idx === -1) return;
-    _updates[idx].starred   = !_updates[idx].starred;
-    _updates[idx].starredAt = _updates[idx].starred ? Date.now() : null;
-    try { localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates)); } catch(e) {}
-    renderFeedFromStorage();
-    refreshAdminUpdatesList();
   }
 
   // ── Refresh admin list ────────────────────────────────────────────────────
@@ -6495,12 +6492,17 @@ When answering:
       return;
     }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    // Show newest first
-    const sorted = [..._updates].map((u,i) => ({...u, _i: i})).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
+    // Show starred first, then newest
+    const sorted = [..._updates].map((u,i) => ({...u, _i: i}))
+      .sort((a,b) => {
+        if (a.starred && !b.starred) return -1;
+        if (!a.starred && b.starred) return 1;
+        return new Date(b.date||0) - new Date(a.date||0);
+      });
     el.innerHTML = sorted.map(u => `
-      <div class="admin-update-item">
-        <div>
-          <div class="admin-update-title">${pesc(u.title || 'Untitled')}</div>
+      <div class="admin-update-item" style="${u.starred ? 'border-left:3px solid #f59e0b;background:rgba(245,158,11,.07);' : ''}">
+        <div style="flex:1;min-width:0;">
+          <div class="admin-update-title">${u.starred ? '📌 ' : ''}${pesc(u.title || 'Untitled')}</div>
           <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(u.message || '')}</div>
           <div class="admin-update-meta">
             <span class="admin-update-type">${pesc(u.type || 'Update')}</span>
@@ -6509,8 +6511,24 @@ When answering:
             ${u.btnText  ? `<span>🔗 ${pesc(u.btnText)}</span>`   : ''}
           </div>
         </div>
-        <button class="admin-update-del" onclick="deleteUpdate(${u._i})">🗑 Delete</button>
+        <div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">
+          <button onclick="adminToggleStar(${u._i})" title="${u.starred ? 'Unpin from top' : 'Pin to top'}"
+            style="background:${u.starred ? 'rgba(245,158,11,.18)' : 'rgba(255,255,255,.06)'};border:1px solid ${u.starred ? '#f59e0b' : 'var(--border-2)'};color:${u.starred ? '#f59e0b' : 'var(--muted-2)'};border-radius:7px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;">
+            ${u.starred ? '📌 Pinned' : '☆ Pin'}
+          </button>
+          <button class="admin-update-del" onclick="deleteUpdate(${u._i})">🗑 Delete</button>
+        </div>
       </div>`).join('');
+  }
+
+  function adminToggleStar(idx) {
+    if (idx < 0 || idx >= _updates.length) return;
+    _updates[idx].starred   = !_updates[idx].starred;
+    _updates[idx].starredAt = _updates[idx].starred ? Date.now() : null;
+    try { localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates)); } catch(e) {}
+    renderFeedFromStorage();
+    refreshAdminUpdatesList();
+    showSnuToast(_updates[idx].starred ? '📌 Update pinned to top of feed.' : '✓ Update unpinned.');
   }
 
   // ── Add a new update ──────────────────────────────────────────────────────
