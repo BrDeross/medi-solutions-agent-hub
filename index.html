@@ -2511,8 +2511,10 @@
 
     /* ── Print ── */
     @media print {
-      /* Hide everything except the print modal */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      /* Hide everything on the page except the print overlay */
       body > *:not(.snu-print-overlay) { display: none !important; }
+      /* Force overlay fully visible */
       .snu-print-overlay {
         position: static !important;
         opacity: 1 !important;
@@ -2523,18 +2525,21 @@
         overflow: visible !important;
         backdrop-filter: none !important;
       }
+      /* Force action bar (Close/Print buttons) hidden */
+      .snu-print-actions { display: none !important; }
+      /* Force modal fully visible and full-width */
       .snu-print-modal {
         box-shadow: none !important;
         border-radius: 0 !important;
         width: 100% !important;
+        max-width: 100% !important;
         transform: none !important;
         opacity: 1 !important;
+        overflow: visible !important;
       }
-      .snu-print-actions { display: none !important; }
-      .mag-cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; height: 320px !important; }
-      .mag-body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .mag-two-col { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .chat-launcher, .chat-overlay, .chat-modal, .bg-glow { display: none !important; }
+      .mag-cover { height: 320px !important; }
+      .chat-launcher, .chat-overlay, .chat-modal, .bg-glow,
+      .admin-overlay, .admin-modal, #snuAdminPanel { display: none !important; }
     }
 
     @media (max-width: 680px) {
@@ -5893,69 +5898,10 @@ When answering:
   }
 
   function triggerSnuPrint() {
-    const modal = document.getElementById('snuPrintModal');
-    if (!modal) { alert('Print modal not found.'); return; }
-
-    // Collect all <style> tag text; strip any literal </style> so they can't break the block
-    const cssText = Array.from(document.querySelectorAll('style'))
-      .map(s => s.textContent || '')
-      .join('\n')
-      .replace(/<\/style\s*>/gi, '/* end-style */');
-
-    const bodyHtml = modal.innerHTML;
-
-    const page = '<!DOCTYPE html>\n<html lang="en"><head>'
-      + '<meta charset="UTF-8">'
-      + '<meta name="viewport" content="width=device-width,initial-scale=1">'
-      + '<title>SNU \u2014 Show N Up Weekly</title>'
-      + '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800'
-      + '&family=Space+Grotesk:wght@400;500;600;700;800'
-      + '&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">'
-      + '<style>'
-      + cssText
-      + '\n.snu-print-overlay{display:block!important;position:static!important;opacity:1!important;pointer-events:all!important;background:none!important;padding:0!important;}'
-      + '\n.snu-print-modal{transform:none!important;border-radius:0!important;box-shadow:none!important;width:100%!important;max-width:100%!important;opacity:1!important;overflow:visible!important;}'
-      + '\n.snu-print-actions{display:none!important;}'
-      + '\n@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}.snu-print-actions{display:none!important;}}'
-      + '</style></head><body style="margin:0;padding:0;background:#f0f4f8;">'
-      + '<div class="snu-print-modal" style="transform:none;border-radius:0;box-shadow:none;width:100%;opacity:1;overflow:visible;">'
-      + bodyHtml
-      + '</div></body></html>';
-
-    // Remove any old print iframe
-    const old = document.getElementById('_snuPrintFrame');
-    if (old) old.remove();
-
-    const iframe = document.createElement('iframe');
-    iframe.id = '_snuPrintFrame';
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(page);
-    doc.close();
-
-    // Wait for fonts/images to settle, then print
-    iframe.onload = () => {
-      setTimeout(() => {
-        try {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        } catch(e) {
-          // Last resort: open new tab
-          const blob = new Blob([page], {type:'text/html'});
-          const url  = URL.createObjectURL(blob);
-          const w = window.open(url, '_blank');
-          if (!w) { alert('Please allow popups for this site to print, or right-click the page and choose Print.'); }
-          setTimeout(() => URL.revokeObjectURL(url), 20000);
-        }
-      }, 600);
-    };
-    // Fallback if onload never fires
-    setTimeout(() => {
-      try { iframe.contentWindow.print(); } catch(e) {}
-    }, 2000);
+    // The @media print CSS already hides everything except .snu-print-overlay.open
+    // The overlay already has .open on it (since the modal is visible).
+    // Just call window.print() — the browser does the rest.
+    window.print();
   }
 
   function closeSnuPrint() {
