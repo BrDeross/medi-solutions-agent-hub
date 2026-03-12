@@ -2512,22 +2512,25 @@
     /* ── Print ── */
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      /* Hide everything on the page except the print overlay */
-      body > *:not(.snu-print-overlay) { display: none !important; }
-      /* Force overlay fully visible */
-      .snu-print-overlay {
+      /* Hide everything — then selectively show only what we need */
+      body > * { display: none !important; }
+      /* Show the overlay wrapper but strip ALL visual chrome */
+      body > .snu-print-overlay {
+        display: block !important;
         position: static !important;
         opacity: 1 !important;
-        pointer-events: all !important;
-        background: none !important;
-        padding: 0 !important;
-        display: block !important;
-        overflow: visible !important;
+        background: transparent !important;
+        background-color: transparent !important;
         backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        width: 100% !important;
       }
-      /* Force action bar (Close/Print buttons) hidden */
+      /* Hide the fixed action bar */
       .snu-print-actions { display: none !important; }
-      /* Force modal fully visible and full-width */
+      /* Strip modal chrome */
       .snu-print-modal {
         box-shadow: none !important;
         border-radius: 0 !important;
@@ -2536,6 +2539,7 @@
         transform: none !important;
         opacity: 1 !important;
         overflow: visible !important;
+        background: #f0f4f8 !important;
       }
       .mag-cover { height: 320px !important; }
       .chat-launcher, .chat-overlay, .chat-modal, .bg-glow,
@@ -2686,22 +2690,49 @@
     /* Bio */
     .spotlight-bio {
       font-size:14px;line-height:1.8;color:var(--muted);
-      margin-bottom:24px;
+      margin-bottom:18px;
       flex:1;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 16px 18px;
+      position: relative;
+    }
+    .spotlight-bio::before {
+      content: '📋 Bio';
+      display: block;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 8px;
+      font-style: normal;
     }
 
     /* Quote */
     .spotlight-quote {
-      border-left:3px solid var(--gold);
-      padding:12px 18px;
-      background:rgba(251,191,36,.06);
-      border-radius:0 8px 8px 0;
-      font-size:14px;font-style:italic;
-      color:rgba(255,255,255,.7);line-height:1.6;
-      margin-bottom:24px;
+      border: 1px solid rgba(251,191,36,.35);
+      padding: 18px 20px 14px;
+      background: rgba(251,191,36,.08);
+      border-radius: 12px;
+      font-size: 15px; font-style: italic;
+      color: rgba(255,255,255,.88); line-height:1.65;
+      margin-bottom: 20px;
+      position: relative;
     }
-    .spotlight-quote::before{content:'"';color:var(--gold);font-size:22px;line-height:0;vertical-align:-.3em;margin-right:4px;}
-    .spotlight-quote::after{content:'"';color:var(--gold);font-size:22px;line-height:0;vertical-align:-.3em;margin-left:2px;}
+    .spotlight-quote::before {
+      content: '"';
+      position: absolute;
+      top: -14px; left: 16px;
+      font-size: 52px;
+      line-height: 1;
+      color: var(--gold);
+      font-style: normal;
+      font-family: Georgia, serif;
+      opacity: .9;
+    }
+    .spotlight-quote::after { content: none; }
 
     /* Footer row */
     .spotlight-footer-row {
@@ -3444,7 +3475,7 @@
             <p>Catchy, practical one-liners organized by call stage and sales situation.</p>
             <span class="card-tag">Calls</span>
           </a>
-          <a class="card" data-color="purple" href="tools/training-videos/">
+          <a class="card" data-color="purple" href="#training-videos">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">🎥</div>
@@ -3452,6 +3483,25 @@
             <p>Step-by-step video walkthroughs for carriers, systems, compliance, and sales skills.</p>
             <span class="card-tag">Training</span>
           </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRAINING VIDEOS -->
+    <section class="section" id="training-videos">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sh-left">
+            <div class="sh-icon purple" style="background:rgba(167,139,250,.15);color:#a78bfa;">🎥</div>
+            <div>
+              <h2>Training Videos</h2>
+              <p>Carrier training, sales skills, compliance, and onboarding walkthroughs</p>
+            </div>
+          </div>
+          <span class="count-chip" id="tv-count">0 videos</span>
+        </div>
+        <div id="tv-grid" class="card-grid">
+          <div class="empty" style="grid-column:1/-1;">No training videos yet — add some via Admin → Training Videos.</div>
         </div>
       </div>
     </section>
@@ -3563,6 +3613,7 @@
           <button class="admin-tab" onclick="switchAdminTab('spotlight',this)">⭐ Agent Spotlight</button>
           <button class="admin-tab" onclick="switchAdminTab('aom',this)">🗓️ Agent of Month</button>
           <button class="admin-tab" onclick="switchAdminTab('updates',this)">📡 Updates Feed</button>
+          <button class="admin-tab" onclick="switchAdminTab('training',this)">🎥 Training Videos</button>
         </div>
 
         <!-- ── Tab: SNU Data ── -->
@@ -3879,6 +3930,69 @@
 
         </div>
         </div><!-- /adminTabUpdates -->
+
+        <!-- ══ TRAINING VIDEOS TAB ══ -->
+        <div id="adminTabTraining" class="admin-tab-panel">
+        <div class="admin-body">
+
+          <div class="admin-section-title">🎥 Training Videos</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add training videos by URL (YouTube, Vimeo, or direct link). Give each a title and short description, then publish. Videos appear in the Training Videos library on the hub.</p>
+
+          <!-- Add video form -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:12px;padding:16px;margin-bottom:16px;">
+            <div class="admin-section-title" style="margin-bottom:10px;font-size:11px;">➕ Add Video</div>
+
+            <!-- Drag & drop zone -->
+            <div id="tvDropZone" style="border:2px dashed var(--border-2);border-radius:10px;padding:20px;text-align:center;margin-bottom:12px;cursor:pointer;transition:border-color .2s,background .2s;" 
+              ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='rgba(59,130,246,.07)'"
+              ondragleave="this.style.borderColor='var(--border-2)';this.style.background=''"
+              ondrop="handleTvDrop(event)">
+              <div style="font-size:28px;margin-bottom:6px;">🎬</div>
+              <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">Drag a video file here, or paste a URL below</div>
+              <div style="font-size:11px;color:var(--muted-2);">MP4, YouTube, or Vimeo links accepted</div>
+            </div>
+
+            <div class="admin-field" style="margin-bottom:10px;">
+              <label>Video URL <span style="color:var(--muted-2);font-weight:400;">(YouTube, Vimeo, or direct .mp4)</span></label>
+              <input class="admin-input" id="tvUrl" placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
+            </div>
+
+            <div class="admin-week-row" style="margin-bottom:10px;">
+              <div class="admin-field">
+                <label>Title</label>
+                <input class="admin-input" id="tvTitle" placeholder="Medicare Basics Overview">
+              </div>
+              <div class="admin-field">
+                <label>Category</label>
+                <select class="admin-input" id="tvCategory">
+                  <option>Carrier Training</option>
+                  <option>Medicare</option>
+                  <option>Sales Skills</option>
+                  <option>Compliance</option>
+                  <option>Systems & Tools</option>
+                  <option>Onboarding</option>
+                  <option>Product Knowledge</option>
+                  <option>General</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="admin-field" style="margin-bottom:14px;">
+              <label>Short Description</label>
+              <textarea class="admin-input" id="tvDesc" rows="2" placeholder="What agents will learn from this video…" style="resize:vertical;min-height:52px;"></textarea>
+            </div>
+
+            <button class="admin-save-btn" style="width:auto;padding:10px 24px;background:var(--accent);" onclick="addTrainingVideo()">➕ Add Video</button>
+          </div>
+
+          <!-- Published videos list -->
+          <div class="admin-section-title" style="margin-top:4px;">📋 Published Videos <span id="tvCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+          <div id="adminVideosList">
+            <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>
+          </div>
+
+        </div>
+        </div><!-- /adminTabTraining -->
 
 
 
@@ -6540,6 +6654,164 @@ When answering:
     showSnuToast('🗑 Update removed.');
   }
 
+  </script>
+
+  <script id="training-video-script">
+  const TV_KEY = 'medi_training_videos_v1';
+  let _tvVideos = [];
+
+  // ── Load from localStorage ────────────────────────────────────────────────
+  (function initTv() {
+    try { _tvVideos = JSON.parse(localStorage.getItem(TV_KEY) || '[]'); } catch(e) { _tvVideos = []; }
+    renderTvHub();
+    refreshAdminVideosList();
+  })();
+
+  // ── Convert any YouTube/Vimeo URL to embeddable URL ──────────────────────
+  function toEmbedUrl(url) {
+    if (!url) return null;
+    url = url.trim();
+    // YouTube full: youtube.com/watch?v=ID
+    let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (m) return 'https://www.youtube.com/embed/' + m[1];
+    // YouTube already embed
+    if (url.includes('youtube.com/embed/')) return url;
+    // Vimeo
+    m = url.match(/vimeo\.com\/(\d+)/);
+    if (m) return 'https://player.vimeo.com/video/' + m[1];
+    // Direct URL (mp4 etc) — return as-is for <video> tag
+    return url;
+  }
+
+  function isEmbedUrl(url) {
+    return url && (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com/'));
+  }
+
+  // ── Drag & drop handler ───────────────────────────────────────────────────
+  function handleTvDrop(event) {
+    event.preventDefault();
+    const zone = document.getElementById('tvDropZone');
+    if (zone) { zone.style.borderColor = 'var(--border-2)'; zone.style.background = ''; }
+    // If a file was dropped, create a local object URL
+    const file = event.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('video/')) {
+      const objUrl = URL.createObjectURL(file);
+      const urlInput = document.getElementById('tvUrl');
+      if (urlInput) urlInput.value = objUrl;
+      if (!document.getElementById('tvTitle').value) {
+        document.getElementById('tvTitle').value = file.name.replace(/\.[^.]+$/, '');
+      }
+      showSnuToast('🎬 Video file loaded — add a title and description, then click Add Video.');
+      return;
+    }
+    // If text/URL was dropped
+    const text = event.dataTransfer.getData('text/plain') || event.dataTransfer.getData('text/uri-list');
+    if (text) {
+      const urlInput = document.getElementById('tvUrl');
+      if (urlInput) urlInput.value = text.trim();
+      showSnuToast('🔗 URL pasted — fill in the title and description, then click Add Video.');
+    }
+  }
+
+  // ── Add video ─────────────────────────────────────────────────────────────
+  function addTrainingVideo() {
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const url   = gv('tvUrl');
+    const title = gv('tvTitle');
+    if (!url)   { showSnuToast('⚠ Please enter a video URL.'); return; }
+    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
+
+    const embed = toEmbedUrl(url);
+    const video = {
+      id:       Date.now(),
+      url,
+      embed,
+      title,
+      category: gv('tvCategory') || 'General',
+      desc:     gv('tvDesc'),
+      addedAt:  new Date().toISOString(),
+    };
+
+    _tvVideos.unshift(video);
+    try { localStorage.setItem(TV_KEY, JSON.stringify(_tvVideos)); } catch(e) {}
+
+    renderTvHub();
+    refreshAdminVideosList();
+
+    // Reset fields
+    ['tvUrl','tvTitle','tvDesc'].forEach(id => { const e = document.getElementById(id); if(e) e.value = ''; });
+    const cat = document.getElementById('tvCategory'); if (cat) cat.selectedIndex = 0;
+    showSnuToast('✓ Training video added and published.');
+  }
+
+  // ── Delete video ──────────────────────────────────────────────────────────
+  function deleteTrainingVideo(id) {
+    _tvVideos = _tvVideos.filter(v => v.id !== id);
+    try { localStorage.setItem(TV_KEY, JSON.stringify(_tvVideos)); } catch(e) {}
+    renderTvHub();
+    refreshAdminVideosList();
+    showSnuToast('🗑 Video removed.');
+  }
+
+  // ── Render hub grid ───────────────────────────────────────────────────────
+  function renderTvHub() {
+    const grid  = document.getElementById('tv-grid');
+    const badge = document.getElementById('tv-count');
+    if (!grid) return;
+    if (badge) badge.textContent = _tvVideos.length + ' video' + (_tvVideos.length === 1 ? '' : 's');
+    if (!_tvVideos.length) {
+      grid.innerHTML = '<div class="empty" style="grid-column:1/-1;">No training videos yet — add some via Admin → Training Videos.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    grid.innerHTML = _tvVideos.map(v => {
+      const embedUrl = v.embed || toEmbedUrl(v.url);
+      let mediaHtml;
+      if (isEmbedUrl(embedUrl)) {
+        mediaHtml = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px 10px 0 0;background:#000;">
+          <iframe src="${embedUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen loading="lazy"></iframe>
+        </div>`;
+      } else {
+        mediaHtml = `<video controls style="width:100%;border-radius:10px 10px 0 0;display:block;background:#000;max-height:200px;">
+          <source src="${v.url}">Your browser doesn't support video.
+        </video>`;
+      }
+      return `
+        <div class="card" data-color="purple" style="padding:0;overflow:hidden;cursor:default;" onclick="">
+          ${mediaHtml}
+          <div style="padding:16px 18px 18px;">
+            <span style="font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#a78bfa;display:block;margin-bottom:4px;">${pesc(v.category)}</span>
+            <h3 style="font-size:15px;font-weight:700;margin:0 0 6px;color:var(--text);">${pesc(v.title)}</h3>
+            ${v.desc ? `<p style="font-size:13px;color:var(--muted);margin:0;line-height:1.5;">${pesc(v.desc)}</p>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Refresh admin list ────────────────────────────────────────────────────
+  function refreshAdminVideosList() {
+    const el    = document.getElementById('adminVideosList');
+    const count = document.getElementById('tvCount');
+    if (!el) return;
+    if (count) count.textContent = '(' + _tvVideos.length + ')';
+    if (!_tvVideos.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = _tvVideos.map(v => `
+      <div class="admin-update-item">
+        <div style="flex:1;min-width:0;">
+          <div class="admin-update-title">🎥 ${pesc(v.title)}</div>
+          <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(v.desc || '')}</div>
+          <div class="admin-update-meta">
+            <span class="admin-update-type">${pesc(v.category)}</span>
+            <span style="word-break:break-all;max-width:240px;overflow:hidden;text-overflow:ellipsis;display:inline-block;">${pesc(v.url)}</span>
+          </div>
+        </div>
+        <button class="admin-update-del" onclick="deleteTrainingVideo(${v.id})">🗑 Delete</button>
+      </div>`).join('');
+  }
   </script>
 
 </body>
