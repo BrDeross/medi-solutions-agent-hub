@@ -2814,25 +2814,37 @@
 
     /* Photo area */
     .aom-photo-wrap {
-      margin: 10px 14px 0;
-      border-radius: 10px;
+      margin: 10px 10px 0;
+      border-radius: 12px;
       overflow: hidden;
-      height: 130px;
-      background: rgba(255,255,255,.04);
+      height: 160px;
+      background: linear-gradient(160deg, rgba(30,61,114,.6), rgba(10,15,26,.8));
       position: relative;
       display: flex; align-items: center; justify-content: center;
     }
     .aom-photo {
+      position: absolute;
+      top: 0; left: 0;
       width: 100%; height: 100%;
-      object-fit: cover; object-position: top;
+      object-fit: cover; object-position: top center;
       display: block;
-      filter: brightness(.85) saturate(1.05);
-      transition: transform 4s ease;
+      filter: brightness(.88) saturate(1.08);
+      transition: transform 5s ease, filter .3s;
+      z-index: 0;
     }
-    .aom-card:hover .aom-photo { transform: scale(1.05); }
+    .aom-card:hover .aom-photo {
+      transform: scale(1.06);
+      filter: brightness(.95) saturate(1.12);
+    }
     .aom-photo-gradient {
       position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(10,15,26,.7) 0%, transparent 60%);
+      background: linear-gradient(
+        to top,
+        rgba(10,15,26,.82) 0%,
+        rgba(10,15,26,.25) 45%,
+        rgba(10,15,26,.08) 100%
+      );
+      z-index: 1;
     }
     .aom-photo-empty {
       font-size: 32px; opacity: .25;
@@ -2845,9 +2857,9 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Award badge on photo */
+    /* Award badge on photo — top left */
     .aom-badge {
-      position: absolute; bottom: 8px; left: 8px;
+      position: absolute; top: 8px; left: 8px;
       background: linear-gradient(135deg, #fbbf24, #f59e0b);
       color: #000;
       font-family: 'Space Grotesk', sans-serif;
@@ -2855,6 +2867,25 @@
       text-transform: uppercase; letter-spacing: 1px;
       padding: 3px 8px; border-radius: 4px;
       box-shadow: 0 2px 8px rgba(251,191,36,.5);
+      z-index: 2;
+    }
+    /* Name overlay on photo — bottom center */
+    .aom-name-on-photo {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 28px 10px 8px;
+      z-index: 2;
+      text-align: center;
+    }
+    .aom-name-on-photo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12.5px; font-weight: 800;
+      color: #fff;
+      text-shadow: 0 1px 6px rgba(0,0,0,.7);
+      line-height: 1.2;
+    }
+    /* Shimmer frame on current month */
+    .aom-card.current-month .aom-photo-wrap {
+      box-shadow: 0 0 0 2px var(--gold), inset 0 0 0 1px rgba(251,191,36,.2);
     }
 
     /* Agent info */
@@ -3681,6 +3712,19 @@
                 <label>Button URL (optional)</label>
                 <input class="admin-input" id="updBtnUrl" placeholder="https://...">
               </div>
+            </div>
+
+            <!-- Attachment upload -->
+            <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">📎 Attachment (optional)</label>
+            <div class="photo-upload-zone" id="updAttachZone" onclick="document.getElementById('updAttachInput').click()" style="padding:16px;margin-bottom:14px;">
+              <img class="photo-upload-preview" id="updAttachPreview" src="" alt="Preview" style="width:80px;height:80px;border-radius:8px;">
+              <div id="updAttachPlaceholder">
+                <div class="photo-upload-icon" style="font-size:26px;">📎</div>
+                <div class="photo-upload-text">Drop or <span>click to upload</span> a photo or PDF</div>
+                <div class="photo-upload-hint">JPG, PNG, WebP, or PDF</div>
+              </div>
+              <div id="updAttachFilename" style="display:none;font-size:11px;color:var(--accent-2);margin-top:6px;font-weight:600;"></div>
+              <input type="file" id="updAttachInput" accept="image/*,.pdf" style="display:none" onchange="handleUpdAttach(this.files[0])">
             </div>
 
             <button class="admin-save-btn" style="width:auto;padding:10px 24px;background:var(--accent);" onclick="addUpdate()">➕ Add Update</button>
@@ -5676,11 +5720,13 @@ When answering:
     photo.innerHTML = d.photo
       ? `<img class="aom-photo" src="${d.photo}" alt="${pesc(d.name)}">
          <div class="aom-photo-gradient"></div>
-         <div class="aom-badge">🏆 Agent of the Month</div>`
+         <div class="aom-badge">🏆 Agent of the Month</div>
+         <div class="aom-name-on-photo">
+           <div class="aom-name-on-photo-text">${pesc(d.name)}</div>
+         </div>`
       : `<div class="aom-photo-empty" style="font-size:36px;">👤<span>${pesc(d.name.split(' ')[0])}</span></div>`;
 
     info.innerHTML = `
-      <div class="aom-agent-name">${pesc(d.name)}</div>
       ${d.stat ? `<div class="aom-agent-stat">${pesc(d.stat)}</div>` : ''}
       ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
     `;
@@ -5825,9 +5871,50 @@ When answering:
   <script id="updates-script">
   const UPDATES_KEY = 'snu_updates_v1';
   let _updates = [];
+  let _updAttachBase64 = null;
+  let _updAttachType   = null;
+  let _updAttachName   = null;
 
-  // ── Init ─────────────────────────────────────────────────────────────────
-  function initUpdates() {
+  // ── Attachment upload handler ─────────────────────────────────────────────
+  function handleUpdAttach(file) {
+    if (!file) return;
+    _updAttachName = file.name;
+    _updAttachType = file.type;
+    const reader = new FileReader();
+    reader.onload = e => {
+      _updAttachBase64 = e.target.result;
+      const preview      = document.getElementById('updAttachPreview');
+      const placeholder  = document.getElementById('updAttachPlaceholder');
+      const filename     = document.getElementById('updAttachFilename');
+      const zone         = document.getElementById('updAttachZone');
+      if (file.type.startsWith('image/') && preview) {
+        preview.src = _updAttachBase64;
+        preview.classList.add('visible');
+        if (placeholder) placeholder.style.display = 'none';
+      } else {
+        // PDF — show filename instead of image preview
+        if (placeholder) placeholder.style.display = 'none';
+      }
+      if (filename) { filename.textContent = '📎 ' + file.name; filename.style.display = 'block'; }
+      if (zone) zone.classList.add('has-photo');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Drag-and-drop on attach zone
+  document.addEventListener('DOMContentLoaded', () => {
+    const zone = document.getElementById('updAttachZone');
+    if (zone) {
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+      zone.addEventListener('dragleave', () => zone.style.borderColor = '');
+      zone.addEventListener('drop', e => {
+        e.preventDefault(); zone.style.borderColor = '';
+        const file = e.dataTransfer.files[0];
+        if (file) handleUpdAttach(file);
+      });
+    }
+    initUpdates();
+  });
     try {
       const raw = localStorage.getItem(UPDATES_KEY);
       _updates = raw ? JSON.parse(raw) : [];
@@ -5849,17 +5936,34 @@ When answering:
     }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const xa   = s => String(s||'').replace(/"/g,'&quot;');
-    el.innerHTML = items.map(i => `
-      <div class="feed-card">
-        <span class="feed-type">${pesc(i.type || 'Update')}</span>
-        <h4>${pesc(i.title || 'Untitled')}</h4>
-        <p>${pesc(i.message || '')}</p>
-        ${i.btnText && i.btnUrl ? `<a class="feed-btn" href="${xa(i.btnUrl)}" target="_blank" rel="noopener noreferrer">${pesc(i.btnText)} ↗</a>` : ''}
-        <div class="feed-meta">
-          ${i.date    ? `<span>📅 ${pesc(i.date)}</span>`         : ''}
-          ${i.priority ? `<span>🚦 ${pesc(i.priority)}</span>`    : ''}
-        </div>
-      </div>`).join('');
+    el.innerHTML = items.map(i => {
+      // Attachment display
+      let attachHtml = '';
+      if (i.attachBase64 && i.attachType) {
+        if (i.attachType.startsWith('image/')) {
+          attachHtml = `<div style="margin:10px 0 4px;">
+            <img src="${i.attachBase64}" alt="Attachment" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--border);object-fit:cover;display:block;">
+          </div>`;
+        } else if (i.attachType === 'application/pdf') {
+          attachHtml = `<a href="${i.attachBase64}" download="${xa(i.attachName||'document.pdf')}"
+            style="display:inline-flex;align-items:center;gap:6px;margin:8px 0 4px;padding:7px 14px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:#f87171;font-size:12px;font-weight:700;text-decoration:none;">
+            📄 ${pesc(i.attachName || 'Download PDF')}
+          </a>`;
+        }
+      }
+      return `
+        <div class="feed-card">
+          <span class="feed-type">${pesc(i.type || 'Update')}</span>
+          <h4>${pesc(i.title || 'Untitled')}</h4>
+          <p>${pesc(i.message || '')}</p>
+          ${attachHtml}
+          ${i.btnText && i.btnUrl ? `<a class="feed-btn" href="${xa(i.btnUrl)}" target="_blank" rel="noopener noreferrer">${pesc(i.btnText)} ↗</a>` : ''}
+          <div class="feed-meta">
+            ${i.date     ? `<span>📅 ${pesc(i.date)}</span>`      : ''}
+            ${i.priority ? `<span>🚦 ${pesc(i.priority)}</span>`  : ''}
+          </div>
+        </div>`;
+    }).join('');
   }
 
   // ── Refresh admin list ────────────────────────────────────────────────────
@@ -5898,28 +6002,47 @@ When answering:
     if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
 
     const update = {
-      id:       Date.now(),
+      id:           Date.now(),
       title,
-      type:     gv('updType')     || 'Announcement',
-      message:  gv('updMessage'),
-      date:     gv('updDate'),
-      priority: gv('updPriority'),
-      btnText:  gv('updBtnText'),
-      btnUrl:   gv('updBtnUrl'),
+      type:         gv('updType')     || 'Announcement',
+      message:      gv('updMessage'),
+      date:         gv('updDate'),
+      priority:     gv('updPriority'),
+      btnText:      gv('updBtnText'),
+      btnUrl:       gv('updBtnUrl'),
+      attachBase64: _updAttachBase64 || null,
+      attachType:   _updAttachType   || null,
+      attachName:   _updAttachName   || null,
     };
 
     _updates.unshift(update);
-    localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
+    try {
+      localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
+    } catch(e) {
+      // Quota exceeded — save without attachment
+      update.attachBase64 = null;
+      localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
+      showSnuToast('⚠ Attachment too large — saved without it. Use a smaller file.');
+    }
     renderFeedFromStorage();
     refreshAdminUpdatesList();
 
-    // Clear form
+    // Reset all fields + attachment
     ['updTitle','updMessage','updDate','updBtnText','updBtnUrl'].forEach(id => {
       const e = document.getElementById(id); if (e) e.value = '';
     });
     ['updType','updPriority'].forEach(id => {
       const e = document.getElementById(id); if (e) e.selectedIndex = 0;
     });
+    _updAttachBase64 = null; _updAttachType = null; _updAttachName = null;
+    const prev = document.getElementById('updAttachPreview');
+    const ph   = document.getElementById('updAttachPlaceholder');
+    const fn   = document.getElementById('updAttachFilename');
+    const zone = document.getElementById('updAttachZone');
+    if (prev) { prev.src = ''; prev.classList.remove('visible'); }
+    if (ph)   ph.style.display = '';
+    if (fn)   { fn.textContent = ''; fn.style.display = 'none'; }
+    if (zone) zone.classList.remove('has-photo');
 
     showSnuToast('✓ Update published!');
   }
@@ -5933,8 +6056,8 @@ When answering:
     showSnuToast('🗑 Update removed.');
   }
 
-  // ── Init on load + refresh admin list when admin opens ───────────────────
-  document.addEventListener('DOMContentLoaded', initUpdates);
+  // ── Init ─────────────────────────────────────────────────────────────────
+  function initUpdates() {
   </script>
 
 </body>
