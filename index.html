@@ -2133,34 +2133,40 @@
       opacity: 0; pointer-events: none;
       transition: opacity .35s;
       overflow-y: auto;
-      padding: 28px 16px 60px;
+      padding: 64px 16px 60px;
       display: flex;
       align-items: flex-start;
       justify-content: center;
     }
     .snu-print-overlay.open { opacity: 1; pointer-events: all; }
 
+    /* Fixed action bar sits at top of the overlay viewport */
+    .snu-print-actions {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 3100;
+      background: #fff;
+      padding: 10px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 2px 12px rgba(0,0,0,.12);
+      pointer-events: all;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .snu-print-overlay.open .snu-print-actions { opacity: 1; }
+
     .snu-print-modal {
       width: min(980px, 100%);
       background: #f0f4f8;
       border-radius: 20px;
-      overflow: visible;
+      overflow: hidden;
       box-shadow: 0 50px 120px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.07);
       transform: translateY(32px) scale(.98);
       transition: transform .4s cubic-bezier(.22,1,.36,1);
       position: relative;
     }
     .snu-print-overlay.open .snu-print-modal { transform: translateY(0) scale(1); }
-
-    /* ── Action bar ── */
-    .snu-print-actions {
-      position: sticky; top: 0; z-index: 20;
-      background: rgba(255,255,255,.97);
-      backdrop-filter: blur(20px);
-      padding: 12px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(0,0,0,.08);
-    }
     .snu-print-action-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px; font-weight: 700; color: #64748b;
@@ -3870,16 +3876,17 @@
 
     <!-- SNU PRINT MODAL — Magazine Edition -->
     <div class="snu-print-overlay" id="snuPrintOverlay" onclick="handlePrintOverlayClick(event)">
-      <div class="snu-print-modal" id="snuPrintModal">
 
-        <!-- Action bar -->
-        <div class="snu-print-actions">
-          <span class="snu-print-action-title">🗞 SNU · Show N Up</span>
-          <div class="snu-print-btn-row">
-            <button class="snu-print-btn ghost" onclick="event.stopPropagation();closeSnuPrint()">✕ Close</button>
-            <button class="snu-print-btn primary" onclick="event.stopPropagation();triggerSnuPrint()">🖨️ Print / Save PDF</button>
-          </div>
+      <!-- Action bar: fixed at top of screen when overlay is open -->
+      <div class="snu-print-actions" onclick="event.stopPropagation()">
+        <span class="snu-print-action-title">🗞 SNU · Show N Up</span>
+        <div class="snu-print-btn-row">
+          <button class="snu-print-btn ghost" onclick="closeSnuPrint()">✕ Close</button>
+          <button class="snu-print-btn primary" onclick="triggerSnuPrint()">🖨️ Print / Save PDF</button>
         </div>
+      </div>
+
+      <div class="snu-print-modal" id="snuPrintModal">
 
         <!-- ══ COVER ══ -->
         <div class="mag-cover">
@@ -5879,68 +5886,62 @@ When answering:
 
   function triggerSnuPrint() {
     const modal = document.getElementById('snuPrintModal');
-    if (!modal) { alert('SNU print modal not found.'); return; }
+    if (!modal) { alert('Print modal not found.'); return; }
 
-    // Gather all <style> blocks from the parent document
-    const allStyles = Array.from(document.querySelectorAll('style'))
-      .map(s => s.textContent).join('\n');
+    // Collect all CSS text from every <style> tag, safely escaped
+    const cssText = Array.from(document.querySelectorAll('style'))
+      .map(s => s.textContent || '').join('\n')
+      // Remove any nested </style> tags that would break the block
+      .replace(/<\/style>/gi, '');
 
-    // Build standalone page with all CSS embedded + modal HTML
-    const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>SNU — Show N Up Weekly</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
-<style>
-/* ── Reset ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; color: #1e293b; }
-img { max-width: 100%; display: block; }
+    const bodyHtml = modal.innerHTML;
 
-/* ── All parent styles (for class references in modal) ── */
-${allStyles}
+    const page = [
+      '<!DOCTYPE html>',
+      '<html lang="en"><head>',
+      '<meta charset="UTF-8">',
+      '<meta name="viewport" content="width=device-width,initial-scale=1">',
+      '<title>SNU — Show N Up Weekly</title>',
+      '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">',
+      '<style>',
+      '*, *::before, *::after { box-sizing: border-box; }',
+      'body { margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; background: #f0f4f8; color: #1e293b; }',
+      cssText,
+      '/* ── Screen: unwrap modal ── */',
+      '.snu-print-modal { transform: none !important; border-radius: 0 !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; opacity: 1 !important; }',
+      '.snu-print-actions { display: none !important; }',
+      '/* ── Print ── */',
+      '@media print {',
+      '  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }',
+      '  .snu-print-actions { display: none !important; }',
+      '}',
+      '</style>',
+      '</head><body>',
+      '<div class="snu-print-modal" style="transform:none;border-radius:0;box-shadow:none;width:100%;opacity:1;">',
+      bodyHtml,
+      '</div>',
+      '</body></html>'
+    ].join('\n');
 
-/* ── Print overrides ── */
-@media print {
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  body { background: #f0f4f8 !important; }
-  .snu-print-actions { display: none !important; }
-}
+    // Use a Blob URL — avoids popup blockers and document.write issues
+    const blob = new Blob([page], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
 
-/* ── Screen: make modal fill the window ── */
-@media screen {
-  body { padding: 0; margin: 0; }
-  .snu-print-modal { border-radius: 0 !important; box-shadow: none !important; width: 100% !important; transform: none !important; opacity: 1 !important; }
-  .snu-print-actions { position: sticky; top: 0; z-index: 100; }
-}
-</style>
-</head>
-<body>
-<div class="snu-print-modal" style="opacity:1;transform:none;border-radius:0;box-shadow:none;width:100%;overflow:visible;">
-${modal.innerHTML}
-</div>
-</body>
-</html>`;
-
-    const win = window.open('', '_blank');
     if (!win) {
-      // Fallback: try direct window.print() with overlay forced visible
-      const overlay = document.getElementById('snuPrintOverlay');
-      const mod     = document.getElementById('snuPrintModal');
-      if (overlay) { overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;opacity:1;pointer-events:all;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:28px 16px 60px;'; }
-      if (mod)     { mod.style.cssText = 'opacity:1;transform:none;width:min(980px,100%);background:#f0f4f8;border-radius:20px;'; }
-      setTimeout(() => window.print(), 200);
+      // Popup blocked — download the HTML file instead
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'SNU-Weekly.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      alert('Popup was blocked. An HTML file has been downloaded — open it and print from your browser.');
       return;
     }
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    // Give fonts/images time to load, then print
-    win.onload = () => setTimeout(() => win.print(), 500);
-    // Fallback if onload doesn't fire
-    setTimeout(() => { if (!win.closed) win.print(); }, 1500);
+
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
   }
 
   function closeSnuPrint() {
