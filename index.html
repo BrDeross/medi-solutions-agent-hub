@@ -11,6 +11,92 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+   /* ===== PRINT FIX ONLY ===== */
+.no-print {
+  display: block;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #snuMagazineModal,
+  #snuMagazineModal * {
+    visibility: visible !important;
+  }
+
+  #snuMagazineModal {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: #fff !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  #snuMagazineModal .modal-dialog {
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  #snuMagazineModal .modal-header,
+  #snuMagazineModal .snu-print-actions,
+  #snuMagazineModal .no-print {
+    display: none !important;
+  }
+
+  #snuMagazineContent {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .magazine {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .mag-cover,
+  .mag-card.dark {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page-break {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .avoid-break,
+  .mag-card,
+  .mag-list .item {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  @page {
+    size: auto;
+    margin: 0.5in;
+  }
+}
     :root {
       --ink:         #1e3a6e;
       --ink-2:       #264880;
@@ -4607,7 +4693,23 @@ When answering:
       el.addEventListener('touchstart', onStart, { passive: false });
     })();
   </script>
+function printSnuMagazine() {
+  const modal = document.getElementById("snuMagazineModal");
+  if (!modal) return;
 
+  modal.classList.add("show");
+
+  setTimeout(() => {
+    window.print();
+  }, 150);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const printBtn = document.getElementById("printMagazineBtn");
+  if (printBtn) {
+    printBtn.addEventListener("click", printSnuMagazine);
+  }
+});
 
   <script id="infobar-script">
     // ── NATIONAL DAYS DATABASE ──────────────────────────────────────────────
