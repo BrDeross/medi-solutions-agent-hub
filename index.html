@@ -5852,19 +5852,16 @@ When answering:
     }
   }
 
-  function triggerSnuPrint() {
-    var modal     = document.getElementById('snuPrintModal');
-    var printWrap = document.getElementById('snuPrintContent');
-    if (!modal || !printWrap) { window.print(); return; }
-    printWrap.innerHTML = '';
-    var clone = modal.cloneNode(true);
-    clone.style.cssText = 'transform:none!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;width:100%!important;overflow:visible!important;';
-    printWrap.appendChild(clone);
-    document.body.classList.add('snu-printing');
-    window.print();
-    document.body.classList.remove('snu-printing');
-    printWrap.innerHTML = '';
-  }
+ <!-- SNU PRINT MODAL — Magazine Edition -->
+    <div class="snu-print-overlay" id="snuPrintOverlay" onclick="handlePrintOverlayClick(event)">
+      <div class="snu-print-modal" id="snuPrintModal">
+
+        <!-- Action bar -->
+        <div class="snu-print-actions">
+          <span class="snu-print-action-title">🗞 SNU · Show N Up</span>
+          <div class="snu-print-btn-row">
+            <button class="snu-print-btn ghost" onclick="closeSnuPrint()">✕ Close</button>
+            <button class="snu-print-btn primary" onclick="triggerSnuPrint()">🖨️ Print / Save PDF</button>
 
   function closeSnuPrint() {
     document.getElementById('snuPrintOverlay').classList.remove('open');
