@@ -4142,6 +4142,127 @@ When answering:
 
   </div>
 
+  <script id="jsonbin-sync">
+  // ═══════════════════════════════════════════════════════════════
+  //  MY MEDI — JSONBin Cloud Sync Layer
+  //  All admin saves write to JSONBin + localStorage (as cache).
+  //  All page loads read from JSONBin (falls back to localStorage).
+  // ═══════════════════════════════════════════════════════════════
+  const JB_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
+  const JB_BIN_ID_KEY = 'mymedi_jb_bin_id';
+  const JB_BASE        = 'https://api.jsonbin.io/v3';
+
+  const JB_EMPTY = {
+    snu_data:     {},
+    snu_article:  {},
+    snu_spotlight:{},
+    snu_aom:      {},
+    snu_updates:  []
+  };
+
+  // ── Low-level helpers ──────────────────────────────────────────
+  async function jbGetBinId() {
+    let id = localStorage.getItem(JB_BIN_ID_KEY);
+    if (id) return id;
+    // Create a new bin on first run
+    try {
+      const res = await fetch(JB_BASE + '/b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': JB_MASTER_KEY,
+          'X-Bin-Name':   'my-medi-hub',
+          'X-Private':    'true'
+        },
+        body: JSON.stringify(JB_EMPTY)
+      });
+      const data = await res.json();
+      id = data?.metadata?.id;
+      if (id) { localStorage.setItem(JB_BIN_ID_KEY, id); return id; }
+    } catch(e) { console.warn('[JB] Could not create bin:', e); }
+    return null;
+  }
+
+  async function jbRead() {
+    const id = await jbGetBinId();
+    if (!id) return null;
+    try {
+      const res  = await fetch(JB_BASE + '/b/' + id + '/latest', {
+        headers: { 'X-Master-Key': JB_MASTER_KEY }
+      });
+      const data = await res.json();
+      return data?.record || null;
+    } catch(e) { console.warn('[JB] Read failed:', e); return null; }
+  }
+
+  async function jbWrite(record) {
+    const id = await jbGetBinId();
+    if (!id) return false;
+    try {
+      await fetch(JB_BASE + '/b/' + id, {
+        method:  'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': JB_MASTER_KEY
+        },
+        body: JSON.stringify(record)
+      });
+      return true;
+    } catch(e) { console.warn('[JB] Write failed:', e); return false; }
+  }
+
+  // ── In-memory cache of the full cloud record ───────────────────
+  window._jbRecord = null;
+
+  // ── Load everything from cloud on page init ────────────────────
+  window.jbInit = async function() {
+    const record = await jbRead();
+    if (!record) {
+      console.warn('[JB] Using localStorage fallback');
+      return;
+    }
+    window._jbRecord = record;
+
+    // Push cloud data into localStorage so existing render functions pick it up
+    if (record.snu_data     && Object.keys(record.snu_data).length)
+      localStorage.setItem('snu_data_v1',     JSON.stringify(record.snu_data));
+    if (record.snu_article  && Object.keys(record.snu_article).length)
+      localStorage.setItem('snu_article_v1',  JSON.stringify(record.snu_article));
+    if (record.snu_spotlight && Object.keys(record.snu_spotlight).length)
+      localStorage.setItem('snu_spotlight_v1',JSON.stringify(record.snu_spotlight));
+    if (record.snu_aom      && Object.keys(record.snu_aom).length)
+      localStorage.setItem('snu_aom_v1',      JSON.stringify(record.snu_aom));
+    if (Array.isArray(record.snu_updates) && record.snu_updates.length)
+      localStorage.setItem('snu_updates_v1',  JSON.stringify(record.snu_updates));
+  };
+
+  // ── Save a specific field to cloud ────────────────────────────
+  window.jbSave = async function(field, value) {
+    // Update localStorage immediately (instant UI)
+    const lsKey = {
+      snu_data:     'snu_data_v1',
+      snu_article:  'snu_article_v1',
+      snu_spotlight:'snu_spotlight_v1',
+      snu_aom:      'snu_aom_v1',
+      snu_updates:  'snu_updates_v1'
+    }[field];
+    if (lsKey) {
+      try { localStorage.setItem(lsKey, JSON.stringify(value)); } catch(e) {}
+    }
+    // Merge with latest cloud record and write back
+    const latest = (await jbRead()) || { ...JB_EMPTY };
+    latest[field] = value;
+    window._jbRecord = latest;
+    const ok = await jbWrite(latest);
+    if (ok) {
+      if (typeof showSnuToast === 'function') showSnuToast('☁️ Synced to cloud!');
+    } else {
+      if (typeof showSnuToast === 'function') showSnuToast('⚠️ Cloud sync failed — saved locally only.');
+    }
+    return ok;
+  };
+
+  </script>
   <script>
     const DATA_URL = 'https://script.google.com/macros/s/AKfycbz6ZQm5QdcvIaqPiCRt-fTvpn65m9SzCHZrEeK16m61wIJeIO6G0Q5HfpqhIQK2RbpEkg/exec';
 
@@ -4905,7 +5026,17 @@ When answering:
 
   // ── LOAD & RENDER on page load ─────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
-    renderSnuFromStorage();
+    // Load from cloud first, then render everything
+    (async () => {
+      if (typeof jbInit === 'function') {
+        if (typeof showSnuToast === 'function') showSnuToast('☁️ Loading from cloud…');
+        await jbInit();
+      }
+      renderSnuFromStorage();
+      if (typeof initUpdates       === 'function') initUpdates();
+      if (typeof renderAllAomCards === 'function') renderAllAomCards();
+      if (typeof renderSpotlight   === 'function') renderSpotlight();
+    })();
     loadWeeklyArticle();
   });
 
@@ -5052,6 +5183,7 @@ When answering:
     };
 
     localStorage.setItem(ARTICLE_KEY, JSON.stringify(article));
+    if (typeof jbSave === 'function') jbSave('snu_article', article);
     renderArticle(article);
   }
 
@@ -5210,6 +5342,7 @@ When answering:
 
     const data = { weekLabel, dateRange, agents, execs, savedAt: new Date().toISOString() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if (typeof jbSave === 'function') jbSave('snu_data', data);
     window._snuState.data = data;
     renderSnuLeaderboard(data);
     renderSnuExecs(data);
@@ -5589,6 +5722,7 @@ When answering:
     }
 
     window._snuState.spotlight = spotlight;
+    if (typeof jbSave === 'function') jbSave('snu_spotlight', spotlight);
     renderSpotlightCard(spotlight);
     closeAdmin();
     showSnuToast('⭐ Spotlight published!');
@@ -5842,6 +5976,7 @@ When answering:
       showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.');
     }
 
+    if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
     renderAomCard(_aomEditingMonth);
     refreshAomAdminPicker();
     showSnuToast('✓ ' + AOM_MONTHS[_aomEditingMonth] + ' saved!');
@@ -5852,6 +5987,7 @@ When answering:
     if (_aomEditingMonth === null) return;
     delete _aomData[_aomEditingMonth];
     localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
+    if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
     _aomPhotoBase64 = null;
     renderAomCard(_aomEditingMonth);
     refreshAomAdminPicker();
@@ -6022,6 +6158,7 @@ When answering:
       // Quota exceeded — save without attachment
       update.attachBase64 = null;
       localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
+      if (typeof jbSave === 'function') jbSave('snu_updates', _updates);
       showSnuToast('⚠ Attachment too large — saved without it. Use a smaller file.');
     }
     renderFeedFromStorage();
@@ -6051,6 +6188,7 @@ When answering:
   function deleteUpdate(idx) {
     _updates.splice(idx, 1);
     localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
+    if (typeof jbSave === 'function') jbSave('snu_updates', _updates);
     renderFeedFromStorage();
     refreshAdminUpdatesList();
     showSnuToast('🗑 Update removed.');
