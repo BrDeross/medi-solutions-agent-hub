@@ -703,14 +703,14 @@
     .r3 { background: rgba(180,120,80,.1); color: #cd7c4a; border: 1px solid rgba(180,120,80,.2); }
     .rn { background: rgba(59,130,246,.08); color: var(--accent-2); border: 1px solid rgba(59,130,246,.15); }
 
-    .agent-name { font-weight: 700; color: #fff; }
-   .prod-val.color-red   { color: #f87171 !important; }
-    .prod-val.color-green { color: #34d399 !important; }
-    .prod-val.color-blue  { color: #60a5fa !important; font-weight: 800 !important; }
+ .agent-name { font-weight: 700; color: #fff; }
     .prod-val {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px; font-weight: 500; color: var(--green);
     }
+    .prod-val.color-red   { color: #f87171 !important; }
+    .prod-val.color-green { color: #34d399 !important; }
+    .prod-val.color-blue  { color: #60a5fa !important; font-weight: 800 !important; }
 
     /* ── OPS BLOCK ── */
     .ops-block {
@@ -6148,25 +6148,13 @@ When answering:
       if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
     }
   }
+}
 function triggerSnuPrint() {
     var overlay = document.getElementById('snuPrintOverlay');
     if (!overlay) { window.print(); return; }
     if (overlay.classList.contains('open')) {
       window.print();
     }
-  }
- 
-
----
-
-```
-patch
-```
-or
-```
-v2026-03-12window.print();
-    document.body.classList.remove('snu-printing');
-    printWrap.innerHTML = '';
   }
 
   function closeSnuPrint() {
