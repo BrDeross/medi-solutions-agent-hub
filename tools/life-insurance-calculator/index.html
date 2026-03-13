@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Life Insurance Calculator</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f4f7fb;color:#1f2937}
+    .shell{max-width:1100px;margin:0 auto;padding:30px 20px 50px}
+    .back{display:inline-block;margin-bottom:18px;color:#0A4DA2;text-decoration:none;font-weight:700}
+    .hero{background:#fff;border:1px solid #e5e7eb;border-radius:22px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    .hero h1{margin:0 0 8px;color:#083b7d}
+    .hero p{margin:0;color:#6b7280;line-height:1.7}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}
+    .field{display:flex;flex-direction:column;gap:8px}
+    .field label{font-size:13px;font-weight:700;color:#083b7d}
+    .field input,.field textarea{border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:14px}
+    .field textarea{min-height:110px;resize:vertical}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:12px;border:none;cursor:pointer;font-weight:700}
+    .primary{background:#0A4DA2;color:#fff}
+    .secondary{background:#fff;color:#083b7d;border:1px solid #e5e7eb}
+    .result{margin-top:18px;background:linear-gradient(135deg,#fff,#eff6ff);border:1px solid #e5e7eb;border-radius:18px;padding:20px}
+    .amount{font-size:40px;font-weight:800;color:#083b7d;margin:10px 0}
+    .breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px}
+    .piece{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px}
+    .piece strong{display:block;font-size:12px;color:#6b7280;margin-bottom:6px}
+    .piece span{font-size:22px;font-weight:800;color:#083b7d}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../../index.html">← Back to Hub</a>
+
+    <div class="hero">
+      <h1>Life Insurance Calculator</h1>
+      <p>Build a practical protection estimate using income replacement, debts, mortgage, college, weddings, legacy property needs, emergency reserve, and current offsets.</p>
+
+      <div class="grid">
+        <div class="field"><label for="income">Annual income</label><input type="number" id="income" value="0"></div>
+        <div class="field"><label for="years">Years of income replacement</label><input type="number" id="years" value="0"></div>
+        <div class="field"><label for="debts">Other debts / liabilities</label><input type="number" id="debts" value="0"></div>
+        <div class="field"><label for="mortgage">Mortgage / property payoff</label><input type="number" id="mortgage" value="0"></div>
+        <div class="field"><label for="college">Children's college funding</label><input type="number" id="college" value="0"></div>
+        <div class="field"><label for="weddings">Weddings / milestones</label><input type="number" id="weddings" value="0"></div>
+        <div class="field"><label for="legacy">Properties / legacy goals</label><input type="number" id="legacy" value="0"></div>
+        <div class="field"><label for="final">Final expenses</label><input type="number" id="final" value="0"></div>
+        <div class="field"><label for="reserve">Emergency reserve</label><input type="number" id="reserve" value="0"></div>
+        <div class="field"><label for="savings">Current savings / investments</label><input type="number" id="savings" value="0"></div>
+        <div class="field"><label for="coverage">Existing life coverage</label><input type="number" id="coverage" value="0"></div>
+        <div class="field" style="grid-column:1/-1"><label for="notes">Notes</label><textarea id="notes" placeholder="Business needs, special needs planning, estate liquidity, etc."></textarea></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" type="button" onclick="calculateLife()">Calculate Need</button>
+        <button class="btn secondary" type="button" onclick="resetLife()">Reset</button>
+      </div>
+
+      <div class="result">
+        <h3>Recommended Coverage</h3>
+        <div class="amount" id="lifeTotal">$0</div>
+        <p id="lifeSummary">Enter values and click Calculate Need.</p>
+
+        <div class="breakdown">
+          <div class="piece"><strong>Income replacement</strong><span id="bdIncome">$0</span></div>
+          <div class="piece"><strong>Debts + mortgage</strong><span id="bdDebt">$0</span></div>
+          <div class="piece"><strong>College + weddings</strong><span id="bdKids">$0</span></div>
+          <div class="piece"><strong>Legacy + final + reserve</strong><span id="bdOther">$0</span></div>
+          <div class="piece"><strong>Less savings + current coverage</strong><span id="bdOffsets">-$0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function money(n){ return '$' + Number(n || 0).toLocaleString(); }
+
+    function calculateLife(){
+      const income = Number(document.getElementById('income').value) || 0;
+      const years = Number(document.getElementById('years').value) || 0;
+      const debts = Number(document.getElementById('debts').value) || 0;
+      const mortgage = Number(document.getElementById('mortgage').value) || 0;
+      const college = Number(document.getElementById('college').value) || 0;
+      const weddings = Number(document.getElementById('weddings').value) || 0;
+      const legacy = Number(document.getElementById('legacy').value) || 0;
+      const final = Number(document.getElementById('final').value) || 0;
+      const reserve = Number(document.getElementById('reserve').value) || 0;
+      const savings = Number(document.getElementById('savings').value) || 0;
+      const coverage = Number(document.getElementById('coverage').value) || 0;
+
+      const incomeNeed = income * years;
+      const debtNeed = debts + mortgage;
+      const kidsNeed = college + weddings;
+      const otherNeed = legacy + final + reserve;
+      const offsets = savings + coverage;
+      const total = Math.max(0, incomeNeed + debtNeed + kidsNeed + otherNeed - offsets);
+
+      document.getElementById('lifeTotal').textContent = money(total);
+      document.getElementById('lifeSummary').textContent =
+        total > 0
+          ? 'This is a planning estimate to guide your protection conversation.'
+          : 'Enter values and click Calculate Need.';
+      document.getElementById('bdIncome').textContent = money(incomeNeed);
+      document.getElementById('bdDebt').textContent = money(debtNeed);
+      document.getElementById('bdKids').textContent = money(kidsNeed);
+      document.getElementById('bdOther').textContent = money(otherNeed);
+      document.getElementById('bdOffsets').textContent = '-' + money(offsets).replace('$','');
+    }
+
+    function resetLife(){
+      ['income','years','debts','mortgage','college','weddings','legacy','final','reserve','savings','coverage'].forEach(id => {
+        document.getElementById(id).value = 0;
+      });
+      document.getElementById('notes').value = '';
+      document.getElementById('lifeTotal').textContent = '$0';
+      document.getElementById('lifeSummary').textContent = 'Enter values and click Calculate Need.';
+      document.getElementById('bdIncome').textContent = '$0';
+      document.getElementById('bdDebt').textContent = '$0';
+      document.getElementById('bdKids').textContent = '$0';
+      document.getElementById('bdOther').textContent = '$0';
+      document.getElementById('bdOffsets').textContent = '-$0';
+    }
+  </script>
+</body>
+</html>
