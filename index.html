@@ -5326,36 +5326,60 @@ When answering:
     `).join('');
   }
 
-  function renderSnuLeaderboard(data) {
-    // Week badge
-    const badge = document.getElementById('snuWeekBadge');
-    if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
+<script>
+function renderSnuLeaderboard(data) {
+  // Week badge
+  const badge = document.getElementById('snuWeekBadge');
+  if (badge && data.weekLabel) {
+    badge.textContent = String(data.weekLabel).toUpperCase();
+  }
 
-    // Leaderboard list
-    const list = document.getElementById('snuLbList');
-    if (!list) return;
-    const agents = data.agents || [];
-    if (!agents.length) {
-      list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
-      return;
-    }
-    const rankClass = i => ['gold','silver','bronze','other','other','other','other','other','other','other'][i] || 'other';
-    const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
-    list.innerHTML = agents.map((a, i) => `
-      <div class="snu-lb-row">
-        <div class="snu-rank ${rankClass(i)}">${i < 3 ? rankEmoji(i) : i+1}</div>
-        <div>
-          <div class="snu-agent-name">${esc(a.name || '—')}</div>
-          ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
-        </div>
-        <div class="snu-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
+  // Production tier class
+  const prodClass = (value) => {
+    const v = Number(value) || 0;
+    if (v <= 5000) return 'prod-low';
+    if (v <= 9999) return 'prod-mid';
+    return 'prod-high';
+  };
+
+  // Leaderboard list
+  const list = document.getElementById('snuLbList');
+  if (!list) return;
+
+  const agents = Array.isArray(data.agents) ? [...data.agents] : [];
+  agents.sort((a, b) => (Number(b.production) || 0) - (Number(a.production) || 0));
+
+  if (!agents.length) {
+    list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
+    return;
+  }
+
+  const rankClass = (i) => ['gold', 'silver', 'bronze'][i] || 'other';
+  const rankLabel = (i) => ['🥇', '🥈', '🥉'][i] || String(i + 1);
+
+  list.innerHTML = agents.map((a, i) => `
+    <div class="snu-lb-row">
+      <div class="snu-rank ${rankClass(i)}">${rankLabel(i)}</div>
+      <div>
+        <div class="snu-agent-name">${esc(a.name || '—')}</div>
+        ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
       </div>
-    `).join('');
-  }
+      <div class="snu-prod ${prodClass(a.production)}">
+        ${a.production !== undefined && a.production !== null && a.production !== ''
+          ? Number(a.production).toLocaleString() + ' pts'
+          : '—'}
+      </div>
+    </div>
+  `).join('');
+}
 
-  function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+</script>
 
   // ── WEEKLY ARTICLE ─────────────────────────────────────────────────────────
   async function loadWeeklyArticle() {
