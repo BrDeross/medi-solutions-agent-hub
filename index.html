@@ -2484,22 +2484,32 @@
     }
     .snu-view-btn:hover { background: rgba(59,130,246,.22); box-shadow: 0 0 18px rgba(59,130,246,.25); }
 
-    /* ── Print ── */
-    @media print {
-      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      body.snu-printing > * { display: none !important; }
-      body.snu-printing > #snuPrintContent {
-        display: block !important; position: static !important;
-        background: #f0f4f8 !important; width: 100% !important;
-        margin: 0 !important; padding: 0 !important; overflow: visible !important;
-      }
-      #snuPrintContent .snu-print-actions { display: none !important; }
-      #snuPrintContent .snu-print-modal {
-        transform: none !important; border-radius: 0 !important;
-        box-shadow: none !important; width: 100% !important;
-        overflow: visible !important; background: #f0f4f8 !important;
-      }
-    }
+   #snuPrintContent {
+  display: none;
+}
+
+@media print {
+  body.snu-printing * {
+    visibility: hidden !important;
+  }
+
+  body.snu-printing #snuPrintContent,
+  body.snu-printing #snuPrintContent * {
+    visibility: visible !important;
+  }
+
+  body.snu-printing #snuPrintContent {
+    display: block !important;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 20px;
+    margin: 0;
+    z-index: 99999;
+  }
+}
 
     @media (max-width: 680px) {
       .mag-snu-title { font-size: 64px; }
@@ -6187,31 +6197,43 @@ function renderSnuLeaderboard(data) {
      if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
     }
   }
-  function triggerSnuPrint() {
-    var overlay = document.getElementById('snuPrintOverlay');
-    if (!overlay) { window.print(); return; }
-    if (overlay.classList.contains('open')) {
-      window.print();
-    }
+<script>
+function triggerSnuPrint() {
+  const overlay = document.getElementById('snuPrintOverlay');
+  const modal = document.getElementById('snuPrintModal');
+  const printContent = document.getElementById('snuPrintContent');
+
+  if (!modal || !printContent) {
+    window.print();
+    return;
   }
 
-  function closeSnuPrint() {
-    document.getElementById('snuPrintOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
+  printContent.innerHTML = modal.outerHTML;
 
-  function handlePrintOverlayClick(e) {
-    if (e.target === document.getElementById('snuPrintOverlay')) closeSnuPrint();
-  }
+  const actions = printContent.querySelector('.snu-print-actions');
+  if (actions) actions.remove();
 
-  function pesc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+  const closeBtn = printContent.querySelector('.snu-print-close, .modal-close, .close');
+  if (closeBtn) closeBtn.remove();
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSnuPrint(); });
-  </script>
+  document.body.classList.add('snu-printing');
 
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
 
+  const cleanupAfterPrint = () => {
+    document.body.classList.remove('snu-printing');
+    printContent.innerHTML = '';
+    window.removeEventListener('afterprint', cleanupAfterPrint);
+  };
+
+  window.addEventListener('afterprint', cleanupAfterPrint);
+
+  setTimeout(() => {
+    window.print();
+  }, 120);
+}
+</script>
   <script id="spotlight-script">
   const SPOTLIGHT_KEY = 'snu_spotlight_v1';
 
