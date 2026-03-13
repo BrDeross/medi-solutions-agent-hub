@@ -4380,7 +4380,7 @@ body.admin-mode .vid-add-btn { display: inline-flex !important; }
     </div>
 
     <!-- Print-only container: no overlay, no dark bg, no blur -->
-    <div id="snuPrintContent" style="display:none;"></div>
+   <div id="snuPrintContent"></div>
 
 
     <!-- ══ AGENT SPOTLIGHT DASHBOARD ══ -->
@@ -6208,16 +6208,20 @@ function triggerSnuPrint() {
     return;
   }
 
+  // Clone printable content
   printContent.innerHTML = modal.outerHTML;
 
+  // Remove action / close controls from print copy
   const actions = printContent.querySelector('.snu-print-actions');
   if (actions) actions.remove();
 
   const closeBtn = printContent.querySelector('.snu-print-close, .modal-close, .close');
   if (closeBtn) closeBtn.remove();
 
+  // Activate print mode
   document.body.classList.add('snu-printing');
 
+  // Hide overlay state
   if (overlay) overlay.classList.remove('open');
   document.body.style.overflow = '';
 
