@@ -1586,90 +1586,127 @@
       gap: 20px;
     }
 
-    /* ── LEFT: Leaderboard ── */
-    .snu-lb-card {
-      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-xl);
-      overflow: hidden;
-    }
+/* ── LEFT: Leaderboard ── */
+.snu-lb-card {
+  background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
 
-    .snu-lb-header {
-      background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
-      border-bottom: 1px solid rgba(251,191,36,.2);
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+.snu-lb-header {
+  background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
+  border-bottom: 1px solid rgba(251,191,36,.2);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    .snu-lb-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px; font-weight: 700;
-      color: var(--gold);
-      display: flex; align-items: center; gap: 8px;
-    }
+.snu-lb-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-    .snu-week-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 600;
-      color: var(--muted);
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 3px 8px;
-      letter-spacing: .5px;
-    }
+.snu-week-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  letter-spacing: .5px;
+}
 
-    .snu-lb-list { padding: 12px 0; }
+.snu-lb-list {
+  padding: 12px 0;
+}
 
-    .snu-lb-row {
-      display: grid;
-      grid-template-columns: 42px 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 24px;
-      transition: background .15s;
-      border-bottom: 1px solid rgba(255,255,255,.04);
-    }
-    .snu-lb-row:last-child { border-bottom: none; }
-    .snu-lb-row:hover { background: rgba(255,255,255,.03); }
+.snu-lb-row {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  transition: background .15s;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
 
-    .snu-rank {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px; font-weight: 800;
-      flex-shrink: 0;
-    }
-    .snu-rank.gold   { background: rgba(251,191,36,.18); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 12px rgba(251,191,36,.2); }
-    .snu-rank.silver { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
-    .snu-rank.bronze { background: rgba(205,124,74,.12); color: #cd7c4a; border: 1px solid rgba(205,124,74,.25); }
-    .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
+.snu-lb-row:last-child {
+  border-bottom: none;
+}
 
-    .snu-agent-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px; font-weight: 700; color: #fff;
-    }
-    .snu-agent-sub {
-      font-size: 11px; color: var(--muted-2); margin-top: 1px;
-    }
+.snu-lb-row:hover {
+  background: rgba(255,255,255,.03);
+}
 
-    .snu-prod {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px; font-weight: 600;
-      color: var(--green);
-      white-space: nowrap;
-    }
+.snu-rank {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  flex-shrink: 0;
+  background: rgba(59,130,246,.10);
+  color: var(--accent-2);
+  border: 1px solid rgba(59,130,246,.20);
+}
 
-    .snu-empty {
-      padding: 32px 24px;
-      text-align: center;
-      color: var(--muted-2);
-      font-size: 13px;
-      font-style: italic;
-    }
+.snu-agent-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.snu-agent-sub {
+  font-size: 11px;
+  color: var(--muted-2);
+  margin-top: 1px;
+}
+
+.snu-prod {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Production tier colors */
+.snu-prod.prod-low {
+  color: #ef4444 !important;
+  font-weight: 700;
+}
+
+.snu-prod.prod-mid {
+  color: #22c55e !important;
+  font-weight: 700;
+}
+
+.snu-prod.prod-high {
+  color: #3b82f6 !important;
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(59,130,246,.35);
+}
+
+.snu-empty {
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--muted-2);
+  font-size: 13px;
+  font-style: italic;
+}
 
     /* ── RIGHT: Article ── */
     .snu-article-card {
@@ -2484,7 +2521,7 @@
     }
     .snu-view-btn:hover { background: rgba(59,130,246,.22); box-shadow: 0 0 18px rgba(59,130,246,.25); }
 
-   #snuPrintContent {
+  #snuPrintContent {
   display: none;
 }
 
@@ -2500,14 +2537,43 @@
 
   body.snu-printing #snuPrintContent {
     display: block !important;
-    position: absolute;
-    inset: 0;
-    width: 100%;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    padding: 20px !important;
+    margin: 0 !important;
     background: #fff !important;
     color: #000 !important;
-    padding: 20px;
-    margin: 0;
-    z-index: 99999;
+    z-index: 99999 !important;
+  }
+
+  body.snu-printing #snuPrintContent .snu-print-actions,
+  body.snu-printing #snuPrintContent .snu-print-close,
+  body.snu-printing #snuPrintContent .modal-close,
+  body.snu-printing #snuPrintContent .close {
+    display: none !important;
+  }
+
+  body.snu-printing #snuPrintContent .snu-print-modal,
+  body.snu-printing #snuPrintContent .snu-modal,
+  body.snu-printing #snuPrintContent .snu-card,
+  body.snu-printing #snuPrintContent .snu-sheet,
+  body.snu-printing #snuPrintContent .mag-col,
+  body.snu-printing #snuPrintContent .mag-article-outer,
+  body.snu-printing #snuPrintContent .mag-article-inner {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  body.snu-printing #snuPrintContent img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid !important;
   }
 }
 
@@ -5649,7 +5715,9 @@ When answering:
 <script>
 function renderSnuLeaderboard(data) {
   const badge = document.getElementById('snuWeekBadge');
-  if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
+  if (badge && data.weekLabel) {
+    badge.textContent = String(data.weekLabel).toUpperCase();
+  }
 
   const list = document.getElementById('snuLbList');
   if (!list) return;
@@ -5658,14 +5726,20 @@ function renderSnuLeaderboard(data) {
   agents.sort((a, b) => (Number(b.production) || 0) - (Number(a.production) || 0));
 
   if (!agents.length) {
-    list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
+    list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results below.</div>';
     return;
   }
 
   const rankClass = i => ['gold', 'silver', 'bronze'][i] || 'other';
-  const rankLabel = i => i < 3 ? ['🥇', '🥈', '🥉'][i] : String(i + 1);
-  const prodClass = i => ['prod-gold', 'prod-silver', 'prod-bronze'][i] || 'prod-other';
+  const rankLabel = i => ['🥇', '🥈', '🥉'][i] || String(i + 1);
   const rowClass  = i => ['row-gold', 'row-silver', 'row-bronze'][i] || 'row-other';
+  const prodClass = i => ['prod-gold', 'prod-silver', 'prod-bronze'][i] || 'prod-other';
+
+  const esc = (value) => {
+    const div = document.createElement('div');
+    div.textContent = value ?? '';
+    return div.innerHTML;
+  };
 
   list.innerHTML = agents.map((a, i) => `
     <div class="snu-lb-row ${rowClass(i)}">
@@ -5674,7 +5748,11 @@ function renderSnuLeaderboard(data) {
         <div class="snu-agent-name">${esc(a.name || '—')}</div>
         ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
       </div>
-      <div class="snu-prod ${prodClass(i)}">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
+      <div class="snu-prod ${prodClass(i)}">
+        ${a.production !== undefined && a.production !== null && a.production !== ''
+          ? '$' + Number(a.production).toLocaleString()
+          : '—'}
+      </div>
     </div>
   `).join('');
 }
