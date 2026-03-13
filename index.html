@@ -6145,11 +6145,10 @@ When answering:
       }
     } else {
       if (hlEl) hlEl.textContent = 'This week\'s article is loading…';
-      if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
+     if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
     }
   }
-}
-function triggerSnuPrint() {
+  function triggerSnuPrint() {
     var overlay = document.getElementById('snuPrintOverlay');
     if (!overlay) { window.print(); return; }
     if (overlay.classList.contains('open')) {
