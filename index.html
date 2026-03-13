@@ -703,14 +703,12 @@
     .r3 { background: rgba(180,120,80,.1); color: #cd7c4a; border: 1px solid rgba(180,120,80,.2); }
     .rn { background: rgba(59,130,246,.08); color: var(--accent-2); border: 1px solid rgba(59,130,246,.15); }
 
- .agent-name { font-weight: 700; color: #fff; }
+    .agent-name { font-weight: 700; color: #fff; }
+
     .prod-val {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px; font-weight: 500; color: var(--green);
     }
-    .prod-val.color-red   { color: #f87171 !important; }
-    .prod-val.color-green { color: #34d399 !important; }
-    .prod-val.color-blue  { color: #60a5fa !important; font-weight: 800 !important; }
 
     /* ── OPS BLOCK ── */
     .ops-block {
@@ -1586,127 +1584,90 @@
       gap: 20px;
     }
 
-/* ── LEFT: Leaderboard ── */
-.snu-lb-card {
-  background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-xl);
-  overflow: hidden;
-}
+    /* ── LEFT: Leaderboard ── */
+    .snu-lb-card {
+      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
 
-.snu-lb-header {
-  background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
-  border-bottom: 1px solid rgba(251,191,36,.2);
-  padding: 18px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+    .snu-lb-header {
+      background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
+      border-bottom: 1px solid rgba(251,191,36,.2);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-.snu-lb-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--gold);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+    .snu-lb-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--gold);
+      display: flex; align-items: center; gap: 8px;
+    }
 
-.snu-week-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  background: rgba(255,255,255,.06);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 3px 8px;
-  letter-spacing: .5px;
-}
+    .snu-week-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 600;
+      color: var(--muted);
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      letter-spacing: .5px;
+    }
 
-.snu-lb-list {
-  padding: 12px 0;
-}
+    .snu-lb-list { padding: 12px 0; }
 
-.snu-lb-row {
-  display: grid;
-  grid-template-columns: 42px 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 24px;
-  transition: background .15s;
-  border-bottom: 1px solid rgba(255,255,255,.04);
-}
+    .snu-lb-row {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 24px;
+      transition: background .15s;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .snu-lb-row:last-child { border-bottom: none; }
+    .snu-lb-row:hover { background: rgba(255,255,255,.03); }
 
-.snu-lb-row:last-child {
-  border-bottom: none;
-}
+    .snu-rank {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .snu-rank.gold   { background: rgba(251,191,36,.18); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 12px rgba(251,191,36,.2); }
+    .snu-rank.silver { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+    .snu-rank.bronze { background: rgba(205,124,74,.12); color: #cd7c4a; border: 1px solid rgba(205,124,74,.25); }
+    .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
 
-.snu-lb-row:hover {
-  background: rgba(255,255,255,.03);
-}
+    .snu-agent-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+    .snu-agent-sub {
+      font-size: 11px; color: var(--muted-2); margin-top: 1px;
+    }
 
-.snu-rank {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  flex-shrink: 0;
-  background: rgba(59,130,246,.10);
-  color: var(--accent-2);
-  border: 1px solid rgba(59,130,246,.20);
-}
+    .snu-prod {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 600;
+      color: var(--green);
+      white-space: nowrap;
+    }
 
-.snu-agent-name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.snu-agent-sub {
-  font-size: 11px;
-  color: var(--muted-2);
-  margin-top: 1px;
-}
-
-.snu-prod {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* Production tier colors */
-.snu-prod.prod-low {
-  color: #ef4444 !important;
-  font-weight: 700;
-}
-
-.snu-prod.prod-mid {
-  color: #22c55e !important;
-  font-weight: 700;
-}
-
-.snu-prod.prod-high {
-  color: #3b82f6 !important;
-  font-weight: 800;
-  text-shadow: 0 0 8px rgba(59,130,246,.35);
-}
-
-.snu-empty {
-  padding: 32px 24px;
-  text-align: center;
-  color: var(--muted-2);
-  font-size: 13px;
-  font-style: italic;
-}
+    .snu-empty {
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted-2);
+      font-size: 13px;
+      font-style: italic;
+    }
 
     /* ── RIGHT: Article ── */
     .snu-article-card {
@@ -2521,61 +2482,29 @@
     }
     .snu-view-btn:hover { background: rgba(59,130,246,.22); box-shadow: 0 0 18px rgba(59,130,246,.25); }
 
-  #snuPrintContent {
-  display: none;
-}
-
-@media print {
-  body.snu-printing * {
-    visibility: hidden !important;
-  }
-
-  body.snu-printing #snuPrintContent,
-  body.snu-printing #snuPrintContent * {
-    visibility: visible !important;
-  }
-
-  body.snu-printing #snuPrintContent {
-    display: block !important;
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-    padding: 20px !important;
-    margin: 0 !important;
-    background: #fff !important;
-    color: #000 !important;
-    z-index: 99999 !important;
-  }
-
-  body.snu-printing #snuPrintContent .snu-print-actions,
-  body.snu-printing #snuPrintContent .snu-print-close,
-  body.snu-printing #snuPrintContent .modal-close,
-  body.snu-printing #snuPrintContent .close {
-    display: none !important;
-  }
-
-  body.snu-printing #snuPrintContent .snu-print-modal,
-  body.snu-printing #snuPrintContent .snu-modal,
-  body.snu-printing #snuPrintContent .snu-card,
-  body.snu-printing #snuPrintContent .snu-sheet,
-  body.snu-printing #snuPrintContent .mag-col,
-  body.snu-printing #snuPrintContent .mag-article-outer,
-  body.snu-printing #snuPrintContent .mag-article-inner {
-    background: #fff !important;
-    color: #000 !important;
-    box-shadow: none !important;
-    border: 0 !important;
-    filter: none !important;
-    backdrop-filter: none !important;
-  }
-
-  body.snu-printing #snuPrintContent img {
-    max-width: 100% !important;
-    height: auto !important;
-    page-break-inside: avoid !important;
-  }
-}
+    /* ── Print ── */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      /* Hide everything except the overlay (which is already open and visible) */
+      body > *:not(#snuPrintOverlay) { display: none !important; }
+      /* Strip the dark overlay — make it plain white */
+      #snuPrintOverlay {
+        position: static !important; display: block !important;
+        background: #ffffff !important; backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        opacity: 1 !important; padding: 0 !important; overflow: visible !important;
+      }
+      /* The modal itself — clean white, no shadow, no rounded corners */
+      .snu-print-modal {
+        transform: none !important; border-radius: 0 !important;
+        box-shadow: none !important; width: 100% !important; max-width: 100% !important;
+        overflow: visible !important; max-height: none !important;
+        background: #f0f4f8 !important; backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+      /* Hide the Print/Close buttons */
+      .snu-print-actions { display: none !important; }
+    }
 
     @media (max-width: 680px) {
       .mag-snu-title { font-size: 64px; }
@@ -3190,334 +3119,6 @@
       transition: background .15s;
     }
     .admin-update-del:hover { background: rgba(239,68,68,.28); }
-
-.snu-lb-card {
-  background: linear-gradient(160deg, rgba(10,20,45,.97) 0%, rgba(16,30,58,.97) 100%) !important;
-  border: 1px solid rgba(251,191,36,.3) !important;
-}
-.snu-lb-header {
-  background: linear-gradient(90deg, rgba(251,191,36,.22), rgba(251,191,36,.06)) !important;
-  border-bottom: 1px solid rgba(251,191,36,.35) !important;
-}
-.snu-lb-row {
-  background: rgba(255,255,255,.025);
-  border-bottom: 1px solid rgba(255,255,255,.06) !important;
-}
-.snu-lb-row:nth-child(even) { background: rgba(255,255,255,.05); }
-.snu-lb-row:hover            { background: rgba(59,130,246,.1) !important; }
-
-/* #1 row — gold tint */
-.snu-lb-row:first-child { background: rgba(251,191,36,.07) !important; }
-.snu-lb-row:first-child .snu-agent-name { color: #fde68a !important; }
-.snu-lb-row:first-child .snu-prod       { color: #fbbf24 !important; text-shadow: 0 0 12px rgba(251,191,36,.5); }
-/* Weekly Top Producers color coding */
-.snu-lb-row.row-gold {
-  background: rgba(251,191,36,.10) !important;
-}
-.snu-lb-row.row-silver {
-  background: rgba(148,163,184,.10) !important;
-}
-.snu-lb-row.row-bronze {
-  background: rgba(205,124,74,.10) !important;
-}
-.snu-lb-row.row-other {
-  background: rgba(255,255,255,.025);
-}
-
-.snu-prod.prod-gold {
-  color: #fbbf24 !important;
-  text-shadow: 0 0 12px rgba(251,191,36,.45);
-  font-weight: 800 !important;
-}
-.snu-prod.prod-silver {
-  color: #e2e8f0 !important;
-  text-shadow: 0 0 10px rgba(148,163,184,.35);
-  font-weight: 800 !important;
-}
-.snu-prod.prod-bronze {
-  color: #f0a876 !important;
-  text-shadow: 0 0 10px rgba(205,124,74,.35);
-  font-weight: 800 !important;
-}
-.snu-prod.prod-other {
-  color: #34d399 !important;
-  text-shadow: 0 0 8px rgba(52,211,153,.35);
-  font-weight: 700 !important;
-}
-/* Rank badges — more vivid */
-.snu-rank.gold   { background: rgba(251,191,36,.28) !important; color: #fbbf24 !important; border-color: rgba(251,191,36,.6) !important; box-shadow: 0 0 14px rgba(251,191,36,.35) !important; }
-.snu-rank.silver { background: rgba(148,163,184,.2)  !important; color: #e2e8f0 !important; border-color: rgba(148,163,184,.45) !important; }
-.snu-rank.bronze { background: rgba(205,124,74,.2)   !important; color: #f0a876 !important; border-color: rgba(205,124,74,.45) !important; }
-.snu-rank.other  { background: rgba(59,130,246,.18)  !important; color: #93c5fd !important; border-color: rgba(59,130,246,.4)  !important; }
-
-/* Names bright white, points vivid green */
-.snu-agent-name { color: #ffffff !important; font-weight: 800 !important; }
-.snu-agent-sub  { color: #93c5fd !important; }
-.snu-prod       { color: #34d399 !important; font-size: 14px !important; font-weight: 700 !important; text-shadow: 0 0 8px rgba(52,211,153,.35); }
-
-
-/* ── FIX 2: AGENT OF THE MONTH PHOTOS — no crop ─────────── */
-
-/* The photo wrapper already has height:160px — we keep that
-   but switch object-fit from cover to contain               */
-.aom-photo-wrap {
-  background: rgba(10,20,45,.9) !important; /* dark fill behind contained photo */
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-.aom-photo-wrap img,
-.aom-photo {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;      /* show full photo, no crop */
-  object-position: center top !important;
-}
-
-/* Same fix for the big Spotlight card photo */
-.spotlight-photo {
-  object-fit: contain !important;
-  object-position: center top !important;
-  background: #0d1826;
-}
-.spotlight-photo-col {
-  background: #0d1826 !important; /* dark fill behind contained photo */
-}
-
-
-/* ── FIX 3: AGENT HIGHLIGHT — framed bio & quote ─────────── */
-
-/* Bio box */
-.spotlight-bio {
-  background: rgba(10,20,45,.75) !important;
-  border: 1px solid rgba(59,130,246,.35) !important;
-  border-left: 4px solid #3b82f6 !important;
-  border-radius: 12px !important;
-  padding: 18px 22px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05) !important;
-  color: #c7ddf5 !important;
-  line-height: 1.8 !important;
-}
-
-/* Quote box */
-.spotlight-quote {
-  background: rgba(251,191,36,.07) !important;
-  border: 1px solid rgba(251,191,36,.35) !important;
-  border-left: 4px solid #fbbf24 !important;
-  border-radius: 0 12px 12px 0 !important;
-  padding: 16px 20px 16px 24px !important;
-  box-shadow: 0 4px 18px rgba(0,0,0,.25) !important;
-  font-size: 14.5px !important;
-  color: rgba(255,255,255,.82) !important;
-  position: relative !important;
-}
-
-/* Big decorative opening quote mark */
-.spotlight-quote::before {
-  content: '\201C' !important;
-  position: absolute !important;
-  top: -14px !important; left: 12px !important;
-  font-size: 60px !important;
-  line-height: 1 !important;
-  color: rgba(251,191,36,.3) !important;
-  font-family: Georgia, serif !important;
-  pointer-events: none !important;
-}
-/* Override the inline ::after that adds the closing " inline */
-.spotlight-quote::after {
-  content: '\201D' !important;
-  color: var(--gold) !important;
-  font-size: 22px !important;
-  line-height: 0 !important;
-  vertical-align: -.3em !important;
-  margin-left: 2px !important;
-  position: static !important;
-}
-
-
-/* ── FIX 4: VIDEO LIBRARY — card grid & admin controls ────── */
-
-/* Video grid */
-.video-library-grid,
-.vid-grid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-  gap: 20px !important;
-}
-
-/* Individual card */
-.vid-card {
-  background: rgba(10,20,45,.9) !important;
-  border: 1px solid rgba(255,255,255,.12) !important;
-  border-radius: 18px !important;
-  overflow: hidden !important;
-  transition: transform .25s, border-color .25s, box-shadow .25s !important;
-}
-.vid-card:hover {
-  transform: translateY(-4px) !important;
-  border-color: rgba(59,130,246,.45) !important;
-  box-shadow: 0 12px 36px rgba(0,0,0,.45) !important;
-}
-
-/* 16:9 thumbnail */
-.vid-thumb {
-  position: relative !important;
-  width: 100% !important;
-  aspect-ratio: 16 / 9 !important;
-  background: rgba(16,30,58,.95) !important;
-  overflow: hidden !important;
-}
-.vid-thumb iframe,
-.vid-thumb video,
-.vid-thumb img {
-  width: 100% !important; height: 100% !important;
-  object-fit: cover !important; display: block !important;
-}
-
-/* Video info area */
-.vid-info { padding: 16px 18px !important; }
-.vid-label {
-  font-family: 'Space Grotesk', sans-serif !important;
-  font-size: 14.5px !important; font-weight: 700 !important;
-  color: #fff !important; margin-bottom: 5px !important; line-height: 1.3 !important;
-}
-.vid-desc { font-size: 12.5px !important; color: #93aec8 !important; line-height: 1.6 !important; }
-.vid-tag {
-  display: inline-flex !important; margin-top: 10px !important;
-  padding: 3px 10px !important; border-radius: 6px !important;
-  font-size: 10px !important; font-weight: 800 !important;
-  text-transform: uppercase !important; letter-spacing: .5px !important;
-  background: rgba(59,130,246,.15) !important; color: #7dd3fc !important;
-  border: 1px solid rgba(59,130,246,.25) !important;
-}
-
-/* Admin bar on each card — hidden from regular users */
-.vid-admin-bar {
-  display: none;
-  padding: 10px 18px 14px !important;
-  gap: 8px !important;
-  border-top: 1px solid rgba(255,255,255,.07) !important;
-}
-body.admin-mode .vid-admin-bar { display: flex !important; }
-
-.vid-edit-btn, .vid-delete-btn {
-  padding: 6px 14px !important; border-radius: 8px !important;
-  font-size: 11.5px !important; font-weight: 700 !important;
-  cursor: pointer !important; border: none !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  transition: background .15s !important;
-}
-.vid-edit-btn   { background: rgba(59,130,246,.18) !important; color: #7dd3fc !important; border: 1px solid rgba(59,130,246,.3) !important; }
-.vid-edit-btn:hover   { background: rgba(59,130,246,.3) !important; }
-.vid-delete-btn { background: rgba(251,113,133,.12) !important; color: #fb7185 !important; border: 1px solid rgba(251,113,133,.25) !important; }
-.vid-delete-btn:hover { background: rgba(251,113,133,.25) !important; }
-
-/* "Add Video" button — visible only in admin mode */
-.vid-add-btn {
-  display: none;
-  align-items: center !important; gap: 8px !important;
-  padding: 11px 20px !important;
-  background: var(--accent) !important; color: #fff !important;
-  border: none !important; border-radius: 12px !important;
-  font-size: 13.5px !important; font-weight: 700 !important;
-  cursor: pointer !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  box-shadow: 0 4px 18px rgba(59,130,246,.35) !important;
-  transition: background .15s, transform .15s !important;
-}
-body.admin-mode .vid-add-btn { display: inline-flex !important; }
-.vid-add-btn:hover { background: #2563eb !important; transform: translateY(-1px) !important; }
-
-/* Add/Edit Video modal */
-.vid-admin-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.75);
-  backdrop-filter: blur(8px);
-  z-index: 3000;
-  opacity: 0; pointer-events: none;
-  transition: opacity .25s;
-}
-.vid-admin-overlay.open { opacity: 1; pointer-events: all; }
-
-.vid-admin-modal {
-  position: fixed; top: 50%; left: 50%;
-  transform: translate(-50%,-50%) scale(.95);
-  width: min(560px, 94vw);
-  background: linear-gradient(160deg,#1a3464,#1e3d72);
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 20px;
-  box-shadow: 0 32px 80px rgba(0,0,0,.65);
-  z-index: 3001;
-  opacity: 0; pointer-events: none;
-  transition: opacity .25s, transform .25s;
-  overflow: hidden;
-}
-.vid-admin-modal.open {
-  opacity: 1; pointer-events: all;
-  transform: translate(-50%,-50%) scale(1);
-}
-.vid-admin-modal-header {
-  padding: 22px 26px 18px;
-  border-bottom: 1px solid rgba(255,255,255,.1);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.vid-admin-modal-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 17px; font-weight: 700; color: #fff;
-  display: flex; align-items: center; gap: 8px;
-}
-.vid-admin-modal-body {
-  padding: 22px 26px 26px;
-  display: flex; flex-direction: column; gap: 14px;
-}
-.vid-field { display: flex; flex-direction: column; gap: 5px; }
-.vid-field label {
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .6px; color: #93aec8;
-}
-.vid-field input,
-.vid-field textarea,
-.vid-field select {
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 9px; padding: 10px 13px;
-  color: #fff; font-size: 13.5px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  outline: none; width: 100%;
-  transition: border-color .15s, background .15s;
-}
-.vid-field input:focus,
-.vid-field textarea:focus,
-.vid-field select:focus { border-color: rgba(59,130,246,.6); background: rgba(255,255,255,.1); }
-.vid-field textarea { min-height: 80px; resize: vertical; }
-.vid-field select option { background: #1e3d72; }
-
-.vid-drop-zone {
-  border: 2px dashed rgba(59,130,246,.35);
-  border-radius: 12px; padding: 28px 20px;
-  text-align: center; cursor: pointer;
-  background: rgba(59,130,246,.04);
-  transition: border-color .2s, background .2s;
-}
-.vid-drop-zone:hover, .vid-drop-zone.drag-over {
-  border-color: rgba(59,130,246,.7) !important;
-  background: rgba(59,130,246,.1) !important;
-}
-.vid-drop-icon { font-size: 28px; margin-bottom: 8px; }
-.vid-drop-text { font-size: 13px; color: #93aec8; line-height: 1.5; }
-.vid-drop-text strong { color: #7dd3fc; }
-
-.vid-admin-save {
-  background: var(--accent); border: none; border-radius: 10px;
-  padding: 12px 24px; color: #fff;
-  font-size: 14px; font-weight: 700; cursor: pointer; width: 100%;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  box-shadow: 0 4px 20px rgba(59,130,246,.4);
-  transition: background .15s, transform .1s; margin-top: 4px;
-}
-.vid-admin-save:hover { background: #2563eb; transform: translateY(-1px); }
-
-/* ── END OF PATCH ── */
   </style>
 </head>
 <body>
@@ -3779,7 +3380,7 @@ body.admin-mode .vid-add-btn { display: inline-flex !important; }
               <p>Searchable knowledge tools for quick reference</p>
             </div>
           </div>
-          <span class="count-chip">4 libraries</span>
+          <span class="count-chip">3 libraries</span>
         </div>
         <div class="card-grid">
           <a class="card" data-color="blue" href="tools/acronyms-library/">
@@ -3806,33 +3407,6 @@ body.admin-mode .vid-add-btn { display: inline-flex !important; }
             <p>Catchy, practical one-liners organized by call stage and sales situation.</p>
             <span class="card-tag">Calls</span>
           </a>
-          <a class="card" data-color="purple" href="#training-videos">
-            <span class="card-arrow">↗</span>
-            <div class="card-shimmer"></div>
-            <div class="card-icon-wrap">🎥</div>
-            <h3>Training Videos</h3>
-            <p>Step-by-step video walkthroughs for carriers, systems, compliance, and sales skills.</p>
-            <span class="card-tag">Training</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- TRAINING VIDEOS -->
-    <section class="section" id="training-videos">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="sh-left">
-            <div class="sh-icon" style="background:rgba(167,139,250,.15);color:#a78bfa;">🎥</div>
-            <div>
-              <h2>Training Videos</h2>
-              <p>Carrier training, sales skills, compliance, and onboarding walkthroughs</p>
-            </div>
-          </div>
-          <span class="count-chip" id="tv-count">0 videos</span>
-        </div>
-        <div id="tv-grid" class="card-grid">
-          <div class="empty" style="grid-column:1/-1;">No training videos yet — add some via Admin → Training Videos.</div>
         </div>
       </div>
     </section>
@@ -3944,7 +3518,6 @@ body.admin-mode .vid-add-btn { display: inline-flex !important; }
           <button class="admin-tab" onclick="switchAdminTab('spotlight',this)">⭐ Agent Spotlight</button>
           <button class="admin-tab" onclick="switchAdminTab('aom',this)">🗓️ Agent of Month</button>
           <button class="admin-tab" onclick="switchAdminTab('updates',this)">📡 Updates Feed</button>
-          <button class="admin-tab" onclick="switchAdminTab('training',this)">🎥 Training Videos</button>
         </div>
 
         <!-- ── Tab: SNU Data ── -->
@@ -4261,64 +3834,6 @@ body.admin-mode .vid-add-btn { display: inline-flex !important; }
         </div>
         </div><!-- /adminTabUpdates -->
 
-        <!-- ══ TRAINING VIDEOS TAB ══ -->
-        <div id="adminTabTraining" class="admin-tab-panel">
-        <div class="admin-body">
-          <div class="admin-section-title">🎥 Training Videos</div>
-          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add training videos by URL (YouTube, Vimeo, or direct link). Give each a title and short description, then publish. Videos appear in the Training Videos section on the hub.</p>
-
-          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div class="admin-section-title" style="margin-bottom:10px;font-size:11px;">➕ Add Video</div>
-
-            <div id="tvDropZone" style="border:2px dashed var(--border-2);border-radius:10px;padding:20px;text-align:center;margin-bottom:12px;cursor:pointer;transition:border-color .2s,background .2s;"
-              ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='rgba(59,130,246,.07)'"
-              ondragleave="this.style.borderColor='var(--border-2)';this.style.background=''"
-              ondrop="handleTvDrop(event)">
-              <div style="font-size:28px;margin-bottom:6px;">🎬</div>
-              <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">Drag a video file here, or paste a URL below</div>
-              <div style="font-size:11px;color:var(--muted-2);">MP4, YouTube, or Vimeo links accepted</div>
-            </div>
-
-            <div class="admin-field" style="margin-bottom:10px;">
-              <label>Video URL <span style="color:var(--muted-2);font-weight:400;">(YouTube, Vimeo, or direct .mp4)</span></label>
-              <input class="admin-input" id="tvUrl" placeholder="https://www.youtube.com/watch?v=...">
-            </div>
-
-            <div class="admin-week-row" style="margin-bottom:10px;">
-              <div class="admin-field">
-                <label>Title</label>
-                <input class="admin-input" id="tvTitle" placeholder="Medicare Basics Overview">
-              </div>
-              <div class="admin-field">
-                <label>Category</label>
-                <select class="admin-input" id="tvCategory">
-                  <option>Carrier Training</option>
-                  <option>Medicare</option>
-                  <option>Sales Skills</option>
-                  <option>Compliance</option>
-                  <option>Systems &amp; Tools</option>
-                  <option>Onboarding</option>
-                  <option>Product Knowledge</option>
-                  <option>General</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="admin-field" style="margin-bottom:14px;">
-              <label>Short Description</label>
-              <textarea class="admin-input" id="tvDesc" rows="2" placeholder="What agents will learn from this video…" style="resize:vertical;min-height:52px;"></textarea>
-            </div>
-
-            <button class="admin-save-btn" style="width:auto;padding:10px 24px;background:var(--accent);" onclick="addTrainingVideo()">➕ Add Video</button>
-          </div>
-
-          <div class="admin-section-title" style="margin-top:4px;">📋 Published Videos <span id="tvCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
-          <div id="adminVideosList">
-            <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>
-          </div>
-        </div>
-        </div><!-- /adminTabTraining -->
-
 
 
       </div>
@@ -4342,7 +3857,7 @@ body.admin-mode .vid-add-btn { display: inline-flex !important; }
         <!-- ══ COVER ══ -->
         <div class="mag-cover">
           <img class="mag-cover-img" id="magCoverImg"
-            src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1400&q=90&fit=crop&crop=center"
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80&fit=crop"
             alt="Cover">
           <div class="mag-cover-gradient"></div>
           <div class="mag-cover-gradient-left"></div>
@@ -4445,8 +3960,8 @@ body.admin-mode .vid-add-btn { display: inline-flex !important; }
       </div>
     </div>
 
-    <!-- Print-only container: no overlay, no dark bg, no blur -->
-   <div id="snuPrintContent"></div>
+    <!-- Print container: clean white div, no overlay, no backdrop-filter -->
+    <div id="snuPrintContent" style="display:none;"></div>
 
 
     <!-- ══ AGENT SPOTLIGHT DASHBOARD ══ -->
@@ -4931,7 +4446,7 @@ When answering:
             <tr>
               <td><span class="rank-badge ${rc(i)}">${x(r.Rank || String(i+1))}</span></td>
               <td class="agent-name">${x(r.AgentName || '—')}</td>
-              <td><span class="prod-val ${Number(r.Production||0) >= 10000 ? 'color-blue' : Number(r.Production||0) >= 5001 ? 'color-green' : 'color-red'}">${'$' + Number(r.Production||0).toLocaleString()}</span></td>
+              <td><span class="prod-val">${'$' + Number(r.Production||0).toLocaleString()}</span></td>
               <td>${Number(r.Policies||0).toLocaleString()}</td>
               <td>${Number(r.AppsSubmitted||0).toLocaleString()}</td>
               <td>${Number(r.Appointments||0).toLocaleString()}</td>
@@ -5712,51 +5227,33 @@ When answering:
     `).join('');
   }
 
-<script>
-function renderSnuLeaderboard(data) {
-  const badge = document.getElementById('snuWeekBadge');
-  if (badge && data.weekLabel) {
-    badge.textContent = String(data.weekLabel).toUpperCase();
+  function renderSnuLeaderboard(data) {
+    // Week badge
+    const badge = document.getElementById('snuWeekBadge');
+    if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
+
+    // Leaderboard list
+    const list = document.getElementById('snuLbList');
+    if (!list) return;
+    const agents = data.agents || [];
+    if (!agents.length) {
+      list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
+      return;
+    }
+    const rankClass = i => ['gold','silver','bronze','other','other','other','other','other','other','other'][i] || 'other';
+    const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
+    list.innerHTML = agents.map((a, i) => `
+      <div class="snu-lb-row">
+        <div class="snu-rank ${rankClass(i)}">${i < 3 ? rankEmoji(i) : i+1}</div>
+        <div>
+          <div class="snu-agent-name">${esc(a.name || '—')}</div>
+          ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
+        </div>
+        <div class="snu-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
+      </div>
+    `).join('');
   }
 
-  const list = document.getElementById('snuLbList');
-  if (!list) return;
-
-  const agents = Array.isArray(data.agents) ? [...data.agents] : [];
-  agents.sort((a, b) => (Number(b.production) || 0) - (Number(a.production) || 0));
-
-  if (!agents.length) {
-    list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results below.</div>';
-    return;
-  }
-
-  const rankClass = i => ['gold', 'silver', 'bronze'][i] || 'other';
-  const rankLabel = i => ['🥇', '🥈', '🥉'][i] || String(i + 1);
-  const rowClass  = i => ['row-gold', 'row-silver', 'row-bronze'][i] || 'row-other';
-  const prodClass = i => ['prod-gold', 'prod-silver', 'prod-bronze'][i] || 'prod-other';
-
-  const esc = (value) => {
-    const div = document.createElement('div');
-    div.textContent = value ?? '';
-    return div.innerHTML;
-  };
-
-  list.innerHTML = agents.map((a, i) => `
-    <div class="snu-lb-row ${rowClass(i)}">
-      <div class="snu-rank ${rankClass(i)}">${rankLabel(i)}</div>
-      <div>
-        <div class="snu-agent-name">${esc(a.name || '—')}</div>
-        ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
-      </div>
-      <div class="snu-prod ${prodClass(i)}">
-        ${a.production !== undefined && a.production !== null && a.production !== ''
-          ? '$' + Number(a.production).toLocaleString()
-          : '—'}
-      </div>
-    </div>
-  `).join('');
-}
-</script>
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
@@ -6165,7 +5662,12 @@ function renderSnuLeaderboard(data) {
     console.log('[SNU Print] agents:', agents.length, 'execs:', execs.length, 'article:', !!article);
 
     // ── Rotating cover + article images ──
-    const coverImgs = ['https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1400&q=90&fit=crop&crop=center'];
+    const coverImgs = [
+      'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80&fit=crop',
+    ];
     const articleImgs = [
       'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80&fit=crop',
       'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=80&fit=crop',
@@ -6272,50 +5774,50 @@ function renderSnuLeaderboard(data) {
       }
     } else {
       if (hlEl) hlEl.textContent = 'This week\'s article is loading…';
-     if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
+      if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
     }
   }
-<script>
-function triggerSnuPrint() {
-  const overlay = document.getElementById('snuPrintOverlay');
-  const modal = document.getElementById('snuPrintModal');
-  const printContent = document.getElementById('snuPrintContent');
 
-  if (!modal || !printContent) {
+  function triggerSnuPrint() {
     window.print();
-    return;
   }
 
-  // Clone printable content
-  printContent.innerHTML = modal.outerHTML;
+  // Strip dark overlay styles before printing, restore after
+  window.addEventListener('beforeprint', function() {
+    var overlay = document.getElementById('snuPrintOverlay');
+    if (overlay) {
+      overlay.dataset.oldBg = overlay.style.background || '';
+      overlay.style.background = '#ffffff';
+      overlay.style.backdropFilter = 'none';
+      overlay.style.webkitBackdropFilter = 'none';
+    }
+  });
+  window.addEventListener('afterprint', function() {
+    var overlay = document.getElementById('snuPrintOverlay');
+    if (overlay) {
+      overlay.style.background = overlay.dataset.oldBg || '';
+      overlay.style.backdropFilter = '';
+      overlay.style.webkitBackdropFilter = '';
+    }
+  });
 
-  // Remove action / close controls from print copy
-  const actions = printContent.querySelector('.snu-print-actions');
-  if (actions) actions.remove();
+  function closeSnuPrint() {
+    document.getElementById('snuPrintOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
 
-  const closeBtn = printContent.querySelector('.snu-print-close, .modal-close, .close');
-  if (closeBtn) closeBtn.remove();
+  function handlePrintOverlayClick(e) {
+    if (e.target === document.getElementById('snuPrintOverlay')) closeSnuPrint();
+  }
 
-  // Activate print mode
-  document.body.classList.add('snu-printing');
+  function pesc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
 
-  // Hide overlay state
-  if (overlay) overlay.classList.remove('open');
-  document.body.style.overflow = '';
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSnuPrint(); });
+  </script>
 
-  const cleanupAfterPrint = () => {
-    document.body.classList.remove('snu-printing');
-    printContent.innerHTML = '';
-    window.removeEventListener('afterprint', cleanupAfterPrint);
-  };
 
-  window.addEventListener('afterprint', cleanupAfterPrint);
-
-  setTimeout(() => {
-    window.print();
-  }, 120);
-}
-</script>
   <script id="spotlight-script">
   const SPOTLIGHT_KEY = 'snu_spotlight_v1';
 
@@ -6903,130 +6405,6 @@ function triggerSnuPrint() {
     showSnuToast('🗑 Update removed.');
   }
 
-  </script>
-
-  <script id="training-video-script">
-  const TV_KEY = 'medi_training_videos_v1';
-  var _tvVideos = [];
-
-  (function initTv() {
-    try { _tvVideos = JSON.parse(localStorage.getItem(TV_KEY) || '[]'); } catch(e) { _tvVideos = []; }
-    renderTvHub();
-    refreshAdminVideosList();
-  })();
-
-  function toEmbedUrl(url) {
-    if (!url) return null;
-    url = url.trim();
-    var m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-    if (m) return 'https://www.youtube.com/embed/' + m[1] + '?rel=0';
-    if (url.includes('youtube.com/embed/')) return url;
-    m = url.match(/vimeo\.com\/(\d+)/);
-    if (m) return 'https://player.vimeo.com/video/' + m[1];
-    return url;
-  }
-
-  function isEmbed(url) {
-    return url && (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com/'));
-  }
-
-  function handleTvDrop(event) {
-    event.preventDefault();
-    var zone = document.getElementById('tvDropZone');
-    if (zone) { zone.style.borderColor = 'var(--border-2)'; zone.style.background = ''; }
-    var file = event.dataTransfer.files && event.dataTransfer.files[0];
-    if (file && file.type.startsWith('video/')) {
-      var urlInput = document.getElementById('tvUrl');
-      if (urlInput) urlInput.value = URL.createObjectURL(file);
-      var titleInput = document.getElementById('tvTitle');
-      if (titleInput && !titleInput.value) titleInput.value = file.name.replace(/\.[^.]+$/, '');
-      if (typeof showSnuToast === 'function') showSnuToast('🎬 Video loaded — add title & description then click Add Video.');
-      return;
-    }
-    var text = event.dataTransfer.getData('text/plain') || event.dataTransfer.getData('text/uri-list');
-    if (text) {
-      var urlInput = document.getElementById('tvUrl');
-      if (urlInput) urlInput.value = text.trim();
-      if (typeof showSnuToast === 'function') showSnuToast('🔗 URL pasted — fill in title & description then click Add Video.');
-    }
-  }
-
-  function addTrainingVideo() {
-    var url   = (document.getElementById('tvUrl')      || {}).value  || '';
-    var title = (document.getElementById('tvTitle')    || {}).value  || '';
-    url = url.trim(); title = title.trim();
-    if (!url)   { if (typeof showSnuToast==='function') showSnuToast('⚠ Please enter a video URL.'); return; }
-    if (!title) { if (typeof showSnuToast==='function') showSnuToast('⚠ Please enter a title.');     return; }
-
-    var cat  = ((document.getElementById('tvCategory') || {}).value || 'General').trim();
-    var desc = ((document.getElementById('tvDesc')     || {}).value || '').trim();
-
-    var video = { id: Date.now(), url: url, embed: toEmbedUrl(url), title: title, category: cat, desc: desc, addedAt: new Date().toISOString() };
-    _tvVideos.unshift(video);
-    try { localStorage.setItem(TV_KEY, JSON.stringify(_tvVideos)); } catch(e) {}
-    renderTvHub();
-    refreshAdminVideosList();
-
-    ['tvUrl','tvTitle','tvDesc'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
-    var cat_el = document.getElementById('tvCategory'); if (cat_el) cat_el.selectedIndex = 0;
-    if (typeof showSnuToast === 'function') showSnuToast('✓ Video published to Training Videos.');
-  }
-
-  function deleteTrainingVideo(id) {
-    _tvVideos = _tvVideos.filter(function(v){ return v.id !== id; });
-    try { localStorage.setItem(TV_KEY, JSON.stringify(_tvVideos)); } catch(e) {}
-    renderTvHub();
-    refreshAdminVideosList();
-    if (typeof showSnuToast === 'function') showSnuToast('🗑 Video removed.');
-  }
-
-  function renderTvHub() {
-    var grid  = document.getElementById('tv-grid');
-    var badge = document.getElementById('tv-count');
-    if (!grid) return;
-    if (badge) badge.textContent = _tvVideos.length + ' video' + (_tvVideos.length === 1 ? '' : 's');
-    if (!_tvVideos.length) {
-      grid.innerHTML = '<div class="empty" style="grid-column:1/-1;">No training videos yet — add some via Admin → Training Videos.</div>';
-      return;
-    }
-    var pesc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
-    grid.innerHTML = _tvVideos.map(function(v) {
-      var embedUrl = v.embed || toEmbedUrl(v.url);
-      var media = isEmbed(embedUrl)
-        ? '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px 10px 0 0;background:#000;"><iframe src="' + embedUrl + '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen loading="lazy"></iframe></div>'
-        : '<video controls style="width:100%;border-radius:10px 10px 0 0;display:block;background:#000;max-height:200px;"><source src="' + v.url + '">Your browser does not support video.</video>';
-      return '<div class="card" data-color="purple" style="padding:0;overflow:hidden;cursor:default;">'
-        + media
-        + '<div style="padding:16px 18px 18px;">'
-        + '<span style="font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#a78bfa;display:block;margin-bottom:4px;">' + pesc(v.category) + '</span>'
-        + '<h3 style="font-size:15px;font-weight:700;margin:0 0 6px;color:var(--text);">' + pesc(v.title) + '</h3>'
-        + (v.desc ? '<p style="font-size:13px;color:var(--muted);margin:0;line-height:1.5;">' + pesc(v.desc) + '</p>' : '')
-        + '</div></div>';
-    }).join('');
-  }
-
-  function refreshAdminVideosList() {
-    var el    = document.getElementById('adminVideosList');
-    var count = document.getElementById('tvCount');
-    if (!el) return;
-    if (count) count.textContent = '(' + _tvVideos.length + ')';
-    if (!_tvVideos.length) {
-      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>';
-      return;
-    }
-    var pesc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
-    el.innerHTML = _tvVideos.map(function(v) {
-      return '<div class="admin-update-item">'
-        + '<div style="flex:1;min-width:0;">'
-        + '<div class="admin-update-title">🎥 ' + pesc(v.title) + '</div>'
-        + '<div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">' + pesc(v.desc||'') + '</div>'
-        + '<div class="admin-update-meta"><span class="admin-update-type">' + pesc(v.category) + '</span>'
-        + '<span style="font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;">' + pesc(v.url) + '</span></div>'
-        + '</div>'
-        + '<button class="admin-update-del" onclick="deleteTrainingVideo(' + v.id + ')">🗑 Delete</button>'
-        + '</div>';
-    }).join('');
-  }
   </script>
 
 </body>
