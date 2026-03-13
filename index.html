@@ -698,9 +698,10 @@
       font-size: 13px; font-weight: 700;
     }
 
-    .r1 { background: rgba(245,158,11,.15); color: var(--gold); border: 1px solid rgba(245,158,11,.3); }
-    .r2 { background: rgba(148,163,184,.08); color: #94a3b8; border: 1px solid rgba(148,163,184,.18); }
-    .r3 { background: rgba(180,120,80,.1); color: #cd7c4a; border: 1px solid rgba(180,120,80,.2); }
+
+    .r1 { background: rgba(239,68,68,.15); color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+    .r2 { background: rgba(34,197,94,.12); color: #22c55e; border: 1px solid rgba(34,197,94,.22); }
+    .r3 { background: rgba(59,130,246,.12); color: #3b82f6; border: 1px solid rgba(59,130,246,.22); }
     .rn { background: rgba(59,130,246,.08); color: var(--accent-2); border: 1px solid rgba(59,130,246,.15); }
 
     .agent-name { font-weight: 700; color: #fff; }
@@ -1641,9 +1642,9 @@
       font-size: 15px; font-weight: 800;
       flex-shrink: 0;
     }
-    .snu-rank.gold   { background: rgba(251,191,36,.18); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 12px rgba(251,191,36,.2); }
-    .snu-rank.silver { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
-    .snu-rank.bronze { background: rgba(205,124,74,.12); color: #cd7c4a; border: 1px solid rgba(205,124,74,.25); }
+    .snu-rank.gold   { background: rgba(239,68,68,.16); color: #ef4444; border: 1px solid rgba(239,68,68,.34); box-shadow: 0 0 12px rgba(239,68,68,.18); }
+    .snu-rank.silver { background: rgba(34,197,94,.12); color: #22c55e; border: 1px solid rgba(34,197,94,.24); }
+    .snu-rank.bronze { background: rgba(59,130,246,.12); color: #3b82f6; border: 1px solid rgba(59,130,246,.24); }
     .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
 
     .snu-agent-name {
@@ -1955,6 +1956,7 @@
     @media (max-width: 860px) {
       .snu-grid { grid-template-columns: 1fr; }
       .snu-left-col { gap: 16px; }
+      .life-calc-grid, .life-calc-results, .life-calc-form { grid-template-columns: 1fr; }
     }
     @media (max-width: 540px) {
       .admin-row { grid-template-columns: 1fr 1fr; }
@@ -2334,9 +2336,9 @@
       font-family: 'Space Grotesk', sans-serif;
       font-size: 15px; font-weight: 900; flex-shrink: 0;
     }
-    .mag-rank.gold   { background: rgba(251,191,36,.18); color: var(--gold); border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 16px rgba(251,191,36,.15); }
-    .mag-rank.silver { background: rgba(148,163,184,.18); color: #475569;    border: 1px solid rgba(148,163,184,.35); }
-    .mag-rank.bronze { background: rgba(205,124,74,.12);  color: #cd7c4a;    border: 1px solid rgba(205,124,74,.25); }
+    .mag-rank.gold   { background: rgba(239,68,68,.16); color: #ef4444; border: 1px solid rgba(239,68,68,.34); box-shadow: 0 0 16px rgba(239,68,68,.15); }
+    .mag-rank.silver { background: rgba(34,197,94,.14); color: #16a34a; border: 1px solid rgba(34,197,94,.28); }
+    .mag-rank.bronze { background: rgba(59,130,246,.14); color: #2563eb; border: 1px solid rgba(59,130,246,.28); }
     .mag-rank.other  { background: rgba(59,130,246,.12);  color: #1d4ed8;    border: 1px solid rgba(59,130,246,.25); }
 
     .mag-agent-name {
@@ -2548,12 +2550,12 @@
     }
     .spotlight-photo {
       width: 100%; height: 100%;
-      object-fit: cover; object-position: top center;
+      object-fit: contain; object-position: center center;
       display: block;
       filter: brightness(.9) saturate(1.05);
       transition: transform 6s ease;
     }
-    .spotlight-card:hover .spotlight-photo { transform: scale(1.03); }
+    .spotlight-card:hover .spotlight-photo { transform: scale(1.01); }
     .spotlight-photo-gradient {
       position:absolute;inset:0;
       background: linear-gradient(to top, rgba(10,15,26,.85) 0%, rgba(10,15,26,.1) 50%, transparent 100%);
@@ -2752,6 +2754,136 @@
     }
 
 
+
+    /* LIFE INSURANCE CALCULATOR */
+    .sh-icon.rose { background: linear-gradient(135deg, rgba(244,63,94,.22), rgba(244,63,94,.08)); border-color: rgba(244,63,94,.28); }
+    .life-calc-shell {
+      display: grid;
+      gap: 18px;
+    }
+    .life-calc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .life-calc-card {
+      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.03) 100%);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .life-calc-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .life-calc-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .life-field label {
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .life-field input {
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--border-2);
+      background:#0f172a;
+      color:#fff;
+      font-size:14px;
+      outline:none;
+      transition:.15s ease;
+    }
+    .life-field input:focus {
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .life-calc-actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+    .life-calc-btn {
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      background: linear-gradient(135deg, var(--accent-2), #2563eb);
+      color:#fff;
+      font-family:'Space Grotesk', sans-serif;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(59,130,246,.18);
+    }
+    .life-calc-btn.ghost {
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      border:1px solid var(--border-2);
+      box-shadow:none;
+    }
+    .life-calc-results {
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+    }
+    .life-calc-result-card,
+    .life-calc-breakdown,
+    .life-calc-note {
+      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.03) 100%);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .life-result-label {
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted-2);
+      margin-bottom:8px;
+    }
+    .life-result-value {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:40px;
+      line-height:1;
+      font-weight:800;
+      color:#fff;
+      margin-bottom:10px;
+    }
+    .life-result-sub {
+      font-size:13px;
+      color:var(--muted-2);
+      line-height:1.55;
+    }
+    .life-break-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:14px;
+      color:#cbd5e1;
+    }
+    .life-break-row:last-child { border-bottom:none; }
+    .life-break-row strong { color:#fff; font-family:'JetBrains Mono', monospace; }
+    .life-break-row.deduct strong { color:#fca5a5; }
+    .life-calc-note {
+      color:var(--muted-2);
+      font-size:13px;
+      line-height:1.65;
+    }
+
     /* SNU section lighter background */
     .snu-section-light {
       position: relative;
@@ -2845,14 +2977,14 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      object-fit: cover; object-position: top center;
+      object-fit: contain; object-position: center center;
       display: block;
-      filter: brightness(.88) saturate(1.08);
+      filter: brightness(.96) saturate(1.02);
       transition: transform 5s ease, filter .3s;
       z-index: 0;
     }
     .aom-card:hover .aom-photo {
-      transform: scale(1.06);
+      transform: scale(1.01);
       filter: brightness(.95) saturate(1.12);
     }
     .aom-photo-gradient {
@@ -3147,6 +3279,7 @@
           <a href="#libraries">Libraries</a>
           <a href="#updates">Updates</a>
           <a href="#leaderboard">Leaderboard</a>
+          <a href="#life-insurance-calculator">Life Calc</a>
           <a href="#operations-ai">Agent AI</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
         </nav>
@@ -3193,6 +3326,7 @@
           <a href="#libraries" onclick="closeNav()">📖 Libraries</a>
           <a href="#updates" onclick="closeNav()">📡 Updates</a>
           <a href="#leaderboard" onclick="closeNav()">🏆 Leaderboard</a>
+          <a href="#life-insurance-calculator" onclick="closeNav()">❤️ Life Calc</a>
           <a href="#operations-ai" onclick="closeNav()">🤖 Agent AI</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
         </nav>
@@ -3248,7 +3382,7 @@
               <p>Coaching, marketing, and planning resources</p>
             </div>
           </div>
-          <span class="count-chip">5 tools</span>
+          <span class="count-chip">6 tools</span>
         </div>
         <div class="card-grid">
           <a class="card" data-color="blue" href="tools/ai-suite/sales-coach.html">
@@ -3282,8 +3416,7 @@
             <h3>Retirement Budget</h3>
             <p>Help clients estimate retirement income and expenses with clarity.</p>
             <span class="card-tag">Planning</span>
-          </a>
-          <a class="card" data-color="green" href="tools/bundle-options/">
+          </a>          <a class="card" data-color="green" href="tools/bundle-options/">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">📦</div>
@@ -3292,6 +3425,122 @@
             <span class="card-tag">Quoting</span>
           </a>
 
+          <a class="card" data-color="rose" href="#life-insurance-calculator">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">❤️</div>
+            <h3>Life Insurance Calculator</h3>
+            <p>Estimate coverage needs for debts, income replacement, children, weddings, properties, and final expenses.</p>
+            <span class="card-tag">Protection</span>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- LIFE INSURANCE CALCULATOR -->
+    <section class="section" id="life-insurance-calculator">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sh-left">
+            <div class="sh-icon rose">❤️</div>
+            <div>
+              <h2>Life Insurance Calculator</h2>
+              <p>Estimate family protection needs for debts, income replacement, children, weddings, properties, and final expenses.</p>
+            </div>
+          </div>
+          <span class="count-chip">Needs Analysis</span>
+        </div>
+
+        <div class="life-calc-shell">
+          <div class="life-calc-grid">
+            <div class="life-calc-card">
+              <div class="life-calc-title">Family Income & Core Obligations</div>
+              <div class="life-calc-form">
+                <div class="life-field">
+                  <label>Annual Household Income to Replace</label>
+                  <input id="lifeIncome" type="number" min="0" step="1000" placeholder="90000">
+                </div>
+                <div class="life-field">
+                  <label>Years of Income Replacement</label>
+                  <input id="lifeYears" type="number" min="0" step="1" placeholder="10">
+                </div>
+                <div class="life-field">
+                  <label>Mortgage / Property Payoff</label>
+                  <input id="lifeMortgage" type="number" min="0" step="1000" placeholder="250000">
+                </div>
+                <div class="life-field">
+                  <label>Other Debts / Risks</label>
+                  <input id="lifeDebts" type="number" min="0" step="1000" placeholder="40000">
+                </div>
+                <div class="life-field">
+                  <label>Final Expenses</label>
+                  <input id="lifeFinal" type="number" min="0" step="1000" placeholder="20000">
+                </div>
+                <div class="life-field">
+                  <label>Emergency Reserve Desired</label>
+                  <input id="lifeEmergency" type="number" min="0" step="1000" placeholder="25000">
+                </div>
+              </div>
+            </div>
+
+            <div class="life-calc-card">
+              <div class="life-calc-title">Children, Milestones & Existing Assets</div>
+              <div class="life-calc-form">
+                <div class="life-field">
+                  <label>College Fund Need</label>
+                  <input id="lifeCollege" type="number" min="0" step="1000" placeholder="100000">
+                </div>
+                <div class="life-field">
+                  <label>Wedding / Future Family Milestones</label>
+                  <input id="lifeWeddings" type="number" min="0" step="1000" placeholder="30000">
+                </div>
+                <div class="life-field">
+                  <label>Other Property / Legacy Needs</label>
+                  <input id="lifeProperties" type="number" min="0" step="1000" placeholder="50000">
+                </div>
+                <div class="life-field">
+                  <label>Current Savings / Investments Available</label>
+                  <input id="lifeSavings" type="number" min="0" step="1000" placeholder="35000">
+                </div>
+                <div class="life-field">
+                  <label>Existing Life Insurance Coverage</label>
+                  <input id="lifeExisting" type="number" min="0" step="1000" placeholder="100000">
+                </div>
+                <div class="life-field">
+                  <label>Notes / Special Risks</label>
+                  <input id="lifeNotes" type="text" placeholder="Special needs child, business buyout, etc.">
+                </div>
+              </div>
+
+              <div class="life-calc-actions">
+                <button class="life-calc-btn" type="button" onclick="calculateLifeInsurance()">Calculate Need</button>
+                <button class="life-calc-btn ghost" type="button" onclick="resetLifeInsuranceCalc()">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="life-calc-results" id="lifeCalcResults">
+            <div class="life-calc-result-card">
+              <div class="life-result-label">Recommended Coverage Need</div>
+              <div class="life-result-value" id="lifeTotalNeed">$0</div>
+              <div class="life-result-sub" id="lifeResultSub">Enter values above and click Calculate Need.</div>
+            </div>
+
+            <div class="life-calc-breakdown">
+              <div class="life-break-row"><span>Income replacement</span><strong id="lifeIncomeNeed">$0</strong></div>
+              <div class="life-break-row"><span>Mortgage / properties</span><strong id="lifeHomeNeed">$0</strong></div>
+              <div class="life-break-row"><span>Debts / risk cleanup</span><strong id="lifeDebtNeed">$0</strong></div>
+              <div class="life-break-row"><span>College / weddings / milestones</span><strong id="lifeFamilyNeed">$0</strong></div>
+              <div class="life-break-row"><span>Final expenses + emergency</span><strong id="lifeFinalNeed">$0</strong></div>
+              <div class="life-break-row deduct"><span>Less savings / existing coverage</span><strong id="lifeOffsets">-$0</strong></div>
+            </div>
+
+            <div class="life-calc-note">
+              This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation and adjust for business needs, special needs planning, legacy goals, or estate liquidity.
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -5779,7 +6028,99 @@ When answering:
   }
 
   function triggerSnuPrint() {
-    window.print();
+    const modal = document.getElementById('snuPrintModal');
+    if (!modal) { window.print(); return; }
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+      .map(n => n.outerHTML).join('\n');
+
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head><title>SNU Print</title>${styles}<style>
+      body{background:#fff !important;color:#111 !important;margin:0;padding:0;}
+      .snu-print-modal{transform:none !important;box-shadow:none !important;border:none !important;width:100% !important;max-width:none !important;}
+      .snu-print-actions{display:none !important;}
+      .snu-print-overlay{position:static !important;opacity:1 !important;pointer-events:auto !important;background:#fff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important;}
+    </style></head><body><div class="snu-print-overlay open">${modal.outerHTML}</div>
+  <script id="life-insurance-calc-script">
+  function formatLifeCurrency(v) {
+    return '$' + Number(v || 0).toLocaleString();
+  }
+
+  function getLifeVal(id) {
+    const el = document.getElementById(id);
+    return el ? Number(el.value || 0) : 0;
+  }
+
+  function calculateLifeInsurance() {
+    const income = getLifeVal('lifeIncome');
+    const years = getLifeVal('lifeYears');
+    const mortgage = getLifeVal('lifeMortgage');
+    const debts = getLifeVal('lifeDebts');
+    const finalExp = getLifeVal('lifeFinal');
+    const emergency = getLifeVal('lifeEmergency');
+    const college = getLifeVal('lifeCollege');
+    const weddings = getLifeVal('lifeWeddings');
+    const properties = getLifeVal('lifeProperties');
+    const savings = getLifeVal('lifeSavings');
+    const existing = getLifeVal('lifeExisting');
+
+    const incomeNeed = income * years;
+    const homeNeed = mortgage + properties;
+    const debtNeed = debts;
+    const familyNeed = college + weddings;
+    const finalNeed = finalExp + emergency;
+    const offsets = savings + existing;
+    const total = Math.max(0, incomeNeed + homeNeed + debtNeed + familyNeed + finalNeed - offsets);
+
+    document.getElementById('lifeIncomeNeed').textContent = formatLifeCurrency(incomeNeed);
+    document.getElementById('lifeHomeNeed').textContent = formatLifeCurrency(homeNeed);
+    document.getElementById('lifeDebtNeed').textContent = formatLifeCurrency(debtNeed);
+    document.getElementById('lifeFamilyNeed').textContent = formatLifeCurrency(familyNeed);
+    document.getElementById('lifeFinalNeed').textContent = formatLifeCurrency(finalNeed);
+    document.getElementById('lifeOffsets').textContent = '-' + formatLifeCurrency(offsets).replace('$','');
+    document.getElementById('lifeTotalNeed').textContent = formatLifeCurrency(total);
+
+    const note = document.getElementById('lifeNotes')?.value?.trim();
+    const summary = note
+      ? `Based on the values entered, the estimated life insurance need is ${formatLifeCurrency(total)}. Review special risks noted: ${note}.`
+      : `Based on the values entered, the estimated life insurance need is ${formatLifeCurrency(total)}. Adjust higher or lower based on health, business needs, special needs planning, and legacy goals.`;
+    document.getElementById('lifeResultSub').textContent = summary;
+  }
+
+  function resetLifeInsuranceCalc() {
+    ['lifeIncome','lifeYears','lifeMortgage','lifeDebts','lifeFinal','lifeEmergency','lifeCollege','lifeWeddings','lifeProperties','lifeSavings','lifeExisting','lifeNotes']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('lifeIncomeNeed').textContent = '$0';
+    document.getElementById('lifeHomeNeed').textContent = '$0';
+    document.getElementById('lifeDebtNeed').textContent = '$0';
+    document.getElementById('lifeFamilyNeed').textContent = '$0';
+    document.getElementById('lifeFinalNeed').textContent = '$0';
+    document.getElementById('lifeOffsets').textContent = '-$0';
+    document.getElementById('lifeTotalNeed').textContent = '$0';
+    document.getElementById('lifeResultSub').textContent = 'Enter values above and click Calculate Need.';
+  }
+  </script>
+
+</body></html>`);
+    doc.close();
+
+    iframe.onload = function() {
+      setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+      }, 250);
+    };
   }
 
   // Strip dark overlay styles before printing, restore after
