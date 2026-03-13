@@ -1,4 +1,4 @@
-index.html<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en"><!-- My Medi Hub v2026-03-12 14:27 -->
 <head>
   <meta charset="UTF-8" />
@@ -3251,6 +3251,75 @@ index.html<!DOCTYPE html>
       transition: background .15s;
     }
     .admin-update-del:hover { background: rgba(239,68,68,.28); }
+  
+
+    /* ── FIXES: life calc modal, SNU colors, photo fitting ── */
+    .life-calc-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(10px);
+      z-index: 4000;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s ease;
+      padding: 22px;
+      overflow-y: auto;
+    }
+    .life-calc-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .life-calc-modal {
+      width: min(1100px, 100%);
+      margin: 20px auto;
+      background: linear-gradient(180deg, rgba(30,61,114,.98) 0%, rgba(26,47,74,.98) 100%);
+      border: 1px solid var(--border-2);
+      border-radius: 24px;
+      box-shadow: 0 40px 100px rgba(0,0,0,.6);
+      overflow: hidden;
+      transform: translateY(24px) scale(.98);
+      transition: transform .28s cubic-bezier(.22,1,.36,1);
+    }
+    .life-calc-modal-overlay.open .life-calc-modal { transform: translateY(0) scale(1); }
+    .life-calc-modal-actions {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      background: rgba(20,38,64,.96);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(18px);
+    }
+    .life-calc-modal-title { color:#fff; font-weight:800; font-family:'Space Grotesk',sans-serif; }
+    .life-calc-modal-body { padding: 0 0 24px; }
+
+    .snu-lb-list .snu-lb-row:nth-child(1) {
+      background: rgba(34,197,94,.10);
+      border-left: 4px solid #22c55e;
+    }
+    .snu-lb-list .snu-lb-row:nth-child(2) {
+      background: rgba(59,130,246,.10);
+      border-left: 4px solid #3b82f6;
+    }
+    .snu-lb-list .snu-lb-row:nth-child(3) {
+      background: rgba(239,68,68,.10);
+      border-left: 4px solid #ef4444;
+    }
+    .snu-lb-list .snu-lb-row:nth-child(1) .snu-prod { color:#22c55e; }
+    .snu-lb-list .snu-lb-row:nth-child(2) .snu-prod { color:#60a5fa; }
+    .snu-lb-list .snu-lb-row:nth-child(3) .snu-prod { color:#f87171; }
+
+    .aom-photo,
+    .spotlight-photo,
+    .aom-photo-mini-preview,
+    #photoUploadPreview {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+    }
+    .aom-photo-wrap,
+    .spotlight-photo-col,
+    .aom-photo-mini-preview,
+    #photoUploadPreview {
+      background: #ffffff !important;
+    }
+
   </style>
 </head>
 <body>
@@ -3279,7 +3348,7 @@ index.html<!DOCTYPE html>
           <a href="#libraries">Libraries</a>
           <a href="#updates">Updates</a>
           <a href="#leaderboard">Leaderboard</a>
-          <a href="#life-insurance-calculator">Life Calc</a>
+          <a href="#" onclick="openLifeCalc(); return false;">Life Calc</a>
           <a href="#operations-ai">Agent AI</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
         </nav>
@@ -3326,7 +3395,7 @@ index.html<!DOCTYPE html>
           <a href="#libraries" onclick="closeNav()">📖 Libraries</a>
           <a href="#updates" onclick="closeNav()">📡 Updates</a>
           <a href="#leaderboard" onclick="closeNav()">🏆 Leaderboard</a>
-          <a href="#life-insurance-calculator" onclick="closeNav()">❤️ Life Calc</a>
+          <a href="#" onclick="openLifeCalc(); return false;" onclick="closeNav()">❤️ Life Calc</a>
           <a href="#operations-ai" onclick="closeNav()">🤖 Agent AI</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
         </nav>
@@ -3425,7 +3494,7 @@ index.html<!DOCTYPE html>
             <span class="card-tag">Quoting</span>
           </a>
 
-          <a class="card" data-color="rose" href="#life-insurance-calculator">
+          <a class="card" data-color="rose" href="#" onclick="openLifeCalc(); return false;">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">❤️</div>
@@ -3440,7 +3509,7 @@ index.html<!DOCTYPE html>
 
 
     <!-- LIFE INSURANCE CALCULATOR -->
-    <section class="section" id="life-insurance-calculator">
+    <section class="section" id="life-insurance-calculator" style="display:none !important;">
       <div class="wrap">
         <div class="section-head">
           <div class="sh-left">
@@ -6111,6 +6180,93 @@ When answering:
   }
   </script>
 
+
+
+  <div class="life-calc-modal-overlay" id="lifeCalcModalOverlay" onclick="closeLifeCalc(event)">
+    <div class="life-calc-modal" role="dialog" aria-modal="true" aria-labelledby="lifeCalcModalTitle">
+      <div class="life-calc-modal-actions">
+        <div class="life-calc-modal-title" id="lifeCalcModalTitle">❤️ Life Insurance Calculator</div>
+        <button class="snu-print-btn ghost" type="button" onclick="closeLifeCalc()">✕ Close</button>
+      </div>
+      <div class="life-calc-modal-body" id="lifeCalcModalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    function openLifeCalc() {
+      const overlay = document.getElementById('lifeCalcModalOverlay');
+      const body = document.getElementById('lifeCalcModalBody');
+      const source = document.querySelector('#life-insurance-calculator .wrap');
+      if (!overlay || !body || !source) return;
+      body.innerHTML = source.innerHTML;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLifeCalc(evt) {
+      const overlay = document.getElementById('lifeCalcModalOverlay');
+      if (evt && evt.target && evt.target !== overlay) return;
+      if (!overlay) return;
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('lifeCalcModalOverlay');
+        if (overlay && overlay.classList.contains('open')) closeLifeCalc();
+      }
+    });
+
+    function openSnuPrint() {
+      const overlay = document.getElementById('snuPrintOverlay');
+      if (!overlay) return;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSnuPrint() {
+      const overlay = document.getElementById('snuPrintOverlay');
+      if (!overlay) return;
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function triggerSnuPrint() {
+      const modal = document.getElementById('snuPrintModal');
+      if (!modal) { window.print(); return; }
+
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow.document;
+      const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).map(n => n.outerHTML).join('
+');
+      doc.open();
+      doc.write(`<!DOCTYPE html><html><head><title>SNU Print</title>${styles}<style>
+        body{background:#fff !important;color:#111 !important;margin:0;padding:0;}
+        .snu-print-overlay{position:static !important;opacity:1 !important;pointer-events:auto !important;background:#fff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important;}
+        .snu-print-modal{transform:none !important;box-shadow:none !important;border:none !important;width:100% !important;max-width:none !important;max-height:none !important;overflow:visible !important;border-radius:0 !important;}
+        .snu-print-actions{display:none !important;}
+      </style></head><body><div class="snu-print-overlay open">${modal.outerHTML}</div></body></html>`);
+      doc.close();
+
+      iframe.onload = function() {
+        setTimeout(function() {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          setTimeout(function(){ document.body.removeChild(iframe); }, 1000);
+        }, 350);
+      };
+    }
+  </script>
+
 </body></html>`);
     doc.close();
 
@@ -6746,6 +6902,93 @@ When answering:
     showSnuToast('🗑 Update removed.');
   }
 
+  </script>
+
+
+
+  <div class="life-calc-modal-overlay" id="lifeCalcModalOverlay" onclick="closeLifeCalc(event)">
+    <div class="life-calc-modal" role="dialog" aria-modal="true" aria-labelledby="lifeCalcModalTitle">
+      <div class="life-calc-modal-actions">
+        <div class="life-calc-modal-title" id="lifeCalcModalTitle">❤️ Life Insurance Calculator</div>
+        <button class="snu-print-btn ghost" type="button" onclick="closeLifeCalc()">✕ Close</button>
+      </div>
+      <div class="life-calc-modal-body" id="lifeCalcModalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    function openLifeCalc() {
+      const overlay = document.getElementById('lifeCalcModalOverlay');
+      const body = document.getElementById('lifeCalcModalBody');
+      const source = document.querySelector('#life-insurance-calculator .wrap');
+      if (!overlay || !body || !source) return;
+      body.innerHTML = source.innerHTML;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLifeCalc(evt) {
+      const overlay = document.getElementById('lifeCalcModalOverlay');
+      if (evt && evt.target && evt.target !== overlay) return;
+      if (!overlay) return;
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('lifeCalcModalOverlay');
+        if (overlay && overlay.classList.contains('open')) closeLifeCalc();
+      }
+    });
+
+    function openSnuPrint() {
+      const overlay = document.getElementById('snuPrintOverlay');
+      if (!overlay) return;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSnuPrint() {
+      const overlay = document.getElementById('snuPrintOverlay');
+      if (!overlay) return;
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function triggerSnuPrint() {
+      const modal = document.getElementById('snuPrintModal');
+      if (!modal) { window.print(); return; }
+
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow.document;
+      const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).map(n => n.outerHTML).join('
+');
+      doc.open();
+      doc.write(`<!DOCTYPE html><html><head><title>SNU Print</title>${styles}<style>
+        body{background:#fff !important;color:#111 !important;margin:0;padding:0;}
+        .snu-print-overlay{position:static !important;opacity:1 !important;pointer-events:auto !important;background:#fff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important;}
+        .snu-print-modal{transform:none !important;box-shadow:none !important;border:none !important;width:100% !important;max-width:none !important;max-height:none !important;overflow:visible !important;border-radius:0 !important;}
+        .snu-print-actions{display:none !important;}
+      </style></head><body><div class="snu-print-overlay open">${modal.outerHTML}</div></body></html>`);
+      doc.close();
+
+      iframe.onload = function() {
+        setTimeout(function() {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          setTimeout(function(){ document.body.removeChild(iframe); }, 1000);
+        }, 350);
+      };
+    }
   </script>
 
 </body>
