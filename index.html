@@ -6149,18 +6149,14 @@ When answering:
       if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
     }
   }
-
-  function triggerSnuPrint() {
-    var modal     = document.getElementById('snuPrintModal');
-    var printWrap = document.getElementById('snuPrintContent');
-    if (!modal || !printWrap) { window.print(); return; }
-    printWrap.innerHTML = '';
-    var clone = modal.cloneNode(true);
-    clone.style.cssText = 'transform:none!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;width:100%!important;overflow:visible!important;';
-    printWrap.appendChild(clone);
-    document.body.classList.add('snu-printing');
-    onclick="if(document.getElementById('snuPrintOverlay').classList.contains('open')){window.print();}"
-```
+function triggerSnuPrint() {
+    var overlay = document.getElementById('snuPrintOverlay');
+    if (!overlay) { window.print(); return; }
+    if (overlay.classList.contains('open')) {
+      window.print();
+    }
+  }
+ 
 
 ---
 
