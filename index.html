@@ -1641,11 +1641,14 @@
       font-size: 15px; font-weight: 800;
       flex-shrink: 0;
     }
-    .snu-rank.gold   { background: rgba(251,191,36,.18); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); box-shadow: 0 0 12px rgba(251,191,36,.2); }
-    .snu-rank.silver { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
-    .snu-rank.bronze { background: rgba(205,124,74,.12); color: #cd7c4a; border: 1px solid rgba(205,124,74,.25); }
-    .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
-
+const prodClass = (value) => {
+  const v = Number(value) || 0;
+  if (v <= 5000) return 'prod-low';
+  if (v <= 9999) return 'prod-mid';
+  return 'prod-high';
+};<div class="snu-prod ${prodClass(a.production)}">
+  ${a.production ? Number(a.production).toLocaleString() : '—'}
+</div>
     .snu-agent-name {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 14px; font-weight: 700; color: #fff;
@@ -3447,31 +3450,127 @@
 
         <div class="snu-grid">
 
-          <!-- Left col: Leaderboard + Consecutive Executives stacked -->
-          <div class="snu-left-col">
+          /* ── LEFT: Leaderboard ── */
+.snu-lb-card {
+  background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
 
-            <div class="snu-lb-card">
-              <div class="snu-lb-header">
-                <div class="snu-lb-title">🥇 Weekly Top Producers</div>
-                <span class="snu-week-badge" id="snuWeekBadge">WEEK —</span>
-              </div>
-              <div class="snu-lb-list" id="snuLbList">
-                <div class="snu-empty">No data yet — admin can add weekly results below.</div>
-              </div>
-            </div>
+.snu-lb-header {
+  background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
+  border-bottom: 1px solid rgba(251,191,36,.2);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-            <!-- Consecutive Executives — directly below leaderboard -->
-            <div class="snu-exec-card">
-              <div class="snu-exec-header">
-                <div class="snu-exec-title">⭐ Consecutive Executives</div>
-                <span class="snu-exec-subtitle">Top 7 multiple weeks in a row</span>
-              </div>
-              <div class="snu-exec-grid" id="snuExecGrid">
-                <div class="snu-exec-empty">No consecutive executives yet.</div>
-              </div>
-            </div>
+.snu-lb-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-          </div>
+.snu-week-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  letter-spacing: .5px;
+}
+
+.snu-lb-list {
+  padding: 12px 0;
+}
+
+.snu-lb-row {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  transition: background .15s;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+
+.snu-lb-row:last-child {
+  border-bottom: none;
+}
+
+.snu-lb-row:hover {
+  background: rgba(255,255,255,.03);
+}
+
+.snu-rank {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  flex-shrink: 0;
+  background: rgba(59,130,246,.10);
+  color: var(--accent-2);
+  border: 1px solid rgba(59,130,246,.20);
+}
+
+.snu-agent-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.snu-agent-sub {
+  font-size: 11px;
+  color: var(--muted-2);
+  margin-top: 1px;
+}
+
+.snu-prod {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Production tier colors */
+.snu-prod.prod-low {
+  color: #ef4444 !important;
+  font-weight: 700;
+}
+
+.snu-prod.prod-mid {
+  color: #22c55e !important;
+  font-weight: 700;
+}
+
+.snu-prod.prod-high {
+  color: #3b82f6 !important;
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(59,130,246,.35);
+}
+
+.snu-empty {
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--muted-2);
+  font-size: 13px;
+  font-style: italic;
+}
 
           <!-- Right col: Article -->
 
