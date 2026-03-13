@@ -4820,7 +4820,7 @@ When answering:
             <tr>
               <td><span class="rank-badge ${rc(i)}">${x(r.Rank || String(i+1))}</span></td>
               <td class="agent-name">${x(r.AgentName || '—')}</td>
-              <td><span class="prod-val">${'$' + Number(r.Production||0).toLocaleString()}</span></td>
+              <td><span class="prod-val ${Number(r.Production||0) >= 10000 ? 'color-blue' : Number(r.Production||0) >= 5001 ? 'color-green' : 'color-red'}">${'$' + Number(r.Production||0).toLocaleString()}</span></td>
               <td>${Number(r.Policies||0).toLocaleString()}</td>
               <td>${Number(r.AppsSubmitted||0).toLocaleString()}</td>
               <td>${Number(r.Appointments||0).toLocaleString()}</td>
@@ -6085,7 +6085,9 @@ When answering:
             </div>`).join('')
         : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:8px 0;">No consecutive executives entered yet.</div>';
     }
-
+.prod-val.color-red  { color: #f87171; }
+.prod-val.color-green { color: #34d399; }
+.prod-val.color-blue  { color: #60a5fa; font-weight: 800; }
     // ── Agent Spotlight ──
     const spotEl = g('magSpotlightSpread');
     if (spotEl) {
