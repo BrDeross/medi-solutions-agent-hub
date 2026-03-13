@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+index.html<!DOCTYPE html>
 <html lang="en"><!-- My Medi Hub v2026-03-12 14:27 -->
 <head>
   <meta charset="UTF-8" />
@@ -3253,72 +3253,31 @@
     .admin-update-del:hover { background: rgba(239,68,68,.28); }
   
 
-    /* ── FIXES: life calc modal, SNU colors, photo fitting ── */
-    .life-calc-modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.75);
-      backdrop-filter: blur(10px);
-      z-index: 4000;
-      opacity: 0; pointer-events: none;
-      transition: opacity .25s ease;
-      padding: 22px;
-      overflow-y: auto;
-    }
-    .life-calc-modal-overlay.open { opacity: 1; pointer-events: all; }
-    .life-calc-modal {
-      width: min(1100px, 100%);
-      margin: 20px auto;
-      background: linear-gradient(180deg, rgba(30,61,114,.98) 0%, rgba(26,47,74,.98) 100%);
-      border: 1px solid var(--border-2);
-      border-radius: 24px;
-      box-shadow: 0 40px 100px rgba(0,0,0,.6);
-      overflow: hidden;
-      transform: translateY(24px) scale(.98);
-      transition: transform .28s cubic-bezier(.22,1,.36,1);
-    }
-    .life-calc-modal-overlay.open .life-calc-modal { transform: translateY(0) scale(1); }
-    .life-calc-modal-actions {
-      position: sticky; top: 0; z-index: 20;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-      padding: 14px 18px;
-      background: rgba(20,38,64,.96);
-      border-bottom: 1px solid rgba(255,255,255,.1);
-      backdrop-filter: blur(18px);
-    }
-    .life-calc-modal-title { color:#fff; font-weight:800; font-family:'Space Grotesk',sans-serif; }
-    .life-calc-modal-body { padding: 0 0 24px; }
+    /* ── LIFE CALC MODAL ── */
+    #life-insurance-calculator { display:none; position:fixed; inset:0; z-index:3200; background:rgba(7,15,30,.84); backdrop-filter:blur(10px); overflow-y:auto; padding:26px 14px 50px; }
+    #life-insurance-calculator.open { display:block; }
+    #life-insurance-calculator .wrap { max-width:1180px; margin:0 auto; position:relative; }
+    .life-calc-close-btn { position:sticky; top:8px; margin-left:auto; display:flex; align-items:center; justify-content:center; padding:10px 14px; border:none; border-radius:12px; background:#fff; color:#1f2937; font-weight:800; cursor:pointer; box-shadow:var(--shadow); z-index:4; }
 
-    .snu-lb-list .snu-lb-row:nth-child(1) {
-      background: rgba(34,197,94,.10);
-      border-left: 4px solid #22c55e;
-    }
-    .snu-lb-list .snu-lb-row:nth-child(2) {
-      background: rgba(59,130,246,.10);
-      border-left: 4px solid #3b82f6;
-    }
-    .snu-lb-list .snu-lb-row:nth-child(3) {
-      background: rgba(239,68,68,.10);
-      border-left: 4px solid #ef4444;
-    }
-    .snu-lb-list .snu-lb-row:nth-child(1) .snu-prod { color:#22c55e; }
-    .snu-lb-list .snu-lb-row:nth-child(2) .snu-prod { color:#60a5fa; }
-    .snu-lb-list .snu-lb-row:nth-child(3) .snu-prod { color:#f87171; }
+    /* ── SNU point color system ── */
+    .snu-lb-row.points-red   { background:linear-gradient(90deg, rgba(239,68,68,.16), rgba(239,68,68,.04)); }
+    .snu-lb-row.points-green { background:linear-gradient(90deg, rgba(16,185,129,.16), rgba(16,185,129,.04)); }
+    .snu-lb-row.points-blue  { background:linear-gradient(90deg, rgba(59,130,246,.16), rgba(59,130,246,.04)); }
 
-    .aom-photo,
-    .spotlight-photo,
-    .aom-photo-mini-preview,
-    #photoUploadPreview {
-      object-fit: contain !important;
-      object-position: center center !important;
-      background: #ffffff !important;
-    }
-    .aom-photo-wrap,
-    .spotlight-photo-col,
-    .aom-photo-mini-preview,
-    #photoUploadPreview {
-      background: #ffffff !important;
-    }
+    /* ── Photo fit fixes ── */
+    .spotlight-photo, .spotlight-photo img, .aom-photo, .aom-photo-wrap img { object-fit:contain !important; object-position:center center !important; background:#fff; }
+
+    /* ── Video library ── */
+    .video-lib-card { background:linear-gradient(180deg,#ffffff,#f8fbff); border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.06); }
+    .video-lib-thumb { aspect-ratio:16/9; background:#e5eefc; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .video-lib-thumb img { width:100%; height:100%; object-fit:contain; background:#fff; }
+    .video-lib-body { padding:16px; }
+    .video-lib-title { font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700; color:#fff; margin:0 0 8px; }
+    .video-lib-desc { font-size:13px; line-height:1.6; color:var(--muted-2); min-height:58px; }
+    .video-lib-link { display:inline-flex; align-items:center; gap:6px; margin-top:12px; padding:9px 12px; border-radius:10px; background:rgba(59,130,246,.16); color:#93c5fd; border:1px solid rgba(59,130,246,.25); text-decoration:none; font-weight:700; font-size:12px; }
+    .admin-video-item { display:grid; grid-template-columns:72px 1fr auto; gap:14px; align-items:center; padding:12px; background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:12px; margin-bottom:10px; }
+    .admin-video-thumb { width:72px; height:48px; border-radius:10px; background:#0f172a; display:flex; align-items:center; justify-content:center; overflow:hidden; color:#fff; font-weight:800; }
+    .admin-video-thumb img { width:100%; height:100%; object-fit:contain; background:#fff; }
 
   </style>
 </head>
@@ -3348,8 +3307,9 @@
           <a href="#libraries">Libraries</a>
           <a href="#updates">Updates</a>
           <a href="#leaderboard">Leaderboard</a>
-          <a href="#" onclick="openLifeCalc(); return false;">Life Calc</a>
+          <a href="javascript:void(0)" onclick="openLifeCalcModal(); return false;">Life Calc</a>
           <a href="#operations-ai">Agent AI</a>
+          <a href="#video-library">Videos</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
         </nav>
         <button class="hamburger" id="hamburger" aria-label="Open menu" onclick="toggleNav()">
@@ -3395,7 +3355,7 @@
           <a href="#libraries" onclick="closeNav()">📖 Libraries</a>
           <a href="#updates" onclick="closeNav()">📡 Updates</a>
           <a href="#leaderboard" onclick="closeNav()">🏆 Leaderboard</a>
-          <a href="#" onclick="openLifeCalc(); return false;" onclick="closeNav()">❤️ Life Calc</a>
+          <a href="javascript:void(0)" onclick="openLifeCalcModal(); return false;" onclick="closeNav()">❤️ Life Calc</a>
           <a href="#operations-ai" onclick="closeNav()">🤖 Agent AI</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
         </nav>
@@ -3494,7 +3454,7 @@
             <span class="card-tag">Quoting</span>
           </a>
 
-          <a class="card" data-color="rose" href="#" onclick="openLifeCalc(); return false;">
+          <a class="card" data-color="rose" href="javascript:void(0)" onclick="openLifeCalcModal(); return false;">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">❤️</div>
@@ -3509,8 +3469,9 @@
 
 
     <!-- LIFE INSURANCE CALCULATOR -->
-    <section class="section" id="life-insurance-calculator" style="display:none !important;">
+    <section class="section" id="life-insurance-calculator">
       <div class="wrap">
+        <button class="life-calc-close-btn" type="button" onclick="closeLifeCalcModal()">✕ Close</button>
         <div class="section-head">
           <div class="sh-left">
             <div class="sh-icon rose">❤️</div>
@@ -3836,6 +3797,7 @@
           <button class="admin-tab" onclick="switchAdminTab('spotlight',this)">⭐ Agent Spotlight</button>
           <button class="admin-tab" onclick="switchAdminTab('aom',this)">🗓️ Agent of Month</button>
           <button class="admin-tab" onclick="switchAdminTab('updates',this)">📡 Updates Feed</button>
+          <button class="admin-tab" onclick="switchAdminTab('videos',this)">🎥 Video Library</button>
         </div>
 
         <!-- ── Tab: SNU Data ── -->
@@ -3879,9 +3841,9 @@
 
           <hr class="admin-divider">
           <div class="admin-section-title">⭐ Consecutive Executives</div>
-          <p style="font-size:12px;color:var(--muted-2);margin-bottom:12px;">Agents who have been in the Top 7 for multiple consecutive weeks.</p>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:12px;">Automatically tallied based on agents who finish in the Top 7 each saved week.</p>
           <div id="adminExecRows"></div>
-          <button class="admin-add-btn" onclick="addExecRow()">+ Add Consecutive Executive</button>
+          
 
           <hr class="admin-divider">
           <button class="admin-save-btn" onclick="saveSnuData()">💾 Save &amp; Publish SNU</button>
@@ -6182,90 +6144,147 @@ When answering:
 
 
 
-  <div class="life-calc-modal-overlay" id="lifeCalcModalOverlay" onclick="closeLifeCalc(event)">
-    <div class="life-calc-modal" role="dialog" aria-modal="true" aria-labelledby="lifeCalcModalTitle">
-      <div class="life-calc-modal-actions">
-        <div class="life-calc-modal-title" id="lifeCalcModalTitle">❤️ Life Insurance Calculator</div>
-        <button class="snu-print-btn ghost" type="button" onclick="closeLifeCalc()">✕ Close</button>
+<script id="hub-fixes-v2">
+const SNU_HISTORY_KEY = 'snu_top7_history_v1';
+const VIDEO_KEY = 'snu_video_library_v1';
+let _videoThumbBase64 = null;
+
+function normalizeWeekKey(s){ return String(s||'').trim().toLowerCase(); }
+function getTop7Streaks(agents){
+  const history = (()=>{ try{return JSON.parse(localStorage.getItem(SNU_HISTORY_KEY)||'[]')}catch(e){return []} })();
+  const top7Now = (agents||[]).slice(0,7).map(a=>String(a.name||'').trim()).filter(Boolean);
+  const streaks = {};
+  for(const name of top7Now){
+    let count = 1;
+    for(let i=history.length-1;i>=0;i--){
+      const arr = Array.isArray(history[i]?.top7) ? history[i].top7 : [];
+      if(arr.includes(name)) count++; else break;
+    }
+    if(count>1) streaks[name]=count;
+  }
+  return Object.entries(streaks).map(([name,weeks])=>({name,weeks})).sort((a,b)=>b.weeks-a.weeks);
+}
+function updateHistory(weekLabel, agents){
+  const key = normalizeWeekKey(weekLabel);
+  if(!key) return;
+  let history = [];
+  try{ history = JSON.parse(localStorage.getItem(SNU_HISTORY_KEY)||'[]'); if(!Array.isArray(history)) history=[]; }catch(e){ history=[]; }
+  const top7 = (agents||[]).slice(0,7).map(a=>String(a.name||'').trim()).filter(Boolean);
+  const idx = history.findIndex(h => normalizeWeekKey(h.weekLabel)===key);
+  const rec = { weekLabel, top7, savedAt:new Date().toISOString() };
+  if(idx>=0) history[idx]=rec; else history.push(rec);
+  localStorage.setItem(SNU_HISTORY_KEY, JSON.stringify(history));
+  if(typeof jbSave==='function') { try{ jbSave('snu_history', history); }catch(e){} }
+}
+function openLifeCalcModal(){
+  const sec = document.getElementById('life-insurance-calculator');
+  if(!sec) return;
+  sec.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLifeCalcModal(){
+  const sec = document.getElementById('life-insurance-calculator');
+  if(!sec) return;
+  sec.classList.remove('open');
+  document.body.style.overflow='';
+  if(location.hash==='#life-insurance-calculator'){ history.replaceState('', document.title, window.location.pathname + window.location.search); }
+}
+window.addEventListener('hashchange', ()=>{ if(location.hash==='#life-insurance-calculator') openLifeCalcModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLifeCalcModal(); });
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(location.hash==='#life-insurance-calculator') openLifeCalcModal();
+  renderVideoLibrary();
+  bindVideoThumbDnD();
+});
+
+// override print with safer popup cloning
+function triggerSnuPrint(){
+  const modal = document.getElementById('snuPrintModal');
+  if(!modal){ window.print(); return; }
+  const clone = modal.cloneNode(true);
+  const actions = clone.querySelector('.snu-print-actions'); if(actions) actions.remove();
+  const win = window.open('', '_blank', 'width=1100,height=900');
+  if(!win) return;
+  const styleEls = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).map(n=>n.outerHTML).join('\n');
+  win.document.open();
+  win.document.write('<!DOCTYPE html><html><head><title>SNU Print</title>'+styleEls+'<style>body{background:#fff !important;margin:0;padding:24px;} .snu-print-overlay{position:static !important;opacity:1 !important;pointer-events:auto !important;background:#fff !important;padding:0 !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;} .snu-print-modal{transform:none !important;box-shadow:none !important;border:none !important;width:100% !important;max-width:none !important;margin:0 auto !important;} .snu-print-actions{display:none !important;} .snu-lb-row.points-red{background:rgba(239,68,68,.16)!important;} .snu-lb-row.points-green{background:rgba(16,185,129,.16)!important;} .snu-lb-row.points-blue{background:rgba(59,130,246,.16)!important;}</style></head><body></body></html>');
+  win.document.body.appendChild(clone);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 350);
+}
+
+// override leaderboard rendering based on points thresholds
+const _oldRenderSnuLeaderboard = window.renderSnuLeaderboard;
+window.renderSnuLeaderboard = function(data){
+  const badge = document.getElementById('snuWeekBadge');
+  if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
+  const list = document.getElementById('snuLbList');
+  if (!list) return;
+  const agents = Array.isArray(data.agents) ? data.agents : [];
+  if (!agents.length) { list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>'; return; }
+  const rankClass = i => ['gold','silver','bronze','other','other','other','other','other','other','other'][i] || 'other';
+  const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
+  const pointClass = p => p <= 5000 ? 'points-red' : (p >= 10000 ? 'points-blue' : 'points-green');
+  list.innerHTML = agents.map((a,i)=>{ const prod=Number(a.production||0); return `
+    <div class="snu-lb-row ${pointClass(prod)}">
+      <div class="snu-rank ${rankClass(i)}">${i<3?rankEmoji(i):i+1}</div>
+      <div>
+        <div class="snu-agent-name">${window.esc ? esc(a.name||'—') : String(a.name||'—')}</div>
+        ${a.note ? `<div class="snu-agent-sub">${window.esc ? esc(a.note) : String(a.note)}</div>` : ''}
       </div>
-      <div class="life-calc-modal-body" id="lifeCalcModalBody"></div>
-    </div>
-  </div>
+      <div class="snu-prod">${prod ? '$' + prod.toLocaleString() : '—'}</div>
+    </div>`; }).join('');
+};
+// override exec render to use auto streaks
+window.renderSnuExecs = function(data){
+  const grid = document.getElementById('snuExecGrid'); if(!grid) return;
+  const execs = getTop7Streaks(Array.isArray(data.agents)?data.agents:[]);
+  data.execs = execs;
+  if (!execs.length) { grid.innerHTML = '<div class="snu-exec-empty">No consecutive executives yet — this will auto-tally as weeks are saved.</div>'; return; }
+  const emoji = ['👑','⭐','🔥','💎','🏅','🎯','✨'];
+  grid.innerHTML = execs.map((e,i)=>`<div class="snu-exec-chip"><div class="snu-exec-avatar">${emoji[i%emoji.length]}</div><div class="snu-exec-info"><div class="snu-exec-name">${esc(e.name)}</div><div class="snu-exec-streak">🔁 ${e.weeks} week${e.weeks!==1?'s':''} straight</div></div></div>`).join('');
+  const adminExecRows = document.getElementById('adminExecRows');
+  if(adminExecRows && document.getElementById('adminTabSnu')?.classList.contains('active')){
+    adminExecRows.innerHTML = execs.map(e=>`<div class="admin-update-item"><div><div class="admin-update-title">${esc(e.name)}</div><div style="font-size:12px;color:var(--muted);">${e.weeks} week${e.weeks!==1?'s':''} in a row</div></div></div>`).join('') || '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No streaks yet — save a few weeks of Top 7 results first.</div>';
+  }
+};
+// patch render from storage to include history if cloud record available later
+const _oldRenderSnuFromStorage = window.renderSnuFromStorage;
+window.renderSnuFromStorage = function(){ if(_oldRenderSnuFromStorage) _oldRenderSnuFromStorage(); try{ const raw = localStorage.getItem('snu_data_v1'); if(raw){ const data=JSON.parse(raw); renderSnuLeaderboard(data); renderSnuExecs(data); } }catch(e){} };
+// patch loadAdminForm to show auto streaks not manual inputs
+const _oldLoadAdminForm = window.loadAdminForm;
+window.loadAdminForm = function(){ if(_oldLoadAdminForm) _oldLoadAdminForm(); try{ const raw = localStorage.getItem('snu_data_v1'); const data = raw?JSON.parse(raw):{agents:[]}; const rows=document.getElementById('adminExecRows'); if(rows){ const execs=getTop7Streaks(data.agents||[]); rows.innerHTML = execs.length ? execs.map(e=>`<div class="admin-update-item"><div><div class="admin-update-title">${esc(e.name)}</div><div style="font-size:12px;color:var(--muted);">${e.weeks} week${e.weeks!==1?'s':''} straight</div></div></div>`).join('') : '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No streaks yet — save a few weeks of Top 7 results first.</div>'; } }catch(e){} };
+// patch saveSnuData to update history automatically
+const _oldSaveSnuData = window.saveSnuData;
+window.saveSnuData = function(){
+  const weekLabel = document.getElementById('adminWeekLabel')?.value?.trim() || '';
+  const agentRows = document.querySelectorAll('#adminAgentRows .admin-row');
+  const agents=[]; agentRows.forEach(row=>{ const name=row.querySelector('.agent-name-input')?.value?.trim(); const prod=row.querySelector('.agent-prod-input')?.value?.trim(); if(name) agents.push({name, production: prod ? Number(prod) : null}); });
+  agents.sort((a,b)=>(b.production||0)-(a.production||0));
+  if(weekLabel && agents.length) updateHistory(weekLabel, agents);
+  if(_oldSaveSnuData) _oldSaveSnuData();
+  try{ const raw = localStorage.getItem('snu_data_v1'); if(raw){ const data=JSON.parse(raw); data.execs = getTop7Streaks(data.agents||[]); localStorage.setItem('snu_data_v1', JSON.stringify(data)); if(typeof jbSave==='function') jbSave('snu_data', data); renderSnuExecs(data); } }catch(e){}
+};
 
-  <script>
-    function openLifeCalc() {
-      const overlay = document.getElementById('lifeCalcModalOverlay');
-      const body = document.getElementById('lifeCalcModalBody');
-      const source = document.querySelector('#life-insurance-calculator .wrap');
-      if (!overlay || !body || !source) return;
-      body.innerHTML = source.innerHTML;
-      overlay.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeLifeCalc(evt) {
-      const overlay = document.getElementById('lifeCalcModalOverlay');
-      if (evt && evt.target && evt.target !== overlay) return;
-      if (!overlay) return;
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        const overlay = document.getElementById('lifeCalcModalOverlay');
-        if (overlay && overlay.classList.contains('open')) closeLifeCalc();
-      }
-    });
-
-    function openSnuPrint() {
-      const overlay = document.getElementById('snuPrintOverlay');
-      if (!overlay) return;
-      overlay.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeSnuPrint() {
-      const overlay = document.getElementById('snuPrintOverlay');
-      if (!overlay) return;
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    function triggerSnuPrint() {
-      const modal = document.getElementById('snuPrintModal');
-      if (!modal) { window.print(); return; }
-
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = '0';
-      document.body.appendChild(iframe);
-
-      const doc = iframe.contentWindow.document;
-      const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).map(n => n.outerHTML).join('
-');
-      doc.open();
-      doc.write(`<!DOCTYPE html><html><head><title>SNU Print</title>${styles}<style>
-        body{background:#fff !important;color:#111 !important;margin:0;padding:0;}
-        .snu-print-overlay{position:static !important;opacity:1 !important;pointer-events:auto !important;background:#fff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important;}
-        .snu-print-modal{transform:none !important;box-shadow:none !important;border:none !important;width:100% !important;max-width:none !important;max-height:none !important;overflow:visible !important;border-radius:0 !important;}
-        .snu-print-actions{display:none !important;}
-      </style></head><body><div class="snu-print-overlay open">${modal.outerHTML}</div></body></html>`);
-      doc.close();
-
-      iframe.onload = function() {
-        setTimeout(function() {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-          setTimeout(function(){ document.body.removeChild(iframe); }, 1000);
-        }, 350);
-      };
-    }
-  </script>
+function bindVideoThumbDnD(){
+  const zone = document.getElementById('videoThumbUploadZone');
+  if(!zone || zone.dataset.bound) return; zone.dataset.bound='1';
+  zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.style.borderColor='var(--accent)'; });
+  zone.addEventListener('dragleave', ()=> zone.style.borderColor='');
+  zone.addEventListener('drop', e=>{ e.preventDefault(); zone.style.borderColor=''; const file=e.dataTransfer.files[0]; if(file && file.type.startsWith('image/')) handleVideoThumb(file); });
+}
+function handleVideoThumb(file){
+  if(!file) return; const r=new FileReader(); r.onload=e=>{ _videoThumbBase64=e.target.result; const prev=document.getElementById('videoThumbPreview'); const ph=document.getElementById('videoThumbPlaceholder'); const zone=document.getElementById('videoThumbUploadZone'); if(prev){ prev.src=_videoThumbBase64; prev.classList.add('visible'); } if(ph) ph.style.display='none'; if(zone) zone.classList.add('has-photo'); }; r.readAsDataURL(file);
+}
+function getVideos(){ try{ const v=JSON.parse(localStorage.getItem(VIDEO_KEY)||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+function saveVideos(arr){ localStorage.setItem(VIDEO_KEY, JSON.stringify(arr)); if(typeof jbSave==='function') try{ jbSave('snu_videos', arr); }catch(e){} }
+function clearVideoForm(){ ['videoTitle','videoUrl','videoDesc'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; }); _videoThumbBase64=null; const prev=document.getElementById('videoThumbPreview'); const ph=document.getElementById('videoThumbPlaceholder'); const zone=document.getElementById('videoThumbUploadZone'); if(prev){ prev.src=''; prev.classList.remove('visible'); } if(ph) ph.style.display=''; if(zone) zone.classList.remove('has-photo'); }
+function addTrainingVideo(){ const title=document.getElementById('videoTitle')?.value?.trim(); const url=document.getElementById('videoUrl')?.value?.trim(); const desc=document.getElementById('videoDesc')?.value?.trim(); if(!title || !url){ if(typeof showSnuToast==='function') showSnuToast('⚠ Enter a video title and URL.'); return; } const vids=getVideos(); vids.unshift({ id:Date.now(), title, url, desc, thumb:_videoThumbBase64||null }); saveVideos(vids); renderVideoLibrary(); refreshAdminVideoList(); clearVideoForm(); if(typeof showSnuToast==='function') showSnuToast('✓ Training video added!'); }
+function deleteTrainingVideo(id){ const vids=getVideos().filter(v=>v.id!==id); saveVideos(vids); renderVideoLibrary(); refreshAdminVideoList(); if(typeof showSnuToast==='function') showSnuToast('🗑 Video removed.'); }
+function renderVideoLibrary(){ const vids=getVideos(); const grid=document.getElementById('videoLibraryGrid'); const count=document.getElementById('videoLibCount'); if(count) count.textContent = vids.length + (vids.length===1?' video':' videos'); if(!grid) return; if(!vids.length){ grid.innerHTML='<div class="empty">No videos added yet — use SNU Admin to upload training.</div>'; } else { grid.innerHTML=vids.map(v=>`<div class="video-lib-card"><div class="video-lib-thumb">${v.thumb?`<img src="${v.thumb}" alt="${esc(v.title)}">`:'🎥'}</div><div class="video-lib-body"><div class="video-lib-title">${esc(v.title)}</div><div class="video-lib-desc">${esc(v.desc||'Internal training video')}</div><a class="video-lib-link" href="${v.url}" target="_blank" rel="noopener noreferrer">Watch video ↗</a></div></div>`).join(''); } refreshAdminVideoList(); }
+function refreshAdminVideoList(){ const el=document.getElementById('adminVideoList'); const badge=document.getElementById('videoCountBadge'); if(!el) return; const vids=getVideos(); if(badge) badge.textContent='('+vids.length+')'; if(!vids.length){ el.innerHTML='<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>'; return; } el.innerHTML=vids.map(v=>`<div class="admin-video-item"><div class="admin-video-thumb">${v.thumb?`<img src="${v.thumb}" alt="${esc(v.title)}">`:'🎥'}</div><div><div class="admin-update-title">${esc(v.title)}</div><div style="font-size:12px;color:var(--muted);margin:4px 0 6px;">${esc(v.desc||'')}</div><a href="${v.url}" target="_blank" rel="noopener noreferrer" style="font-size:12px;color:#93c5fd;">${esc(v.url)}</a></div><button class="admin-update-del" onclick="deleteTrainingVideo(${v.id})">🗑 Delete</button></div>`).join(''); }
+</script>
 
 </body></html>`);
     doc.close();
@@ -6902,93 +6921,6 @@ When answering:
     showSnuToast('🗑 Update removed.');
   }
 
-  </script>
-
-
-
-  <div class="life-calc-modal-overlay" id="lifeCalcModalOverlay" onclick="closeLifeCalc(event)">
-    <div class="life-calc-modal" role="dialog" aria-modal="true" aria-labelledby="lifeCalcModalTitle">
-      <div class="life-calc-modal-actions">
-        <div class="life-calc-modal-title" id="lifeCalcModalTitle">❤️ Life Insurance Calculator</div>
-        <button class="snu-print-btn ghost" type="button" onclick="closeLifeCalc()">✕ Close</button>
-      </div>
-      <div class="life-calc-modal-body" id="lifeCalcModalBody"></div>
-    </div>
-  </div>
-
-  <script>
-    function openLifeCalc() {
-      const overlay = document.getElementById('lifeCalcModalOverlay');
-      const body = document.getElementById('lifeCalcModalBody');
-      const source = document.querySelector('#life-insurance-calculator .wrap');
-      if (!overlay || !body || !source) return;
-      body.innerHTML = source.innerHTML;
-      overlay.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeLifeCalc(evt) {
-      const overlay = document.getElementById('lifeCalcModalOverlay');
-      if (evt && evt.target && evt.target !== overlay) return;
-      if (!overlay) return;
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        const overlay = document.getElementById('lifeCalcModalOverlay');
-        if (overlay && overlay.classList.contains('open')) closeLifeCalc();
-      }
-    });
-
-    function openSnuPrint() {
-      const overlay = document.getElementById('snuPrintOverlay');
-      if (!overlay) return;
-      overlay.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeSnuPrint() {
-      const overlay = document.getElementById('snuPrintOverlay');
-      if (!overlay) return;
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    function triggerSnuPrint() {
-      const modal = document.getElementById('snuPrintModal');
-      if (!modal) { window.print(); return; }
-
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = '0';
-      document.body.appendChild(iframe);
-
-      const doc = iframe.contentWindow.document;
-      const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).map(n => n.outerHTML).join('
-');
-      doc.open();
-      doc.write(`<!DOCTYPE html><html><head><title>SNU Print</title>${styles}<style>
-        body{background:#fff !important;color:#111 !important;margin:0;padding:0;}
-        .snu-print-overlay{position:static !important;opacity:1 !important;pointer-events:auto !important;background:#fff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important;}
-        .snu-print-modal{transform:none !important;box-shadow:none !important;border:none !important;width:100% !important;max-width:none !important;max-height:none !important;overflow:visible !important;border-radius:0 !important;}
-        .snu-print-actions{display:none !important;}
-      </style></head><body><div class="snu-print-overlay open">${modal.outerHTML}</div></body></html>`);
-      doc.close();
-
-      iframe.onload = function() {
-        setTimeout(function() {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-          setTimeout(function(){ document.body.removeChild(iframe); }, 1000);
-        }, 350);
-      };
-    }
   </script>
 
 </body>
