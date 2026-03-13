@@ -3134,7 +3134,40 @@
 .snu-lb-row:first-child { background: rgba(251,191,36,.07) !important; }
 .snu-lb-row:first-child .snu-agent-name { color: #fde68a !important; }
 .snu-lb-row:first-child .snu-prod       { color: #fbbf24 !important; text-shadow: 0 0 12px rgba(251,191,36,.5); }
+/* Weekly Top Producers color coding */
+.snu-lb-row.row-gold {
+  background: rgba(251,191,36,.10) !important;
+}
+.snu-lb-row.row-silver {
+  background: rgba(148,163,184,.10) !important;
+}
+.snu-lb-row.row-bronze {
+  background: rgba(205,124,74,.10) !important;
+}
+.snu-lb-row.row-other {
+  background: rgba(255,255,255,.025);
+}
 
+.snu-prod.prod-gold {
+  color: #fbbf24 !important;
+  text-shadow: 0 0 12px rgba(251,191,36,.45);
+  font-weight: 800 !important;
+}
+.snu-prod.prod-silver {
+  color: #e2e8f0 !important;
+  text-shadow: 0 0 10px rgba(148,163,184,.35);
+  font-weight: 800 !important;
+}
+.snu-prod.prod-bronze {
+  color: #f0a876 !important;
+  text-shadow: 0 0 10px rgba(205,124,74,.35);
+  font-weight: 800 !important;
+}
+.snu-prod.prod-other {
+  color: #34d399 !important;
+  text-shadow: 0 0 8px rgba(52,211,153,.35);
+  font-weight: 700 !important;
+}
 /* Rank badges — more vivid */
 .snu-rank.gold   { background: rgba(251,191,36,.28) !important; color: #fbbf24 !important; border-color: rgba(251,191,36,.6) !important; box-shadow: 0 0 14px rgba(251,191,36,.35) !important; }
 .snu-rank.silver { background: rgba(148,163,184,.2)  !important; color: #e2e8f0 !important; border-color: rgba(148,163,184,.45) !important; }
@@ -5603,33 +5636,39 @@ When answering:
     `).join('');
   }
 
-  function renderSnuLeaderboard(data) {
-    // Week badge
-    const badge = document.getElementById('snuWeekBadge');
-    if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
+<script>
+function renderSnuLeaderboard(data) {
+  const badge = document.getElementById('snuWeekBadge');
+  if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
 
-    // Leaderboard list
-    const list = document.getElementById('snuLbList');
-    if (!list) return;
-    const agents = data.agents || [];
-    if (!agents.length) {
-      list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
-      return;
-    }
-    const rankClass = i => ['gold','silver','bronze','other','other','other','other','other','other','other'][i] || 'other';
-    const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
-    list.innerHTML = agents.map((a, i) => `
-      <div class="snu-lb-row">
-        <div class="snu-rank ${rankClass(i)}">${i < 3 ? rankEmoji(i) : i+1}</div>
-        <div>
-          <div class="snu-agent-name">${esc(a.name || '—')}</div>
-          ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
-        </div>
-        <div class="snu-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
-      </div>
-    `).join('');
+  const list = document.getElementById('snuLbList');
+  if (!list) return;
+
+  const agents = Array.isArray(data.agents) ? [...data.agents] : [];
+  agents.sort((a, b) => (Number(b.production) || 0) - (Number(a.production) || 0));
+
+  if (!agents.length) {
+    list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
+    return;
   }
 
+  const rankClass = i => ['gold', 'silver', 'bronze'][i] || 'other';
+  const rankLabel = i => i < 3 ? ['🥇', '🥈', '🥉'][i] : String(i + 1);
+  const prodClass = i => ['prod-gold', 'prod-silver', 'prod-bronze'][i] || 'prod-other';
+  const rowClass  = i => ['row-gold', 'row-silver', 'row-bronze'][i] || 'row-other';
+
+  list.innerHTML = agents.map((a, i) => `
+    <div class="snu-lb-row ${rowClass(i)}">
+      <div class="snu-rank ${rankClass(i)}">${rankLabel(i)}</div>
+      <div>
+        <div class="snu-agent-name">${esc(a.name || '—')}</div>
+        ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
+      </div>
+      <div class="snu-prod ${prodClass(i)}">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
+    </div>
+  `).join('');
+}
+</script>
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
