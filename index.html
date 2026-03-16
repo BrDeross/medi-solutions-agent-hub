@@ -2501,16 +2501,15 @@
     /* ── Print ── */
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      /* Hide everything except the overlay (which is already open and visible) */
-      body > *:not(#snuPrintOverlay) { display: none !important; }
-      /* Strip the dark overlay — make it plain white */
+      body > * { display: none !important; }
+      body > #snuPrintOverlay { display: block !important; }
       #snuPrintOverlay {
         position: static !important; display: block !important;
         background: #ffffff !important; backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         opacity: 1 !important; padding: 0 !important; overflow: visible !important;
+        width: 100% !important;
       }
-      /* The modal itself — clean white, no shadow, no rounded corners */
       .snu-print-modal {
         transform: none !important; border-radius: 0 !important;
         box-shadow: none !important; width: 100% !important; max-width: 100% !important;
@@ -2518,8 +2517,10 @@
         background: #f0f4f8 !important; backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
-      /* Hide the Print/Close buttons */
       .snu-print-actions { display: none !important; }
+      .mag-cover-img { transform: none !important; filter: brightness(.45) saturate(1.1) !important; }
+      .mag-article-img { transform: none !important; }
+      .bg-glow, .chat-launcher, .life-modal-overlay { display: none !important; }
     }
 
     @media (max-width: 680px) {
@@ -4423,7 +4424,7 @@
         <div class="mag-cover">
           <img class="mag-cover-img" id="magCoverImg"
             src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80&fit=crop"
-            alt="Cover">
+            alt="Cover" loading="eager" crossorigin="anonymous">
           <div class="mag-cover-gradient"></div>
           <div class="mag-cover-gradient-left"></div>
 
@@ -6241,6 +6242,9 @@ When answering:
     if (!overlay) return;
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
+    // Force browser to load cover image (may be skipped when overlay is hidden)
+    const ci = document.getElementById('magCoverImg');
+    if (ci && ci.src) { const s = ci.src; ci.src = ''; ci.src = s; }
 
     const data = window._snuState?.data || {};
     const article = window._snuState?.article || null;
@@ -6284,50 +6288,54 @@ When answering:
     const tx = g('magArticleText');
     if (hl) hl.textContent = article?.headline || "This week's article is loading…";
     if (tx) tx.innerHTML = article?.body?.length ? article.body.map(p => `<p>${pesc(p)}</p>`).join('') : '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
+
+    // ── Populate Agent Spotlight spread ──────────────────────────────────────
+    const spread = g('magSpotlightSpread');
+    if (spread) {
+      let sp = null;
+      // Try in-memory record first (has photo), fall back to localStorage
+      try { sp = window._jbRecord?.snu_spotlight || JSON.parse(localStorage.getItem('snu_spotlight_v1') || 'null'); } catch(e) {}
+      if (sp && sp.name) {
+        const p = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const photoHtml = sp.photo
+          ? `<img src="${sp.photo}" alt="${p(sp.name)}" style="width:160px;height:160px;object-fit:cover;border-radius:12px;display:block;margin-bottom:16px;">`
+          : '<div style="width:160px;height:160px;border-radius:12px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px;">👤</div>';
+        const statsHtml = sp.stats?.length ? sp.stats.map(s => `
+          <div style="text-align:center;padding:10px 16px;background:rgba(255,255,255,.06);border-radius:10px;">
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:#fff;">${p(s.val)}</div>
+            <div style="font-size:11px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;">${p(s.lbl)}</div>
+          </div>`).join('') : '';
+        spread.innerHTML = `
+          <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+            <div>${photoHtml}</div>
+            <div style="flex:1;min-width:200px;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;">${p(sp.name)}</div>
+              ${sp.title ? `<div style="font-size:14px;color:var(--accent-2);margin-bottom:14px;">${p(sp.title)}</div>` : ''}
+              ${sp.bio ? `<div style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:14px;">${p(sp.bio)}</div>` : ''}
+              ${sp.quote ? `<div style="font-style:italic;font-size:15px;color:var(--gold);border-left:3px solid var(--gold);padding-left:14px;margin-bottom:14px;">"${p(sp.quote)}"</div>` : ''}
+              ${statsHtml ? `<div style="display:flex;gap:10px;flex-wrap:wrap;">${statsHtml}</div>` : ''}
+            </div>
+          </div>`;
+      } else {
+        spread.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;text-align:center;padding:24px 0;">No spotlight set — feature an agent via SNU Admin.</div>';
+      }
+    }
   }
 
   function triggerSnuPrint() {
-    const modal = document.getElementById('snuPrintModal');
-    if (!modal) return;
-
-    // Collect page styles
-    const styles = Array.from(document.querySelectorAll('style'))
-      .map(s => s.textContent).join('\n');
-
-    // Build a clean print document in a hidden iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(`<!DOCTYPE html><html><head>
-      <meta charset="UTF-8">
-      <title>SNU — Show N Up</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
-      <style>
-        ${styles}
-        @page { margin: 0.4in; }
-        body { background: #f0f4f8 !important; margin: 0; padding: 0; }
-        .snu-print-overlay { position: static !important; display: block !important;
-          background: transparent !important; backdrop-filter: none !important;
-          padding: 0 !important; opacity: 1 !important; pointer-events: auto !important; }
-        .snu-print-modal { transform: none !important; box-shadow: none !important;
-          width: 100% !important; max-width: 100% !important; border-radius: 0 !important;
-          overflow: visible !important; max-height: none !important; }
-        .snu-print-actions { display: none !important; }
-      </style>
-    </head><body>
-      <div class="snu-print-overlay open">${modal.outerHTML}</div>
-    </body></html>`);
-    doc.close();
-
-    iframe.onload = function() {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-      setTimeout(() => document.body.removeChild(iframe), 2000);
-    };
+    const overlay = document.getElementById('snuPrintOverlay');
+    if (!overlay) return;
+    // Temporarily make the overlay static so @media print can target it as body > *
+    overlay.style.position = 'static';
+    overlay.style.overflow = 'visible';
+    overlay.style.padding = '0';
+    window.print();
+    // Restore after the print dialog closes
+    setTimeout(function() {
+      overlay.style.position = '';
+      overlay.style.overflow = '';
+      overlay.style.padding = '';
+    }, 500);
   }
 
   function closeSnuPrint() {
