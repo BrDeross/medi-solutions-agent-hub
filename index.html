@@ -1,4 +1,4 @@
-]index.html<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en"><!-- My Medi Hub v2026-03-12 14:27 -->
 <head>
   <meta charset="UTF-8" />
@@ -1587,15 +1587,15 @@
 
     /* ── LEFT: Leaderboard ── */
     .snu-lb-card {
-      background: linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
-      border: 1px solid var(--border-2);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: var(--r-xl);
       overflow: hidden;
     }
 
     .snu-lb-header {
-      background: linear-gradient(90deg, rgba(251,191,36,.15), rgba(251,191,36,.05));
-      border-bottom: 1px solid rgba(251,191,36,.2);
+      background: linear-gradient(90deg, rgba(251,191,36,.22), rgba(251,191,36,.08));
+      border-bottom: 1px solid rgba(180,130,0,.2);
       padding: 18px 24px;
       display: flex;
       align-items: center;
@@ -1605,16 +1605,16 @@
     .snu-lb-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 15px; font-weight: 700;
-      color: var(--gold);
+      color: #92400e;
       display: flex; align-items: center; gap: 8px;
     }
 
     .snu-week-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px; font-weight: 600;
-      color: var(--muted);
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border);
+      color: #64748b;
+      background: rgba(0,0,0,.06);
+      border: 1px solid #cbd5e1;
       border-radius: 6px;
       padding: 3px 8px;
       letter-spacing: .5px;
@@ -1629,10 +1629,24 @@
       gap: 12px;
       padding: 10px 24px;
       transition: background .15s;
-      border-bottom: 1px solid rgba(255,255,255,.04);
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
     }
     .snu-lb-row:last-child { border-bottom: none; }
-    .snu-lb-row:hover { background: rgba(255,255,255,.03); }
+    .snu-lb-row:hover { background: #f1f5f9; }
+
+    /* ≤5000 pts = red */
+    .snu-lb-row.rank-red  { background: #fff5f5; border-left: 4px solid #ef4444; }
+    .snu-lb-row.rank-red  .snu-agent-name { color: #b91c1c; }
+    .snu-lb-row.rank-red  .snu-prod { color: #dc2626 !important; font-weight: 700; }
+    /* 5001–9999 pts = green */
+    .snu-lb-row.rank-green { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .snu-lb-row.rank-green .snu-agent-name { color: #15803d; }
+    .snu-lb-row.rank-green .snu-prod { color: #16a34a !important; font-weight: 700; }
+    /* ≥10000 pts = bold blue */
+    .snu-lb-row.rank-blue  { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .snu-lb-row.rank-blue  .snu-agent-name { color: #1d4ed8; font-weight: 800; }
+    .snu-lb-row.rank-blue  .snu-prod { color: #1d4ed8 !important; font-weight: 800; }
 
     .snu-rank {
       width: 36px; height: 36px;
@@ -1642,14 +1656,14 @@
       font-size: 15px; font-weight: 800;
       flex-shrink: 0;
     }
-    .snu-rank.gold   { background: rgba(239,68,68,.16); color: #ef4444; border: 1px solid rgba(239,68,68,.34); box-shadow: 0 0 12px rgba(239,68,68,.18); }
-    .snu-rank.silver { background: rgba(34,197,94,.12); color: #22c55e; border: 1px solid rgba(34,197,94,.24); }
-    .snu-rank.bronze { background: rgba(59,130,246,.12); color: #3b82f6; border: 1px solid rgba(59,130,246,.24); }
-    .snu-rank.other  { background: rgba(59,130,246,.1); color: var(--accent-2); border: 1px solid rgba(59,130,246,.2); }
+    .snu-rank.gold   { background: rgba(239,68,68,.12); color: #dc2626; border: 1px solid rgba(239,68,68,.3); box-shadow: 0 0 10px rgba(239,68,68,.1); }
+    .snu-rank.silver { background: rgba(34,197,94,.12);  color: #16a34a; border: 1px solid rgba(34,197,94,.28); }
+    .snu-rank.bronze { background: rgba(59,130,246,.12); color: #2563eb; border: 1px solid rgba(59,130,246,.28); }
+    .snu-rank.other  { background: rgba(59,130,246,.08); color: #3b82f6; border: 1px solid rgba(59,130,246,.2); }
 
     .snu-agent-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px; font-weight: 700; color: #fff;
+      font-size: 14px; font-weight: 700; color: #1e293b;
     }
     .snu-agent-sub {
       font-size: 11px; color: var(--muted-2); margin-top: 1px;
@@ -1658,7 +1672,7 @@
     .snu-prod {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px; font-weight: 600;
-      color: var(--green);
+      color: #334155;
       white-space: nowrap;
     }
 
@@ -3253,45 +3267,191 @@
     .admin-update-del:hover { background: rgba(239,68,68,.28); }
 
 
-    /* ── VIDEO LIBRARY ───────────────────────────────────────────────────── */
-    .video-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-      gap:18px;
-    }
-    .video-card {
-      background:linear-gradient(160deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.03) 100%);
-      border:1px solid var(--border-2);
-      border-radius:18px;
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      box-shadow:0 10px 24px rgba(0,0,0,.18);
-    }
-    .video-thumb {
-      aspect-ratio: 16 / 9;
-      background:linear-gradient(135deg,#203d73,#2e5490);
-      display:flex;align-items:center;justify-content:center;
-      overflow:hidden;
-      position:relative;
-    }
-    .video-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-    .video-thumb-fallback { color:#dbeafe; font-size:40px; opacity:.8; }
-    .video-body { padding:16px; display:flex; flex-direction:column; gap:10px; }
-    .video-cat { display:inline-flex; align-items:center; gap:6px; width:max-content; padding:6px 10px; border-radius:999px; background:rgba(96,165,250,.14); color:#bfdbfe; font-size:11px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; }
-    .video-title { font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700; color:#fff; line-height:1.35; }
-    .video-desc { color:var(--muted-2); font-size:13px; line-height:1.6; min-height:56px; }
-    .video-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:auto; }
-    .video-btn { display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:10px; text-decoration:none; font-size:13px; font-weight:700; }
-    .video-btn.primary { background:var(--accent); color:#fff; }
-    .video-btn.secondary { background:rgba(255,255,255,.06); border:1px solid var(--border-2); color:var(--muted); }
-    .video-admin-row { background:rgba(255,255,255,.03); border:1px solid var(--border-2); border-radius:12px; padding:14px; margin-bottom:10px; }
-    .video-admin-title { font-weight:700; color:#fff; margin-bottom:4px; }
-    .video-admin-meta { color:var(--muted-2); font-size:12px; margin-bottom:8px; }
-    .video-admin-actions { display:flex; gap:8px; flex-wrap:wrap; }
-    .video-admin-btn { background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; }
-    .video-admin-btn.delete { background:rgba(239,68,68,.12); color:#fecaca; border-color:rgba(239,68,68,.25); }
 
+    /* ── AGENT TOOLS TABS ── */
+    .at-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      padding-bottom: 0;
+    }
+    .at-tab {
+      padding: 9px 20px;
+      border-radius: 10px 10px 0 0;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: color .15s, background .15s;
+      border: 1px solid transparent;
+      border-bottom: none;
+      margin-bottom: -1px;
+    }
+    .at-tab:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .at-tab.active {
+      background: rgba(30,55,100,.95);
+      color: #fff;
+      border-color: rgba(255,255,255,.12);
+      border-bottom-color: transparent;
+    }
+    .at-panel { display: none; }
+    .at-panel.active { display: block; }
+
+    /* ══════════════════════════════════════════════
+       VIDEO TRAINING LIBRARY
+    ══════════════════════════════════════════════ */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 4px;
+    }
+
+    .video-card {
+      background: rgba(26,47,74,.9);
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .2s, box-shadow .25s;
+    }
+    .video-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(99,170,255,.4);
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
+    .video-thumb {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      background: #0d1826;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .video-thumb iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+    .video-thumb-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #1a3870, #0d1826);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .video-thumb-placeholder:hover { background: linear-gradient(160deg, #1e4080, #111e33); }
+    .video-play-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: rgba(59,130,246,.85);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 0 8px rgba(59,130,246,.18), 0 8px 24px rgba(59,130,246,.4);
+      transition: transform .2s, box-shadow .2s;
+      margin-bottom: 10px;
+    }
+    .video-thumb-placeholder:hover .video-play-icon {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 12px rgba(59,130,246,.22), 0 12px 30px rgba(59,130,246,.5);
+    }
+    .video-play-label {
+      font-size: 12px; font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .video-info {
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .video-category {
+      font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .7px;
+      padding: 3px 9px; border-radius: 5px;
+      width: fit-content;
+      background: rgba(59,130,246,.12);
+      color: var(--accent-2);
+      border: 1px solid rgba(59,130,246,.2);
+    }
+    .video-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: #fff; line-height: 1.35;
+    }
+    .video-desc {
+      font-size: 13px; color: var(--muted);
+      line-height: 1.6; flex: 1;
+    }
+    .video-meta {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 11.5px; color: var(--muted-2);
+      font-family: 'JetBrains Mono', monospace;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .video-empty {
+      grid-column: 1 / -1;
+      padding: 48px 32px;
+      text-align: center;
+      border: 1px dashed rgba(255,255,255,.08);
+      border-radius: var(--r-lg);
+      color: var(--muted-2);
+      font-size: 14px;
+    }
+    .video-empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+    /* Admin video rows */
+    .admin-video-item {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+    .admin-video-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 700; color: #fff;
+    }
+    .admin-video-url {
+      font-size: 11px; color: var(--accent-2);
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 300px;
+    }
+    .admin-video-del {
+      background: rgba(239,68,68,.15);
+      border: 1px solid rgba(239,68,68,.25);
+      color: #f87171;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background .15s;
+    }
+    .admin-video-del:hover { background: rgba(239,68,68,.28); }
+
+    @media (max-width: 640px) {
+      .video-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -3318,9 +3478,9 @@
           <a href="#agent-tools">Tools</a>
           <a href="#quick-access">Portals</a>
           <a href="#libraries">Libraries</a>
-          <a href="#video-library">Videos</a>
           <a href="#updates">Updates</a>
           <a href="#leaderboard">Leaderboard</a>
+          <a href="#video-library">Videos</a>
           <a href="#life-insurance-calculator">Life Calc</a>
           <a href="#operations-ai">Agent AI</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
@@ -3366,9 +3526,9 @@
           <a href="#agent-tools" onclick="closeNav()">🛠 Tools</a>
           <a href="#quick-access" onclick="closeNav()">🔗 Portals</a>
           <a href="#libraries" onclick="closeNav()">📖 Libraries</a>
-          <a href="#video-library" onclick="closeNav()">🎬 Videos</a>
           <a href="#updates" onclick="closeNav()">📡 Updates</a>
           <a href="#leaderboard" onclick="closeNav()">🏆 Leaderboard</a>
+          <a href="#video-library" onclick="closeNav()">🎬 Videos</a>
           <a href="#life-insurance-calculator" onclick="closeNav()">❤️ Life Calc</a>
           <a href="#operations-ai" onclick="closeNav()">🤖 Agent AI</a>
           <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
@@ -3427,6 +3587,8 @@
           </div>
           <span class="count-chip">6 tools</span>
         </div>
+
+        <!-- Tool Cards -->
         <div class="card-grid">
           <a class="card" data-color="blue" href="tools/ai-suite/sales-coach.html">
             <span class="card-arrow">↗</span>
@@ -3459,7 +3621,8 @@
             <h3>Retirement Budget</h3>
             <p>Help clients estimate retirement income and expenses with clarity.</p>
             <span class="card-tag">Planning</span>
-          </a>          <a class="card" data-color="green" href="tools/bundle-options/">
+          </a>
+          <a class="card" data-color="green" href="tools/bundle-options/">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">📦</div>
@@ -3467,8 +3630,7 @@
             <p>Create bundled coverage scenarios and review option groupings for clients.</p>
             <span class="card-tag">Quoting</span>
           </a>
-
-          <a class="card" data-color="rose" href="#life-insurance-calculator">
+          <a class="card" data-color="rose" href="tools/life-insurance-calculator/">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">❤️</div>
@@ -3476,119 +3638,12 @@
             <p>Estimate coverage needs for debts, income replacement, children, weddings, properties, and final expenses.</p>
             <span class="card-tag">Protection</span>
           </a>
-
         </div>
+
       </div>
     </section>
 
-
-    <!-- LIFE INSURANCE CALCULATOR -->
-    <section class="section" id="life-insurance-calculator">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="sh-left">
-            <div class="sh-icon rose">❤️</div>
-            <div>
-              <h2>Life Insurance Calculator</h2>
-              <p>Estimate family protection needs for debts, income replacement, children, weddings, properties, and final expenses.</p>
-            </div>
-          </div>
-          <span class="count-chip">Needs Analysis</span>
-        </div>
-
-        <div class="life-calc-shell">
-          <div class="life-calc-grid">
-            <div class="life-calc-card">
-              <div class="life-calc-title">Family Income & Core Obligations</div>
-              <div class="life-calc-form">
-                <div class="life-field">
-                  <label>Annual Household Income to Replace</label>
-                  <input id="lifeIncome" type="number" min="0" step="1000" placeholder="90000">
-                </div>
-                <div class="life-field">
-                  <label>Years of Income Replacement</label>
-                  <input id="lifeYears" type="number" min="0" step="1" placeholder="10">
-                </div>
-                <div class="life-field">
-                  <label>Mortgage / Property Payoff</label>
-                  <input id="lifeMortgage" type="number" min="0" step="1000" placeholder="250000">
-                </div>
-                <div class="life-field">
-                  <label>Other Debts / Risks</label>
-                  <input id="lifeDebts" type="number" min="0" step="1000" placeholder="40000">
-                </div>
-                <div class="life-field">
-                  <label>Final Expenses</label>
-                  <input id="lifeFinal" type="number" min="0" step="1000" placeholder="20000">
-                </div>
-                <div class="life-field">
-                  <label>Emergency Reserve Desired</label>
-                  <input id="lifeEmergency" type="number" min="0" step="1000" placeholder="25000">
-                </div>
-              </div>
-            </div>
-
-            <div class="life-calc-card">
-              <div class="life-calc-title">Children, Milestones & Existing Assets</div>
-              <div class="life-calc-form">
-                <div class="life-field">
-                  <label>College Fund Need</label>
-                  <input id="lifeCollege" type="number" min="0" step="1000" placeholder="100000">
-                </div>
-                <div class="life-field">
-                  <label>Wedding / Future Family Milestones</label>
-                  <input id="lifeWeddings" type="number" min="0" step="1000" placeholder="30000">
-                </div>
-                <div class="life-field">
-                  <label>Other Property / Legacy Needs</label>
-                  <input id="lifeProperties" type="number" min="0" step="1000" placeholder="50000">
-                </div>
-                <div class="life-field">
-                  <label>Current Savings / Investments Available</label>
-                  <input id="lifeSavings" type="number" min="0" step="1000" placeholder="35000">
-                </div>
-                <div class="life-field">
-                  <label>Existing Life Insurance Coverage</label>
-                  <input id="lifeExisting" type="number" min="0" step="1000" placeholder="100000">
-                </div>
-                <div class="life-field">
-                  <label>Notes / Special Risks</label>
-                  <input id="lifeNotes" type="text" placeholder="Special needs child, business buyout, etc.">
-                </div>
-              </div>
-
-              <div class="life-calc-actions">
-                <button class="life-calc-btn" type="button" onclick="calculateLifeInsurance()">Calculate Need</button>
-                <button class="life-calc-btn ghost" type="button" onclick="resetLifeInsuranceCalc()">Reset</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="life-calc-results" id="lifeCalcResults">
-            <div class="life-calc-result-card">
-              <div class="life-result-label">Recommended Coverage Need</div>
-              <div class="life-result-value" id="lifeTotalNeed">$0</div>
-              <div class="life-result-sub" id="lifeResultSub">Enter values above and click Calculate Need.</div>
-            </div>
-
-            <div class="life-calc-breakdown">
-              <div class="life-break-row"><span>Income replacement</span><strong id="lifeIncomeNeed">$0</strong></div>
-              <div class="life-break-row"><span>Mortgage / properties</span><strong id="lifeHomeNeed">$0</strong></div>
-              <div class="life-break-row"><span>Debts / risk cleanup</span><strong id="lifeDebtNeed">$0</strong></div>
-              <div class="life-break-row"><span>College / weddings / milestones</span><strong id="lifeFamilyNeed">$0</strong></div>
-              <div class="life-break-row"><span>Final expenses + emergency</span><strong id="lifeFinalNeed">$0</strong></div>
-              <div class="life-break-row deduct"><span>Less savings / existing coverage</span><strong id="lifeOffsets">-$0</strong></div>
-            </div>
-
-            <div class="life-calc-note">
-              This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation and adjust for business needs, special needs planning, legacy goals, or estate liquidity.
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- QUICK ACCESS PORTALS -->
+        <!-- QUICK ACCESS PORTALS -->
     <section class="section" id="quick-access">
       <div class="wrap">
         <div class="section-head">
@@ -3672,7 +3727,7 @@
               <p>Searchable knowledge tools for quick reference</p>
             </div>
           </div>
-          <span class="count-chip">3 libraries</span>
+          <span class="count-chip">4 libraries</span>
         </div>
         <div class="card-grid">
           <a class="card" data-color="blue" href="tools/acronyms-library/">
@@ -3699,6 +3754,37 @@
             <p>Catchy, practical one-liners organized by call stage and sales situation.</p>
             <span class="card-tag">Calls</span>
           </a>
+          <a class="card" data-color="purple" href="#video-library">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">🎬</div>
+            <h3>Video Training Library</h3>
+            <p>On-demand training videos, product walkthroughs, and coaching sessions.</p>
+            <span class="card-tag">Training</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- VIDEO TRAINING LIBRARY -->
+    <section class="section" id="video-library">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sh-left">
+            <div class="sh-icon purple">🎬</div>
+            <div>
+              <h2>Video <span style="color:var(--accent-2)">Training Library</span></h2>
+              <p>On-demand training videos, product walkthroughs, and coaching sessions</p>
+            </div>
+          </div>
+          <span class="count-chip" id="videoCount">0 videos</span>
+        </div>
+        <div class="video-grid" id="videoGrid">
+          <div class="video-empty">
+            <div class="video-empty-icon">🎬</div>
+            <div>No videos yet — admin can add training videos below.</div>
+          </div>
         </div>
       </div>
     </section>
@@ -3774,6 +3860,7 @@
     </section>
 
 
+
     <!-- ADMIN OVERLAY -->
     <div class="admin-overlay" id="adminOverlay" onclick="closeAdmin()"></div>
 
@@ -3809,8 +3896,8 @@
           <button class="admin-tab active" onclick="switchAdminTab('snu',this)">🏆 SNU Data</button>
           <button class="admin-tab" onclick="switchAdminTab('spotlight',this)">⭐ Agent Spotlight</button>
           <button class="admin-tab" onclick="switchAdminTab('aom',this)">🗓️ Agent of Month</button>
-          <button class="admin-tab" onclick="switchAdminTab('videos',this)">🎬 Video Library</button>
           <button class="admin-tab" onclick="switchAdminTab('updates',this)">📡 Updates Feed</button>
+          <button class="admin-tab" onclick="switchAdminTab('videos',this)">🎬 Videos</button>
         </div>
 
         <!-- ── Tab: SNU Data ── -->
@@ -4126,6 +4213,58 @@
 
         </div>
         </div><!-- /adminTabUpdates -->
+
+        <!-- ── Tab: Videos ── -->
+        <div id="adminTabVideos" class="admin-tab-panel">
+        <div class="admin-body">
+
+          <div class="admin-section-title">🎬 Add Training Video</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Paste a YouTube or Vimeo URL. The video will embed directly in the library.</p>
+
+          <div class="admin-field" style="margin-bottom:10px;">
+            <label>Video Title</label>
+            <input class="admin-input" id="vidTitle" placeholder="Medicare Advantage Overview 2025">
+          </div>
+
+          <div class="admin-field" style="margin-bottom:10px;">
+            <label>Video URL (YouTube or Vimeo)</label>
+            <input class="admin-input" id="vidUrl" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+
+          <div class="admin-week-row" style="margin-bottom:10px;">
+            <div class="admin-field">
+              <label>Category</label>
+              <select class="admin-input" id="vidCategory">
+                <option>Medicare</option>
+                <option>Life Insurance</option>
+                <option>Annuities</option>
+                <option>Sales Skills</option>
+                <option>Compliance</option>
+                <option>Technology</option>
+                <option>Leadership</option>
+                <option>General Training</option>
+              </select>
+            </div>
+            <div class="admin-field">
+              <label>Duration (optional)</label>
+              <input class="admin-input" id="vidDuration" placeholder="12:34">
+            </div>
+          </div>
+
+          <div class="admin-field" style="margin-bottom:14px;">
+            <label>Description</label>
+            <textarea class="admin-input" id="vidDesc" rows="3" placeholder="What agents will learn from this video…" style="resize:vertical;min-height:66px;"></textarea>
+          </div>
+
+          <button class="admin-save-btn" style="width:auto;padding:10px 24px;background:var(--accent);" onclick="addVideo()">➕ Add Video</button>
+
+          <div class="admin-section-title" style="margin-top:20px;">📋 Current Videos <span id="vidAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+          <div id="adminVideosList">
+            <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>
+          </div>
+
+        </div>
+        </div><!-- /adminTabVideos -->
 
 
 
@@ -5465,7 +5604,6 @@ When answering:
       if (typeof renderAllAomCards    === 'function') renderAllAomCards();
       if (typeof renderSpotlightCard  === 'function') renderSpotlightCard();
       if (typeof initUpdates          === 'function') initUpdates();
-      if (typeof initVideoLibrary     === 'function') initVideoLibrary();
       // Then fetch from cloud and re-render with latest data
       if (typeof jbInit === 'function') {
         await jbInit();
@@ -5521,12 +5659,17 @@ When answering:
     `).join('');
   }
 
+  function getSnuPointClass(prod) {
+    const points = Number(prod || 0);
+    if (points <= 5000) return 'rank-red';
+    if (points <= 9999) return 'rank-green';
+    return 'rank-blue';
+  }
+
   function renderSnuLeaderboard(data) {
-    // Week badge
     const badge = document.getElementById('snuWeekBadge');
     if (badge && data.weekLabel) badge.textContent = data.weekLabel.toUpperCase();
 
-    // Leaderboard list
     const list = document.getElementById('snuLbList');
     if (!list) return;
     const agents = data.agents || [];
@@ -5534,18 +5677,19 @@ When answering:
       list.innerHTML = '<div class="snu-empty">No data yet — admin can add weekly results.</div>';
       return;
     }
-    const rankClass = i => ['gold','silver','bronze','other','other','other','other','other','other','other'][i] || 'other';
     const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
-    list.innerHTML = agents.map((a, i) => `
-      <div class="snu-lb-row">
-        <div class="snu-rank ${rankClass(i)}">${i < 3 ? rankEmoji(i) : i+1}</div>
+    list.innerHTML = agents.map((a, i) => {
+      const rowClass = getSnuPointClass(a.production);
+      return `
+      <div class="snu-lb-row ${rowClass}">
+        <div class="snu-rank other">${i < 3 ? rankEmoji(i) : i+1}</div>
         <div>
           <div class="snu-agent-name">${esc(a.name || '—')}</div>
           ${a.note ? `<div class="snu-agent-sub">${esc(a.note)}</div>` : ''}
         </div>
-        <div class="snu-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
-      </div>
-    `).join('');
+        <div class="snu-prod">${a.production ? Number(a.production).toLocaleString() + ' pts' : '—'}</div>
+      </div>`;
+    }).join('');
   }
 
   function esc(s) {
@@ -5711,14 +5855,16 @@ When answering:
     const agents = data.agents?.length ? data.agents : [{}];
     agents.forEach(a => addAgentRow(a));
 
-    // Load exec rows
     const execRows = document.getElementById('adminExecRows');
     if (execRows) {
       execRows.innerHTML = '';
-      const execs = data.execs?.length ? data.execs : [{}];
-      execs.forEach(e => addExecRow(e));
+      const execs = data.execs?.length ? data.execs : [];
+      if (!execs.length) {
+        execRows.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">Consecutive executives are now auto-tallied from each saved Top 7 week.</div>';
+      } else {
+        execs.forEach(e => addExecRow(e));
+      }
     }
-    if (typeof refreshVideoAdminList === 'function') refreshVideoAdminList();
   }
 
   function addAgentRow(a) {
@@ -5748,15 +5894,33 @@ When answering:
     div.innerHTML = `
       <div class="admin-field">
         <label>Agent Name</label>
-        <input class="admin-input exec-name-input" value="${esc(e.name||'')}" placeholder="Jane Smith">
+        <input class="admin-input exec-name-input" value="${esc(e.name||'')}" placeholder="Jane Smith" readonly>
       </div>
       <div class="admin-field">
         <label>Weeks in a Row</label>
-        <input class="admin-input exec-weeks-input" type="number" min="1" value="${e.weeks||''}" placeholder="3">
+        <input class="admin-input exec-weeks-input" type="number" min="1" value="${e.weeks||''}" readonly>
       </div>
       <button class="admin-remove-btn" onclick="this.closest('.admin-exec-row').remove()" title="Remove">✕</button>
     `;
     rows.appendChild(div);
+  }
+
+  function computeExecStreaks(weekEntries) {
+    if (!Array.isArray(weekEntries) || !weekEntries.length) return [];
+    const sorted = [...weekEntries].sort((a,b) => new Date(a.savedAt||0) - new Date(b.savedAt||0));
+    const latest = sorted[sorted.length - 1];
+    const latestNames = Array.isArray(latest.top7) ? latest.top7 : [];
+    const execs = latestNames.map(name => {
+      let weeks = 0;
+      for (let i = sorted.length - 1; i >= 0; i--) {
+        const names = Array.isArray(sorted[i].top7) ? sorted[i].top7 : [];
+        if (names.includes(name)) weeks++;
+        else break;
+      }
+      return { name, weeks };
+    }).filter(e => e.weeks >= 2)
+      .sort((a,b) => (b.weeks||0) - (a.weeks||0));
+    return execs;
   }
 
   function saveSnuData() {
@@ -5769,16 +5933,18 @@ When answering:
       const prod = row.querySelector('.agent-prod-input')?.value.trim();
       if (name) agents.push({ name, production: prod ? Number(prod) : null });
     });
-    // Sort by production desc
     agents.sort((a, b) => (b.production || 0) - (a.production || 0));
-    // Collect exec rows
-    const execDivs = document.querySelectorAll('#adminExecRows .admin-exec-row');
-    const execs = [];
-    execDivs.forEach(row => {
-      const name  = row.querySelector('.exec-name-input')?.value.trim();
-      const weeks = parseInt(row.querySelector('.exec-weeks-input')?.value) || null;
-      if (name) execs.push({ name, weeks });
-    });
+
+    const top7 = agents.slice(0, 7).map(a => a.name);
+    const HISTORY_KEY = 'snu_exec_history_v1';
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) { history = []; }
+    const entry = { weekLabel, dateRange, top7, savedAt: new Date().toISOString() };
+    const existingIndex = history.findIndex(h => (h.weekLabel || '') === weekLabel && weekLabel);
+    if (existingIndex >= 0) history[existingIndex] = entry;
+    else history.push(entry);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    const execs = computeExecStreaks(history);
 
     const data = { weekLabel, dateRange, agents, execs, savedAt: new Date().toISOString() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -5787,7 +5953,6 @@ When answering:
     renderSnuLeaderboard(data);
     renderSnuExecs(data);
     closeAdmin();
-    // Show confirmation toast
     showSnuToast('✓ SNU data published!');
   }
 
@@ -5937,167 +6102,111 @@ When answering:
   </script>
 
 
-  <script id="snu-print-script">
+    <script id="snu-print-script">
   function openSnuPrint() {
-    // ── ALWAYS open the overlay first — never let a JS error block it ──
     const overlay = document.getElementById('snuPrintOverlay');
-    if (!overlay) { console.error('[SNU] snuPrintOverlay not found'); return; }
+    if (!overlay) return;
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    // ── Helper: safely set text on an element ──
-    const g  = id => document.getElementById(id);
+    const data = window._snuState?.data || {};
+    const article = window._snuState?.article || null;
+    const agents = Array.isArray(data.agents) ? data.agents : [];
+    const execs = Array.isArray(data.execs) ? data.execs : [];
+
+    const g = id => document.getElementById(id);
     const st = (id, val) => { const e = g(id); if (e) e.textContent = val; };
 
-    // ── Pull data from global state ──
-    const data    = window._snuState?.data    || {};
-    const article = window._snuState?.article || null;
-    const agents  = Array.isArray(data.agents) ? data.agents : [];
-    const execs   = Array.isArray(data.execs)  ? data.execs  : [];
-    console.log('[SNU Print] agents:', agents.length, 'execs:', execs.length, 'article:', !!article);
-
-    // ── Rotating cover + article images ──
-    const coverImgs = [
-      'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80&fit=crop',
-    ];
-    const articleImgs = [
-      'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=900&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80&fit=crop',
-    ];
-    const wk = (typeof getWeekNumber === 'function') ? getWeekNumber() : new Date().getMonth();
-    const coverImgEl = g('magCoverImg');   if (coverImgEl) coverImgEl.src = coverImgs[wk % coverImgs.length];
-    const artImgEl   = g('magArticleImg'); if (artImgEl)   artImgEl.src   = articleImgs[wk % articleImgs.length];
-
-    // ── Cover meta ──
-    const now     = new Date();
+    const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
-    st('magIssueLabel', data.weekLabel ? data.weekLabel.toUpperCase() : 'CURRENT ISSUE');
+    st('magIssueLabel', data.weekLabel || 'CURRENT ISSUE');
     st('magBrandRight', data.dateRange || dateStr);
-    st('magDateLabel',  data.dateRange || dateStr);
-    st('magAgentCount', agents.length || '0');
-    st('magExecCount',  execs.length  || '0');
+    st('magDateLabel', data.dateRange || dateStr);
+    st('magAgentCount', agents.length || 0);
+    st('magExecCount', execs.length || 0);
 
-    // ── Leaderboard ──
-    const rankClass = i => ['gold','silver','bronze','other'][Math.min(i, 3)];
-    const rankLabel = i => i < 3 ? ['🥇','🥈','🥉'][i] : String(i + 1);
+    const rankEmoji = i => ['🥇','🥈','🥉','4','5','6','7','8','9','10'][i] || String(i+1);
     const lbEl = g('magLbList');
     if (lbEl) {
-      lbEl.innerHTML = agents.length
-        ? agents.map((a, i) => `
-            <div class="mag-lb-row">
-              <div class="mag-rank ${rankClass(i)}">${rankLabel(i)}</div>
-              <div><div class="mag-agent-name">${pesc(a.name || '—')}</div></div>
-              <div class="mag-prod">${a.production ? '$' + Number(a.production).toLocaleString() : '—'}</div>
-            </div>`).join('')
-        : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:16px 0 8px;">No leaderboard data yet — enter producers in SNU Admin and Save &amp; Publish.</div>';
+      lbEl.innerHTML = agents.length ? agents.map((a,i) => `
+        <div class="mag-lb-row">
+          <div class="mag-rank other">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div><div class="mag-agent-name">${pesc(a.name || '—')}</div></div>
+          <div class="mag-prod">${a.production ? Number(a.production).toLocaleString() + ' pts' : '—'}</div>
+        </div>
+      `).join('') : '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:16px 0;">No leaderboard data yet.</div>';
     }
 
-    // ── Consecutive Executives ──
-    const execEmoji   = ['👑','⭐','🔥','💎','🏅','🎯','✨'];
-    const sortedExecs = [...execs].sort((a, b) => (b.weeks || 0) - (a.weeks || 0));
     const execEl = g('magExecList');
     if (execEl) {
-      execEl.innerHTML = sortedExecs.length
-        ? sortedExecs.map((e, i) => `
-            <div class="mag-exec-row">
-              <span class="mag-exec-emo">${execEmoji[i % execEmoji.length]}</span>
-              <span class="mag-exec-name">${pesc(e.name)}</span>
-              <span class="mag-exec-streak">${e.weeks || '?'}wk</span>
-            </div>`).join('')
-        : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:8px 0;">No consecutive executives entered yet.</div>';
+      execEl.innerHTML = execs.length ? execs.map(e => `
+        <div class="mag-exec-row">
+          <span class="mag-exec-name">${pesc(e.name || '—')}</span>
+          <span class="mag-exec-streak">${e.weeks || 0}wk</span>
+        </div>
+      `).join('') : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:8px 0;">No consecutive executives yet.</div>';
     }
 
-    // ── Agent Spotlight ──
-    const spotEl = g('magSpotlightSpread');
-    if (spotEl) {
-      let sp = null;
-      // Try window._jbRecord first (has photos injected from cloud)
-      if (window._jbRecord && window._jbRecord.snu_spotlight && window._jbRecord.snu_spotlight.name) {
-        sp = window._jbRecord.snu_spotlight;
-      } else {
-        try { sp = JSON.parse(localStorage.getItem('snu_spotlight_v1') || 'null'); } catch(e) {}
-      }
-      if (sp && sp.name) {
-        const stats = Array.isArray(sp.stats) ? sp.stats.filter(s => s.label && s.value) : [];
-        spotEl.innerHTML = `
-          <div style="display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:start;">
-            <div>
-              ${sp.photo
-                ? `<img src="${sp.photo}" alt="${pesc(sp.name)}" style="width:100%;height:260px;object-fit:cover;object-position:top center;border-radius:12px;display:block;">`
-                : `<div style="width:100%;height:260px;border-radius:12px;background:linear-gradient(135deg,#1e3a6e,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:64px;">⭐</div>`
-              }
-              ${sp.award ? `<div style="margin-top:10px;text-align:center;font-size:12px;font-weight:700;color:#f59e0b;letter-spacing:.06em;text-transform:uppercase;">${pesc(sp.award)}</div>` : ''}
-            </div>
-            <div>
-              <div style="font-size:22px;font-weight:800;color:#1e3a6e;margin-bottom:2px;">${pesc(sp.name)}</div>
-              ${sp.title ? `<div style="font-size:13px;color:#64748b;margin-bottom:14px;">${pesc(sp.title)}</div>` : ''}
-              ${stats.length ? `
-                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-                  ${stats.map(s => `
-                    <div style="background:#f1f5f9;border-radius:8px;padding:10px 16px;min-width:80px;text-align:center;">
-                      <div style="font-size:16px;font-weight:800;color:#1e3a6e;">${pesc(s.value)}</div>
-                      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">${pesc(s.label)}</div>
-                    </div>`).join('')}
-                </div>` : ''}
-              ${sp.bio  ? `<p style="font-size:13px;color:#334155;line-height:1.65;margin-bottom:12px;">${pesc(sp.bio)}</p>` : ''}
-              ${sp.quote ? `<blockquote style="border-left:3px solid #f59e0b;margin:0;padding:8px 14px;font-style:italic;font-size:13px;color:#475569;">"${pesc(sp.quote)}"</blockquote>` : ''}
-            </div>
-          </div>`;
-      } else {
-        spotEl.innerHTML = `<div style="color:#94a3b8;font-style:italic;font-size:13px;text-align:center;padding:24px 0;">No spotlight set — feature an agent via SNU Admin.</div>`;
-      }
-    }
-
-    // ── Article ──
-    const catEl = g('magArticleCat');
-    const hlEl  = g('magArticleHeadline');
-    const txEl  = g('magArticleText');
-    const pqEl  = g('magPullQuote');
-    if (article) {
-      const cat = article.category || 'industry';
-      if (catEl) { catEl.textContent = article.tag || cat; catEl.className = 'mag-article-cat ' + cat; }
-      if (hlEl)  hlEl.textContent = article.headline || '';
-      if (txEl)  txEl.innerHTML   = (article.body || []).map(p => `<p>${pesc(p)}</p>`).join('');
-      if (pqEl && article.body?.[0]) {
-        const sentence = article.body[0].split('.')[0];
-        if (sentence.length > 20) pqEl.textContent = sentence + '.';
-      }
-    } else {
-      if (hlEl) hlEl.textContent = 'This week\'s article is loading…';
-      if (txEl) txEl.innerHTML   = '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
-    }
+    const hl = g('magArticleHeadline');
+    const tx = g('magArticleText');
+    if (hl) hl.textContent = article?.headline || "This week's article is loading…";
+    if (tx) tx.innerHTML = article?.body?.length ? article.body.map(p => `<p>${pesc(p)}</p>`).join('') : '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
   }
 
   function triggerSnuPrint() {
-    const modal = document.getElementById('snuPrintModal');
-    if (!modal) { window.print(); return; }
+    // Hide the action bar, trigger browser print, then restore
+    const actions = document.querySelector('.snu-print-actions');
+    const overlay = document.getElementById('snuPrintOverlay');
+    if (actions) actions.style.display = 'none';
+    // Add print-specific styles temporarily
+    const printStyle = document.createElement('style');
+    printStyle.id = 'snuPrintStyle';
+    printStyle.textContent = `
+      @media print {
+        body > *:not(#snuPrintOverlay) { display: none !important; }
+        #snuPrintOverlay {
+          position: static !important;
+          opacity: 1 !important;
+          pointer-events: auto !important;
+          background: #fff !important;
+          backdrop-filter: none !important;
+          padding: 0 !important;
+          display: block !important;
+        }
+        .snu-print-actions { display: none !important; }
+        .snu-print-modal {
+          transform: none !important;
+          box-shadow: none !important;
+          width: 100% !important;
+          max-width: none !important;
+          border-radius: 0 !important;
+        }
+      }
+    `;
+    document.head.appendChild(printStyle);
+    window.print();
+    // Restore after print dialog closes
+    setTimeout(() => {
+      if (actions) actions.style.display = '';
+      const s = document.getElementById('snuPrintStyle');
+      if (s) s.remove();
+    }, 1000);
+  }
 
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
+  function closeSnuPrint() {
+    const overlay = document.getElementById('snuPrintOverlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
 
-    const doc = iframe.contentWindow.document;
-    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
-      .map(n => n.outerHTML).join('\n');
+  function handlePrintOverlayClick(e) {
+    if (e.target === document.getElementById('snuPrintOverlay')) closeSnuPrint();
+  }
 
-    doc.open();
-    doc.write(`<!DOCTYPE html><html><head><title>SNU Print</title>${styles}<style>
-      body{background:#fff !important;color:#111 !important;margin:0;padding:0;}
-      .snu-print-modal{transform:none !important;box-shadow:none !important;border:none !important;width:100% !important;max-width:none !important;}
-      .snu-print-actions{display:none !important;}
-      .snu-print-overlay{position:static !important;opacity:1 !important;pointer-events:auto !important;background:#fff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important;}
-    </style></head><body><div class="snu-print-overlay open">${modal.outerHTML}</div>
-  <script id="life-insurance-calc-script">
+  function pesc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
   function formatLifeCurrency(v) {
     return '$' + Number(v || 0).toLocaleString();
   }
@@ -6128,227 +6237,34 @@ When answering:
     const offsets = savings + existing;
     const total = Math.max(0, incomeNeed + homeNeed + debtNeed + familyNeed + finalNeed - offsets);
 
-    document.getElementById('lifeIncomeNeed').textContent = formatLifeCurrency(incomeNeed);
-    document.getElementById('lifeHomeNeed').textContent = formatLifeCurrency(homeNeed);
-    document.getElementById('lifeDebtNeed').textContent = formatLifeCurrency(debtNeed);
-    document.getElementById('lifeFamilyNeed').textContent = formatLifeCurrency(familyNeed);
-    document.getElementById('lifeFinalNeed').textContent = formatLifeCurrency(finalNeed);
-    document.getElementById('lifeOffsets').textContent = '-' + formatLifeCurrency(offsets).replace('$','');
-    document.getElementById('lifeTotalNeed').textContent = formatLifeCurrency(total);
+    const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+    set('lifeIncomeNeed', formatLifeCurrency(incomeNeed));
+    set('lifeHomeNeed', formatLifeCurrency(homeNeed));
+    set('lifeDebtNeed', formatLifeCurrency(debtNeed));
+    set('lifeFamilyNeed', formatLifeCurrency(familyNeed));
+    set('lifeFinalNeed', formatLifeCurrency(finalNeed));
+    set('lifeOffsets', '-' + formatLifeCurrency(offsets).replace('$',''));
+    set('lifeTotalNeed', formatLifeCurrency(total));
 
     const note = document.getElementById('lifeNotes')?.value?.trim();
     const summary = note
       ? `Based on the values entered, the estimated life insurance need is ${formatLifeCurrency(total)}. Review special risks noted: ${note}.`
       : `Based on the values entered, the estimated life insurance need is ${formatLifeCurrency(total)}. Adjust higher or lower based on health, business needs, special needs planning, and legacy goals.`;
-    document.getElementById('lifeResultSub').textContent = summary;
+    set('lifeResultSub', summary);
   }
 
   function resetLifeInsuranceCalc() {
     ['lifeIncome','lifeYears','lifeMortgage','lifeDebts','lifeFinal','lifeEmergency','lifeCollege','lifeWeddings','lifeProperties','lifeSavings','lifeExisting','lifeNotes']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    document.getElementById('lifeIncomeNeed').textContent = '$0';
-    document.getElementById('lifeHomeNeed').textContent = '$0';
-    document.getElementById('lifeDebtNeed').textContent = '$0';
-    document.getElementById('lifeFamilyNeed').textContent = '$0';
-    document.getElementById('lifeFinalNeed').textContent = '$0';
-    document.getElementById('lifeOffsets').textContent = '-$0';
-    document.getElementById('lifeTotalNeed').textContent = '$0';
-    document.getElementById('lifeResultSub').textContent = 'Enter values above and click Calculate Need.';
-  }
-
-  // ── VIDEO LIBRARY ─────────────────────────────────────────────────────────
-  const VIDEO_LIBRARY_KEY = 'snu_video_library_v1';
-  let _videoLibrary = [];
-  let _videoThumbBase64 = null;
-
-  function getVideoThumbFromUrl(url) {
-    const u = String(url || '').trim();
-    const yt = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
-    if (yt) return `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`;
-    return '';
-  }
-
-  function handleVideoThumb(file) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      _videoThumbBase64 = e.target.result;
-      const preview = document.getElementById('vidThumbPreview');
-      const placeholder = document.getElementById('vidThumbPlaceholder');
-      const zone = document.getElementById('vidThumbZone');
-      if (preview) { preview.src = _videoThumbBase64; preview.classList.add('visible'); }
-      if (placeholder) placeholder.style.display = 'none';
-      if (zone) zone.classList.add('has-photo');
-    };
-    reader.readAsDataURL(file);
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const zone = document.getElementById('vidThumbZone');
-    if (zone) {
-      zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
-      zone.addEventListener('dragleave', () => zone.style.borderColor = '');
-      zone.addEventListener('drop', e => {
-        e.preventDefault();
-        zone.style.borderColor = '';
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) handleVideoThumb(file);
-      });
-    }
-  });
-
-  function initVideoLibrary() {
-    try {
-      const raw = localStorage.getItem(VIDEO_LIBRARY_KEY);
-      _videoLibrary = raw ? JSON.parse(raw) : [];
-    } catch(e) { _videoLibrary = []; }
-    renderVideoLibrary();
-    refreshVideoAdminList();
-  }
-
-  function renderVideoLibrary() {
-    const grid = document.getElementById('video-library-grid');
-    const badge = document.getElementById('video-count');
-    if (!grid) return;
-    const items = [..._videoLibrary];
-    if (badge) badge.textContent = items.length + (items.length === 1 ? ' video' : ' videos');
-    if (!items.length) {
-      grid.innerHTML = '<div class="empty">No training videos yet. Add them from SNU Admin.</div>';
-      return;
-    }
-    grid.innerHTML = items.map((v, idx) => {
-      const thumb = v.thumb || getVideoThumbFromUrl(v.url);
-      return `
-        <div class="video-card">
-          <div class="video-thumb">
-            ${thumb ? `<img src="${xa(thumb)}" alt="${x(v.title || 'Training Video')}">` : '<div class="video-thumb-fallback">🎬</div>'}
-          </div>
-          <div class="video-body">
-            <span class="video-cat">${x(v.category || 'Training')}</span>
-            <div class="video-title">${x(v.title || 'Untitled Video')}</div>
-            <div class="video-desc">${x(v.description || 'No description provided.')}</div>
-            <div class="video-actions">
-              <a class="video-btn primary" href="${xa(v.url || '#')}" target="_blank" rel="noopener noreferrer">Watch Training ↗</a>
-            </div>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  function refreshVideoAdminList() {
-    const list = document.getElementById('adminVideoList');
-    const count = document.getElementById('videoAdminCount');
-    if (!list) return;
-    if (count) count.textContent = _videoLibrary.length ? `(${_videoLibrary.length})` : '';
-    if (!_videoLibrary.length) {
-      list.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>';
-      return;
-    }
-    list.innerHTML = _videoLibrary.map((v, idx) => `
-      <div class="video-admin-row">
-        <div class="video-admin-title">${x(v.title || 'Untitled Video')}</div>
-        <div class="video-admin-meta">${x(v.category || 'Training')} • ${x(v.url || '')}</div>
-        <div style="color:var(--muted-2);font-size:12px;line-height:1.6;margin-bottom:10px;">${x(v.description || 'No description provided.')}</div>
-        <div class="video-admin-actions">
-          <a class="video-admin-btn" href="${xa(v.url || '#')}" target="_blank" rel="noopener noreferrer">Open ↗</a>
-          <button class="video-admin-btn delete" onclick="deleteVideoItem(${idx})">Delete</button>
-        </div>
-      </div>`).join('');
-  }
-
-  function addVideoItem() {
-    const gv = id => document.getElementById(id)?.value?.trim() || '';
-    const title = gv('vidTitle');
-    const url = gv('vidUrl');
-    if (!title || !url) { showSnuToast('⚠ Enter a video title and URL.'); return; }
-
-    const item = {
-      id: Date.now(),
-      title,
-      description: gv('vidDesc'),
-      url,
-      category: gv('vidCategory') || 'Training',
-      thumb: _videoThumbBase64 || gv('vidThumbUrl') || getVideoThumbFromUrl(url) || ''
-    };
-
-    _videoLibrary.unshift(item);
-    try {
-      localStorage.setItem(VIDEO_LIBRARY_KEY, JSON.stringify(_videoLibrary));
-    } catch(e) {
-      item.thumb = gv('vidThumbUrl') || getVideoThumbFromUrl(url) || '';
-      localStorage.setItem(VIDEO_LIBRARY_KEY, JSON.stringify(_videoLibrary));
-      showSnuToast('⚠ Thumbnail too large — saved video without uploaded image.');
-    }
-
-    renderVideoLibrary();
-    refreshVideoAdminList();
-
-    ['vidTitle','vidDesc','vidUrl','vidThumbUrl'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    const cat = document.getElementById('vidCategory'); if (cat) cat.selectedIndex = 0;
-    _videoThumbBase64 = null;
-    const prev = document.getElementById('vidThumbPreview');
-    const ph = document.getElementById('vidThumbPlaceholder');
-    const zone = document.getElementById('vidThumbZone');
-    if (prev) { prev.src = ''; prev.classList.remove('visible'); }
-    if (ph) ph.style.display = '';
-    if (zone) zone.classList.remove('has-photo');
-
-    showSnuToast('✓ Video added to library!');
-  }
-
-  function deleteVideoItem(idx) {
-    _videoLibrary.splice(idx, 1);
-    localStorage.setItem(VIDEO_LIBRARY_KEY, JSON.stringify(_videoLibrary));
-    renderVideoLibrary();
-    refreshVideoAdminList();
-    showSnuToast('🗑 Video removed.');
-  }
-
-
-  </script>
-
-</body></html>`);
-    doc.close();
-
-    iframe.onload = function() {
-      setTimeout(() => {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        setTimeout(() => document.body.removeChild(iframe), 1000);
-      }, 250);
-    };
-  }
-
-  // Strip dark overlay styles before printing, restore after
-  window.addEventListener('beforeprint', function() {
-    var overlay = document.getElementById('snuPrintOverlay');
-    if (overlay) {
-      overlay.dataset.oldBg = overlay.style.background || '';
-      overlay.style.background = '#ffffff';
-      overlay.style.backdropFilter = 'none';
-      overlay.style.webkitBackdropFilter = 'none';
-    }
-  });
-  window.addEventListener('afterprint', function() {
-    var overlay = document.getElementById('snuPrintOverlay');
-    if (overlay) {
-      overlay.style.background = overlay.dataset.oldBg || '';
-      overlay.style.backdropFilter = '';
-      overlay.style.webkitBackdropFilter = '';
-    }
-  });
-
-  function closeSnuPrint() {
-    document.getElementById('snuPrintOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  function handlePrintOverlayClick(e) {
-    if (e.target === document.getElementById('snuPrintOverlay')) closeSnuPrint();
-  }
-
-  function pesc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+    set('lifeIncomeNeed','$0');
+    set('lifeHomeNeed','$0');
+    set('lifeDebtNeed','$0');
+    set('lifeFamilyNeed','$0');
+    set('lifeFinalNeed','$0');
+    set('lifeOffsets','-$0');
+    set('lifeTotalNeed','$0');
+    set('lifeResultSub','Enter values above and click Calculate Need.');
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSnuPrint(); });
@@ -6359,6 +6275,14 @@ When answering:
   const SPOTLIGHT_KEY = 'snu_spotlight_v1';
 
   // ── Tab switcher ──────────────────────────────────────────────────────────
+  function switchAtTab(panelId, btn) {
+    document.querySelectorAll('.at-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.at-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('active');
+  }
+
   function switchAdminTab(name, btn) {
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'));
@@ -6942,6 +6866,147 @@ When answering:
     showSnuToast('🗑 Update removed.');
   }
 
+  </script>
+
+
+  <script id="video-library-script">
+  // ── VIDEO LIBRARY ──────────────────────────────────────────────────────────
+  const VIDEO_KEY = 'snu_videos_v1';
+  let _videos = [];
+
+  // ── Parse any YouTube/Vimeo URL into an embed URL ─────────────────────────
+  function parseVideoEmbed(url) {
+    url = url.trim();
+    // YouTube standard, shortened, shorts
+    let m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (m) return 'https://www.youtube.com/embed/' + m[1] + '?rel=0&modestbranding=1';
+    // Vimeo
+    m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (m) return 'https://player.vimeo.com/video/' + m[1];
+    return null;
+  }
+
+  // ── Load from localStorage ─────────────────────────────────────────────────
+  function initVideos() {
+    try {
+      const raw = localStorage.getItem(VIDEO_KEY);
+      _videos = raw ? JSON.parse(raw) : [];
+    } catch(e) { _videos = []; }
+    renderVideoGrid();
+    refreshAdminVideosList();
+  }
+
+  // ── Render the public video grid ───────────────────────────────────────────
+  function renderVideoGrid() {
+    const grid  = document.getElementById('videoGrid');
+    const count = document.getElementById('videoCount');
+    if (!grid) return;
+    if (count) count.textContent = _videos.length + ' video' + (_videos.length !== 1 ? 's' : '');
+    if (!_videos.length) {
+      grid.innerHTML = '<div class="video-empty"><div class="video-empty-icon">🎬</div><div>No videos yet — admin can add training videos below.</div></div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const xa   = s => String(s||'').replace(/"/g,'&quot;');
+    grid.innerHTML = _videos.map((v, i) => {
+      const embedUrl = parseVideoEmbed(v.url || '');
+      const thumb = embedUrl
+        ? `<div class="video-thumb"><iframe src="${xa(embedUrl)}" allowfullscreen loading="lazy" title="${xa(v.title||'')}"></iframe></div>`
+        : `<div class="video-thumb"><div class="video-thumb-placeholder" onclick="alert('Invalid video URL')">
+            <div class="video-play-icon">▶</div>
+            <div class="video-play-label">Video unavailable</div>
+           </div></div>`;
+      return `
+        <div class="video-card">
+          ${thumb}
+          <div class="video-info">
+            <span class="video-category">${pesc(v.category || 'Training')}</span>
+            <div class="video-title">${pesc(v.title || 'Untitled')}</div>
+            ${v.desc ? `<div class="video-desc">${pesc(v.desc)}</div>` : ''}
+            <div class="video-meta">
+              ${v.duration ? `<span>⏱ ${pesc(v.duration)}</span>` : ''}
+              ${v.added ? `<span>📅 ${pesc(v.added)}</span>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Refresh admin list ─────────────────────────────────────────────────────
+  function refreshAdminVideosList() {
+    const el    = document.getElementById('adminVideosList');
+    const count = document.getElementById('vidAdminCount');
+    if (!el) return;
+    if (count) count.textContent = '(' + _videos.length + ')';
+    if (!_videos.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No videos yet.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = [..._videos].map((v, i) => `
+      <div class="admin-video-item">
+        <div>
+          <div class="admin-video-title">${pesc(v.title || 'Untitled')}</div>
+          <div class="admin-video-url">${pesc(v.url || '')}</div>
+          <div style="font-size:11px;color:var(--muted-2);margin-top:3px;">
+            <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;color:var(--accent-2);text-transform:uppercase;letter-spacing:.5px;">${pesc(v.category||'Training')}</span>
+            ${v.duration ? `<span style="margin-left:8px;">⏱ ${pesc(v.duration)}</span>` : ''}
+          </div>
+        </div>
+        <button class="admin-video-del" onclick="deleteVideo(${i})">🗑 Delete</button>
+      </div>`).join('');
+  }
+
+  // ── Add a video ────────────────────────────────────────────────────────────
+  function addVideo() {
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const title = gv('vidTitle');
+    const url   = gv('vidUrl');
+    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
+    if (!url)   { showSnuToast('⚠ Please enter a video URL.'); return; }
+    if (!parseVideoEmbed(url)) { showSnuToast('⚠ URL must be a valid YouTube or Vimeo link.'); return; }
+
+    const video = {
+      id:       Date.now(),
+      title,
+      url,
+      category: gv('vidCategory') || 'General Training',
+      duration: gv('vidDuration'),
+      desc:     gv('vidDesc'),
+      added:    new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
+    };
+
+    _videos.unshift(video);
+    try {
+      localStorage.setItem(VIDEO_KEY, JSON.stringify(_videos));
+      if (typeof jbSave === 'function') jbSave('snu_videos', _videos);
+    } catch(e) { showSnuToast('⚠ Storage error — video may not persist.'); }
+
+    renderVideoGrid();
+    refreshAdminVideosList();
+
+    // Reset fields
+    ['vidTitle','vidUrl','vidDuration','vidDesc'].forEach(id => {
+      const e = document.getElementById(id); if (e) e.value = '';
+    });
+    const cat = document.getElementById('vidCategory');
+    if (cat) cat.selectedIndex = 0;
+
+    showSnuToast('✓ Video added to library!');
+  }
+
+  // ── Delete a video ─────────────────────────────────────────────────────────
+  function deleteVideo(idx) {
+    _videos.splice(idx, 1);
+    localStorage.setItem(VIDEO_KEY, JSON.stringify(_videos));
+    if (typeof jbSave === 'function') jbSave('snu_videos', _videos);
+    renderVideoGrid();
+    refreshAdminVideosList();
+    showSnuToast('🗑 Video removed.');
+  }
+
+  // ── Init on DOMContentLoaded ──────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', initVideos);
   </script>
 
 </body>
