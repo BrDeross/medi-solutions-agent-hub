@@ -4424,7 +4424,7 @@
         <div class="mag-cover">
           <img class="mag-cover-img" id="magCoverImg"
             src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80&fit=crop"
-            alt="Cover" loading="eager" crossorigin="anonymous">
+            alt="Cover" loading="eager">
           <div class="mag-cover-gradient"></div>
           <div class="mag-cover-gradient-left"></div>
 
@@ -6325,17 +6325,24 @@ When answering:
   function triggerSnuPrint() {
     const overlay = document.getElementById('snuPrintOverlay');
     if (!overlay) return;
-    // Temporarily make the overlay static so @media print can target it as body > *
-    overlay.style.position = 'static';
-    overlay.style.overflow = 'visible';
-    overlay.style.padding = '0';
-    window.print();
-    // Restore after the print dialog closes
-    setTimeout(function() {
+
+    function restoreOverlay() {
       overlay.style.position = '';
       overlay.style.overflow = '';
       overlay.style.padding = '';
-    }, 500);
+      window.removeEventListener('afterprint', restoreOverlay);
+    }
+
+    // afterprint fires after the print dialog closes (or is cancelled)
+    window.addEventListener('afterprint', restoreOverlay);
+
+    // Make overlay static so @media print treats it as a normal block element
+    overlay.style.position = 'static';
+    overlay.style.overflow = 'visible';
+    overlay.style.padding = '0';
+
+    // Small delay lets the browser repaint with the new position before printing
+    setTimeout(function() { window.print(); }, 150);
   }
 
   function closeSnuPrint() {
