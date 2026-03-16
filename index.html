@@ -3541,6 +3541,51 @@
         position: static !important;
       }
     }
+
+    /* ── LIFE CALC MODAL ── */
+    .life-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 40px 16px 60px;
+      overflow-y: auto;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    .life-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .life-modal-box {
+      background: linear-gradient(160deg, #1e3d72 0%, #1a3060 100%);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-xl);
+      width: min(980px, 100%);
+      box-shadow: 0 40px 100px rgba(0,0,0,.8);
+      overflow: hidden;
+      transform: translateY(24px) scale(.97);
+      transition: transform .35s cubic-bezier(.22,1,.36,1);
+    }
+    .life-modal-overlay.open .life-modal-box { transform: translateY(0) scale(1); }
+    .life-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border-2);
+      background: rgba(0,0,0,.2);
+    }
+    .life-modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .life-modal-close {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      color: #fff; width: 34px; height: 34px; border-radius: 50%;
+      cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .life-modal-close:hover { background: rgba(255,255,255,.2); }
+    .life-modal-body { padding: 28px; }
   </style>
 </head>
 <body>
@@ -3717,14 +3762,14 @@
             <p>Create bundled coverage scenarios and review option groupings for clients.</p>
             <span class="card-tag">Quoting</span>
           </a>
-          <a class="card" data-color="rose" href="#agent-tools" onclick="document.getElementById('agent-tools').scrollIntoView({behavior:'smooth'});return false;">
+          <div class="card" data-color="rose" style="cursor:pointer;" onclick="openLifeCalcModal()">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">❤️</div>
             <h3>Life Insurance Calculator</h3>
             <p>Estimate coverage needs for debts, income replacement, children, weddings, properties, and final expenses.</p>
             <span class="card-tag">Protection</span>
-          </a>
+          </div>
         </div>
 
       </div>
@@ -6242,10 +6287,47 @@ When answering:
   }
 
   function triggerSnuPrint() {
-    // The @media print CSS in the stylesheet already handles layout:
-    // it hides everything except #snuPrintOverlay and makes it white.
-    // Just call window.print() directly — no popup needed.
-    window.print();
+    const modal = document.getElementById('snuPrintModal');
+    if (!modal) return;
+
+    // Collect page styles
+    const styles = Array.from(document.querySelectorAll('style'))
+      .map(s => s.textContent).join('\n');
+
+    // Build a clean print document in a hidden iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head>
+      <meta charset="UTF-8">
+      <title>SNU — Show N Up</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+      <style>
+        ${styles}
+        @page { margin: 0.4in; }
+        body { background: #f0f4f8 !important; margin: 0; padding: 0; }
+        .snu-print-overlay { position: static !important; display: block !important;
+          background: transparent !important; backdrop-filter: none !important;
+          padding: 0 !important; opacity: 1 !important; pointer-events: auto !important; }
+        .snu-print-modal { transform: none !important; box-shadow: none !important;
+          width: 100% !important; max-width: 100% !important; border-radius: 0 !important;
+          overflow: visible !important; max-height: none !important; }
+        .snu-print-actions { display: none !important; }
+      </style>
+    </head><body>
+      <div class="snu-print-overlay open">${modal.outerHTML}</div>
+    </body></html>`);
+    doc.close();
+
+    iframe.onload = function() {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => document.body.removeChild(iframe), 2000);
+    };
   }
 
   function closeSnuPrint() {
@@ -6280,6 +6362,15 @@ When answering:
     if (panel) panel.classList.add('active');
     // Refresh print panel when switched to
     if (panelId === 'lifePrintPanel') refreshLifePrintPanel();
+  }
+
+  function openLifeCalcModal() {
+    const overlay = document.getElementById('lifeCalcOverlay');
+    if (overlay) { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  }
+  function closeLifeCalcModal() {
+    const overlay = document.getElementById('lifeCalcOverlay');
+    if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
   }
 
   function calculateLifeInsurance() {
@@ -6377,8 +6468,7 @@ When answering:
       `Best regards,`,
       `[Your Name]`,
       `Medi Solutions`,
-    ].filter(l => l !== null).join('
-');
+    ].filter(l => l !== null).join('\n');
 
     const prev = document.getElementById('lifeEmailPreview');
     if (prev) prev.textContent = emailBody;
@@ -6452,7 +6542,7 @@ ${target.outerHTML}
     if (calcTab) switchLifeTab('lifeCalcPanel', calcTab);
   }
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSnuPrint(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSnuPrint(); closeLifeCalcModal(); } });
   </script>
 
 
@@ -7193,6 +7283,67 @@ ${target.outerHTML}
   // ── Init on DOMContentLoaded ──────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', initVideos);
   </script>
+
+
+  <!-- LIFE INSURANCE CALCULATOR MODAL -->
+  <div class="life-modal-overlay" id="lifeCalcOverlay" onclick="if(event.target===this)closeLifeCalcModal()">
+    <div class="life-modal-box">
+      <div class="life-modal-header">
+        <div class="life-modal-title">❤️ Life Insurance Calculator</div>
+        <button class="life-modal-close" onclick="closeLifeCalcModal()">✕</button>
+      </div>
+      <div class="life-modal-body">
+        <div class="life-calc-shell">
+          <div class="life-calc-grid">
+            <div class="life-calc-card">
+              <div class="life-calc-title">Family Income &amp; Core Obligations</div>
+              <div class="life-calc-form">
+                <div class="life-field"><label>Annual Household Income to Replace</label><input id="lifeIncome" type="number" min="0" step="1000" placeholder="90000"></div>
+                <div class="life-field"><label>Years of Income Replacement</label><input id="lifeYears" type="number" min="0" step="1" placeholder="10"></div>
+                <div class="life-field"><label>Mortgage / Property Payoff</label><input id="lifeMortgage" type="number" min="0" step="1000" placeholder="250000"></div>
+                <div class="life-field"><label>Other Debts / Risks</label><input id="lifeDebts" type="number" min="0" step="1000" placeholder="40000"></div>
+                <div class="life-field"><label>Final Expenses</label><input id="lifeFinal" type="number" min="0" step="1000" placeholder="20000"></div>
+                <div class="life-field"><label>Emergency Reserve Desired</label><input id="lifeEmergency" type="number" min="0" step="1000" placeholder="25000"></div>
+              </div>
+            </div>
+            <div class="life-calc-card">
+              <div class="life-calc-title">Children, Milestones &amp; Existing Assets</div>
+              <div class="life-calc-form">
+                <div class="life-field"><label>College Fund Need</label><input id="lifeCollege" type="number" min="0" step="1000" placeholder="100000"></div>
+                <div class="life-field"><label>Wedding / Future Family Milestones</label><input id="lifeWeddings" type="number" min="0" step="1000" placeholder="30000"></div>
+                <div class="life-field"><label>Other Property / Legacy Needs</label><input id="lifeProperties" type="number" min="0" step="1000" placeholder="50000"></div>
+                <div class="life-field"><label>Current Savings / Investments Available</label><input id="lifeSavings" type="number" min="0" step="1000" placeholder="35000"></div>
+                <div class="life-field"><label>Existing Life Insurance Coverage</label><input id="lifeExisting" type="number" min="0" step="1000" placeholder="100000"></div>
+                <div class="life-field"><label>Notes / Special Risks</label><input id="lifeNotes" type="text" placeholder="Special needs child, business buyout, etc."></div>
+              </div>
+              <div class="life-calc-actions">
+                <button class="life-calc-btn" type="button" onclick="calculateLifeInsurance()">Calculate Need</button>
+                <button class="life-calc-btn ghost" type="button" onclick="resetLifeInsuranceCalc()">Reset</button>
+              </div>
+            </div>
+          </div>
+          <div class="life-calc-results" id="lifeCalcResults">
+            <div class="life-calc-result-card">
+              <div class="life-result-label">Recommended Coverage Need</div>
+              <div class="life-result-value" id="lifeTotalNeed">$0</div>
+              <div class="life-result-sub" id="lifeResultSub">Enter values above and click Calculate Need.</div>
+            </div>
+            <div class="life-calc-breakdown">
+              <div class="life-break-row"><span>Income replacement</span><strong id="lifeIncomeNeed">$0</strong></div>
+              <div class="life-break-row"><span>Mortgage / properties</span><strong id="lifeHomeNeed">$0</strong></div>
+              <div class="life-break-row"><span>Debts / risk cleanup</span><strong id="lifeDebtNeed">$0</strong></div>
+              <div class="life-break-row"><span>College / weddings / milestones</span><strong id="lifeFamilyNeed">$0</strong></div>
+              <div class="life-break-row"><span>Final expenses + emergency</span><strong id="lifeFinalNeed">$0</strong></div>
+              <div class="life-break-row deduct"><span>Less savings / existing coverage</span><strong id="lifeOffsets">-$0</strong></div>
+            </div>
+            <div class="life-calc-note">
+              This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation and adjust for business needs, special needs planning, legacy goals, or estate liquidity.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
