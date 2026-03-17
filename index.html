@@ -4662,7 +4662,7 @@ When answering:
   const JB_MAIN_BIN      = '69b2cd77aa77b81da9dbc6e6';
   const JB_PHOTO_BIN_KEY          = 'mymedi_jb_photo_bin_id';
   const JB_PHOTO_BIN_HARDCODED = '69b2da94c3097a1dd51cd2cf';
-  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
+  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_videos:[], snu_trip:{agents:[],meta:{}} };
 
   // ── Generic bin helpers ────────────────────────────────────────
   async function jbReadBin(id) {
@@ -4761,6 +4761,10 @@ When answering:
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
     if (Array.isArray(record.snu_updates) && record.snu_updates.length) localStorage.setItem('snu_updates_v1',  JSON.stringify(record.snu_updates));
     if (record.snu_trip?.agents?.length) localStorage.setItem('snu_trip_v1', JSON.stringify(record.snu_trip));
+    if (Array.isArray(record.snu_videos) && record.snu_videos.length) {
+      localStorage.setItem('snu_videos_v1', JSON.stringify(record.snu_videos));
+      if (typeof renderVideoLibrary === 'function') renderVideoLibrary();
+    }
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
@@ -4772,7 +4776,7 @@ When answering:
 
   // ── Save a field ──────────────────────────────────────────────
   window.jbSave = async function(field, value) {
-    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
+    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_videos:'snu_videos_v1', snu_trip:'snu_trip_v1' };
     if (lsMap[field]) { try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {} }
 
     // Save photos to photo bin
