@@ -2504,29 +2504,34 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      /* Hide everything on the page EXCEPT the SNU print overlay */
-      .bg-glow,
-      .page,
-      .life-modal-overlay,
-      .life-calc-overlay,
-      #lifeCalcOverlay {
+      /* Force white page — kills dark body/html background */
+      html, body {
+        background: #ffffff !important;
+        color: #1e293b !important;
+      }
+      /* Hide entire page chrome — only show the modal content */
+      body > .bg-glow,
+      body > .page,
+      body > #lifeCalcOverlay,
+      #snuPrintOverlay {
         display: none !important;
       }
-      /* The overlay is position:fixed — make it fill the page for print */
-      #snuPrintOverlay {
-        position: fixed !important;
-        inset: 0 !important;
+      /* When print is triggered, JS adds .printing class to body */
+      body.snu-printing > #snuPrintOverlay {
+        display: block !important;
+        position: static !important;
         width: 100% !important;
-        height: 100% !important;
-        overflow: visible !important;
-        background: #f0f4f8 !important;
+        height: auto !important;
+        background: #ffffff !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         padding: 0 !important;
-        display: flex !important;
-        align-items: flex-start !important;
-        justify-content: center !important;
-        z-index: 9999 !important;
+        overflow: visible !important;
+      }
+      body.snu-printing > .bg-glow,
+      body.snu-printing > .page,
+      body.snu-printing > #lifeCalcOverlay {
+        display: none !important;
       }
       .snu-print-modal {
         transform: none !important;
@@ -2536,7 +2541,7 @@
         max-width: 100% !important;
         max-height: none !important;
         overflow: visible !important;
-        background: #dde4ee !important;
+        background: #f0f4f8 !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
@@ -2563,8 +2568,8 @@
     .spotlight-section { padding: 80px 0 60px; }
 
     .spotlight-card {
-      background: linear-gradient(135deg, rgba(15,35,75,.92) 0%, rgba(25,55,105,.85) 100%);
-      border: 1px solid rgba(99,140,210,.3);
+      background: linear-gradient(135deg, #0c2044 0%, #152d5e 100%);
+      border: 1px solid rgba(99,140,210,.4);
       border-radius: 24px;
       overflow: hidden;
       display: grid;
@@ -2588,9 +2593,9 @@
     }
     .spotlight-photo {
       width: 100%; height: 100%;
-      object-fit: contain; object-position: center center;
+      object-fit: cover; object-position: center top;
       display: block;
-      filter: brightness(.9) saturate(1.05);
+      filter: brightness(.95) saturate(1.05);
       transition: transform 6s ease;
     }
     .spotlight-card:hover .spotlight-photo { transform: scale(1.01); }
@@ -2683,15 +2688,16 @@
       margin-bottom:2px;
     }
     .spotlight-stat-lbl {
-      font-size:10px;color:var(--muted-2);
-      text-transform:uppercase;letter-spacing:1px;font-weight:600;
+      font-size:10px;color:rgba(255,255,255,.55);
+      text-transform:uppercase;letter-spacing:1px;font-weight:700;
     }
 
     /* Bio */
     .spotlight-bio {
-      font-size:14px;line-height:1.8;color:var(--muted);
+      font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);
       margin-bottom:24px;
       flex:1;
+      font-weight:500;
     }
 
     /* Quote */
@@ -2701,7 +2707,7 @@
       background:rgba(251,191,36,.12);
       border-radius:0 8px 8px 0;
       font-size:14px;font-style:italic;
-      color:rgba(255,255,255,.7);line-height:1.6;
+      color:rgba(255,255,255,.88);line-height:1.6;font-weight:500;
       margin-bottom:24px;
     }
     .spotlight-quote::before{content:'"';color:var(--gold);font-size:22px;line-height:0;vertical-align:-.3em;margin-right:4px;}
@@ -6226,8 +6232,13 @@ When answering:
   }
 
   function triggerSnuPrint() {
-    // Overlay is a direct child of <body>, so @media print targets it correctly.
-    window.print();
+    document.body.classList.add('snu-printing');
+    function cleanup() {
+      document.body.classList.remove('snu-printing');
+      window.removeEventListener('afterprint', cleanup);
+    }
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(function() { window.print(); }, 80);
   }
 
   function closeSnuPrint() {
