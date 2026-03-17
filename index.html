@@ -2736,16 +2736,21 @@
       display:flex;gap:0;
       border-bottom:1px solid var(--border);
       background:rgba(0,0,0,.2);
+      overflow-x:auto;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
     }
+    .admin-tabs::-webkit-scrollbar { display:none; }
     .admin-tab {
-      padding:12px 20px;
-      font-size:12.5px;font-weight:700;
+      padding:10px 14px;
+      font-size:11.5px;font-weight:700;
       color:var(--muted-2);
       cursor:pointer;border:none;background:none;
       font-family:'Plus Jakarta Sans',sans-serif;
       border-bottom:2px solid transparent;
       transition:color .15s,border-color .15s;
       white-space:nowrap;
+      flex-shrink:0;
     }
     .admin-tab.active{color:#fff;border-bottom-color:var(--accent);}
     .admin-tab:hover:not(.active){color:var(--muted);}
@@ -6704,6 +6709,7 @@ ${target.outerHTML}
     document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('adminTab' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+    btn.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
   }
 
   // ── Photo upload handler ──────────────────────────────────────────────────
