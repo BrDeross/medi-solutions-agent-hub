@@ -1,0 +1,11 @@
+[
+  {
+    "id": "vid-001",
+    "title": "Your Video Title Here",
+    "category": "Training",
+    "desc": "Short description of the video.",
+    "url": "https://www.youtube.com/watch?v=YOUR_ID_HERE",
+    "duration": "5:00",
+    "added": "Mar 17, 2026"
+  }
+]
