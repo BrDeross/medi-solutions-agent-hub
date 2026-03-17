@@ -2504,45 +2504,46 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      /* Redefine dark CSS vars to print-safe values */
-      :root {
-        --ink: #f0f4f8 !important;
-        --text: #1e293b !important;
-        --muted: #475569 !important;
-        --muted-2: #64748b !important;
-        --border: rgba(0,0,0,.12) !important;
-        --border-2: rgba(0,0,0,.1) !important;
-        --accent: #2563eb !important;
-        --gold: #b45309 !important;
+      /* Hide everything on the page EXCEPT the SNU print overlay */
+      .bg-glow,
+      .page,
+      .life-modal-overlay,
+      .life-calc-overlay,
+      #lifeCalcOverlay {
+        display: none !important;
       }
-      html, body { background: #f0f4f8 !important; margin: 0 !important; }
-      /* Hide everything except the overlay */
-      body > * { display: none !important; }
-      body > #snuPrintOverlay {
-        display: block !important;
-        position: static !important;
-        inset: auto !important;
-        width: 100% !important; height: auto !important;
-        background: transparent !important;
-        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
-        opacity: 1 !important; padding: 0 !important;
-        overflow: visible !important; z-index: auto !important;
+      /* The overlay is position:fixed — make it fill the page for print */
+      #snuPrintOverlay {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: visible !important;
+        background: #f0f4f8 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        z-index: 9999 !important;
       }
       .snu-print-modal {
-        transform: none !important; border-radius: 0 !important;
-        box-shadow: none !important; width: 100% !important;
-        max-width: 100% !important; max-height: none !important;
-        overflow: visible !important; background: #f0f4f8 !important;
-        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: #dde4ee !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
       }
       .snu-print-actions { display: none !important; }
       .mag-cover { height: 300px !important; overflow: hidden !important; }
       .mag-cover-img { transform: none !important; }
       .mag-article-img { transform: none !important; }
-      /* Ensure text is visible */
-      .mag-snu-title, .mag-cover-content * { color: #fff !important; }
-      .mag-body, .mag-body * { color: #1e293b !important; }
-      .mag-lb-row, .mag-exec-row { color: #1e293b !important; }
     }
 
     @media (max-width: 680px) {
@@ -2562,8 +2563,8 @@
     .spotlight-section { padding: 80px 0 60px; }
 
     .spotlight-card {
-      background: linear-gradient(135deg, rgba(30,61,114,.7) 0%, rgba(42,79,136,.5) 100%);
-      border: 1px solid var(--border-2);
+      background: linear-gradient(135deg, rgba(15,35,75,.92) 0%, rgba(25,55,105,.85) 100%);
+      border: 1px solid rgba(99,140,210,.3);
       border-radius: 24px;
       overflow: hidden;
       display: grid;
@@ -2582,7 +2583,7 @@
     .spotlight-photo-col {
       position: relative;
       overflow: hidden;
-      background: linear-gradient(160deg,#162847,#0d1826);
+      background: linear-gradient(160deg,#0d1e38,#08121e);
       display: flex; align-items: flex-end;
     }
     .spotlight-photo {
@@ -2666,8 +2667,8 @@
     /* Stats row */
     .spotlight-stats {
       display:flex;gap:0;
-      background:rgba(0,0,0,.25);
-      border:1px solid var(--border);
+      background:rgba(0,0,0,.4);
+      border:1px solid rgba(0,0,0,.35);
       border-radius:12px;overflow:hidden;
       margin-bottom:24px;
     }
@@ -2697,7 +2698,7 @@
     .spotlight-quote {
       border-left:3px solid var(--gold);
       padding:12px 18px;
-      background:rgba(251,191,36,.06);
+      background:rgba(251,191,36,.12);
       border-radius:0 8px 8px 0;
       font-size:14px;font-style:italic;
       color:rgba(255,255,255,.7);line-height:1.6;
