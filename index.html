@@ -1587,8 +1587,8 @@
 
     /* ── LEFT: Leaderboard ── */
     .snu-lb-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: #eef2f7;
+      border: 1px solid #d4dce8;
       border-radius: var(--r-xl);
       overflow: hidden;
     }
@@ -1630,7 +1630,7 @@
       padding: 10px 24px;
       transition: background .15s;
       border-bottom: 1px solid #e2e8f0;
-      background: #fff;
+      background: #f5f8fc;
     }
     .snu-lb-row:last-child { border-bottom: none; }
     .snu-lb-row:hover { background: #f1f5f9; }
@@ -2016,8 +2016,8 @@
 
     /* ── CONSECUTIVE EXECUTIVES ── */
     .snu-exec-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: #eef2f7;
+      border: 1px solid #d4dce8;
       border-radius: var(--r-xl);
       overflow: hidden;
     }
@@ -2051,8 +2051,8 @@
     }
 
     .snu-exec-chip {
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
+      background: #e8edf5;
+      border: 1px solid #d0d9e8;
       border-radius: 12px;
       padding: 14px 16px;
       display: flex;
@@ -2081,12 +2081,12 @@
     .snu-exec-name {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px; font-weight: 700;
-      color: #fff;
+      color: #1e3a5f;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
     .snu-exec-streak {
-      font-size: 11px; color: #a78bfa;
+      font-size: 11px; color: #4a6fa5;
       font-weight: 600; margin-top: 2px;
       display: flex; align-items: center; gap: 4px;
     }
@@ -2138,7 +2138,7 @@
 
     .snu-print-modal {
       width: min(980px, 100%);
-      background: #f0f4f8;
+      background: #dde4ee;
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 50px 120px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.07);
@@ -2504,45 +2504,45 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      /* White body — kills the dark blue background */
-      html, body { background: #fff !important; }
-      /* Hide everything */
+      /* Redefine dark CSS vars to print-safe values */
+      :root {
+        --ink: #f0f4f8 !important;
+        --text: #1e293b !important;
+        --muted: #475569 !important;
+        --muted-2: #64748b !important;
+        --border: rgba(0,0,0,.12) !important;
+        --border-2: rgba(0,0,0,.1) !important;
+        --accent: #2563eb !important;
+        --gold: #b45309 !important;
+      }
+      html, body { background: #f0f4f8 !important; margin: 0 !important; }
+      /* Hide everything except the overlay */
       body > * { display: none !important; }
-      /* Show only the SNU overlay */
       body > #snuPrintOverlay {
         display: block !important;
         position: static !important;
-        top: auto !important; left: auto !important;
-        right: auto !important; bottom: auto !important;
         inset: auto !important;
-        width: 100% !important;
-        height: auto !important;
-        background: #fff !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        opacity: 1 !important;
-        padding: 0 !important;
-        overflow: visible !important;
-        z-index: auto !important;
+        width: 100% !important; height: auto !important;
+        background: transparent !important;
+        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+        opacity: 1 !important; padding: 0 !important;
+        overflow: visible !important; z-index: auto !important;
       }
       .snu-print-modal {
-        transform: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        max-height: none !important;
-        overflow: visible !important;
-        background: #f0f4f8 !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
+        transform: none !important; border-radius: 0 !important;
+        box-shadow: none !important; width: 100% !important;
+        max-width: 100% !important; max-height: none !important;
+        overflow: visible !important; background: #f0f4f8 !important;
+        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
       }
-      /* Hide buttons */
       .snu-print-actions { display: none !important; }
-      /* Fix image transforms */
       .mag-cover { height: 300px !important; overflow: hidden !important; }
-      .mag-cover-img { transform: none !important; position: absolute !important; }
+      .mag-cover-img { transform: none !important; }
       .mag-article-img { transform: none !important; }
+      /* Ensure text is visible */
+      .mag-snu-title, .mag-cover-content * { color: #fff !important; }
+      .mag-body, .mag-body * { color: #1e293b !important; }
+      .mag-lb-row, .mag-exec-row { color: #1e293b !important; }
     }
 
     @media (max-width: 680px) {
