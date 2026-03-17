@@ -7295,14 +7295,24 @@ ${target.outerHTML}
     return null;
   }
 
-  // ── Load from localStorage ─────────────────────────────────────────────────
+  // ── Load from videos.json (shared for all users) ──────────────────────────
   function initVideos() {
-    try {
-      const raw = localStorage.getItem(VIDEO_KEY);
-      _videos = raw ? JSON.parse(raw) : [];
-    } catch(e) { _videos = []; }
-    renderVideoGrid();
-    refreshAdminVideosList();
+    fetch('videos.json?v=' + Date.now())
+      .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
+      .then(data => {
+        _videos = Array.isArray(data) ? data : [];
+        renderVideoGrid();
+        refreshAdminVideosList();
+      })
+      .catch(() => {
+        // Fallback to localStorage if videos.json doesn't exist yet
+        try {
+          const raw = localStorage.getItem(VIDEO_KEY);
+          _videos = raw ? JSON.parse(raw) : [];
+        } catch(e) { _videos = []; }
+        renderVideoGrid();
+        refreshAdminVideosList();
+      });
   }
 
   // ── Render the public video grid ───────────────────────────────────────────
@@ -7386,10 +7396,11 @@ ${target.outerHTML}
     };
 
     _videos.unshift(video);
+
+    // Save to localStorage as a local draft; to publish for all users, update videos.json in GitHub
     try {
       localStorage.setItem(VIDEO_KEY, JSON.stringify(_videos));
-      if (typeof jbSave === 'function') jbSave('snu_videos', _videos);
-    } catch(e) { showSnuToast('⚠ Storage error — video may not persist.'); }
+    } catch(e) {}
 
     renderVideoGrid();
     refreshAdminVideosList();
@@ -7401,17 +7412,16 @@ ${target.outerHTML}
     const cat = document.getElementById('vidCategory');
     if (cat) cat.selectedIndex = 0;
 
-    showSnuToast('✓ Video added to library!');
+    showSnuToast('✓ Video added! Update videos.json in GitHub to publish for everyone.');
   }
 
   // ── Delete a video ─────────────────────────────────────────────────────────
   function deleteVideo(idx) {
     _videos.splice(idx, 1);
-    localStorage.setItem(VIDEO_KEY, JSON.stringify(_videos));
-    if (typeof jbSave === 'function') jbSave('snu_videos', _videos);
+    try { localStorage.setItem(VIDEO_KEY, JSON.stringify(_videos)); } catch(e) {}
     renderVideoGrid();
     refreshAdminVideosList();
-    showSnuToast('🗑 Video removed.');
+    showSnuToast('🗑 Video removed. Update videos.json in GitHub to apply for everyone.');
   }
 
   // ── Init on DOMContentLoaded ──────────────────────────────────────────────
