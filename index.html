@@ -3707,7 +3707,7 @@
       transition: width .8s cubic-bezier(.22,1,.36,1);
     }
     .trip-mini-bar-fill.q  { background: linear-gradient(90deg, #22c55e, #4ade80); }
-    .trip-mini-bar-fill.nq { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .trip-mini-bar-fill.nq { background: linear-gradient(90deg, #ef4444, #f87171); }
     .trip-mini-pct { font-size: 10px; color: var(--muted-2); text-align: right; }
     .trip-pts {
       font-family: 'JetBrains Mono', monospace;
@@ -3715,7 +3715,7 @@
       white-space: nowrap; text-align: right;
     }
     .trip-pts.q  { color: #22c55e; }
-    .trip-pts.nq { color: #7eb3f5; }
+    .trip-pts.nq { color: #ef4444; }
     .trip-empty {
       text-align: center; padding: 32px 0;
       color: var(--muted-2); font-style: italic; font-size: 13px;
@@ -4616,6 +4616,13 @@
               <input class="admin-input" id="tripGoalInput" type="number" min="1" step="1000"
                 placeholder="e.g. 50000"
                 value="">
+            </div>
+
+            <div class="admin-field" style="margin-bottom:12px;">
+              <label>Months Elapsed (1–18 of the trip period)</label>
+              <input class="admin-input" id="tripMonthsElapsed" type="number" min="1" max="18" step="1"
+                placeholder="e.g. 3" value="">
+              <div style="font-size:11px;color:var(--muted-2);margin-top:4px;">Used to calculate 1/18th pace. Green = on track, Red = behind pace.</div>
             </div>
 
             <div class="admin-field" style="margin-bottom:12px;">
@@ -7651,26 +7658,33 @@ ${target.outerHTML}
     if (goalPct) goalPct.textContent = teamPct + '% qualifying';
 
     const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+    const monthsElapsed = Math.min(18, Math.max(1, Number(_tripMeta.monthsElapsed) || 1));
     list.innerHTML = sorted.map((a, i) => {
       const prod = Number(a.production) || 0;
       const agentGoal = Number(a.goal) || goal;
-      const pct = Math.min(100, Math.round(prod / agentGoal * 100));
-      const isQ = prod >= agentGoal;
-      const cls = isQ ? 'q' : 'nq';
-      const rankCls = i < 3 && isQ ? 'top' : (isQ ? 'q' : 'nq');
-      const remaining = isQ ? '' : `${(agentGoal - prod).toLocaleString()} pts to go`;
+      const paceTarget = agentGoal * monthsElapsed / 18;
+      const fullPct = Math.min(100, Math.round(prod / agentGoal * 100));
+      const isOnTrack = prod >= paceTarget;
+      const isFullyQ = prod >= agentGoal;
+      // Green if on/ahead of pace, red if behind
+      const cls = isOnTrack ? 'q' : 'nq';
+      const rankCls = i < 3 && isFullyQ ? 'top' : (isOnTrack ? 'q' : 'nq');
+      const remaining = isFullyQ ? '' : `${(agentGoal - prod).toLocaleString()} pts to go`;
+      const paceLabel = isOnTrack
+        ? (isFullyQ ? '✅ Qualified!' : `✅ On pace (${monthsElapsed}/18 mo)`)
+        : `⚠️ ${(paceTarget - prod).toLocaleString()} pts behind pace`;
       return `
         <div class="trip-row">
           <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
           <div>
-            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
-            ${remaining ? `<div class="trip-agent-sub">${remaining}</div>` : '<div class="trip-agent-sub">✅ Qualified!</div>'}
+            <div class="trip-agent-name" style="color:${isOnTrack ? '#22c55e' : '#ef4444'}">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${paceLabel}</div>
           </div>
           <div class="trip-progress-col">
             <div class="trip-mini-bar">
-              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
+              <div class="trip-mini-bar-fill ${cls}" style="width:${fullPct}%"></div>
             </div>
-            <div class="trip-mini-pct">${pct}%</div>
+            <div class="trip-mini-pct">${fullPct}%</div>
           </div>
           <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
         </div>`;
@@ -7733,11 +7747,14 @@ ${target.outerHTML}
           preview.style.display = 'block';
           if (previewCount) previewCount.textContent = agents.length;
           const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
+          const monthsElapsed = Math.min(18, Math.max(1, Number(document.getElementById('tripMonthsElapsed')?.value) || 1));
           previewRows.innerHTML = agents.map(a => {
-            const isQ = a.production >= (a.goal || goal);
+            const agentGoal = Number(a.goal) || goal;
+            const paceTarget = agentGoal * monthsElapsed / 18;
+            const isOnTrack = a.production >= paceTarget;
             return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
-              <span style="color:${isQ?'#22c55e':'#e2e8f0'}">${pesc(a.name)}</span>
-              <span style="color:${isQ?'#22c55e':'#7eb3f5'};font-family:'JetBrains Mono',monospace;">${Number(a.production).toLocaleString()} pts ${isQ?'✅':''}</span>
+              <span style="color:${isOnTrack?'#22c55e':'#ef4444'}">${pesc(a.name)}</span>
+              <span style="color:${isOnTrack?'#22c55e':'#ef4444'};font-family:'JetBrains Mono',monospace;">${Number(a.production).toLocaleString()} pts ${isOnTrack?'✅':'🔴'}</span>
             </div>`;
           }).join('');
         }
@@ -7751,7 +7768,8 @@ ${target.outerHTML}
     if (!_tripAgents.length) { alert('No data to save. Upload a CSV first.'); return; }
     const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
     const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || '';
-    _tripMeta = { qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
+    const monthsElapsed = Math.min(18, Math.max(1, Number(document.getElementById('tripMonthsElapsed')?.value) || 1));
+    _tripMeta = { qualifyingGoal: goal, monthLabel, monthsElapsed, updatedAt: new Date().toISOString() };
     const data = { agents: _tripAgents, meta: _tripMeta };
     localStorage.setItem(TRIP_KEY, JSON.stringify(data));
     renderTripTracker();
@@ -7793,6 +7811,8 @@ ${target.outerHTML}
     // Pre-fill goal input if stored
     const goalInp = document.getElementById('tripGoalInput');
     if (goalInp && _tripMeta.qualifyingGoal) goalInp.value = _tripMeta.qualifyingGoal;
+    const moInp = document.getElementById('tripMonthsElapsed');
+    if (moInp && _tripMeta.monthsElapsed) moInp.value = _tripMeta.monthsElapsed;
   });
   </script>
 
