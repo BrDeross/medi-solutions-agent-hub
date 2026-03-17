@@ -7279,40 +7279,54 @@ ${target.outerHTML}
 
 
   <script id="video-library-script">
-  // ── VIDEO LIBRARY ──────────────────────────────────────────────────────────
-  const VIDEO_KEY = 'snu_videos_v1';
+  // ── VIDEO LIBRARY (JSONBin backend) ────────────────────────────────────────
+  const JB_BIN_ID  = '69b9b61fc3097a1dd53415fb';
+  const JB_API_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
+  const JB_URL     = 'https://api.jsonbin.io/v3/b/' + JB_BIN_ID;
   let _videos = [];
+  let _videosSaving = false;
 
   // ── Parse any YouTube/Vimeo URL into an embed URL ─────────────────────────
   function parseVideoEmbed(url) {
     url = url.trim();
-    // YouTube standard, shortened, shorts
     let m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
     if (m) return 'https://www.youtube.com/embed/' + m[1] + '?rel=0&modestbranding=1';
-    // Vimeo
     m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
     if (m) return 'https://player.vimeo.com/video/' + m[1];
     return null;
   }
 
-  // ── Load from videos.json (shared for all users) ──────────────────────────
+  // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initVideos() {
-    fetch('videos.json?v=' + Date.now())
-      .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
-      .then(data => {
-        _videos = Array.isArray(data) ? data : [];
-        renderVideoGrid();
-        refreshAdminVideosList();
-      })
-      .catch(() => {
-        // Fallback to localStorage if videos.json doesn't exist yet
-        try {
-          const raw = localStorage.getItem(VIDEO_KEY);
-          _videos = raw ? JSON.parse(raw) : [];
-        } catch(e) { _videos = []; }
-        renderVideoGrid();
-        refreshAdminVideosList();
-      });
+    fetch(JB_URL + '/latest', {
+      headers: { 'X-Access-Key': JB_API_KEY }
+    })
+    .then(r => r.json())
+    .then(data => {
+      const raw = data.record;
+      _videos = Array.isArray(raw) ? raw.filter(v => v && v.id !== 'init') : [];
+      renderVideoGrid();
+      refreshAdminVideosList();
+    })
+    .catch(() => {
+      _videos = [];
+      renderVideoGrid();
+      refreshAdminVideosList();
+    });
+  }
+
+  // ── Save to JSONBin ────────────────────────────────────────────────────────
+  function saveVideos(onSuccess) {
+    if (_videosSaving) return;
+    _videosSaving = true;
+    fetch(JB_URL, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Access-Key': JB_API_KEY },
+      body:    JSON.stringify(_videos)
+    })
+    .then(r => r.json())
+    .then(() => { _videosSaving = false; if (onSuccess) onSuccess(); })
+    .catch(() => { _videosSaving = false; showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
   }
 
   // ── Render the public video grid ───────────────────────────────────────────
@@ -7322,17 +7336,17 @@ ${target.outerHTML}
     if (!grid) return;
     if (count) count.textContent = _videos.length + ' video' + (_videos.length !== 1 ? 's' : '');
     if (!_videos.length) {
-      grid.innerHTML = '<div class="video-empty"><div class="video-empty-icon">🎬</div><div>No videos yet — admin can add training videos below.</div></div>';
+      grid.innerHTML = '<div class="video-empty"><div class="video-empty-icon">\ud83c\udfac</div><div>No videos yet \u2014 admin can add training videos below.</div></div>';
       return;
     }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const xa   = s => String(s||'').replace(/"/g,'&quot;');
+    const xa   = s => String(s||'').replace(/\"/g,'&quot;');
     grid.innerHTML = _videos.map((v, i) => {
       const embedUrl = parseVideoEmbed(v.url || '');
       const thumb = embedUrl
         ? `<div class="video-thumb"><iframe src="${xa(embedUrl)}" allowfullscreen loading="lazy" title="${xa(v.title||'')}"></iframe></div>`
         : `<div class="video-thumb"><div class="video-thumb-placeholder" onclick="alert('Invalid video URL')">
-            <div class="video-play-icon">▶</div>
+            <div class="video-play-icon">\u25b6</div>
             <div class="video-play-label">Video unavailable</div>
            </div></div>`;
       return `
@@ -7343,8 +7357,8 @@ ${target.outerHTML}
             <div class="video-title">${pesc(v.title || 'Untitled')}</div>
             ${v.desc ? `<div class="video-desc">${pesc(v.desc)}</div>` : ''}
             <div class="video-meta">
-              ${v.duration ? `<span>⏱ ${pesc(v.duration)}</span>` : ''}
-              ${v.added ? `<span>📅 ${pesc(v.added)}</span>` : ''}
+              ${v.duration ? `<span>\u23f1 ${pesc(v.duration)}</span>` : ''}
+              ${v.added ? `<span>\ud83d\udcc5 ${pesc(v.added)}</span>` : ''}
             </div>
           </div>
         </div>`;
@@ -7369,10 +7383,10 @@ ${target.outerHTML}
           <div class="admin-video-url">${pesc(v.url || '')}</div>
           <div style="font-size:11px;color:var(--muted-2);margin-top:3px;">
             <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;color:var(--accent-2);text-transform:uppercase;letter-spacing:.5px;">${pesc(v.category||'Training')}</span>
-            ${v.duration ? `<span style="margin-left:8px;">⏱ ${pesc(v.duration)}</span>` : ''}
+            ${v.duration ? `<span style="margin-left:8px;">\u23f1 ${pesc(v.duration)}</span>` : ''}
           </div>
         </div>
-        <button class="admin-video-del" onclick="deleteVideo(${i})">🗑 Delete</button>
+        <button class="admin-video-del" onclick="deleteVideo(${i})">\ud83d\uddd1 Delete</button>
       </div>`).join('');
   }
 
@@ -7381,9 +7395,9 @@ ${target.outerHTML}
     const gv = id => document.getElementById(id)?.value?.trim() || '';
     const title = gv('vidTitle');
     const url   = gv('vidUrl');
-    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
-    if (!url)   { showSnuToast('⚠ Please enter a video URL.'); return; }
-    if (!parseVideoEmbed(url)) { showSnuToast('⚠ URL must be a valid YouTube or Vimeo link.'); return; }
+    if (!title) { showSnuToast('\u26a0 Please enter a title.'); return; }
+    if (!url)   { showSnuToast('\u26a0 Please enter a video URL.'); return; }
+    if (!parseVideoEmbed(url)) { showSnuToast('\u26a0 URL must be a valid YouTube or Vimeo link.'); return; }
 
     const video = {
       id:       Date.now(),
@@ -7396,32 +7410,26 @@ ${target.outerHTML}
     };
 
     _videos.unshift(video);
-
-    // Save to localStorage as a local draft; to publish for all users, update videos.json in GitHub
-    try {
-      localStorage.setItem(VIDEO_KEY, JSON.stringify(_videos));
-    } catch(e) {}
-
     renderVideoGrid();
     refreshAdminVideosList();
 
-    // Reset fields
     ['vidTitle','vidUrl','vidDuration','vidDesc'].forEach(id => {
       const e = document.getElementById(id); if (e) e.value = '';
     });
     const cat = document.getElementById('vidCategory');
     if (cat) cat.selectedIndex = 0;
 
-    showSnuToast('✓ Video added! Update videos.json in GitHub to publish for everyone.');
+    showSnuToast('\u23f3 Saving video...');
+    saveVideos(() => showSnuToast('\u2713 Video added \u2014 visible to everyone!'));
   }
 
   // ── Delete a video ─────────────────────────────────────────────────────────
   function deleteVideo(idx) {
     _videos.splice(idx, 1);
-    try { localStorage.setItem(VIDEO_KEY, JSON.stringify(_videos)); } catch(e) {}
     renderVideoGrid();
     refreshAdminVideosList();
-    showSnuToast('🗑 Video removed. Update videos.json in GitHub to apply for everyone.');
+    showSnuToast('\u23f3 Removing video...');
+    saveVideos(() => showSnuToast('\ud83d\uddd1 Video removed for everyone.'));
   }
 
   // ── Init on DOMContentLoaded ──────────────────────────────────────────────
