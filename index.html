@@ -6206,22 +6206,23 @@ When answering:
       try { sp = window._jbRecord?.snu_spotlight || JSON.parse(localStorage.getItem('snu_spotlight_v1') || 'null'); } catch(e) {}
       if (sp && sp.name) {
         const p = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        // Photo: tall enough to show full portrait, cover+top so face always visible
         const photoHtml = sp.photo
-          ? `<img src="${sp.photo}" alt="${p(sp.name)}" style="width:160px;height:160px;object-fit:cover;border-radius:12px;display:block;margin-bottom:16px;">`
-          : '<div style="width:160px;height:160px;border-radius:12px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px;">👤</div>';
+          ? `<img src="${sp.photo}" alt="${p(sp.name)}" style="width:200px;height:260px;object-fit:cover;object-position:center top;border-radius:14px;display:block;flex-shrink:0;">`
+          : '<div style="width:200px;height:260px;border-radius:14px;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:56px;flex-shrink:0;">👤</div>';
         const statsHtml = sp.stats?.length ? sp.stats.map(s => `
-          <div style="text-align:center;padding:10px 16px;background:rgba(255,255,255,.06);border-radius:10px;">
+          <div style="text-align:center;padding:10px 16px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:10px;">
             <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:#fff;">${p(s.val)}</div>
-            <div style="font-size:11px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;">${p(s.lbl)}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;font-weight:600;">${p(s.lbl)}</div>
           </div>`).join('') : '';
         spread.innerHTML = `
-          <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
-            <div>${photoHtml}</div>
+          <div style="background:linear-gradient(135deg,#0c2044 0%,#152d5e 100%);border-radius:18px;padding:28px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;">
+            ${photoHtml}
             <div style="flex:1;min-width:200px;">
-              <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;">${p(sp.name)}</div>
-              ${sp.title ? `<div style="font-size:14px;color:var(--accent-2);margin-bottom:14px;">${p(sp.title)}</div>` : ''}
-              ${sp.bio ? `<div style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:14px;">${p(sp.bio)}</div>` : ''}
-              ${sp.quote ? `<div style="font-style:italic;font-size:15px;color:var(--gold);border-left:3px solid var(--gold);padding-left:14px;margin-bottom:14px;">"${p(sp.quote)}"</div>` : ''}
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:4px;line-height:1.1;">${p(sp.name)}</div>
+              ${sp.title ? `<div style="font-size:13px;color:#7eb3f5;font-weight:600;margin-bottom:16px;">${p(sp.title)}</div>` : ''}
+              ${sp.bio ? `<div style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:16px;font-weight:500;">${p(sp.bio)}</div>` : ''}
+              ${sp.quote ? `<div style="font-style:italic;font-size:14px;color:rgba(255,255,255,.85);border-left:3px solid #f59e0b;padding-left:14px;margin-bottom:16px;font-weight:500;">"${p(sp.quote)}"</div>` : ''}
               ${statsHtml ? `<div style="display:flex;gap:10px;flex-wrap:wrap;">${statsHtml}</div>` : ''}
             </div>
           </div>`;
