@@ -7299,7 +7299,7 @@ ${target.outerHTML}
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initVideos() {
     fetch(JB_URL + '/latest', {
-      headers: { 'X-Access-Key': JB_API_KEY }
+      headers: { 'X-Access-Key': JB_API_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
     .then(data => {
