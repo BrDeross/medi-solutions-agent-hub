@@ -2500,27 +2500,42 @@
 
     /* ── Print ── */
     @media print {
-      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      /* Hide everything on the page */
       body > * { display: none !important; }
-      body > #snuPrintOverlay { display: block !important; }
-      #snuPrintOverlay {
-        position: static !important; display: block !important;
-        background: #ffffff !important; backdrop-filter: none !important;
+      /* Show only the SNU overlay (now a direct body child) */
+      body > #snuPrintOverlay {
+        display: block !important;
+        position: static !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-        opacity: 1 !important; padding: 0 !important; overflow: visible !important;
+        opacity: 1 !important;
+        padding: 0 !important;
+        overflow: visible !important;
         width: 100% !important;
+        height: auto !important;
+        inset: auto !important;
       }
       .snu-print-modal {
-        transform: none !important; border-radius: 0 !important;
-        box-shadow: none !important; width: 100% !important; max-width: 100% !important;
-        overflow: visible !important; max-height: none !important;
-        background: #f0f4f8 !important; backdrop-filter: none !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: #f0f4f8 !important;
+        backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
       .snu-print-actions { display: none !important; }
-      .mag-cover-img { transform: none !important; filter: brightness(.45) saturate(1.1) !important; }
+      .mag-cover { height: 300px !important; }
+      .mag-cover-img { transform: none !important; }
       .mag-article-img { transform: none !important; }
-      .bg-glow, .chat-launcher, .life-modal-overlay { display: none !important; }
     }
 
     @media (max-width: 680px) {
@@ -4406,126 +4421,6 @@
 
     </div>
 
-
-    <!-- SNU PRINT MODAL — Magazine Edition -->
-    <div class="snu-print-overlay" id="snuPrintOverlay" onclick="handlePrintOverlayClick(event)">
-      <div class="snu-print-modal" id="snuPrintModal">
-
-        <!-- Action bar -->
-        <div class="snu-print-actions">
-          <span class="snu-print-action-title">🗞 SNU · Show N Up</span>
-          <div class="snu-print-btn-row">
-            <button class="snu-print-btn ghost" onclick="closeSnuPrint()">✕ Close</button>
-            <button class="snu-print-btn primary" onclick="triggerSnuPrint()">🖨️ Print / Save PDF</button>
-          </div>
-        </div>
-
-        <!-- ══ COVER ══ -->
-        <div class="mag-cover">
-          <img class="mag-cover-img" id="magCoverImg"
-            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80&fit=crop"
-            alt="Cover" loading="eager">
-          <div class="mag-cover-gradient"></div>
-          <div class="mag-cover-gradient-left"></div>
-
-          <div class="mag-cover-brand-strip">
-            <span class="mag-brand-left">My Medi</span>
-            <span class="mag-brand-right" id="magBrandRight">Weekly Edition</span>
-          </div>
-
-          <div class="mag-cover-content">
-            <div class="mag-issue-label" id="magIssueLabel">CURRENT ISSUE</div>
-            <div class="mag-snu-title">S<span>N</span>U</div>
-            <div class="mag-tagline">Show N Up — Weekly Agent Performance &amp; Industry News</div>
-            <div class="mag-meta-chips">
-              <span class="mag-meta-chip">📅 <span id="magDateLabel">—</span></span>
-              <span class="mag-meta-chip">🏆 <span id="magAgentCount">—</span> Top Producers</span>
-              <span class="mag-meta-chip">⭐ <span id="magExecCount">—</span> Consecutive Execs</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ══ BODY ══ -->
-        <div class="mag-body">
-
-          <!-- Section: Leaderboard + Execs -->
-          <div class="mag-section-header">
-            <span class="mag-section-tag">🥇 This Week's Leaders</span>
-            <div class="mag-section-line"></div>
-          </div>
-
-          <div class="mag-two-col">
-            <!-- Leaderboard -->
-            <div class="mag-col">
-              <div id="magLbList">
-                <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:16px 0;">No leaderboard data — save from SNU Admin.</div>
-              </div>
-            </div>
-
-            <!-- Consecutive Execs -->
-            <div class="mag-col">
-              <div class="mag-exec-list" id="magExecList">
-                <div style="color:var(--muted-2);font-style:italic;font-size:12px;">No consecutive executives yet.</div>
-              </div>
-            </div>
-          </div>
-
-        <!-- ══ AGENT SPOTLIGHT SPREAD ══ -->
-        <div class="mag-section-header" style="padding-top:28px;">
-          <span class="mag-section-tag purple">⭐ Agent Spotlight</span>
-          <div class="mag-section-line"></div>
-        </div>
-        <div style="padding:0 36px 28px;" id="magSpotlightSpread">
-          <div style="color:var(--muted-2);font-style:italic;font-size:13px;text-align:center;padding:24px 0;">
-            No spotlight set — feature an agent via SNU Admin.
-          </div>
-        </div>
-
-        </div>
-
-          <!-- Section: Article -->
-          <div class="mag-section-header" style="padding-top:28px;">
-            <span class="mag-section-tag blue">📰 Industry Spotlight</span>
-            <div class="mag-section-line"></div>
-          </div>
-
-          <div class="mag-article-outer">
-            <div class="mag-article-inner">
-              <!-- Main article -->
-              <div>
-                <div class="mag-article-img-wrap">
-                  <img class="mag-article-img" id="magArticleImg"
-                    src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80&fit=crop"
-                    alt="Article">
-                  <div class="mag-article-img-overlay"></div>
-                </div>
-                <span class="mag-article-cat industry" id="magArticleCat">Industry</span>
-                <div class="mag-article-headline" id="magArticleHeadline">Loading this week's article…</div>
-                <div class="mag-article-text" id="magArticleText">
-                  <p style="color:var(--muted-2);font-style:italic;">Fetching industry news…</p>
-                </div>
-              </div>
-
-              <!-- Sidebar -->
-              <div class="mag-sidebar">
-                <div class="mag-pull-quote" id="magPullQuote">Consistency is the foundation of every great agent's career.</div>
-                <div style="margin-top:24px;">
-                  <div class="mag-sidebar-tip-title">💡 Agent Tip of the Week</div>
-                  <div class="mag-sidebar-tip" id="magAgentTip">Follow up within 24 hours of every client interaction. The agents in this week's top 7 all share one trait: they show up consistently.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        <!-- ══ FOOTER ══ -->
-        <div class="mag-footer">
-          <span class="mag-footer-disclaimer">For internal use only. All production figures should be independently verified. Agent Assistant AI guidance is not guaranteed to be 100% accurate.</span>
-          <span class="mag-footer-brand">My Medi</span>
-        </div>
-
-      </div>
-    </div>
-
     <!-- Print container: clean white div, no overlay, no backdrop-filter -->
     <div id="snuPrintContent" style="display:none;"></div>
 
@@ -6323,26 +6218,8 @@ When answering:
   }
 
   function triggerSnuPrint() {
-    const overlay = document.getElementById('snuPrintOverlay');
-    if (!overlay) return;
-
-    function restoreOverlay() {
-      overlay.style.position = '';
-      overlay.style.overflow = '';
-      overlay.style.padding = '';
-      window.removeEventListener('afterprint', restoreOverlay);
-    }
-
-    // afterprint fires after the print dialog closes (or is cancelled)
-    window.addEventListener('afterprint', restoreOverlay);
-
-    // Make overlay static so @media print treats it as a normal block element
-    overlay.style.position = 'static';
-    overlay.style.overflow = 'visible';
-    overlay.style.padding = '0';
-
-    // Small delay lets the browser repaint with the new position before printing
-    setTimeout(function() { window.print(); }, 150);
+    // Overlay is a direct child of <body>, so @media print targets it correctly.
+    window.print();
   }
 
   function closeSnuPrint() {
@@ -7357,6 +7234,128 @@ ${target.outerHTML}
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+
+
+  <!-- SNU PRINT MODAL — Magazine Edition -->
+  <!-- SNU PRINT MODAL — Magazine Edition -->
+  <div class="snu-print-overlay" id="snuPrintOverlay" onclick="handlePrintOverlayClick(event)">
+    <div class="snu-print-modal" id="snuPrintModal">
+
+      <!-- Action bar -->
+      <div class="snu-print-actions">
+        <span class="snu-print-action-title">🗞 SNU · Show N Up</span>
+        <div class="snu-print-btn-row">
+          <button class="snu-print-btn ghost" onclick="closeSnuPrint()">✕ Close</button>
+          <button class="snu-print-btn primary" onclick="triggerSnuPrint()">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+
+      <!-- ══ COVER ══ -->
+      <div class="mag-cover">
+        <img class="mag-cover-img" id="magCoverImg"
+          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80&fit=crop"
+          alt="Cover" loading="eager">
+        <div class="mag-cover-gradient"></div>
+        <div class="mag-cover-gradient-left"></div>
+
+        <div class="mag-cover-brand-strip">
+          <span class="mag-brand-left">My Medi</span>
+          <span class="mag-brand-right" id="magBrandRight">Weekly Edition</span>
+        </div>
+
+        <div class="mag-cover-content">
+          <div class="mag-issue-label" id="magIssueLabel">CURRENT ISSUE</div>
+          <div class="mag-snu-title">S<span>N</span>U</div>
+          <div class="mag-tagline">Show N Up — Weekly Agent Performance &amp; Industry News</div>
+          <div class="mag-meta-chips">
+            <span class="mag-meta-chip">📅 <span id="magDateLabel">—</span></span>
+            <span class="mag-meta-chip">🏆 <span id="magAgentCount">—</span> Top Producers</span>
+            <span class="mag-meta-chip">⭐ <span id="magExecCount">—</span> Consecutive Execs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BODY ══ -->
+      <div class="mag-body">
+
+        <!-- Section: Leaderboard + Execs -->
+        <div class="mag-section-header">
+          <span class="mag-section-tag">🥇 This Week's Leaders</span>
+          <div class="mag-section-line"></div>
+        </div>
+
+        <div class="mag-two-col">
+          <!-- Leaderboard -->
+          <div class="mag-col">
+            <div id="magLbList">
+              <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:16px 0;">No leaderboard data — save from SNU Admin.</div>
+            </div>
+          </div>
+
+          <!-- Consecutive Execs -->
+          <div class="mag-col">
+            <div class="mag-exec-list" id="magExecList">
+              <div style="color:var(--muted-2);font-style:italic;font-size:12px;">No consecutive executives yet.</div>
+            </div>
+          </div>
+        </div>
+
+      <!-- ══ AGENT SPOTLIGHT SPREAD ══ -->
+      <div class="mag-section-header" style="padding-top:28px;">
+        <span class="mag-section-tag purple">⭐ Agent Spotlight</span>
+        <div class="mag-section-line"></div>
+      </div>
+      <div style="padding:0 36px 28px;" id="magSpotlightSpread">
+        <div style="color:var(--muted-2);font-style:italic;font-size:13px;text-align:center;padding:24px 0;">
+          No spotlight set — feature an agent via SNU Admin.
+        </div>
+      </div>
+
+      </div>
+
+        <!-- Section: Article -->
+        <div class="mag-section-header" style="padding-top:28px;">
+          <span class="mag-section-tag blue">📰 Industry Spotlight</span>
+          <div class="mag-section-line"></div>
+        </div>
+
+        <div class="mag-article-outer">
+          <div class="mag-article-inner">
+            <!-- Main article -->
+            <div>
+              <div class="mag-article-img-wrap">
+                <img class="mag-article-img" id="magArticleImg"
+                  src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80&fit=crop"
+                  alt="Article">
+                <div class="mag-article-img-overlay"></div>
+              </div>
+              <span class="mag-article-cat industry" id="magArticleCat">Industry</span>
+              <div class="mag-article-headline" id="magArticleHeadline">Loading this week's article…</div>
+              <div class="mag-article-text" id="magArticleText">
+                <p style="color:var(--muted-2);font-style:italic;">Fetching industry news…</p>
+              </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="mag-sidebar">
+              <div class="mag-pull-quote" id="magPullQuote">Consistency is the foundation of every great agent's career.</div>
+              <div style="margin-top:24px;">
+                <div class="mag-sidebar-tip-title">💡 Agent Tip of the Week</div>
+                <div class="mag-sidebar-tip" id="magAgentTip">Follow up within 24 hours of every client interaction. The agents in this week's top 7 all share one trait: they show up consistently.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <!-- ══ FOOTER ══ -->
+      <div class="mag-footer">
+        <span class="mag-footer-disclaimer">For internal use only. All production figures should be independently verified. Agent Assistant AI guidance is not guaranteed to be 100% accurate.</span>
+        <span class="mag-footer-brand">My Medi</span>
+      </div>
+
     </div>
   </div>
 
