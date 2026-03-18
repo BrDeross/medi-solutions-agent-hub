@@ -1949,6 +1949,10 @@
       border-color: var(--accent);
       background: rgba(255,255,255,.1);
     }
+    .admin-input option {
+      background: #1e3a6e;
+      color: #f0f6ff;
+    }
 
     .admin-remove-btn {
       width: 32px; height: 36px;
@@ -7164,6 +7168,7 @@ ${target.outerHTML}
   // ── UPDATES (JSONBin backend) ──────────────────────────────────────────────
   const UPD_BIN_ID  = '69bb0686b7ec241ddc7ea0a5';
   const UPD_API_KEY = '$2a$10$R0cyKY91znGTJV37A9XDG.w5hxyHbYEdkSWAWyqvpkpBpmLITlUSi';
+  const UPD_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
   const UPD_URL     = 'https://api.jsonbin.io/v3/b/' + UPD_BIN_ID;
   let _updates = [];
   let _updSaving = false;
@@ -7176,51 +7181,24 @@ ${target.outerHTML}
     if (!file) return;
     _updAttachName = file.name;
     _updAttachType = file.type;
-
-    const preview     = document.getElementById('updAttachPreview');
-    const placeholder = document.getElementById('updAttachPlaceholder');
-    const filename    = document.getElementById('updAttachFilename');
-    const zone        = document.getElementById('updAttachZone');
-
-    if (file.type.startsWith('image/')) {
-      // ── Compress image to stay under JSONBin 100KB limit ──────────────────
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        const MAX_DIM = 1000;   // max width or height
-        const QUALITY = 0.72;   // jpeg quality
-        let w = img.width, h = img.height;
-        if (w > MAX_DIM || h > MAX_DIM) {
-          if (w > h) { h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
-          else       { w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        _updAttachBase64 = canvas.toDataURL('image/jpeg', QUALITY);
-        _updAttachType   = 'image/jpeg';
-        if (preview) { preview.src = _updAttachBase64; preview.classList.add('visible'); }
+    const reader = new FileReader();
+    reader.onload = e => {
+      _updAttachBase64 = e.target.result;
+      const preview     = document.getElementById('updAttachPreview');
+      const placeholder = document.getElementById('updAttachPlaceholder');
+      const filename    = document.getElementById('updAttachFilename');
+      const zone        = document.getElementById('updAttachZone');
+      if (file.type.startsWith('image/') && preview) {
+        preview.src = _updAttachBase64;
+        preview.classList.add('visible');
         if (placeholder) placeholder.style.display = 'none';
-        if (filename) { filename.textContent = '\ud83d\udcce ' + file.name + ' (compressed)'; filename.style.display = 'block'; }
-        if (zone) zone.classList.add('has-photo');
-      };
-      img.src = objectUrl;
-    } else if (file.type === 'application/pdf') {
-      // ── Warn if PDF is too large ───────────────────────────────────────────
-      if (file.size > 70000) {
-        showSnuToast('\u26a0 PDF too large for cloud storage. Use a link button instead.');
-        return;
+      } else {
+        if (placeholder) placeholder.style.display = 'none';
       }
-      const reader = new FileReader();
-      reader.onload = e => {
-        _updAttachBase64 = e.target.result;
-        if (placeholder) placeholder.style.display = 'none';
-        if (filename) { filename.textContent = '\ud83d\udcce ' + file.name; filename.style.display = 'block'; }
-        if (zone) zone.classList.add('has-photo');
-      };
-      reader.readAsDataURL(file);
-    }
+      if (filename) { filename.textContent = '\ud83d\udcce ' + file.name; filename.style.display = 'block'; }
+      if (zone) zone.classList.add('has-photo');
+    };
+    reader.readAsDataURL(file);
   }
 
   // Drag-and-drop on attach zone
@@ -7263,7 +7241,7 @@ ${target.outerHTML}
     _updSaving = true;
     fetch(UPD_URL, {
       method:  'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Access-Key': UPD_API_KEY },
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': UPD_MASTER_KEY },
       body:    JSON.stringify(_updates)
     })
     .then(r => r.json())
