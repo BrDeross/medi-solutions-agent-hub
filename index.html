@@ -5123,13 +5123,11 @@ When answering:
     if (record.snu_article  && Object.keys(record.snu_article).length)  localStorage.setItem('snu_article_v1',   JSON.stringify(record.snu_article));
     if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
-    if (Array.isArray(record.snu_updates) && record.snu_updates.length) localStorage.setItem('snu_updates_v1',  JSON.stringify(record.snu_updates));
     if (record.snu_trip?.agents?.length) localStorage.setItem('snu_trip_v1', JSON.stringify(record.snu_trip));
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
     if (typeof renderSpotlightCard  === 'function') renderSpotlightCard(record.snu_spotlight?.name ? record.snu_spotlight : undefined);
-    if (Array.isArray(record.snu_updates) && record.snu_updates.length) window._jb_updates_override = record.snu_updates;
 
     if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cloud!');
   };
@@ -7163,8 +7161,12 @@ ${target.outerHTML}
 
 
   <script id="updates-script">
-  const UPDATES_KEY = 'snu_updates_v1';
+  // ── UPDATES (JSONBin backend) ──────────────────────────────────────────────
+  const UPD_BIN_ID  = '69bb0686b7ec241ddc7ea0a5';
+  const UPD_API_KEY = '$2a$10$R0cyKY91znGTJV37A9XDG.w5hxyHbYEdkSWAWyqvpkpBpmLITlUSi';
+  const UPD_URL     = 'https://api.jsonbin.io/v3/b/' + UPD_BIN_ID;
   let _updates = [];
+  let _updSaving = false;
   let _updAttachBase64 = null;
   let _updAttachType   = null;
   let _updAttachName   = null;
@@ -7177,19 +7179,18 @@ ${target.outerHTML}
     const reader = new FileReader();
     reader.onload = e => {
       _updAttachBase64 = e.target.result;
-      const preview      = document.getElementById('updAttachPreview');
-      const placeholder  = document.getElementById('updAttachPlaceholder');
-      const filename     = document.getElementById('updAttachFilename');
-      const zone         = document.getElementById('updAttachZone');
+      const preview     = document.getElementById('updAttachPreview');
+      const placeholder = document.getElementById('updAttachPlaceholder');
+      const filename    = document.getElementById('updAttachFilename');
+      const zone        = document.getElementById('updAttachZone');
       if (file.type.startsWith('image/') && preview) {
         preview.src = _updAttachBase64;
         preview.classList.add('visible');
         if (placeholder) placeholder.style.display = 'none';
       } else {
-        // PDF — show filename instead of image preview
         if (placeholder) placeholder.style.display = 'none';
       }
-      if (filename) { filename.textContent = '📎 ' + file.name; filename.style.display = 'block'; }
+      if (filename) { filename.textContent = '\ud83d\udcce ' + file.name; filename.style.display = 'block'; }
       if (zone) zone.classList.add('has-photo');
     };
     reader.readAsDataURL(file);
@@ -7210,16 +7211,40 @@ ${target.outerHTML}
     initUpdates();
   });
 
+  // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initUpdates() {
-    try {
-      const raw = localStorage.getItem(UPDATES_KEY);
-      _updates = raw ? JSON.parse(raw) : [];
-    } catch(e) { _updates = []; }
-    renderFeedFromStorage();
-    refreshAdminUpdatesList();
+    fetch(UPD_URL + '/latest', {
+      headers: { 'X-Access-Key': UPD_API_KEY, 'Cache-Control': 'no-cache' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      const raw = data.record;
+      _updates = Array.isArray(raw) ? raw.filter(u => u && u.id !== 'init') : [];
+      renderFeedFromStorage();
+      refreshAdminUpdatesList();
+    })
+    .catch(() => {
+      _updates = [];
+      renderFeedFromStorage();
+      refreshAdminUpdatesList();
+    });
   }
 
-  // ── Render the dashboard feed from localStorage ──────────────────────────
+  // ── Save to JSONBin ────────────────────────────────────────────────────────
+  function saveUpdates(onSuccess) {
+    if (_updSaving) return;
+    _updSaving = true;
+    fetch(UPD_URL, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Access-Key': UPD_API_KEY },
+      body:    JSON.stringify(_updates)
+    })
+    .then(r => r.json())
+    .then(() => { _updSaving = false; if (onSuccess) onSuccess(); })
+    .catch(() => { _updSaving = false; showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
+  }
+
+  // ── Render the dashboard feed ──────────────────────────────────────────────
   function renderFeedFromStorage() {
     const items = [..._updates].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
     const el    = document.getElementById('feed-list');
@@ -7227,13 +7252,12 @@ ${target.outerHTML}
     if (!el) return;
     if (badge) badge.textContent = items.length + (items.length === 1 ? ' update' : ' updates');
     if (!items.length) {
-      el.innerHTML = '<div class="empty">No updates right now — add some via SNU Admin.</div>';
+      el.innerHTML = '<div class="empty">No updates right now \u2014 add some via SNU Admin.</div>';
       return;
     }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const xa   = s => String(s||'').replace(/"/g,'&quot;');
     el.innerHTML = items.map(i => {
-      // Attachment display
       let attachHtml = '';
       if (i.attachBase64 && i.attachType) {
         const safeSrc  = xa(i.attachBase64);
@@ -7242,11 +7266,11 @@ ${target.outerHTML}
         if (i.attachType.startsWith('image/')) {
           attachHtml = `<div class="attach-thumb" onclick="openLightbox('${safeSrc}','${safeType}','${safeName}')">
             <img src="${safeSrc}" alt="${safeName}">
-            <div class="attach-thumb-overlay">🔍</div>
+            <div class="attach-thumb-overlay">\ud83d\udd0d</div>
           </div>`;
         } else if (i.attachType === 'application/pdf') {
           attachHtml = `<button class="attach-pdf-btn" onclick="openLightbox('${safeSrc}','${safeType}','${safeName}')">
-            📄 ${safeName} — Click to View &amp; Print
+            \ud83d\udcc4 ${safeName} \u2014 Click to View &amp; Print
           </button>`;
         }
       }
@@ -7256,10 +7280,10 @@ ${target.outerHTML}
           <h4>${pesc(i.title || 'Untitled')}</h4>
           <p>${pesc(i.message || '')}</p>
           ${attachHtml}
-          ${i.btnText && i.btnUrl ? `<a class="feed-btn" href="${xa(i.btnUrl)}" target="_blank" rel="noopener noreferrer">${pesc(i.btnText)} ↗</a>` : ''}
+          ${i.btnText && i.btnUrl ? `<a class="feed-btn" href="${xa(i.btnUrl)}" target="_blank" rel="noopener noreferrer">${pesc(i.btnText)} \u2197</a>` : ''}
           <div class="feed-meta">
-            ${i.date     ? `<span>📅 ${pesc(i.date)}</span>`      : ''}
-            ${i.priority ? `<span>🚦 ${pesc(i.priority)}</span>`  : ''}
+            ${i.date     ? `<span>\ud83d\udcc5 ${pesc(i.date)}</span>`     : ''}
+            ${i.priority ? `<span>\ud83d\udea6 ${pesc(i.priority)}</span>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -7276,7 +7300,6 @@ ${target.outerHTML}
       return;
     }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    // Show newest first
     const sorted = [..._updates].map((u,i) => ({...u, _i: i})).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
     el.innerHTML = sorted.map(u => `
       <div class="admin-update-item">
@@ -7285,12 +7308,13 @@ ${target.outerHTML}
           <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(u.message || '')}</div>
           <div class="admin-update-meta">
             <span class="admin-update-type">${pesc(u.type || 'Update')}</span>
-            ${u.date     ? `<span>📅 ${pesc(u.date)}</span>`      : ''}
-            ${u.priority ? `<span>🚦 ${pesc(u.priority)}</span>`  : ''}
-            ${u.btnText  ? `<span>🔗 ${pesc(u.btnText)}</span>`   : ''}
+            ${u.date     ? `<span>\ud83d\udcc5 ${pesc(u.date)}</span>`     : ''}
+            ${u.priority ? `<span>\ud83d\udea6 ${pesc(u.priority)}</span>` : ''}
+            ${u.btnText  ? `<span>\ud83d\udd17 ${pesc(u.btnText)}</span>`  : ''}
+            ${u.attachName ? `<span>\ud83d\udcce ${pesc(u.attachName)}</span>` : ''}
           </div>
         </div>
-        <button class="admin-update-del" onclick="deleteUpdate(${u._i})">🗑 Delete</button>
+        <button class="admin-update-del" onclick="deleteUpdate(${u._i})">\ud83d\uddd1 Delete</button>
       </div>`).join('');
   }
 
@@ -7298,7 +7322,7 @@ ${target.outerHTML}
   function addUpdate() {
     const gv = id => document.getElementById(id)?.value?.trim() || '';
     const title = gv('updTitle');
-    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
+    if (!title) { showSnuToast('\u26a0 Please enter a title.'); return; }
 
     const update = {
       id:           Date.now(),
@@ -7315,19 +7339,9 @@ ${target.outerHTML}
     };
 
     _updates.unshift(update);
-    try {
-      localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
-    } catch(e) {
-      // Quota exceeded — save without attachment
-      update.attachBase64 = null;
-      localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
-      if (typeof jbSave === 'function') jbSave('snu_updates', _updates);
-      showSnuToast('⚠ Attachment too large — saved without it. Use a smaller file.');
-    }
     renderFeedFromStorage();
     refreshAdminUpdatesList();
 
-    // Reset all fields + attachment
     ['updTitle','updMessage','updDate','updBtnText','updBtnUrl'].forEach(id => {
       const e = document.getElementById(id); if (e) e.value = '';
     });
@@ -7344,17 +7358,17 @@ ${target.outerHTML}
     if (fn)   { fn.textContent = ''; fn.style.display = 'none'; }
     if (zone) zone.classList.remove('has-photo');
 
-    showSnuToast('✓ Update published!');
+    showSnuToast('\u23f3 Saving update...');
+    saveUpdates(() => showSnuToast('\u2713 Update published \u2014 visible to everyone!'));
   }
 
   // ── Delete an update ──────────────────────────────────────────────────────
   function deleteUpdate(idx) {
     _updates.splice(idx, 1);
-    localStorage.setItem(UPDATES_KEY, JSON.stringify(_updates));
-    if (typeof jbSave === 'function') jbSave('snu_updates', _updates);
     renderFeedFromStorage();
     refreshAdminUpdatesList();
-    showSnuToast('🗑 Update removed.');
+    showSnuToast('\u23f3 Removing update...');
+    saveUpdates(() => showSnuToast('\ud83d\uddd1 Update removed for everyone.'));
   }
 
   </script>
