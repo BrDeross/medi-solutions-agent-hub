@@ -654,6 +654,78 @@
     }
     .feed-btn:hover { background: #2563eb; box-shadow: 0 6px 20px rgba(59,130,246,.4); }
 
+    /* ── ATTACHMENT LIGHTBOX ── */
+    .attach-thumb {
+      margin: 10px 0 4px;
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .attach-thumb:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+    .attach-thumb img { max-width: 100%; max-height: 180px; display: block; object-fit: cover; }
+    .attach-thumb-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.35);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s;
+      font-size: 28px;
+    }
+    .attach-thumb:hover .attach-thumb-overlay { opacity: 1; }
+
+    .attach-pdf-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin: 8px 0 4px; padding: 8px 16px;
+      background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3);
+      border-radius: 8px; color: #f87171; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+    }
+    .attach-pdf-btn:hover { background: rgba(239,68,68,.22); }
+
+    /* Lightbox overlay */
+    #attachLightbox {
+      display: none; position: fixed; inset: 0; z-index: 9000;
+      background: rgba(0,0,0,.88); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; flex-direction: column;
+      padding: 20px;
+    }
+    #attachLightbox.open { display: flex; }
+    #attachLightbox .lb-inner {
+      position: relative; max-width: 900px; width: 100%;
+      background: rgba(20,40,80,.95); border: 1px solid var(--border-2);
+      border-radius: 18px; overflow: hidden;
+      display: flex; flex-direction: column;
+      max-height: 90vh;
+    }
+    #attachLightbox .lb-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #attachLightbox .lb-title {
+      font-size: 14px; font-weight: 700; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;
+    }
+    #attachLightbox .lb-actions { display: flex; gap: 10px; align-items: center; }
+    #attachLightbox .lb-print-btn {
+      padding: 7px 16px; background: var(--accent); border: none; border-radius: 8px;
+      color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    #attachLightbox .lb-print-btn:hover { background: #2563eb; }
+    #attachLightbox .lb-close {
+      width: 32px; height: 32px; border-radius: 8px; border: none;
+      background: rgba(255,255,255,.1); color: var(--text);
+      font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    #attachLightbox .lb-close:hover { background: rgba(255,255,255,.2); }
+    #attachLightbox .lb-body { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    #attachLightbox .lb-body img { max-width: 100%; max-height: 75vh; border-radius: 8px; object-fit: contain; }
+    #attachLightbox .lb-body iframe { width: 100%; height: 75vh; border: none; border-radius: 8px; background: #fff; }
+
     /* ── LEADERBOARD ── */
     .lb-shell {
       background: rgba(26,47,74,.9);
@@ -6650,15 +6722,18 @@ ${target.outerHTML}
       // Attachment display
       let attachHtml = '';
       if (i.attachBase64 && i.attachType) {
+        const safeSrc  = xa(i.attachBase64);
+        const safeName = pesc(i.attachName || 'Attachment');
+        const safeType = xa(i.attachType);
         if (i.attachType.startsWith('image/')) {
-          attachHtml = `<div style="margin:10px 0 4px;">
-            <img src="${i.attachBase64}" alt="Attachment" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--border);object-fit:cover;display:block;">
+          attachHtml = `<div class="attach-thumb" onclick="openLightbox('${safeSrc}','${safeType}','${safeName}')">
+            <img src="${safeSrc}" alt="${safeName}">
+            <div class="attach-thumb-overlay">🔍</div>
           </div>`;
         } else if (i.attachType === 'application/pdf') {
-          attachHtml = `<a href="${i.attachBase64}" download="${xa(i.attachName||'document.pdf')}"
-            style="display:inline-flex;align-items:center;gap:6px;margin:8px 0 4px;padding:7px 14px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:#f87171;font-size:12px;font-weight:700;text-decoration:none;">
-            📄 ${pesc(i.attachName || 'Download PDF')}
-          </a>`;
+          attachHtml = `<button class="attach-pdf-btn" onclick="openLightbox('${safeSrc}','${safeType}','${safeName}')">
+            📄 ${safeName} — Click to View &amp; Print
+          </button>`;
         }
       }
       return `
@@ -7243,6 +7318,55 @@ ${target.outerHTML}
     const moInp = document.getElementById('tripMonthsElapsed');
     if (moInp && _tripMeta.monthsElapsed) moInp.value = _tripMeta.monthsElapsed;
   });
+  </script>
+
+  <!-- ATTACHMENT LIGHTBOX -->
+  <div id="attachLightbox" onclick="if(event.target===this)closeLightbox()">
+    <div class="lb-inner">
+      <div class="lb-header">
+        <div class="lb-title" id="lbTitle">Attachment</div>
+        <div class="lb-actions">
+          <button class="lb-print-btn" onclick="printAttachment()">🖨 Print</button>
+          <button class="lb-close" onclick="closeLightbox()">✕</button>
+        </div>
+      </div>
+      <div class="lb-body" id="lbBody"></div>
+    </div>
+  </div>
+
+  <script>
+  function openLightbox(src, type, name) {
+    const lb   = document.getElementById('attachLightbox');
+    const body = document.getElementById('lbBody');
+    const title = document.getElementById('lbTitle');
+    title.textContent = name || 'Attachment';
+    if (type && type.startsWith('image/')) {
+      body.innerHTML = `<img src="${src}" alt="${name||'Attachment'}">`;
+    } else {
+      body.innerHTML = `<iframe src="${src}" title="${name||'Document'}"></iframe>`;
+    }
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('attachLightbox').classList.remove('open');
+    document.getElementById('lbBody').innerHTML = '';
+    document.body.style.overflow = '';
+  }
+  function printAttachment() {
+    const body = document.getElementById('lbBody');
+    const img  = body.querySelector('img');
+    const ifr  = body.querySelector('iframe');
+    if (img) {
+      const w = window.open('');
+      w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${img.src}" style="max-width:100%;"></body></html>`);
+      w.document.close(); w.focus(); w.print();
+    } else if (ifr) {
+      ifr.contentWindow.focus();
+      ifr.contentWindow.print();
+    }
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
   </script>
 
 
