@@ -7176,24 +7176,51 @@ ${target.outerHTML}
     if (!file) return;
     _updAttachName = file.name;
     _updAttachType = file.type;
-    const reader = new FileReader();
-    reader.onload = e => {
-      _updAttachBase64 = e.target.result;
-      const preview     = document.getElementById('updAttachPreview');
-      const placeholder = document.getElementById('updAttachPlaceholder');
-      const filename    = document.getElementById('updAttachFilename');
-      const zone        = document.getElementById('updAttachZone');
-      if (file.type.startsWith('image/') && preview) {
-        preview.src = _updAttachBase64;
-        preview.classList.add('visible');
+
+    const preview     = document.getElementById('updAttachPreview');
+    const placeholder = document.getElementById('updAttachPlaceholder');
+    const filename    = document.getElementById('updAttachFilename');
+    const zone        = document.getElementById('updAttachZone');
+
+    if (file.type.startsWith('image/')) {
+      // ── Compress image to stay under JSONBin 100KB limit ──────────────────
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const MAX_DIM = 1000;   // max width or height
+        const QUALITY = 0.72;   // jpeg quality
+        let w = img.width, h = img.height;
+        if (w > MAX_DIM || h > MAX_DIM) {
+          if (w > h) { h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
+          else       { w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        _updAttachBase64 = canvas.toDataURL('image/jpeg', QUALITY);
+        _updAttachType   = 'image/jpeg';
+        if (preview) { preview.src = _updAttachBase64; preview.classList.add('visible'); }
         if (placeholder) placeholder.style.display = 'none';
-      } else {
-        if (placeholder) placeholder.style.display = 'none';
+        if (filename) { filename.textContent = '\ud83d\udcce ' + file.name + ' (compressed)'; filename.style.display = 'block'; }
+        if (zone) zone.classList.add('has-photo');
+      };
+      img.src = objectUrl;
+    } else if (file.type === 'application/pdf') {
+      // ── Warn if PDF is too large ───────────────────────────────────────────
+      if (file.size > 70000) {
+        showSnuToast('\u26a0 PDF too large for cloud storage. Use a link button instead.');
+        return;
       }
-      if (filename) { filename.textContent = '\ud83d\udcce ' + file.name; filename.style.display = 'block'; }
-      if (zone) zone.classList.add('has-photo');
-    };
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = e => {
+        _updAttachBase64 = e.target.result;
+        if (placeholder) placeholder.style.display = 'none';
+        if (filename) { filename.textContent = '\ud83d\udcce ' + file.name; filename.style.display = 'block'; }
+        if (zone) zone.classList.add('has-photo');
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   // Drag-and-drop on attach zone
