@@ -7166,10 +7166,9 @@ ${target.outerHTML}
 
   <script id="updates-script">
   // ── UPDATES (JSONBin backend) ──────────────────────────────────────────────
-  const UPD_BIN_ID  = '69bb0686b7ec241ddc7ea0a5';
-  const UPD_API_KEY = '$2a$10$R0cyKY91znGTJV37A9XDG.w5hxyHbYEdkSWAWyqvpkpBpmLITlUSi';
-  const UPD_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
-  const UPD_URL     = 'https://api.jsonbin.io/v3/b/' + UPD_BIN_ID;
+  const SUPA_URL    = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  const UPD_HUB     = 'medi';
   let _updates = [];
   let _updSaving = false;
   let _updAttachBase64 = null;
@@ -7218,13 +7217,12 @@ ${target.outerHTML}
 
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initUpdates() {
-    fetch(UPD_URL + '/latest', {
-      headers: { 'X-Access-Key': UPD_API_KEY, 'Cache-Control': 'no-cache' }
+    fetch(`${SUPA_URL}/rest/v1/updates?hub=eq.${UPD_HUB}&select=data`, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
     })
     .then(r => r.json())
-    .then(data => {
-      const raw = data.record;
-      _updates = Array.isArray(raw) ? raw.filter(u => u && u.id !== 'init') : [];
+    .then(rows => {
+      _updates = rows.length ? JSON.parse(rows[0].data) : [];
       renderFeedFromStorage();
       refreshAdminUpdatesList();
     })
@@ -7239,12 +7237,15 @@ ${target.outerHTML}
   function saveUpdates(onSuccess) {
     if (_updSaving) return;
     _updSaving = true;
-    fetch(UPD_URL, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': UPD_MASTER_KEY },
-      body:    JSON.stringify(_updates)
+    fetch(`${SUPA_URL}/rest/v1/updates?hub=eq.${UPD_HUB}`, {
+      method:  'DELETE',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
     })
-    .then(r => r.json())
+    .then(() => fetch(`${SUPA_URL}/rest/v1/updates`, {
+      method:  'POST',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body:    JSON.stringify({ hub: UPD_HUB, data: JSON.stringify(_updates) })
+    }))
     .then(() => { _updSaving = false; if (onSuccess) onSuccess(); })
     .catch(() => { _updSaving = false; showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
   }
@@ -7381,9 +7382,9 @@ ${target.outerHTML}
 
   <script id="video-library-script">
   // ── VIDEO LIBRARY (JSONBin backend) ────────────────────────────────────────
-  const JB_BIN_ID  = '69b9b61fc3097a1dd53415fb';
-  const JB_API_KEY = '$2a$10$R0cyKY91znGTJV37A9XDG.w5hxyHbYEdkSWAWyqvpkpBpmLITlUSi';
-  const JB_URL     = 'https://api.jsonbin.io/v3/b/' + JB_BIN_ID;
+  const JB_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const JB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  const VID_HUB     = 'medi';
   let _videos = [];
   let _videosSaving = false;
 
@@ -7399,13 +7400,12 @@ ${target.outerHTML}
 
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initVideos() {
-    fetch(JB_URL + '/latest', {
-      headers: { 'X-Access-Key': JB_API_KEY, 'Cache-Control': 'no-cache' }
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
+      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY }
     })
     .then(r => r.json())
-    .then(data => {
-      const raw = data.record;
-      _videos = Array.isArray(raw) ? raw.filter(v => v && v.id !== 'init') : [];
+    .then(rows => {
+      _videos = rows.length ? JSON.parse(rows[0].data) : [];
       renderVideoGrid();
       refreshAdminVideosList();
     })
@@ -7420,12 +7420,15 @@ ${target.outerHTML}
   function saveVideos(onSuccess) {
     if (_videosSaving) return;
     _videosSaving = true;
-    fetch(JB_URL, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Access-Key': JB_API_KEY },
-      body:    JSON.stringify(_videos)
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
+      method:  'DELETE',
+      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY }
     })
-    .then(r => r.json())
+    .then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
+      method:  'POST',
+      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body:    JSON.stringify({ hub: VID_HUB, data: JSON.stringify(_videos) })
+    }))
     .then(() => { _videosSaving = false; if (onSuccess) onSuccess(); })
     .catch(() => { _videosSaving = false; showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
   }
