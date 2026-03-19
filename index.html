@@ -4419,78 +4419,6 @@
       </div>
     </section>
 
-    <!-- SCORE MODAL -->
-    <div id="scoreModal" onclick="if(event.target===this)closeScoreModal()">
-      <div class="score-inner">
-        <div class="score-title">📊 Submit Your Score</div>
-        <div class="score-sub">Rate your performance after the roleplay session</div>
-        <div class="score-field">
-          <label class="score-label">Your Name</label>
-          <input class="score-input" id="scoreAgent" placeholder="Jane Smith" />
-        </div>
-        <div class="score-field">
-          <label class="score-label">Persona</label>
-          <input class="score-input" id="scorePersona" readonly />
-        </div>
-        <div class="score-field">
-          <label class="score-label">Score (1–10)</label>
-          <select class="score-input" id="scoreValue">
-            <option value="">Select…</option>
-            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-            <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-          </select>
-        </div>
-        <div class="score-field">
-          <label class="score-label">Would Client Buy? (Y/N)</label>
-          <select class="score-input" id="scoreWouldBuy">
-            <option value="">Select…</option>
-            <option>Yes</option>
-            <option>No</option>
-            <option>Maybe</option>
-          </select>
-        </div>
-        <div class="score-field">
-          <label class="score-label">Weakest Area</label>
-          <select class="score-input" id="scoreWeakArea">
-            <option value="">Select…</option>
-            <option>Opening / Rapport</option>
-            <option>Discovery Questions</option>
-            <option>Product Knowledge</option>
-            <option>Objection Handling</option>
-            <option>Closing</option>
-            <option>Listening</option>
-            <option>Pacing / Tone</option>
-          </select>
-        </div>
-        <div class="score-btn-row">
-          <button class="score-cancel-btn" onclick="closeScoreModal()">Cancel</button>
-          <button class="score-submit-btn" onclick="submitScore()">Submit Score</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROLEPLAY MODAL -->
-    <div id="roleplayModal" onclick="if(event.target===this)closeRoleplay()">
-      <div class="roleplay-inner">
-        <div class="roleplay-header">
-          <div class="roleplay-header-left">
-            <div class="roleplay-avatar" id="roleplayAvatar">👤</div>
-            <div>
-              <div class="roleplay-title" id="roleplayTitle">Practice Roleplay</div>
-              <div class="roleplay-subtitle" id="roleplaySubtitle">Medicare Sales</div>
-            </div>
-          </div>
-          <button class="roleplay-close" onclick="closeRoleplay()">✕</button>
-        </div>
-        <div class="roleplay-messages" id="roleplayMessages"></div>
-        <div class="roleplay-input-row">
-          <textarea class="roleplay-input" id="roleplayInput" placeholder="Type your response…" rows="2"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRoleplayMessage();}"></textarea>
-          <button class="roleplay-send-btn" id="roleplaySendBtn" onclick="sendRoleplayMessage()">Send ↑</button>
-        </div>
-      </div>
-    </div>
-
     <!-- UPDATES -->
     <section class="section" id="updates">
       <div class="wrap">
@@ -8372,6 +8300,45 @@ ${target.outerHTML}
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeRoleplay(); closeScoreModal(); } });
   </script>
+
+  <!-- SCORE MODAL -->
+  <div id="scoreModal" onclick="if(event.target===this)closeScoreModal()">
+    <div class="score-inner">
+      <div class="score-title">📊 Submit Your Score</div>
+      <div class="score-sub">Rate your performance after the roleplay session</div>
+      <div class="score-field"><label class="score-label">Your Name</label><input class="score-input" id="scoreAgent" placeholder="Jane Smith"></div>
+      <div class="score-field"><label class="score-label">Persona</label><input class="score-input" id="scorePersona" readonly></div>
+      <div class="score-field"><label class="score-label">Score (1–10)</label><select class="score-input" id="scoreValue"><option value="">Select…</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></div>
+      <div class="score-field"><label class="score-label">Would Client Buy?</label><select class="score-input" id="scoreWouldBuy"><option value="">Select…</option><option>Yes</option><option>No</option><option>Maybe</option></select></div>
+      <div class="score-field"><label class="score-label">Weakest Area</label><select class="score-input" id="scoreWeakArea"><option value="">Select…</option><option>Opening / Rapport</option><option>Discovery Questions</option><option>Product Knowledge</option><option>Objection Handling</option><option>Closing</option><option>Listening</option><option>Pacing / Tone</option></select></div>
+      <div class="score-btn-row">
+        <button class="score-cancel-btn" onclick="closeScoreModal()">Cancel</button>
+        <button class="score-submit-btn" onclick="submitScore()">Submit Score</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROLEPLAY MODAL -->
+  <div id="roleplayModal" onclick="if(event.target===this)closeRoleplay()">
+    <div class="roleplay-inner">
+      <div class="roleplay-header">
+        <div class="roleplay-header-left">
+          <div class="roleplay-avatar" id="roleplayAvatar">👤</div>
+          <div>
+            <div class="roleplay-title" id="roleplayTitle">Practice Roleplay</div>
+            <div class="roleplay-subtitle" id="roleplaySubtitle">Medicare Sales</div>
+          </div>
+        </div>
+        <button class="roleplay-close" onclick="closeRoleplay()">✕</button>
+      </div>
+      <div class="roleplay-messages" id="roleplayMessages"></div>
+      <div class="roleplay-input-row">
+        <textarea class="roleplay-input" id="roleplayInput" placeholder="Type your response…" rows="2"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRoleplayMessage();}"></textarea>
+        <button class="roleplay-send-btn" id="roleplaySendBtn" onclick="sendRoleplayMessage()">Send ↑</button>
+      </div>
+    </div>
+  </div>
 
   <script id="practice-client-script">
   // ── PRACTICE CLIENT ────────────────────────────────────────────────────────
