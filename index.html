@@ -3011,16 +3011,22 @@
       display:flex;gap:0;
       border-bottom:1px solid var(--border);
       background:rgba(0,0,0,.2);
+      overflow-x:auto;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+      flex-wrap:nowrap;
     }
+    .admin-tabs::-webkit-scrollbar{display:none;}
     .admin-tab {
-      padding:12px 20px;
-      font-size:12.5px;font-weight:700;
+      padding:11px 14px;
+      font-size:12px;font-weight:700;
       color:var(--muted-2);
       cursor:pointer;border:none;background:none;
       font-family:'Plus Jakarta Sans',sans-serif;
       border-bottom:2px solid transparent;
       transition:color .15s,border-color .15s;
       white-space:nowrap;
+      flex-shrink:0;
     }
     .admin-tab.active{color:#fff;border-bottom-color:var(--accent);}
     .admin-tab:hover:not(.active){color:var(--muted);}
@@ -4998,7 +5004,7 @@
 
 <!-- /adminTabVideos -->
 
-        <div id="adminTabPractice" class="admin-tab-panel" style="display:none;">
+        <div id="adminTabPractice" class="admin-tab-panel">
           <div class="admin-section-title">🎯 Weekly Practice Client</div>
           <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Set this week's client persona and scenario. Agents will see this when they visit the Practice Client section.</p>
 
