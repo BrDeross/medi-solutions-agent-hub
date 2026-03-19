@@ -4370,55 +4370,24 @@
           <div class="sh-left">
             <div class="sh-icon rose" style="background:rgba(251,113,133,.15);color:#fb7185;">🎯</div>
             <div>
-              <h2>Weekly Practice Client</h2>
-              <p>Roleplay with this week's client persona and sharpen your sales skills</p>
+              <h2>Sales Roleplay Practice</h2>
+              <p>Sharpen your skills with AI-powered client roleplay</p>
             </div>
           </div>
-          <span class="count-chip" id="practiceWeekLabel">This Week</span>
         </div>
-
-        <div class="practice-layout" id="practiceLayout">
-          <!-- LEFT: Persona -->
-          <div class="practice-persona">
-            <div class="practice-persona-img" id="practicePersonaImg">👤</div>
-            <div class="practice-persona-name" id="practicePersonaName">Loading…</div>
-            <div class="practice-persona-meta" id="practicePersonaMeta"></div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:6px;">🤖 AI Consumer Roleplay</div>
+            <div style="font-size:13.5px;color:var(--muted);margin-bottom:10px;">Practice live client scenarios with an AI-powered Medicare consumer. Available via ChatGPT.</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:6px 14px;">
+              <span style="font-size:16px;">📱</span>
+              <span style="font-size:12px;font-weight:700;color:var(--gold);">Only use the Roleplay tool from a mobile phone.</span>
+            </div>
           </div>
-
-          <!-- RIGHT: Details -->
-          <div class="practice-details">
-            <div class="practice-box">
-              <div class="practice-box-title">This Week's Scenario</div>
-              <div class="practice-scenario-grid">
-                <div class="practice-scenario-item">
-                  <span class="practice-scenario-label">Product</span>
-                  <span class="practice-scenario-value" id="practiceProduct">—</span>
-                </div>
-                <div class="practice-scenario-item">
-                  <span class="practice-scenario-label">Appointment</span>
-                  <span class="practice-scenario-value" id="practiceAppointment">—</span>
-                </div>
-                <div class="practice-scenario-item">
-                  <span class="practice-scenario-label">Focus</span>
-                  <span class="practice-scenario-value" id="practiceFocus">—</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="practice-box">
-              <div class="practice-box-title">Client Mindset</div>
-              <div class="practice-mindset-tags" id="practiceMindset"></div>
-            </div>
-
-            <div class="practice-buttons">
-              <button class="practice-btn practice-btn-primary" onclick="openRoleplay()">🎤 Start AI Roleplay</button>
-              <div style="display:flex;flex-direction:column;gap:4px;">
-                <a class="practice-btn practice-btn-secondary" href="https://chatgpt.com/g/g-69bbfe5f216c8191b29ee1b3b3f98d97-consumer-rolepay" target="_blank" rel="noopener" style="text-decoration:none;">🤖 Open GPT Roleplay</a>
-                <span style="font-size:11px;color:var(--gold);font-weight:700;padding-left:4px;">📱 Only use the Roleplay tool from a mobile phone.</span>
-              </div>
-            </div>
-
-          </div>
+          <a href="https://chatgpt.com/g/g-69bbfe5f216c8191b29ee1b3b3f98d97-consumer-rolepay" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--accent);border-radius:14px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 4px 20px rgba(59,130,246,.4);white-space:nowrap;flex-shrink:0;">
+            🚀 Launch GPT Roleplay
+          </a>
         </div>
       </div>
     </section>
@@ -6557,7 +6526,7 @@ When answering:
     div.innerHTML = `
       <div class="admin-field">
         <label>Agent Name</label>
-        <input class="admin-input exec-name-input" value="${esc(e.name||'')}" placeholder="Jane Smith" readonly>
+        <input class="admin-input exec-name-input" value="${esc(e.name||'')}" placeholder="Jane Smith">
       </div>
       <div class="admin-field">
         <label>Weeks in a Row</label>
@@ -8335,7 +8304,7 @@ ${target.outerHTML}
   // ── Load practice client from Supabase ────────────────────────────────────
   function initPracticeClient() {
     fetch(`${PC_SUPA_URL}/rest/v1/practice_client?hub=eq.${PC_HUB}&select=data`, {
-      headers: { 'apikey': PC_SUPA_KEY, 'Authorization': 'Bearer ' + PC_SUPA_KEY }
+      headers: { 'apikey': PC_SUPA_KEY, 'Authorization': 'Bearer ' + PC_SUPA_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
     .then(rows => {
