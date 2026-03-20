@@ -7452,7 +7452,7 @@ ${target.outerHTML}
 
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initVideos() {
-    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data&t=${Date.now()}`, {
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
       headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
