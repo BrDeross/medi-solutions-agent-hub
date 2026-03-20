@@ -4229,26 +4229,7 @@
     </section>
 
 
-    <!-- FRIDAY MEETINGS -->
-    <section class="section" id="friday-meetings">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="sh-left">
-            <div class="sh-icon" style="background:rgba(167,139,250,.15);color:#a78bfa;">📅</div>
-            <div>
-              <h2>Friday Team Meetings</h2>
-              <p>Upcoming Friday meeting schedule and topics</p>
-            </div>
-          </div>
-          <span class="count-chip" id="fridayMeetingCount">0 meetings</span>
-        </div>
-        <div id="fridayMeetingList" style="display:flex;flex-direction:column;gap:12px;">
-          <div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings scheduled yet.</div>
-        </div>
-      </div>
-    </section>
-
-        <!-- SNU — SHOW N UP NEWSLETTER -->
+    <!-- SNU — SHOW N UP NEWSLETTER -->
     <section class="section" id="leaderboard">
       <div class="wrap">
         <div class="section-head">
@@ -5087,7 +5068,24 @@ When answering:
       </div>
     </section>
 
-
+    <!-- FRIDAY MEETINGS -->
+    <section class="section" id="friday-meetings">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sh-left">
+            <div class="sh-icon" style="background:rgba(167,139,250,.15);color:#a78bfa;">📅</div>
+            <div>
+              <h2>Friday Team Meetings</h2>
+              <p>Upcoming Friday meeting schedule and topics</p>
+            </div>
+          </div>
+          <span class="count-chip" id="fridayMeetingCount">0 meetings</span>
+        </div>
+        <div id="fridayMeetingList" style="display:flex;flex-direction:column;gap:12px;">
+          <div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings scheduled yet.</div>
+        </div>
+      </div>
+    </section>
 
     <!-- SEP RULES MODAL -->
     <div id="sepModal" onclick="if(event.target===this)closeSepModal()" style="display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px;">
@@ -7306,6 +7304,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const SUPA_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
   const SUPA_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
   const UPD_HUB     = 'medi';
+  const UPD_STORAGE_KEY = 'snu_updates_v1';
   let _updates = [];
   let _updSaving = false;
   let _updAttachBase64 = null;
@@ -7354,17 +7353,27 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initUpdates() {
+    let localUpdates = [];
+    try {
+      localUpdates = JSON.parse(localStorage.getItem(UPD_STORAGE_KEY) || '[]');
+      if (!Array.isArray(localUpdates)) localUpdates = [];
+    } catch(e) { localUpdates = []; }
+    _updates = localUpdates;
+    renderFeedFromStorage();
+    refreshAdminUpdatesList();
+
     fetch(`${SUPA_URL}/rest/v1/updates?hub=eq.${UPD_HUB}&select=data`, {
       headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
     })
     .then(r => r.json())
     .then(rows => {
       _updates = rows.length ? JSON.parse(rows[0].data) : [];
+      try { localStorage.setItem(UPD_STORAGE_KEY, JSON.stringify(_updates)); } catch(e) {}
       renderFeedFromStorage();
       refreshAdminUpdatesList();
     })
     .catch(() => {
-      _updates = [];
+      _updates = localUpdates;
       renderFeedFromStorage();
       refreshAdminUpdatesList();
     });
@@ -7372,23 +7381,18 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Save to JSONBin ────────────────────────────────────────────────────────
   function saveUpdates(onSuccess) {
+    try { localStorage.setItem(UPD_STORAGE_KEY, JSON.stringify(_updates)); } catch(e) {}
     if (_updSaving) return;
     _updSaving = true;
-    const payload = JSON.stringify(_updates);
-    // DELETE existing row then INSERT fresh - bulletproof, no conflict issues
-    fetch(`${SUPA_URL}/rest/v1/updates?hub=eq.${UPD_HUB}`, {
-      method: 'DELETE',
-      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY }
+    fetch(`${SUPA_URL}/rest/v1/updates?on_conflict=hub`, {
+      method:  'POST',
+      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body:    JSON.stringify({ hub: UPD_HUB, data: JSON.stringify(_updates) })
     })
-    .then(() => fetch(`${SUPA_URL}/rest/v1/updates`, {
-      method: 'POST',
-      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: UPD_HUB, data: payload })
-    }))
     .then(r => {
       _updSaving = false;
-      if (r.ok || r.status === 201) {
-        console.log('[UPD SAVE] OK');
+      if (r.ok || r.status === 200 || r.status === 201 || r.status === 204) {
+        console.log('[UPD SAVE] OK', r.status);
         if (onSuccess) onSuccess();
       } else {
         r.text().then(t => console.error('[UPD SAVE] ERROR', r.status, t));
@@ -7534,6 +7538,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const JB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
   const JB_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
   const VID_HUB     = 'medi';
+  const VID_STORAGE_KEY = 'videos_v1';
   let _videos = [];
   let _videosSaving = false;
 
@@ -7549,17 +7554,27 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initVideos() {
+    let localVideos = [];
+    try {
+      localVideos = JSON.parse(localStorage.getItem(VID_STORAGE_KEY) || '[]');
+      if (!Array.isArray(localVideos)) localVideos = [];
+    } catch(e) { localVideos = []; }
+    _videos = localVideos;
+    renderVideoGrid();
+    refreshAdminVideosList();
+
     fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
       headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
     .then(rows => {
       _videos = rows.length ? JSON.parse(rows[0].data) : [];
+      try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
       renderVideoGrid();
       refreshAdminVideosList();
     })
     .catch(() => {
-      _videos = [];
+      _videos = localVideos;
       renderVideoGrid();
       refreshAdminVideosList();
     });
@@ -7567,22 +7582,18 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Save to JSONBin ────────────────────────────────────────────────────────
   function saveVideos(onSuccess) {
+    try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
     if (_videosSaving) return;
     _videosSaving = true;
-    const payload = JSON.stringify(_videos);
-    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
-      method: 'DELETE',
-      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY }
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?on_conflict=hub`, {
+      method:  'POST',
+      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body:    JSON.stringify({ hub: VID_HUB, data: JSON.stringify(_videos) })
     })
-    .then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
-      method: 'POST',
-      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: VID_HUB, data: payload })
-    }))
     .then(r => {
       _videosSaving = false;
-      if (r.ok || r.status === 201) {
-        console.log('[VID SAVE] OK');
+      if (r.ok || r.status === 200 || r.status === 201 || r.status === 204) {
+        console.log('[VID SAVE] OK', r.status);
         if (onSuccess) onSuccess();
       } else {
         r.text().then(t => console.error('[VID SAVE] ERROR', r.status, t));
@@ -8296,34 +8307,43 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const FM_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
   const FM_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
   const FM_SVC_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const FRIDAY_STORAGE_KEY = 'friday_meetings_v1';
   let _fridayMeetings = [];
 
   function initFridayMeetings() {
+    let localMeetings = [];
+    try {
+      localMeetings = JSON.parse(localStorage.getItem(FRIDAY_STORAGE_KEY) || '[]');
+      if (!Array.isArray(localMeetings)) localMeetings = [];
+    } catch(e) { localMeetings = []; }
+    _fridayMeetings = localMeetings;
+    renderFridayMeetings(); renderFridayAdminList();
+
     fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi&select=data`, {
       headers: { 'apikey': FM_SUPA_KEY, 'Authorization': 'Bearer ' + FM_SUPA_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
     .then(rows => {
       _fridayMeetings = rows.length && rows[0].data ? JSON.parse(rows[0].data) : [];
+      try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
       renderFridayMeetings(); renderFridayAdminList();
     })
-    .catch(() => { _fridayMeetings = []; renderFridayMeetings(); });
+    .catch(() => {
+      _fridayMeetings = localMeetings;
+      renderFridayMeetings(); renderFridayAdminList();
+    });
   }
 
   function saveFridayMeetings(onSuccess) {
-    const payload = JSON.stringify(_fridayMeetings);
-    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi`, {
-      method: 'DELETE',
-      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY }
-    })
-    .then(() => fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings`, {
+    try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
+    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?on_conflict=hub`, {
       method: 'POST',
-      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: 'medi', data: payload })
-    }))
+      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ hub: 'medi', data: JSON.stringify(_fridayMeetings) })
+    })
     .then(r => {
-      if (r.ok || r.status === 201) {
-        console.log('[FM SAVE] OK');
+      if (r.ok || r.status === 200 || r.status === 201 || r.status === 204) {
+        console.log('[FM SAVE] OK', r.status);
         if (onSuccess) onSuccess();
       } else {
         r.text().then(t => console.error('[FM SAVE] ERROR', r.status, t));
