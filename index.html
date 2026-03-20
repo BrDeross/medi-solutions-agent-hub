@@ -7372,17 +7372,18 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function saveUpdates(onSuccess) {
     if (_updSaving) return;
     _updSaving = true;
-    fetch(`${SUPA_URL}/rest/v1/updates?hub=eq.${UPD_HUB}`, {
-      method:  'PATCH',
-      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body:    JSON.stringify({ data: JSON.stringify(_updates) })
+    fetch(`${SUPA_URL}/rest/v1/updates?on_conflict=hub`, {
+      method:  'POST',
+      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body:    JSON.stringify({ hub: UPD_HUB, data: JSON.stringify(_updates) })
     })
     .then(r => {
       _updSaving = false;
-      if (r.ok || r.status === 204) {
+      if (r.ok || r.status === 200 || r.status === 201 || r.status === 204) {
+        console.log('[UPD SAVE] OK', r.status);
         if (onSuccess) onSuccess();
       } else {
-        r.text().then(t => console.error('[UPD SAVE]', r.status, t));
+        r.text().then(t => console.error('[UPD SAVE] ERROR', r.status, t));
         showSnuToast('\u26a0 Save error ' + r.status);
       }
     })
@@ -7560,17 +7561,18 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function saveVideos(onSuccess) {
     if (_videosSaving) return;
     _videosSaving = true;
-    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
-      method:  'PATCH',
-      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body:    JSON.stringify({ data: JSON.stringify(_videos) })
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?on_conflict=hub`, {
+      method:  'POST',
+      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body:    JSON.stringify({ hub: VID_HUB, data: JSON.stringify(_videos) })
     })
     .then(r => {
       _videosSaving = false;
-      if (r.ok || r.status === 204) {
+      if (r.ok || r.status === 200 || r.status === 201 || r.status === 204) {
+        console.log('[VID SAVE] OK', r.status);
         if (onSuccess) onSuccess();
       } else {
-        r.text().then(t => console.error('[VID SAVE]', r.status, t));
+        r.text().then(t => console.error('[VID SAVE] ERROR', r.status, t));
         showSnuToast('\u26a0 Save error ' + r.status);
       }
     })
@@ -8296,16 +8298,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function saveFridayMeetings(onSuccess) {
-    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi`, {
-      method: 'PATCH',
-      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ data: JSON.stringify(_fridayMeetings) })
+    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?on_conflict=hub`, {
+      method: 'POST',
+      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ hub: 'medi', data: JSON.stringify(_fridayMeetings) })
     })
     .then(r => {
-      if (r.ok || r.status === 204) {
+      if (r.ok || r.status === 200 || r.status === 201 || r.status === 204) {
+        console.log('[FM SAVE] OK', r.status);
         if (onSuccess) onSuccess();
       } else {
-        r.text().then(t => console.error('[FM SAVE]', r.status, t));
+        r.text().then(t => console.error('[FM SAVE] ERROR', r.status, t));
         showSnuToast('\u26a0 Save error ' + r.status);
       }
     })
