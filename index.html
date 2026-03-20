@@ -7213,6 +7213,7 @@ ${target.outerHTML}
   // ── UPDATES (JSONBin backend) ──────────────────────────────────────────────
   const SUPA_URL    = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
   const SUPA_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  const SUPA_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
   const UPD_HUB     = 'medi';
   let _updates = [];
   let _updSaving = false;
@@ -7284,11 +7285,11 @@ ${target.outerHTML}
     _updSaving = true;
     fetch(`${SUPA_URL}/rest/v1/updates?hub=eq.${UPD_HUB}`, {
       method:  'DELETE',
-      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY }
     })
     .then(() => fetch(`${SUPA_URL}/rest/v1/updates`, {
       method:  'POST',
-      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body:    JSON.stringify({ hub: UPD_HUB, data: JSON.stringify(_updates) })
     }))
     .then(() => { _updSaving = false; if (onSuccess) onSuccess(); })
@@ -7429,6 +7430,7 @@ ${target.outerHTML}
   // ── VIDEO LIBRARY (JSONBin backend) ────────────────────────────────────────
   const JB_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
   const JB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  const JB_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
   const VID_HUB     = 'medi';
   let _videos = [];
   let _videosSaving = false;
@@ -7467,11 +7469,11 @@ ${target.outerHTML}
     _videosSaving = true;
     fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
       method:  'DELETE',
-      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY }
+      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY }
     })
     .then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
       method:  'POST',
-      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body:    JSON.stringify({ hub: VID_HUB, data: JSON.stringify(_videos) })
     }))
     .then(() => { _videosSaving = false; if (onSuccess) onSuccess(); })
