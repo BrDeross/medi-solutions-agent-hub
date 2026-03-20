@@ -6281,7 +6281,7 @@ When answering:
       </div>
       <div class="admin-field">
         <label>Weeks in a Row</label>
-        <input class="admin-input exec-weeks-input" type="number" min="1" value="${e.weeks||''}" readonly>
+        <input class="admin-input exec-weeks-input" type="number" min="1" value="${e.weeks||''}" placeholder="2">
       </div>
       <button class="admin-remove-btn" onclick="this.closest('.admin-exec-row').remove()" title="Remove">✕</button>
     `;
@@ -6327,7 +6327,15 @@ When answering:
     if (existingIndex >= 0) history[existingIndex] = entry;
     else history.push(entry);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    const execs = computeExecStreaks(history);
+    // Collect manually entered exec rows first
+    const manualExecRows = document.querySelectorAll('#adminExecRows .admin-exec-row');
+    const manualExecs = [];
+    manualExecRows.forEach(row => {
+      const name  = row.querySelector('.exec-name-input')?.value?.trim();
+      const weeks = parseInt(row.querySelector('.exec-weeks-input')?.value) || 0;
+      if (name) manualExecs.push({ name, weeks: weeks || 1 });
+    });
+    const execs = manualExecs.length > 0 ? manualExecs : computeExecStreaks(history);
 
     const data = { weekLabel, dateRange, agents, execs, savedAt: new Date().toISOString() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
