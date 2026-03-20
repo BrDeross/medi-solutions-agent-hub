@@ -7284,14 +7284,19 @@ ${target.outerHTML}
     if (_updSaving) return;
     _updSaving = true;
     fetch(`${SUPA_URL}/rest/v1/updates?hub=eq.${UPD_HUB}`, {
-      method:  'DELETE',
-      headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY }
-    })
-    .then(() => fetch(`${SUPA_URL}/rest/v1/updates`, {
-      method:  'POST',
+      method:  'PATCH',
       headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body:    JSON.stringify({ hub: UPD_HUB, data: JSON.stringify(_updates) })
-    }))
+      body:    JSON.stringify({ data: JSON.stringify(_updates) })
+    })
+    .then(r => {
+      if (r.status === 404 || r.headers.get('content-range') === '*/0') {
+        return fetch(`${SUPA_URL}/rest/v1/updates`, {
+          method:  'POST',
+          headers: { 'apikey': SUPA_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPA_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body:    JSON.stringify({ hub: UPD_HUB, data: JSON.stringify(_updates) })
+        });
+      }
+    })
     .then(() => { _updSaving = false; if (onSuccess) onSuccess(); })
     .catch(() => { _updSaving = false; showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
   }
@@ -7447,8 +7452,8 @@ ${target.outerHTML}
 
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initVideos() {
-    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
-      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY }
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data&t=${Date.now()}`, {
+      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
     .then(rows => {
@@ -7468,14 +7473,20 @@ ${target.outerHTML}
     if (_videosSaving) return;
     _videosSaving = true;
     fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
-      method:  'DELETE',
-      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY }
-    })
-    .then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
-      method:  'POST',
+      method:  'PATCH',
       headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body:    JSON.stringify({ hub: VID_HUB, data: JSON.stringify(_videos) })
-    }))
+      body:    JSON.stringify({ data: JSON.stringify(_videos) })
+    })
+    .then(r => {
+      // If no row exists yet (nothing to PATCH), insert one
+      if (r.status === 404 || r.headers.get('content-range') === '*/0') {
+        return fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
+          method:  'POST',
+          headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body:    JSON.stringify({ hub: VID_HUB, data: JSON.stringify(_videos) })
+        });
+      }
+    })
     .then(() => { _videosSaving = false; if (onSuccess) onSuccess(); })
     .catch(() => { _videosSaving = false; showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
   }
