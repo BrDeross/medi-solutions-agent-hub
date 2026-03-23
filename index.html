@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><!-- My Medi Hub v2026-03-12 14:27 -->
+<html lang="en"><!-- My Medi Hub v2026-03-23 17:15 backend-sync-layout-friday-video-fix -->
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
@@ -4865,6 +4865,7 @@
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Date</label>
               <input type="date" class="admin-input" id="fridayDatePicker" onchange="syncFridayDate(this.value)" style="cursor:pointer;">
+              <input type="hidden" id="fridayDate">
             </div>
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Time</label>
@@ -4914,7 +4915,7 @@
 
         <div id="adminTabLayout" class="admin-tab-panel">
           <div class="admin-section-title">🔀 Section Order</div>
-          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Drag to reorder sections. The first item in this list will appear first on the main hub.</p>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Drag to reorder sections. Changes apply instantly and are saved to your browser.</p>
           <div id="layoutSortList" style="display:flex;flex-direction:column;gap:8px;"></div>
           <button class="admin-save-btn" onclick="resetSectionOrder()" style="width:auto;padding:8px 20px;margin-top:16px;background:rgba(255,255,255,.06);border:1px solid var(--border);">↺ Reset to Default</button>
         </div>
@@ -5239,7 +5240,7 @@ When answering:
   const JB_MAIN_BIN      = '69b2cd77aa77b81da9dbc6e6';
   const JB_PHOTO_BIN_KEY          = 'mymedi_jb_photo_bin_id';
   const JB_PHOTO_BIN_HARDCODED = '69b2da94c3097a1dd51cd2cf';
-  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
+  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}}, snu_videos:[], snu_friday_meetings:[], snu_layout_order:[], snu_layout_vis:{} };
 
   // ── Generic bin helpers ────────────────────────────────────────
   async function jbReadBin(id) {
@@ -5337,6 +5338,10 @@ When answering:
     if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
     if (record.snu_trip?.agents?.length) localStorage.setItem('snu_trip_v1', JSON.stringify(record.snu_trip));
+    if (Array.isArray(record.snu_videos)) localStorage.setItem('videos_v1', JSON.stringify(record.snu_videos));
+    if (Array.isArray(record.snu_friday_meetings)) localStorage.setItem('friday_meetings_v1', JSON.stringify(record.snu_friday_meetings));
+    if (Array.isArray(record.snu_layout_order)) localStorage.setItem('medi_section_order_v2', JSON.stringify(record.snu_layout_order));
+    if (record.snu_layout_vis && typeof record.snu_layout_vis === 'object') localStorage.setItem('medi_section_vis_v2', JSON.stringify(record.snu_layout_vis));
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
@@ -5347,7 +5352,7 @@ When answering:
 
   // ── Save a field ──────────────────────────────────────────────
   window.jbSave = async function(field, value) {
-    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
+    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1', snu_videos:'videos_v1', snu_friday_meetings:'friday_meetings_v1', snu_layout_order:'medi_section_order_v2', snu_layout_vis:'medi_section_vis_v2' };
     if (lsMap[field]) { try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {} }
 
     // Save photos to photo bin
@@ -6167,6 +6172,10 @@ When answering:
           _updates = window._jb_updates_override;
           if (typeof renderFeedFromStorage === 'function') renderFeedFromStorage();
         }
+        if (typeof initVideos === 'function') initVideos();
+        if (typeof initFridayMeetings === 'function') initFridayMeetings();
+        if (typeof applySectionOrder === 'function') applySectionOrder();
+        if (typeof renderLayoutAdmin === 'function') renderLayoutAdmin();
       }
     })();
     loadWeeklyArticle();
@@ -7666,56 +7675,37 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       localVideos = JSON.parse(localStorage.getItem(VID_STORAGE_KEY) || '[]');
       if (!Array.isArray(localVideos)) localVideos = [];
     } catch(e) { localVideos = []; }
-    _videos = localVideos;
+
+    const cloudVideos = Array.isArray(window._jbRecord?.snu_videos) ? window._jbRecord.snu_videos : null;
+    _videos = cloudVideos || localVideos;
+    try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
     renderVideoGrid();
     refreshAdminVideosList();
-
-    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
-      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
-    })
-    .then(r => r.json())
-    .then(rows => {
-      const cloudData = rows.length ? JSON.parse(rows[0].data) : [];
-      if (cloudData.length > 0 || localVideos.length === 0) {
-        _videos = cloudData;
-        try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
-      }
-      renderVideoGrid();
-      refreshAdminVideosList();
-    })
-    .catch(() => {
-      _videos = localVideos;
-      renderVideoGrid();
-      refreshAdminVideosList();
-    });
   }
 
-  // ── Save to JSONBin ────────────────────────────────────────────────────────
+  // ── Save videos to shared hub record ─────────────────────────────────────
   function saveVideos(onSuccess) {
     try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
     if (_videosSaving) return;
     _videosSaving = true;
-    const payload = JSON.stringify(_videos);
-    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
-      method: 'DELETE',
-      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY }
-    })
-    .then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
-      method: 'POST',
-      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: VID_HUB, data: payload })
-    }))
-    .then(r => {
+
+    const done = (ok) => {
       _videosSaving = false;
-      if (r.ok || r.status === 201) {
-        console.log('[VID SAVE] OK');
+      if (ok) {
         if (onSuccess) onSuccess();
       } else {
-        r.text().then(t => console.error('[VID SAVE] ERROR', r.status, t));
-        showSnuToast('\u26a0 Save error ' + r.status);
+        showSnuToast('⚠ Save failed.');
       }
-    })
-    .catch(e => { _videosSaving = false; console.error('[VID SAVE]', e); showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
+    };
+
+    if (typeof jbSave === 'function') {
+      Promise.resolve(jbSave('snu_videos', _videos))
+        .then(() => done(true))
+        .catch(err => { console.error('[VID SAVE]', err); done(false); });
+      return;
+    }
+
+    done(false);
   }
 
   // ── Render the public video grid ───────────────────────────────────────────
@@ -8425,55 +8415,46 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const FRIDAY_STORAGE_KEY = 'friday_meetings_v1';
   let _fridayMeetings = [];
 
+  function syncFridayDate(val) {
+    const picker = document.getElementById('fridayDatePicker');
+    const hidden = document.getElementById('fridayDate');
+    const raw = val || picker?.value || '';
+    if (hidden) hidden.value = raw;
+  }
+
+  function formatFridayDate(raw) {
+    if (!raw) return '';
+    const d = new Date(raw + 'T00:00:00');
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+
   function initFridayMeetings() {
     let localMeetings = [];
     try {
       localMeetings = JSON.parse(localStorage.getItem(FRIDAY_STORAGE_KEY) || '[]');
       if (!Array.isArray(localMeetings)) localMeetings = [];
     } catch(e) { localMeetings = []; }
-    _fridayMeetings = localMeetings;
-    renderFridayMeetings(); renderFridayAdminList();
 
-    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi&select=data`, {
-      headers: { 'apikey': FM_SUPA_KEY, 'Authorization': 'Bearer ' + FM_SUPA_KEY, 'Cache-Control': 'no-cache' }
-    })
-    .then(r => r.json())
-    .then(rows => {
-      const cloudData = rows.length && rows[0].data ? JSON.parse(rows[0].data) : [];
-      if (cloudData.length > 0 || localMeetings.length === 0) {
-        _fridayMeetings = cloudData;
-        try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
-      }
-      renderFridayMeetings(); renderFridayAdminList();
-    })
-    .catch(() => {
-      _fridayMeetings = localMeetings;
-      renderFridayMeetings(); renderFridayAdminList();
-    });
+    const cloudMeetings = Array.isArray(window._jbRecord?.snu_friday_meetings) ? window._jbRecord.snu_friday_meetings : null;
+    _fridayMeetings = cloudMeetings || localMeetings;
+    try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
+
+    renderFridayMeetings(); 
+    renderFridayAdminList();
   }
 
   function saveFridayMeetings(onSuccess) {
     try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
-    const payload = JSON.stringify(_fridayMeetings);
-    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi`, {
-      method: 'DELETE',
-      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY }
-    })
-    .then(() => fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings`, {
-      method: 'POST',
-      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: 'medi', data: payload })
-    }))
-    .then(r => {
-      if (r.ok || r.status === 201) {
-        console.log('[FM SAVE] OK');
-        if (onSuccess) onSuccess();
-      } else {
-        r.text().then(t => console.error('[FM SAVE] ERROR', r.status, t));
-        showSnuToast('\u26a0 Save error ' + r.status);
-      }
-    })
-    .catch(e => { console.error('[FM SAVE]', e); showSnuToast('\u26a0 Save failed.'); });
+
+    if (typeof jbSave === 'function') {
+      Promise.resolve(jbSave('snu_friday_meetings', _fridayMeetings))
+        .then(() => { if (onSuccess) onSuccess(); })
+        .catch(err => { console.error('[FM SAVE]', err); showSnuToast('⚠ Save failed.'); });
+      return;
+    }
+
+    showSnuToast('⚠ Save failed.');
   }
 
   function renderFridayMeetings() {
@@ -8489,7 +8470,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
           <div style="font-size:22px;">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'}</div>
           <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
-          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${pesc(m.date||'')}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${pesc(formatFridayDate(m.date||''))}</div>
         </div>
         <div style="flex:1;">
           <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
@@ -8510,7 +8491,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     el.innerHTML = _fridayMeetings.map((m,i) => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
         <div><div style="font-size:13px;font-weight:700;color:var(--text);">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'} ${pesc(m.topic||'Meeting')}</div>
-        <div style="font-size:11px;color:var(--muted-2);">${pesc(m.date||'')} ${m.time?'\u00b7 '+pesc(m.time):''}</div></div>
+        <div style="font-size:11px;color:var(--muted-2);">${pesc(formatFridayDate(m.date||''))} ${m.time?'\u00b7 '+pesc(m.time):''}</div></div>
         <button class="admin-remove-btn" onclick="deleteFridayMeeting(${i})" title="Remove">\u2715</button>
       </div>`).join('');
   }
@@ -8533,8 +8514,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const gv = id => document.getElementById(id)?.value?.trim()||'';
     const topic = gv('fridayTopic');
     if (!topic) { showSnuToast('\u26a0 Please enter a meeting topic.'); return; }
-    _fridayMeetings.push({ id: Date.now(), date: gv('fridayDate'), time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), type: _fridayType });
-    ['fridayDate','fridayTime','fridayTopic','fridayNotes','fridayLink'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+    _fridayMeetings.push({ id: Date.now(), date: (document.getElementById('fridayDatePicker')?.value || gv('fridayDate')), time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), type: _fridayType });
+    ['fridayDate','fridayDatePicker','fridayTime','fridayTopic','fridayNotes','fridayLink'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
     setFridayType('in-person');
     renderFridayMeetings(); renderFridayAdminList();
     showSnuToast('\u23f3 Saving...');
@@ -8554,20 +8535,20 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   <script id="layout-manager-script">
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
-    { id: 'cert-tracker',        label: '🎓 Cert Tracker' },
-    { id: 'friday-meetings',     label: '📅 Friday Meetings' },
-    { id: 'leaderboard',         label: '🏆 SNU / Leaderboard' },
-    { id: 'agent-tools',         label: '🛠 Agent Tools' },
-    { id: 'quick-access',        label: '🔗 Quick Access Portals' },
-    { id: 'video-library',       label: '🎬 Video Library' },
-    { id: 'practice-client',     label: '🎯 Practice Client' },
-    { id: 'updates',             label: '📡 Updates Feed' },
-    { id: 'trip-tracker',        label: '🏝️ Trip Tracker' },
-    { id: 'agent-spotlight',     label: '⭐ Agent Spotlight' },
-    { id: 'agent-of-the-month',  label: '🗓️ Agent of the Month' },
-    { id: 'industry-spotlight',  label: '📰 Industry Spotlight' },
-    { id: 'libraries',           label: '📖 Agent Libraries' },
-    { id: 'operations-ai',       label: '🤖 Agent Assistant' },
+    { id: 'industry-spotlight', label: '💡 Industry Spotlight' },
+    { id: 'agent-of-the-month', label: '🏅 Agent of the Month' },
+    { id: 'agent-spotlight',    label: '⭐ Agent Spotlight' },
+    { id: 'libraries',          label: '📚 Agent Libraries' },
+    { id: 'cert-tracker',       label: '🎓 Cert Tracker' },
+    { id: 'friday-meetings',    label: '📅 Friday Meetings' },
+    { id: 'leaderboard',        label: '🏆 SNU / Leaderboard' },
+    { id: 'agent-tools',        label: '🛠 Agent Tools' },
+    { id: 'quick-access',       label: '🔗 Quick Access Portals' },
+    { id: 'video-library',      label: '🎬 Video Library' },
+    { id: 'practice-client',    label: '🎯 Practice Client' },
+    { id: 'updates',            label: '📡 Updates Feed' },
+    { id: 'trip-tracker',       label: '🏝️ Trip Tracker' },
+    { id: 'operations-ai',      label: '🤖 Agent Assistant' },
   ];
   const LAYOUT_KEY     = 'medi_section_order_v2';
   const LAYOUT_VIS_KEY = 'medi_section_vis_v2';
@@ -8588,35 +8569,31 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function getSectionVis() {
     try {
       const saved = JSON.parse(localStorage.getItem(LAYOUT_VIS_KEY) || '{}');
-      return saved;
+      return saved && typeof saved === 'object' ? saved : {};
     } catch(e) { return {}; }
   }
 
   function saveSectionVis(vis) {
     try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
+    if (typeof jbSave === 'function') jbSave('snu_layout_vis', vis);
   }
 
   function applySectionOrder() {
     const order = getSectionOrder();
     const vis   = getSectionVis();
 
-    // Get the direct-child footer of .page as our anchor
     const page = document.querySelector('.page');
     if (!page) return;
-    let footer = null;
-    for (const child of page.children) {
-      if (child.tagName === 'FOOTER') { footer = child; break; }
-    }
+    const footer = page.querySelector(':scope > footer');
     if (!footer) return;
 
-    // Move each section to just before footer in the same order shown in Admin.
-    // Do not reverse it — the admin top item should become the top item on the page.
+    const frag = document.createDocumentFragment();
     order.forEach(id => {
       const el = document.getElementById(id);
-      if (el) page.insertBefore(el, footer);
+      if (el && el.parentElement === page) frag.appendChild(el);
     });
+    page.insertBefore(frag, footer);
 
-    // Apply visibility
     LAYOUT_SECTIONS.forEach(s => {
       const el = document.getElementById(s.id);
       if (!el) return;
@@ -8636,11 +8613,20 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveSectionOrder(order) {
     try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(order)); } catch(e) {}
+    if (typeof jbSave === 'function') jbSave('snu_layout_order', order);
   }
 
   function resetSectionOrder() {
     localStorage.removeItem(LAYOUT_KEY);
     localStorage.removeItem(LAYOUT_VIS_KEY);
+    const defaultOrder = LAYOUT_SECTIONS.map(s => s.id);
+    const defaultVis = {};
+    try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(defaultOrder)); } catch(e) {}
+    try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(defaultVis)); } catch(e) {}
+    if (typeof jbSave === 'function') {
+      jbSave('snu_layout_order', defaultOrder);
+      jbSave('snu_layout_vis', defaultVis);
+    }
     applySectionOrder();
     renderLayoutAdmin();
     showSnuToast('↺ Layout reset to default.');
