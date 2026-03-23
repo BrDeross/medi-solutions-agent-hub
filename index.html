@@ -8549,6 +8549,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
+    { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
     { id: 'friday-meetings',  label: '📅 Friday Meetings' },
     { id: 'leaderboard',      label: '🏆 SNU / Leaderboard' },
     { id: 'agent-tools',      label: '🛠 Agent Tools' },
@@ -8560,13 +8561,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     { id: 'agent-spotlight',  label: '⭐ Agent Spotlight' },
     { id: 'operations-ai',    label: '🤖 Agent Assistant' },
   ];
-  const LAYOUT_KEY = 'medi_section_order_v1';
+  const LAYOUT_KEY     = 'medi_section_order_v2';
+  const LAYOUT_VIS_KEY = 'medi_section_vis_v2';
 
   function getSectionOrder() {
     try {
       const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || '[]');
       if (saved.length) {
-        // Merge: keep saved order, append any new sections not in saved
         const known = LAYOUT_SECTIONS.map(s => s.id);
         const valid = saved.filter(id => known.includes(id));
         const missing = known.filter(id => !valid.includes(id));
@@ -8576,19 +8577,51 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     return LAYOUT_SECTIONS.map(s => s.id);
   }
 
+  function getSectionVis() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LAYOUT_VIS_KEY) || '{}');
+      return saved;
+    } catch(e) { return {}; }
+  }
+
+  function saveSectionVis(vis) {
+    try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
+  }
+
   function applySectionOrder() {
     const order = getSectionOrder();
-    const container = document.querySelector('.wrap') || document.body;
-    // Find a common parent for all sections
-    const firstSection = document.getElementById(order[0]);
-    if (!firstSection) return;
-    const parent = firstSection.parentElement;
+    const vis   = getSectionVis();
+
+    // Find the main page wrapper — parent of the first known section
+    let parent = null;
+    for (const id of order) {
+      const el = document.getElementById(id);
+      if (el && el.parentElement) { parent = el.parentElement; break; }
+    }
     if (!parent) return;
 
+    // Apply order
     order.forEach(id => {
       const el = document.getElementById(id);
       if (el) parent.appendChild(el);
     });
+
+    // Apply visibility
+    LAYOUT_SECTIONS.forEach(s => {
+      const el = document.getElementById(s.id);
+      if (!el) return;
+      const hidden = vis[s.id] === false;
+      el.style.display = hidden ? 'none' : '';
+    });
+  }
+
+  function toggleSectionVis(id) {
+    const vis = getSectionVis();
+    vis[id] = vis[id] === false ? true : false;
+    saveSectionVis(vis);
+    applySectionOrder();
+    renderLayoutAdmin();
+    showSnuToast(vis[id] === false ? '🙈 Section hidden.' : '👁 Section visible.');
   }
 
   function saveSectionOrder(order) {
@@ -8597,29 +8630,38 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function resetSectionOrder() {
     localStorage.removeItem(LAYOUT_KEY);
+    localStorage.removeItem(LAYOUT_VIS_KEY);
     applySectionOrder();
     renderLayoutAdmin();
-    showSnuToast('↺ Section order reset to default.');
+    showSnuToast('↺ Layout reset to default.');
   }
 
   function renderLayoutAdmin() {
     const list = document.getElementById('layoutSortList');
     if (!list) return;
     const order = getSectionOrder();
+    const vis   = getSectionVis();
     const labelMap = {};
     LAYOUT_SECTIONS.forEach(s => labelMap[s.id] = s.label);
 
-    list.innerHTML = order.map((id, i) => `
+    list.innerHTML = order.map((id, i) => {
+      const visible = vis[id] !== false;
+      return `
       <div class="layout-row" draggable="true" data-id="${id}" data-index="${i}"
            ondragstart="layoutDragStart(event)"
            ondragover="layoutDragOver(event)"
            ondrop="layoutDrop(event)"
            ondragend="layoutDragEnd(event)"
-           style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;cursor:grab;user-select:none;">
-        <span style="color:var(--muted-2);font-size:16px;cursor:grab;">⠿</span>
+           style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;cursor:grab;user-select:none;opacity:${visible?1:.45};">
+        <span style="color:var(--muted-2);font-size:18px;cursor:grab;line-height:1;">⠿</span>
         <span style="flex:1;font-size:13px;font-weight:600;color:var(--text);">${labelMap[id] || id}</span>
-        <span style="font-size:11px;color:var(--muted-2);">${i === 0 ? 'TOP' : '#' + (i+1)}</span>
-      </div>`).join('');
+        <span style="font-size:11px;color:var(--muted-2);margin-right:8px;">${i === 0 ? 'TOP' : '#'+(i+1)}</span>
+        <button onclick="toggleSectionVis('${id}')" title="${visible?'Hide':'Show'} section"
+          style="padding:5px 12px;border-radius:7px;border:1px solid ${visible?'rgba(34,197,94,.3)':'rgba(255,255,255,.1)'};background:${visible?'rgba(34,197,94,.12)':'rgba(255,255,255,.04)'};color:${visible?'#22c55e':'var(--muted)'};font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">
+          ${visible ? '👁 Visible' : '🙈 Hidden'}
+        </button>
+      </div>`;
+    }).join('');
   }
 
   let _layoutDragSrc = null;
@@ -8628,7 +8670,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     _layoutDragSrc = e.currentTarget;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', e.currentTarget.dataset.index);
-    setTimeout(() => { if (_layoutDragSrc) _layoutDragSrc.style.opacity = '0.4'; }, 0);
+    setTimeout(() => { if (_layoutDragSrc) _layoutDragSrc.style.opacity = '0.2'; }, 0);
   }
 
   function layoutDragOver(e) {
@@ -8636,6 +8678,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     e.dataTransfer.dropEffect = 'move';
     document.querySelectorAll('.layout-row').forEach(r => r.style.borderColor = 'var(--border)');
     e.currentTarget.style.borderColor = 'var(--accent)';
+    e.currentTarget.style.background = 'rgba(99,179,237,.08)';
   }
 
   function layoutDrop(e) {
@@ -8649,23 +8692,24 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     saveSectionOrder(order);
     applySectionOrder();
     renderLayoutAdmin();
-    showSnuToast('\u2713 Section order saved.');
+    showSnuToast('\u2713 Section order updated.');
   }
 
   function layoutDragEnd(e) {
     document.querySelectorAll('.layout-row').forEach(r => {
-      r.style.opacity = '1';
+      r.style.opacity = '';
       r.style.borderColor = 'var(--border)';
+      r.style.background = 'rgba(255,255,255,.04)';
     });
     _layoutDragSrc = null;
   }
 
-  // Apply saved order on load, and render admin list when tab opens
+  // Apply on load
   document.addEventListener('DOMContentLoaded', () => {
     applySectionOrder();
   });
 
-  // Hook into switchAdminTab to render layout list when that tab is opened
+  // Hook into switchAdminTab
   const _origSwitchAdminTab = typeof switchAdminTab === 'function' ? switchAdminTab : null;
   document.addEventListener('DOMContentLoaded', () => {
     const origFn = window.switchAdminTab;
