@@ -8597,20 +8597,21 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const order = getSectionOrder();
     const vis   = getSectionVis();
 
-    // Find the .page div — the true parent of all sections
-    const parent = document.querySelector('.page');
-    if (!parent) return;
+    // Get the direct-child footer of .page as our anchor
+    const page = document.querySelector('.page');
+    if (!page) return;
+    let footer = null;
+    for (const child of page.children) {
+      if (child.tagName === 'FOOTER') { footer = child; break; }
+    }
+    if (!footer) return;
 
-    // Find the footer to insert sections before it
-    const footer = parent.querySelector('footer');
-
-    // Apply order — insert each section before the footer
-    order.forEach(id => {
+    // Move each section (in reverse order) to just before footer
+    // Reversing ensures final order matches the desired order array
+    const reversed = [...order].reverse();
+    reversed.forEach(id => {
       const el = document.getElementById(id);
-      if (el) {
-        if (footer) parent.insertBefore(el, footer);
-        else parent.appendChild(el);
-      }
+      if (el) page.insertBefore(el, footer);
     });
 
     // Apply visibility
