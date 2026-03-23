@@ -4811,10 +4811,49 @@
           <div class="admin-section-title">📅 Friday Team Meetings</div>
           <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add upcoming Friday meetings. Agents will see them in the Friday Meetings section.</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-            <div><label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Date (e.g. Friday, Mar 21)</label><input class="admin-input" id="fridayDate" placeholder="Friday, Mar 21, 2026"></div>
-            <div><label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Time</label><input class="admin-input" id="fridayTime" placeholder="10:00 AM EST"></div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Date</label>
+              <input type="date" class="admin-input" id="fridayDatePicker" onchange="syncFridayDate(this.value)" style="cursor:pointer;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Time</label>
+              <select class="admin-input" id="fridayTime">
+                <option value="">Select time…</option>
+                <option value="9:00 AM EST">9:00 AM EST</option>
+                <option value="9:30 AM EST">9:30 AM EST</option>
+                <option value="10:00 AM EST">10:00 AM EST</option>
+                <option value="10:30 AM EST">10:30 AM EST</option>
+                <option value="11:00 AM EST">11:00 AM EST</option>
+                <option value="11:30 AM EST">11:30 AM EST</option>
+                <option value="12:00 PM EST">12:00 PM EST</option>
+                <option value="1:00 PM EST">1:00 PM EST</option>
+                <option value="2:00 PM EST">2:00 PM EST</option>
+                <option value="3:00 PM EST">3:00 PM EST</option>
+              </select>
+            </div>
           </div>
-          <div style="margin-bottom:12px;"><label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Meeting Topic / Title</label><input class="admin-input" id="fridayTopic" placeholder="Weekly Team Check-in"></div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Topic Category</label>
+            <select class="admin-input" id="fridayTopic">
+              <option value="">Select topic…</option>
+              <option value="Medicare">Medicare</option>
+              <option value="Annuities">Annuities</option>
+              <option value="Life Insurance">Life Insurance</option>
+              <option value="Carrier Spotlight">Carrier Spotlight</option>
+              <option value="Sales Training">Sales Training</option>
+              <option value="General Training">General Training</option>
+              <option value="Technology">Technology</option>
+              <option value="Compliance">Compliance</option>
+              <option value="Team Meeting">Team Meeting</option>
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;">Meeting Type</label>
+            <div style="display:flex;gap:10px;">
+              <button id="fridayTypeInPerson" onclick="setFridayType('in-person')" style="flex:1;padding:9px 0;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">🏢 In Person</button>
+              <button id="fridayTypeVirtual" onclick="setFridayType('virtual')" style="flex:1;padding:9px 0;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">💻 Virtual</button>
+            </div>
+          </div>
           <div style="margin-bottom:12px;"><label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Details / Notes (optional)</label><textarea class="admin-input" id="fridayNotes" rows="2" placeholder="Agenda, guest speaker, focus area…" style="resize:vertical;"></textarea></div>
           <div style="margin-bottom:16px;"><label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Meeting Link (optional)</label><input class="admin-input" id="fridayLink" placeholder="https://zoom.us/j/..."></div>
           <button class="admin-save-btn" onclick="addFridayMeeting()" style="width:auto;padding:10px 24px;">➕ Add Meeting</button>
@@ -8390,7 +8429,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     el.innerHTML = meetings.map(m => `
       <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
         <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
-          <div style="font-size:22px;">\ud83d\udcc5</div>
+          <div style="font-size:22px;">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
           <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${pesc(m.date||'')}</div>
         </div>
         <div style="flex:1;">
@@ -8411,18 +8451,33 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     el.innerHTML = _fridayMeetings.map((m,i) => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div><div style="font-size:13px;font-weight:700;color:var(--text);">${pesc(m.topic||'Meeting')}</div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--text);">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'} ${pesc(m.topic||'Meeting')}</div>
         <div style="font-size:11px;color:var(--muted-2);">${pesc(m.date||'')} ${m.time?'\u00b7 '+pesc(m.time):''}</div></div>
         <button class="admin-remove-btn" onclick="deleteFridayMeeting(${i})" title="Remove">\u2715</button>
       </div>`).join('');
+  }
+
+  let _fridayType = 'in-person';
+  function setFridayType(type) {
+    _fridayType = type;
+    const ip = document.getElementById('fridayTypeInPerson');
+    const vt = document.getElementById('fridayTypeVirtual');
+    if (type === 'in-person') {
+      if (ip) { ip.style.background='var(--accent)'; ip.style.color='#fff'; ip.style.borderColor='var(--accent)'; }
+      if (vt) { vt.style.background='transparent'; vt.style.color='var(--muted)'; vt.style.borderColor='var(--border)'; }
+    } else {
+      if (vt) { vt.style.background='var(--accent)'; vt.style.color='#fff'; vt.style.borderColor='var(--accent)'; }
+      if (ip) { ip.style.background='transparent'; ip.style.color='var(--muted)'; ip.style.borderColor='var(--border)'; }
+    }
   }
 
   function addFridayMeeting() {
     const gv = id => document.getElementById(id)?.value?.trim()||'';
     const topic = gv('fridayTopic');
     if (!topic) { showSnuToast('\u26a0 Please enter a meeting topic.'); return; }
-    _fridayMeetings.push({ id: Date.now(), date: gv('fridayDate'), time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink') });
+    _fridayMeetings.push({ id: Date.now(), date: gv('fridayDate'), time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), type: _fridayType });
     ['fridayDate','fridayTime','fridayTopic','fridayNotes','fridayLink'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+    setFridayType('in-person');
     renderFridayMeetings(); renderFridayAdminList();
     showSnuToast('\u23f3 Saving...');
     saveFridayMeetings(() => showSnuToast('\u2713 Meeting added!'));
