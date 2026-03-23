@@ -5239,7 +5239,7 @@ When answering:
   const JB_MAIN_BIN      = '69b2cd77aa77b81da9dbc6e6';
   const JB_PHOTO_BIN_KEY          = 'mymedi_jb_photo_bin_id';
   const JB_PHOTO_BIN_HARDCODED = '69b2da94c3097a1dd51cd2cf';
-  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
+  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}}, cert_tracker:{agents:[],meta:{}}, hub_layout:{order:[],vis:{}} };
 
   // ── Generic bin helpers ────────────────────────────────────────
   async function jbReadBin(id) {
@@ -5337,17 +5337,27 @@ When answering:
     if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
     if (record.snu_trip?.agents?.length) localStorage.setItem('snu_trip_v1', JSON.stringify(record.snu_trip));
+    if (record.cert_tracker && (Array.isArray(record.cert_tracker.agents) || record.cert_tracker.meta)) {
+      localStorage.setItem('cert_tracker_v1', JSON.stringify(record.cert_tracker));
+    }
+    if (record.hub_layout && (Array.isArray(record.hub_layout.order) || record.hub_layout.vis)) {
+      if (Array.isArray(record.hub_layout.order)) localStorage.setItem('medi_section_order_v2', JSON.stringify(record.hub_layout.order));
+      if (record.hub_layout.vis && typeof record.hub_layout.vis === 'object') localStorage.setItem('medi_section_vis_v2', JSON.stringify(record.hub_layout.vis));
+    }
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
     if (typeof renderSpotlightCard  === 'function') renderSpotlightCard(record.snu_spotlight?.name ? record.snu_spotlight : undefined);
+    if (typeof loadCertData         === 'function') loadCertData();
+    if (typeof applySectionOrder    === 'function') applySectionOrder();
+    if (typeof renderLayoutAdmin    === 'function') renderLayoutAdmin();
 
     if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cloud!');
   };
 
   // ── Save a field ──────────────────────────────────────────────
   window.jbSave = async function(field, value) {
-    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
+    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1', cert_tracker:'cert_tracker_v1' };
     if (lsMap[field]) { try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {} }
 
     // Save photos to photo bin
@@ -5380,7 +5390,7 @@ When answering:
     const btn = document.querySelector('[onclick="syncAllToCloud()"]');
     if (btn) { btn.textContent = '⏳ Syncing…'; btn.disabled = true; }
     const g = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
-    const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[] };
+    const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[], snu_trip: g('snu_trip_v1')||{agents:[],meta:{}}, cert_tracker: g('cert_tracker_v1')||{agents:[],meta:{}}, hub_layout: { order: g('medi_section_order_v2')||[], vis: g('medi_section_vis_v2')||{} } };
     const [ok] = await Promise.all([
       jbWriteBin(JB_MAIN_BIN, jbStripPhotos(record)),
       jbSavePhotos(record.snu_spotlight?.photo||null, record.snu_aom)
@@ -7466,7 +7476,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     })
     .then(r => r.json())
     .then(rows => {
-      const cloudData = rows.length ? JSON.parse(rows[0].data) : [];
+      const rawCloud = rows.length ? rows[0].data : [];
+      const cloudData = Array.isArray(rawCloud) ? rawCloud : (typeof rawCloud === 'string' ? JSON.parse(rawCloud || '[]') : (rawCloud || []));
       if (cloudData.length > 0 || localUpdates.length === 0) {
         _updates = cloudData;
         try { localStorage.setItem(UPD_STORAGE_KEY, JSON.stringify(_updates)); } catch(e) {}
@@ -7675,7 +7686,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     })
     .then(r => r.json())
     .then(rows => {
-      const cloudData = rows.length ? JSON.parse(rows[0].data) : [];
+      const rawCloud = rows.length ? rows[0].data : [];
+      const cloudData = Array.isArray(rawCloud) ? rawCloud : (typeof rawCloud === 'string' ? JSON.parse(rawCloud || '[]') : (rawCloud || []));
       if (cloudData.length > 0 || localVideos.length === 0) {
         _videos = cloudData;
         try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
@@ -8554,15 +8566,14 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   <script id="layout-manager-script">
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
-    { id: 'agent-tools',      label: '🛠 Agent Tools' },
-    { id: 'quick-access',     label: '🔗 Quick Access Portals' },
-    { id: 'libraries',        label: '📖 Agent Libraries' },
-    { id: 'video-library',    label: '🎬 Video Library' },
-    { id: 'practice-client',  label: '🎯 Practice Client' },
-    { id: 'updates',          label: '📡 Updates Feed' },
     { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
     { id: 'friday-meetings',  label: '📅 Friday Meetings' },
     { id: 'leaderboard',      label: '🏆 SNU / Leaderboard' },
+    { id: 'agent-tools',      label: '🛠 Agent Tools' },
+    { id: 'quick-access',     label: '🔗 Quick Access Portals' },
+    { id: 'video-library',    label: '🎬 Video Library' },
+    { id: 'practice-client',  label: '🎯 Practice Client' },
+    { id: 'updates',          label: '📡 Updates Feed' },
     { id: 'trip-tracker',     label: '🏝️ Trip Tracker' },
     { id: 'agent-spotlight',  label: '⭐ Agent Spotlight' },
     { id: 'operations-ai',    label: '🤖 Agent Assistant' },
@@ -8590,21 +8601,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     } catch(e) { return {}; }
   }
 
-  function saveSectionVis(vis) {
-    try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
+  function saveLayoutToCloud(order, vis) {
+    if (typeof jbSave === 'function') jbSave('hub_layout', { order: order || getSectionOrder(), vis: vis || getSectionVis() });
   }
 
-  function syncLayoutNav(vis = getSectionVis()) {
-    const navLinks = document.querySelectorAll('nav a[href^="#"]');
-    navLinks.forEach(link => {
-      const href = link.getAttribute('href') || '';
-      const id = href.startsWith('#') ? href.slice(1) : '';
-      if (!id) return;
-      const managed = LAYOUT_SECTIONS.some(s => s.id === id);
-      if (!managed) return;
-      const hidden = vis[id] === false;
-      link.style.display = hidden ? 'none' : '';
-    });
+  function saveSectionVis(vis) {
+    try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
+    saveLayoutToCloud(getSectionOrder(), vis);
   }
 
   function applySectionOrder() {
@@ -8614,13 +8617,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     // Get the direct-child footer of .page as our anchor
     const page = document.querySelector('.page');
     if (!page) return;
-    const footer = page.querySelector(':scope > footer');
+    let footer = null;
+    for (const child of page.children) {
+      if (child.tagName === 'FOOTER') { footer = child; break; }
+    }
     if (!footer) return;
 
-    // Move each managed section (in reverse order) to just before footer.
-    // Reversing ensures final order matches the desired order array.
-    [...order].reverse().forEach(id => {
-      const el = page.querySelector(`:scope > section#${CSS.escape(id)}`);
+    // Move each section (in reverse order) to just before footer
+    // Reversing ensures final order matches the desired order array
+    const reversed = [...order].reverse();
+    reversed.forEach(id => {
+      const el = document.getElementById(id);
       if (el) page.insertBefore(el, footer);
     });
 
@@ -8631,8 +8638,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       const hidden = vis[s.id] === false;
       el.style.display = hidden ? 'none' : '';
     });
-
-    syncLayoutNav(vis);
   }
 
   function toggleSectionVis(id) {
@@ -8646,11 +8651,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveSectionOrder(order) {
     try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(order)); } catch(e) {}
+    saveLayoutToCloud(order, getSectionVis());
   }
 
   function resetSectionOrder() {
     localStorage.removeItem(LAYOUT_KEY);
     localStorage.removeItem(LAYOUT_VIS_KEY);
+    saveLayoutToCloud(LAYOUT_SECTIONS.map(s => s.id), {});
     applySectionOrder();
     renderLayoutAdmin();
     showSnuToast('↺ Layout reset to default.');
@@ -8749,13 +8756,26 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   let _certMeta   = {};
 
   function loadCertData() {
+    let rendered = false;
     try {
-      const raw = localStorage.getItem(CERT_KEY);
-      if (!raw) return;
-      const d = JSON.parse(raw);
-      _certAgents = Array.isArray(d.agents) ? d.agents : [];
-      _certMeta   = d.meta || {};
+      const cloud = window._jbRecord?.cert_tracker;
+      if (cloud && (Array.isArray(cloud.agents) || cloud.meta)) {
+        _certAgents = Array.isArray(cloud.agents) ? cloud.agents : [];
+        _certMeta   = cloud.meta || {};
+        try { localStorage.setItem(CERT_KEY, JSON.stringify({ agents:_certAgents, meta:_certMeta })); } catch(e) {}
+        rendered = true;
+      }
     } catch(e) {}
+    if (!rendered) {
+      try {
+        const raw = localStorage.getItem(CERT_KEY);
+        if (raw) {
+          const d = JSON.parse(raw);
+          _certAgents = Array.isArray(d.agents) ? d.agents : [];
+          _certMeta   = d.meta || {};
+        }
+      } catch(e) {}
+    }
     renderCertTracker();
   }
 
@@ -8926,7 +8946,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const data = { agents: _certAgents, meta: _certMeta };
     localStorage.setItem(CERT_KEY, JSON.stringify(data));
     renderCertTracker();
-    alert('✅ Certification data saved!');
+    if (typeof jbSave === 'function') jbSave('cert_tracker', data);
+    alert('✅ Certification data saved and published!');
     const inp = document.getElementById('certCsvInput'); if (inp) inp.value = '';
     const status = document.getElementById('certCsvStatus'); if (status) { status.textContent=''; status.className='csv-status'; }
     const preview = document.getElementById('certAdminPreview'); if (preview) preview.style.display = 'none';
@@ -8936,6 +8957,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!confirm('Clear all certification data? This cannot be undone.')) return;
     _certAgents = []; _certMeta = {};
     localStorage.removeItem(CERT_KEY);
+    if (typeof jbSave === 'function') jbSave('cert_tracker', { agents:[], meta:{} });
     renderCertTracker();
     const status = document.getElementById('certCsvStatus'); if (status) { status.textContent=''; status.className='csv-status'; }
     const preview = document.getElementById('certAdminPreview'); if (preview) preview.style.display = 'none';
