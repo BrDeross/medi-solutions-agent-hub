@@ -4914,7 +4914,7 @@
 
         <div id="adminTabLayout" class="admin-tab-panel">
           <div class="admin-section-title">🔀 Section Order</div>
-          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Drag to reorder sections. Changes apply instantly and are saved to your browser.</p>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Drag to reorder sections. The first item in this list will appear first on the main hub.</p>
           <div id="layoutSortList" style="display:flex;flex-direction:column;gap:8px;"></div>
           <button class="admin-save-btn" onclick="resetSectionOrder()" style="width:auto;padding:8px 20px;margin-top:16px;background:rgba(255,255,255,.06);border:1px solid var(--border);">↺ Reset to Default</button>
         </div>
@@ -5336,40 +5336,18 @@ When answering:
     if (record.snu_article  && Object.keys(record.snu_article).length)  localStorage.setItem('snu_article_v1',   JSON.stringify(record.snu_article));
     if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
-    if (record.snu_trip?.agents?.length)                                 localStorage.setItem('snu_trip_v1',      JSON.stringify(record.snu_trip));
-    if (record.snu_cert && (Array.isArray(record.snu_cert.agents) || record.snu_cert.meta)) {
-      localStorage.setItem('cert_tracker_v1', JSON.stringify(record.snu_cert));
-    }
-    if (Array.isArray(record.snu_layout_order) && record.snu_layout_order.length) {
-      localStorage.setItem('medi_section_order_v2', JSON.stringify(record.snu_layout_order));
-    }
-    if (record.snu_layout_vis && typeof record.snu_layout_vis === 'object') {
-      localStorage.setItem('medi_section_vis_v2', JSON.stringify(record.snu_layout_vis));
-    }
+    if (record.snu_trip?.agents?.length) localStorage.setItem('snu_trip_v1', JSON.stringify(record.snu_trip));
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
     if (typeof renderSpotlightCard  === 'function') renderSpotlightCard(record.snu_spotlight?.name ? record.snu_spotlight : undefined);
-    if (typeof loadCertData         === 'function') loadCertData();
-    if (typeof applySectionOrder    === 'function') applySectionOrder();
-    if (typeof renderLayoutAdmin    === 'function') renderLayoutAdmin();
 
     if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cloud!');
   };
 
   // ── Save a field ──────────────────────────────────────────────
   window.jbSave = async function(field, value) {
-    const lsMap = {
-      snu_data:'snu_data_v1',
-      snu_article:'snu_article_v1',
-      snu_spotlight:'snu_spotlight_v1',
-      snu_aom:'snu_aom_v1',
-      snu_updates:'snu_updates_v1',
-      snu_trip:'snu_trip_v1',
-      snu_cert:'cert_tracker_v1',
-      snu_layout_order:'medi_section_order_v2',
-      snu_layout_vis:'medi_section_vis_v2'
-    };
+    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
     if (lsMap[field]) { try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {} }
 
     // Save photos to photo bin
@@ -5402,17 +5380,7 @@ When answering:
     const btn = document.querySelector('[onclick="syncAllToCloud()"]');
     if (btn) { btn.textContent = '⏳ Syncing…'; btn.disabled = true; }
     const g = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
-    const record = {
-      snu_data: g('snu_data_v1')||{},
-      snu_article: g('snu_article_v1')||{},
-      snu_spotlight: g('snu_spotlight_v1')||{},
-      snu_aom: g('snu_aom_v1')||{},
-      snu_updates: g('snu_updates_v1')||[],
-      snu_trip: g('snu_trip_v1')||{},
-      snu_cert: g('cert_tracker_v1')||{},
-      snu_layout_order: g('medi_section_order_v2')||[],
-      snu_layout_vis: g('medi_section_vis_v2')||{}
-    };
+    const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[] };
     const [ok] = await Promise.all([
       jbWriteBin(JB_MAIN_BIN, jbStripPhotos(record)),
       jbSavePhotos(record.snu_spotlight?.photo||null, record.snu_aom)
@@ -8586,17 +8554,20 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   <script id="layout-manager-script">
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
-    { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
-    { id: 'friday-meetings',  label: '📅 Friday Meetings' },
-    { id: 'leaderboard',      label: '🏆 SNU / Leaderboard' },
-    { id: 'agent-tools',      label: '🛠 Agent Tools' },
-    { id: 'quick-access',     label: '🔗 Quick Access Portals' },
-    { id: 'video-library',    label: '🎬 Video Library' },
-    { id: 'practice-client',  label: '🎯 Practice Client' },
-    { id: 'updates',          label: '📡 Updates Feed' },
-    { id: 'trip-tracker',     label: '🏝️ Trip Tracker' },
-    { id: 'agent-spotlight',  label: '⭐ Agent Spotlight' },
-    { id: 'operations-ai',    label: '🤖 Agent Assistant' },
+    { id: 'cert-tracker',        label: '🎓 Cert Tracker' },
+    { id: 'friday-meetings',     label: '📅 Friday Meetings' },
+    { id: 'leaderboard',         label: '🏆 SNU / Leaderboard' },
+    { id: 'agent-tools',         label: '🛠 Agent Tools' },
+    { id: 'quick-access',        label: '🔗 Quick Access Portals' },
+    { id: 'video-library',       label: '🎬 Video Library' },
+    { id: 'practice-client',     label: '🎯 Practice Client' },
+    { id: 'updates',             label: '📡 Updates Feed' },
+    { id: 'trip-tracker',        label: '🏝️ Trip Tracker' },
+    { id: 'agent-spotlight',     label: '⭐ Agent Spotlight' },
+    { id: 'agent-of-the-month',  label: '🗓️ Agent of the Month' },
+    { id: 'industry-spotlight',  label: '📰 Industry Spotlight' },
+    { id: 'libraries',           label: '📖 Agent Libraries' },
+    { id: 'operations-ai',       label: '🤖 Agent Assistant' },
   ];
   const LAYOUT_KEY     = 'medi_section_order_v2';
   const LAYOUT_VIS_KEY = 'medi_section_vis_v2';
@@ -8623,7 +8594,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveSectionVis(vis) {
     try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
-    if (typeof jbSave === 'function') jbSave('snu_layout_vis', vis);
   }
 
   function applySectionOrder() {
@@ -8639,10 +8609,9 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     }
     if (!footer) return;
 
-    // Move each section (in reverse order) to just before footer
-    // Reversing ensures final order matches the desired order array
-    const reversed = [...order].reverse();
-    reversed.forEach(id => {
+    // Move each section to just before footer in the same order shown in Admin.
+    // Do not reverse it — the admin top item should become the top item on the page.
+    order.forEach(id => {
       const el = document.getElementById(id);
       if (el) page.insertBefore(el, footer);
     });
@@ -8667,16 +8636,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveSectionOrder(order) {
     try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(order)); } catch(e) {}
-    if (typeof jbSave === 'function') jbSave('snu_layout_order', order);
   }
 
   function resetSectionOrder() {
     localStorage.removeItem(LAYOUT_KEY);
     localStorage.removeItem(LAYOUT_VIS_KEY);
-    if (typeof jbSave === 'function') {
-      jbSave('snu_layout_order', LAYOUT_SECTIONS.map(s => s.id));
-      jbSave('snu_layout_vis', {});
-    }
     applySectionOrder();
     renderLayoutAdmin();
     showSnuToast('↺ Layout reset to default.');
@@ -8951,7 +8915,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     _certMeta = { year, updatedAt: new Date().toISOString() };
     const data = { agents: _certAgents, meta: _certMeta };
     localStorage.setItem(CERT_KEY, JSON.stringify(data));
-    if (typeof jbSave === 'function') jbSave('snu_cert', data);
     renderCertTracker();
     alert('✅ Certification data saved!');
     const inp = document.getElementById('certCsvInput'); if (inp) inp.value = '';
@@ -8963,7 +8926,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!confirm('Clear all certification data? This cannot be undone.')) return;
     _certAgents = []; _certMeta = {};
     localStorage.removeItem(CERT_KEY);
-    if (typeof jbSave === 'function') jbSave('snu_cert', { agents: [], meta: {} });
     renderCertTracker();
     const status = document.getElementById('certCsvStatus'); if (status) { status.textContent=''; status.className='csv-status'; }
     const preview = document.getElementById('certAdminPreview'); if (preview) preview.style.display = 'none';
