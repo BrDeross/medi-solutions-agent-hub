@@ -4293,6 +4293,11 @@
                 <div class="snu-lb-title">🥇 Weekly Top Producers</div>
                 <span class="snu-week-badge" id="snuWeekBadge">WEEK —</span>
               </div>
+              <div style="display:flex;gap:14px;flex-wrap:wrap;padding:8px 12px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;">
+                <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ef4444;flex-shrink:0;"></span><span style="color:#ef4444;">0 – 5,000 pts</span></span>
+                <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#22c55e;flex-shrink:0;"></span><span style="color:#22c55e;">5,001 – 9,999 pts</span></span>
+                <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3b82f6;flex-shrink:0;"></span><span style="color:#3b82f6;">10,000+ pts</span></span>
+              </div>
               <div class="snu-lb-list" id="snuLbList">
                 <div class="snu-empty">No data yet — admin can add weekly results below.</div>
               </div>
@@ -8592,18 +8597,20 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const order = getSectionOrder();
     const vis   = getSectionVis();
 
-    // Find the main page wrapper — parent of the first known section
-    let parent = null;
-    for (const id of order) {
-      const el = document.getElementById(id);
-      if (el && el.parentElement) { parent = el.parentElement; break; }
-    }
+    // Find the .page div — the true parent of all sections
+    const parent = document.querySelector('.page');
     if (!parent) return;
 
-    // Apply order
+    // Find the footer to insert sections before it
+    const footer = parent.querySelector('footer');
+
+    // Apply order — insert each section before the footer
     order.forEach(id => {
       const el = document.getElementById(id);
-      if (el) parent.appendChild(el);
+      if (el) {
+        if (footer) parent.insertBefore(el, footer);
+        else parent.appendChild(el);
+      }
     });
 
     // Apply visibility
