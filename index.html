@@ -8554,14 +8554,15 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   <script id="layout-manager-script">
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
-    { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
-    { id: 'friday-meetings',  label: '📅 Friday Meetings' },
-    { id: 'leaderboard',      label: '🏆 SNU / Leaderboard' },
     { id: 'agent-tools',      label: '🛠 Agent Tools' },
     { id: 'quick-access',     label: '🔗 Quick Access Portals' },
+    { id: 'libraries',        label: '📖 Agent Libraries' },
     { id: 'video-library',    label: '🎬 Video Library' },
     { id: 'practice-client',  label: '🎯 Practice Client' },
     { id: 'updates',          label: '📡 Updates Feed' },
+    { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
+    { id: 'friday-meetings',  label: '📅 Friday Meetings' },
+    { id: 'leaderboard',      label: '🏆 SNU / Leaderboard' },
     { id: 'trip-tracker',     label: '🏝️ Trip Tracker' },
     { id: 'agent-spotlight',  label: '⭐ Agent Spotlight' },
     { id: 'operations-ai',    label: '🤖 Agent Assistant' },
@@ -8593,6 +8594,19 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
   }
 
+  function syncLayoutNav(vis = getSectionVis()) {
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href') || '';
+      const id = href.startsWith('#') ? href.slice(1) : '';
+      if (!id) return;
+      const managed = LAYOUT_SECTIONS.some(s => s.id === id);
+      if (!managed) return;
+      const hidden = vis[id] === false;
+      link.style.display = hidden ? 'none' : '';
+    });
+  }
+
   function applySectionOrder() {
     const order = getSectionOrder();
     const vis   = getSectionVis();
@@ -8600,17 +8614,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     // Get the direct-child footer of .page as our anchor
     const page = document.querySelector('.page');
     if (!page) return;
-    let footer = null;
-    for (const child of page.children) {
-      if (child.tagName === 'FOOTER') { footer = child; break; }
-    }
+    const footer = page.querySelector(':scope > footer');
     if (!footer) return;
 
-    // Move each section (in reverse order) to just before footer
-    // Reversing ensures final order matches the desired order array
-    const reversed = [...order].reverse();
-    reversed.forEach(id => {
-      const el = document.getElementById(id);
+    // Move each managed section (in reverse order) to just before footer.
+    // Reversing ensures final order matches the desired order array.
+    [...order].reverse().forEach(id => {
+      const el = page.querySelector(`:scope > section#${CSS.escape(id)}`);
       if (el) page.insertBefore(el, footer);
     });
 
@@ -8621,6 +8631,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       const hidden = vis[s.id] === false;
       el.style.display = hidden ? 'none' : '';
     });
+
+    syncLayoutNav(vis);
   }
 
   function toggleSectionVis(id) {
