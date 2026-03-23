@@ -8546,7 +8546,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSepModal(); });
   </script>
 
-
+  <script id="layout-manager-script">
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
     { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
@@ -8718,6 +8718,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       if (tab === 'layout') renderLayoutAdmin();
     };
   });
+  </script>
 
   <script id="cert-tracker-script">
   // ── CARRIER CERT TRACKER ───────────────────────────────────────────────────
