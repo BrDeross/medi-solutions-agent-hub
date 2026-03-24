@@ -6383,7 +6383,8 @@ When answering:
         }
       }
     })();
-    loadWeeklyArticle();
+    // loadWeeklyArticle only runs as fallback if Article Locker has no content
+    // Article Locker's loadArticleLocker() handles the industry spotlight when active
   });
 
   function renderSnuFromStorage() {
@@ -8831,14 +8832,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const payload = JSON.stringify({ order, vis });
     const headers = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
     fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.layout`, {
-      method: 'PATCH', headers, body: JSON.stringify({ data: payload })
-    }).then(r => r.text()).then(t => {
-      if (t === '[]' || t === '') {
-        return fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
-          method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key: 'layout', data: payload })
-        });
-      }
-    }).catch(() => {});
+      method: 'DELETE', headers: { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY }
+    }).then(() => fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
+      method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key: 'layout', data: payload })
+    })).then(() => showSnuToast('✓ Layout saved!')).catch(() => {});
   }
 
   function getSectionOrder() {
@@ -9341,6 +9338,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         if (Array.isArray(cloud) && (cloud.length > 0 || _medUpdates.length === 0)) {
           _medUpdates = cloud;
           renderMedUpdates();
+          renderMedUpdatesAdmin();
         }
       }
     }).catch(() => {});
@@ -9350,14 +9348,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const payload = JSON.stringify(_medUpdates);
     const hdrs = { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
     fetch(`${SUPA_BASE}/rest/v1/med_updates?hub=eq.${MED_UPD_HUB}`, {
-      method: 'PATCH', headers: hdrs, body: JSON.stringify({ data: payload })
-    }).then(r => r.text()).then(t => {
-      if (t === '[]' || t === '') {
-        return fetch(`${SUPA_BASE}/rest/v1/med_updates`, {
-          method: 'POST', headers: hdrs, body: JSON.stringify({ hub: MED_UPD_HUB, data: payload })
-        });
-      }
-    }).then(() => { if (cb) cb(); }).catch(() => { if (cb) cb(); });
+      method: 'DELETE', headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2 }
+    }).then(() => fetch(`${SUPA_BASE}/rest/v1/med_updates`, {
+      method: 'POST', headers: hdrs, body: JSON.stringify({ hub: MED_UPD_HUB, data: payload })
+    })).then(() => { if (cb) cb(); }).catch(() => { if (cb) cb(); });
   }
 
   function renderMedUpdates() {
@@ -9577,7 +9571,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         _artIdx    = d.activeIdx || 0;
         renderActiveArticle();
       }
-    }).catch(() => {}).finally(() => { renderActiveArticle(); });
+    }).catch(() => {});
   }
 
   function saveArticleLocker(cb) {
@@ -9830,14 +9824,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const headers = { 'apikey': TILE_KEY2, 'Authorization': 'Bearer ' + TILE_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
     // PATCH first, POST if no row
     fetch(`${TILE_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.${key}`, {
-      method: 'PATCH', headers, body: JSON.stringify({ data: payload })
-    }).then(r => r.text()).then(t => {
-      if (t === '[]' || t === '') {
-        return fetch(`${TILE_SUPA}/rest/v1/tile_content`, {
-          method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key, data: payload })
-        });
-      }
-    }).then(() => showSnuToast('✓ ' + (key === 'alliance' ? 'Alliance Program' : 'Census Form') + ' saved!'))
+      method: 'DELETE', headers: { 'apikey': TILE_KEY2, 'Authorization': 'Bearer ' + TILE_KEY2 }
+    }).then(() => fetch(`${TILE_SUPA}/rest/v1/tile_content`, {
+      method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key, data: payload })
+    })).then(() => showSnuToast('✓ ' + (key === 'alliance' ? 'Alliance Program' : 'Census Form') + ' saved!'))
     .catch(() => showSnuToast('⚠ Save failed.'));
   }
 
