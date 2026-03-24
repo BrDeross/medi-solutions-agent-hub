@@ -9703,17 +9703,53 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function prefillArticleFromUrl() {
     const url = document.getElementById('artUrl')?.value?.trim();
-    if (!url) return;
-    // Try to extract domain as a starting point for title
-    try {
-      const domain = new URL(url).hostname.replace('www.','');
-      const titleEl = document.getElementById('artTitle');
-      if (titleEl && !titleEl.value) titleEl.value = domain;
-      titleEl?.focus();
-      showSnuToast('Paste a URL — fill in the title, summary, and image URL manually.');
-    } catch(e) {
-      showSnuToast('⚠ Invalid URL format.');
-    }
+    if (!url) { showSnuToast('⚠ Paste a URL first.'); return; }
+    try { new URL(url); } catch(e) { showSnuToast('⚠ Invalid URL format.'); return; }
+
+    const btn = document.querySelector('[onclick="prefillArticleFromUrl()"]');
+    if (btn) { btn.textContent = '⏳ Fetching…'; btn.disabled = true; }
+
+    // Use allorigins.win as a CORS proxy to fetch the page and extract meta tags
+    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+    fetch(proxy)
+      .then(r => r.json())
+      .then(data => {
+        const html = data.contents || '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Title: og:title > twitter:title > <title>
+        const ogTitle    = doc.querySelector('meta[property="og:title"]')?.content;
+        const twTitle    = doc.querySelector('meta[name="twitter:title"]')?.content;
+        const pageTitle  = doc.querySelector('title')?.textContent;
+        const title = (ogTitle || twTitle || pageTitle || '').trim();
+
+        // Description: og:description > meta description > twitter:description
+        const ogDesc  = doc.querySelector('meta[property="og:description"]')?.content;
+        const metaDesc = doc.querySelector('meta[name="description"]')?.content;
+        const twDesc  = doc.querySelector('meta[name="twitter:description"]')?.content;
+        const desc = (ogDesc || metaDesc || twDesc || '').trim();
+
+        // Image: og:image > twitter:image
+        const ogImg = doc.querySelector('meta[property="og:image"]')?.content;
+        const twImg = doc.querySelector('meta[name="twitter:image"]')?.content;
+        const img   = (ogImg || twImg || '').trim();
+
+        // Populate fields
+        const titleEl = document.getElementById('artTitle');
+        const descEl  = document.getElementById('artSummary');
+        const imgEl   = document.getElementById('artThumb');
+        if (titleEl && title) titleEl.value = title;
+        if (descEl  && desc)  descEl.value  = desc;
+        if (imgEl   && img)   imgEl.value   = img;
+
+        const filled = [title && 'title', desc && 'description', img && 'image'].filter(Boolean);
+        showSnuToast(filled.length ? '✓ Pre-filled: ' + filled.join(', ') : '⚠ No meta tags found — fill in manually.');
+      })
+      .catch(() => showSnuToast('⚠ Could not fetch page — fill in manually.'))
+      .finally(() => {
+        if (btn) { btn.textContent = '📋 Pre-fill'; btn.disabled = false; }
+      });
   }
 
   // ── Drag-to-reorder ───────────────────────────────────────────
