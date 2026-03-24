@@ -6837,8 +6837,10 @@ When answering:
 
     const hl = g('magArticleHeadline');
     const tx = g('magArticleText');
-    if (hl) hl.textContent = article?.headline || "This week's article is loading…";
-    if (tx) tx.innerHTML = article?.body?.length ? article.body.map(p => `<p>${pesc(p)}</p>`).join('') : '<p style="color:var(--muted-2);font-style:italic;">The industry spotlight will appear here once the page finishes loading the weekly article.</p>';
+    const ac = g('magArticleCat');
+    if (hl) hl.textContent = article?.headline || "No article set — add one in Admin → Article Locker.";
+    if (tx) tx.innerHTML = article?.body?.length ? article.body.map(p => `<p>${pesc(p)}</p>`).join('') : (article?.headline ? '<p style="color:var(--muted-2);font-style:italic;">Visit the full article for more details.</p>' : '<p style="color:var(--muted-2);font-style:italic;">Add an article in Admin → Article Locker to populate this section.</p>');
+    if (ac && article?.category) { ac.className = 'mag-article-cat ' + article.category; ac.textContent = article.category === 'health' ? 'Medicare / Health' : article.category === 'life' ? 'Life Insurance' : article.category === 'annuity' ? 'Annuities' : 'Industry Trends'; }
 
     // ── Populate Agent Spotlight spread ──────────────────────────────────────
     const spread = g('magSpotlightSpread');
@@ -9561,6 +9563,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       const body = document.getElementById('snuArticleBody');
       if (body) body.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:12px 0;">No article set — add one in Admin → Article Locker.</div>';
       return;
+    }
+    // Sync to _snuState so SNU print modal picks it up
+    const _a = _artLocker[Math.min(_artIdx, _artLocker.length - 1)];
+    if (_a && window._snuState) {
+      window._snuState.article = {
+        headline: _a.title || '',
+        tag:      _a.category || 'industry',
+        body:     _a.summary ? [_a.summary] : [],
+        category: _a.category || 'industry',
+        url:      _a.url || null,
+      };
     }
     _artIdx = Math.min(_artIdx, _artLocker.length - 1);
     const a = _artLocker[_artIdx];
