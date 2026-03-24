@@ -4542,6 +4542,16 @@
           <button class="admin-add-btn" onclick="addExecRow()">+ Add Consecutive Executive</button>
 
           <hr class="admin-divider">
+          <div class="admin-section-title">💡 Agent Tip &amp; Pull Quote</div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Agent Tip of the Week</label>
+            <textarea class="admin-input" id="adminAgentTip" rows="3" placeholder="Follow up within 24 hours of every client interaction…" style="resize:vertical;"></textarea>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Pull Quote (sidebar highlight)</label>
+            <input class="admin-input" id="adminPullQuote" placeholder="Consistency is the foundation of every great agent's career.">
+          </div>
+          <hr class="admin-divider">
           <button class="admin-save-btn" onclick="saveSnuData()">💾 Save &amp; Publish SNU</button>
         </div>
         </div><!-- /adminTabSnu -->
@@ -6531,6 +6541,11 @@ When answering:
     const agents = data.agents?.length ? data.agents : [{}];
     agents.forEach(a => addAgentRow(a));
 
+    const tipEl  = document.getElementById('adminAgentTip');
+    const pullEl = document.getElementById('adminPullQuote');
+    if (tipEl)  tipEl.value  = data.agentTip  || '';
+    if (pullEl) pullEl.value = data.pullQuote || '';
+
     const execRows = document.getElementById('adminExecRows');
     if (execRows) {
       execRows.innerHTML = '';
@@ -6630,7 +6645,9 @@ When answering:
     });
     const execs = manualExecs.length > 0 ? manualExecs : computeExecStreaks(history);
 
-    const data = { weekLabel, dateRange, agents, execs, savedAt: new Date().toISOString() };
+    const agentTip   = document.getElementById('adminAgentTip')?.value?.trim() || '';
+    const pullQuote  = document.getElementById('adminPullQuote')?.value?.trim() || '';
+    const data = { weekLabel, dateRange, agents, execs, agentTip, pullQuote, savedAt: new Date().toISOString() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     if (typeof jbSave === 'function') jbSave('snu_data', data);
     window._snuState.data = data;
@@ -6833,6 +6850,21 @@ When answering:
           <span class="mag-exec-streak">${e.weeks || 0}wk</span>
         </div>
       `).join('') : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:8px 0;">No consecutive executives yet.</div>';
+    }
+
+    // Tip of the week + pull quote
+    const tipEl2  = g('magAgentTip');
+    const pullEl2 = g('magPullQuote');
+    if (tipEl2  && data.agentTip)  tipEl2.textContent  = data.agentTip;
+    if (pullEl2 && data.pullQuote) pullEl2.textContent = data.pullQuote;
+
+    // Article image — use thumbnail from Article Locker if available
+    const imgEl = g('magArticleImg');
+    if (imgEl && article?.url && !article.url.match(/\.(pdf|doc)/i)) {
+      // Don't use article URL as image — use thumb if set
+    }
+    if (imgEl && article?.thumb) {
+      imgEl.src = article.thumb;
     }
 
     const hl = g('magArticleHeadline');
@@ -9568,11 +9600,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const _a = _artLocker[Math.min(_artIdx, _artLocker.length - 1)];
     if (_a && window._snuState) {
       window._snuState.article = {
-        headline: _a.title || '',
+        headline: _a.title    || '',
         tag:      _a.category || 'industry',
-        body:     _a.summary ? [_a.summary] : [],
+        body:     _a.summary  ? [_a.summary] : [],
         category: _a.category || 'industry',
-        url:      _a.url || null,
+        url:      _a.url      || null,
+        thumb:    _a.thumb    || null,
       };
     }
     _artIdx = Math.min(_artIdx, _artLocker.length - 1);
