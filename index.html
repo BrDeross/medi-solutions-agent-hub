@@ -4377,6 +4377,18 @@
           </div>
 
           <!-- Right col: Article -->
+          <div class="snu-right-col">
+            <div class="snu-article-card" id="snuArticleCard">
+              <div class="snu-article-header">
+                <div class="snu-article-title-bar">
+                  <span class="snu-article-tag" id="snuArticleTag">Weekly</span>
+                </div>
+              </div>
+              <div class="snu-article-body" id="snuArticleBody">
+                <div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:12px 0;">Loading article…</div>
+              </div>
+            </div>
+          </div>
 
 
         </div>
@@ -5345,7 +5357,7 @@
               <p>This week's curated insurance industry news</p>
             </div>
           </div>
-          <span class="snu-article-tag" id="snuArticleTag" style="align-self:center;">Weekly</span>
+
         </div>
 
         <div class="industry-teaser-card" id="industryTeaserCard">
@@ -5355,15 +5367,6 @@
           </div>
         </div>
 
-        <!-- Full article body — populated by Article Locker -->
-        <div class="snu-article-card" style="margin-top:20px;display:none;" id="snuArticleCard">
-          <div class="snu-article-header">
-            <div class="snu-article-title-bar">
-              <span class="snu-article-tag" id="snuArticleTagFull">Industry</span>
-            </div>
-          </div>
-          <div class="snu-article-body" id="snuArticleBody"></div>
-        </div>
       </div>
     </section>
 
@@ -7848,7 +7851,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     grid.innerHTML = _videos.map((v, i) => {
       const embedUrl = parseVideoEmbed(v.url || '');
       const thumb = embedUrl
-        ? `<div class="video-thumb"><iframe src="${xa(embedUrl)}" allowfullscreen loading="lazy" title="${xa(v.title||'')}"></iframe></div>`
+        ? `<div class="video-thumb"><iframe src="${xa(embedUrl)}" allowfullscreen loading="lazy"></iframe></div>`
         : `<div class="video-thumb"><div class="video-thumb-placeholder" onclick="alert('Invalid video URL')">
             <div class="video-play-icon">\u25b6</div>
             <div class="video-play-label">Video unavailable</div>
@@ -8452,7 +8455,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       const icon = catIcons[cat]||'\ud83d\udcc1';
       const cards = videos.map(v => {
         const embedUrl = parseVideoEmbed(v.url||'');
-        const thumb = embedUrl ? `<div class="video-thumb"><iframe src="${xa(embedUrl)}" allowfullscreen loading="lazy" title="${xa(v.title||'')}"></iframe></div>` : `<div class="video-thumb"><div class="video-thumb-placeholder"><div class="video-play-icon">\u25b6</div><div class="video-play-label">Video unavailable</div></div></div>`;
+        const thumb = embedUrl ? `<div class="video-thumb"><iframe src="${xa(embedUrl)}" allowfullscreen loading="lazy"></iframe></div>` : `<div class="video-thumb"><div class="video-thumb-placeholder"><div class="video-play-icon">\u25b6</div><div class="video-play-label">Video unavailable</div></div></div>`;
         return `<div class="video-card">${thumb}<div class="video-info"><div class="video-title">${pesc(v.title||'Untitled')}</div>${v.desc?`<div class="video-desc">${pesc(v.desc)}</div>`:''}<div class="video-meta">${v.duration?`<span>\u23f1 ${pesc(v.duration)}</span>`:''}</div></div></div>`;
       }).join('');
       return `<div class="vid-category-section" id="vidsrch-${gi}"><div class="vid-category-header" onclick="toggleVidCat('vidsrch-${gi}')"><span class="vid-category-icon">${icon}</span><span class="vid-category-name">${pesc(cat)}</span><span class="vid-category-count">${videos.length} video${videos.length!==1?'s':''}</span><span class="vid-category-chevron">\u25bc</span></div><div class="vid-category-grid">${cards}</div></div>`;
@@ -9258,10 +9261,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;width:min(640px,93vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);">
           <div style="font-size:16px;font-weight:800;color:var(--text);">📰 Medicare Updates</div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="printMedUpdates()" style="padding:7px 14px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🖨️ Print</button>
-            <button onclick="document.getElementById('medUpdModal').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;">×</button>
-          </div>
+          <button onclick="document.getElementById('medUpdModal').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;">×</button>
         </div>
         <div id="medUpdList" style="padding:20px 22px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;">
           <div style="color:var(--muted-2);font-size:13px;font-style:italic;">Loading…</div>
@@ -9588,12 +9588,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         </div>`;
     }
 
-    // Update SNU article body + show card
-    const card = document.getElementById('snuArticleCard');
+    // Update SNU article body (in print modal if it exists)
     const body = document.getElementById('snuArticleBody');
-    const tagFull = document.getElementById('snuArticleTagFull');
-    if (tagFull && tagEl) tagFull.textContent = tagEl.textContent;
-    if (card) card.style.display = '';
     if (body) {
       body.innerHTML = `
         <div class="snu-article-headline">${pesc(a.title||'')}</div>
