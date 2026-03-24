@@ -8589,7 +8589,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     renderFridayMeetings(); renderFridayAdminList();
 
     fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi&select=data`, {
-      headers: { 'apikey': FM_SUPA_KEY, 'Authorization': 'Bearer ' + FM_SUPA_KEY, 'Cache-Control': 'no-cache' }
+      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
     .then(rows => {
