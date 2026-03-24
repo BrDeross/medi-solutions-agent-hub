@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><!-- My Medi Hub v2026-03-23 17:15 backend-sync-layout-friday-video-fix -->
+<html lang="en"><!-- My Medi Hub v2026-03-12 14:27 -->
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
@@ -3835,7 +3835,7 @@
           </div>
           <div>
             <div class="brand-name">My Medi</div>
-            <div class="brand-sub">Tools, libraries &amp; ops support</div>
+            
           </div>
         </div>
         <nav class="desktop-nav">
@@ -4016,6 +4016,16 @@
             <p>Medicare Special Enrollment Period rules and qualifying events from AARP.</p>
             <span class="card-tag">Compliance</span>
           </div>
+
+          <div class="card" data-color="blue" onclick="openMapdScriptModal()" style="cursor:pointer;">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">📜</div>
+            <h3>MAPD/PDP Compliance Script</h3>
+            <p>State-specific Medicare Advantage and Part D compliance scripts.</p>
+            <span class="card-tag">Compliance</span>
+          </div>
+
         </div>
 
       </div>
@@ -4033,7 +4043,7 @@
               <p>Direct links to your key portals and platforms</p>
             </div>
           </div>
-          <span class="count-chip">6 portals</span>
+          <span class="count-chip">7 portals</span>
         </div>
         <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
 
@@ -4089,6 +4099,15 @@
             <h3>AHIP</h3>
             <p>Medicare training and certification portal.</p>
             <span class="card-tag">Training</span>
+          </a>
+
+          <a class="card" data-color="teal" href="https://www.sircon.com/ComplianceExpress/NonSscrbEducation/index.jsp?nonSscrb=Y&sscrbid=9999" target="_blank" rel="noopener noreferrer">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">📄</div>
+            <h3>Check CE Transcript</h3>
+            <p>Verify your continuing education transcript via Sircon.</p>
+            <span class="card-tag">Licensing</span>
           </a>
 
         </div>
@@ -4150,6 +4169,18 @@
             <span class="card-tag">Compliance</span>
           </a>
         </div>
+
+        <!-- Medicare Updates subsection -->
+        <div style="margin-top:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:15px;font-weight:700;color:var(--text);">📰 Medicare Updates</div>
+            <span class="count-chip" id="medUpdCount">0 documents</span>
+          </div>
+          <div id="medUpdList" style="display:flex;flex-direction:column;gap:10px;">
+            <div style="color:var(--muted-2);font-size:13px;font-style:italic;">No Medicare updates posted yet.</div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -4220,6 +4251,16 @@
             </div>
           </div>
           <span class="count-chip" id="feed-count">Loading…</span>
+        </div>
+        <!-- Pinned: Note from the President -->
+        <div id="presidentNoteCard" style="display:none;margin-bottom:18px;background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.35);border-left:4px solid var(--gold);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:18px;">📌</span>
+            <span style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.8px;text-transform:uppercase;">Note from the President</span>
+          </div>
+          <h4 id="presidentNoteTitle" style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;"></h4>
+          <p id="presidentNoteMsg" style="font-size:13px;color:var(--muted);line-height:1.6;margin:0;white-space:pre-wrap;"></p>
+          <div id="presidentNoteMeta" style="font-size:11px;color:var(--muted-2);margin-top:10px;"></div>
         </div>
         <div style="margin-bottom:16px;">
           <input id="feedSearch" class="admin-input" placeholder="🔍 Search updates…" oninput="filterFeed(this.value)" style="max-width:340px;">
@@ -4418,6 +4459,8 @@
           <button class="admin-tab" onclick="switchAdminTab('trip',this)">🏝️ Trip</button>
           <button class="admin-tab" onclick="switchAdminTab('friday',this)">📅 Meetings</button>
           <button class="admin-tab" onclick="switchAdminTab('certs',this)">🎓 Certs</button>
+          <button class="admin-tab" onclick="switchAdminTab('medupdates',this)">📰 Med Updates</button>
+          <button class="admin-tab" onclick="switchAdminTab('articles',this)">📚 Article Locker</button>
           <button class="admin-tab" onclick="switchAdminTab('layout',this)">🔀 Layout</button>
         </div>
 
@@ -4655,6 +4698,29 @@
           <div class="admin-section-title">📡 Updates Feed</div>
           <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add announcements, carrier updates, training reminders, or weekly priorities. They appear instantly on the dashboard.</p>
 
+          <!-- Note from the President -->
+          <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:12px;padding:14px 16px;margin-bottom:20px;">
+            <div style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.5px;margin-bottom:10px;">📌 NOTE FROM THE PRESIDENT</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Title</label>
+                <input class="admin-input" id="presTitle" placeholder="e.g. Welcome to Q2 2026">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Date</label>
+                <input class="admin-input" id="presDate" type="date">
+              </div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Message</label>
+              <textarea class="admin-input" id="presMessage" rows="3" placeholder="Write the note here…" style="resize:vertical;"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <button class="admin-save-btn" onclick="savePresidentNote()" style="width:auto;padding:8px 20px;">💾 Save Note</button>
+              <button onclick="clearPresidentNote()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;">Clear / Hide</button>
+            </div>
+          </div>
+
           <!-- New update form -->
           <div style="background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:12px;padding:16px;margin-bottom:16px;">
             <div class="admin-section-title" style="margin-bottom:10px;font-size:11px;">➕ New Update</div>
@@ -4835,6 +4901,42 @@
 
 <!-- /adminTabVideos -->
 
+        <div id="adminTabMedUpdates" class="admin-tab-panel">
+          <div class="admin-section-title">📰 Medicare Updates</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add documents or links to the Medicare Updates section in Libraries. Drag to reorder. Agents see these as clickable tiles.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Title</label>
+              <input class="admin-input" id="medUpdTitle" placeholder="e.g. 2026 MAPD Changes Summary">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Category / Tag</label>
+              <input class="admin-input" id="medUpdTag" placeholder="e.g. CMS, Carrier, Policy">
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Description (optional)</label>
+            <textarea class="admin-input" id="medUpdDesc" rows="2" placeholder="Brief description…" style="resize:vertical;"></textarea>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Link URL (optional)</label>
+            <input class="admin-input" id="medUpdUrl" placeholder="https://…">
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Attach PDF or Image (optional)</label>
+            <div class="csv-drop-zone" id="medUpdDrop" onclick="document.getElementById('medUpdFile').click()" style="padding:14px;">
+              <div class="csv-drop-icon" style="font-size:20px;">📎</div>
+              <div class="csv-drop-text">Drop file or <span>click to browse</span></div>
+              <input type="file" id="medUpdFile" accept=".pdf,image/*" style="display:none" onchange="handleMedUpdFile(this.files[0])">
+            </div>
+            <div class="csv-status" id="medUpdFileStatus"></div>
+          </div>
+          <button class="admin-save-btn" onclick="addMedUpdate()" style="width:auto;padding:10px 24px;">➕ Add Update</button>
+          <div class="admin-section-title" style="margin-top:20px;">📋 Current Updates <span id="medUpdAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+          <p style="font-size:11px;color:var(--muted-2);margin-bottom:10px;">Drag rows to reorder.</p>
+          <div id="medUpdAdminList"></div>
+        </div>
+
         <div id="adminTabCerts" class="admin-tab-panel">
           <div class="admin-section-title">🎓 Carrier Certification Tracker</div>
           <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
@@ -4865,7 +4967,6 @@
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Date</label>
               <input type="date" class="admin-input" id="fridayDatePicker" onchange="syncFridayDate(this.value)" style="cursor:pointer;">
-              <input type="hidden" id="fridayDate">
             </div>
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Time</label>
@@ -4911,6 +5012,57 @@
           <button class="admin-save-btn" onclick="addFridayMeeting()" style="width:auto;padding:10px 24px;">➕ Add Meeting</button>
           <div class="admin-section-title" style="margin-top:20px;">📋 Scheduled Meetings <span id="fridayAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
           <div id="fridayAdminList"></div>
+        </div>
+
+        <div id="adminTabArticles" class="admin-tab-panel">
+          <div class="admin-section-title">📚 Article Locker</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
+            Build a library of articles. Each time you save the SNU leaderboard, the spotlight automatically advances to the next article in the queue. You can also manually pick which article shows now.
+          </p>
+
+          <!-- Add new article form -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;">
+            <div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.5px;margin-bottom:12px;">➕ ADD ARTICLE</div>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Article URL</label>
+              <div style="display:flex;gap:8px;">
+                <input class="admin-input" id="artUrl" placeholder="https://…" style="flex:1;">
+                <button class="admin-save-btn" onclick="prefillArticleFromUrl()" style="width:auto;padding:8px 14px;font-size:12px;">📋 Pre-fill</button>
+              </div>
+              <div style="font-size:10px;color:var(--muted-2);margin-top:4px;">Paste URL first, then click Pre-fill to auto-populate the title field. Fill in the rest manually.</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Headline / Title</label>
+                <input class="admin-input" id="artTitle" placeholder="Article headline…">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Category / Tag</label>
+                <select class="admin-input" id="artCategory">
+                  <option value="health">Medicare / Health</option>
+                  <option value="life">Life Insurance</option>
+                  <option value="annuity">Annuities</option>
+                  <option value="industry">Industry Trends</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Summary / Excerpt</label>
+              <textarea class="admin-input" id="artSummary" rows="3" placeholder="2–3 sentence summary of the article…" style="resize:vertical;"></textarea>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Thumbnail Image URL (optional)</label>
+              <input class="admin-input" id="artThumb" placeholder="https://…/image.jpg">
+            </div>
+            <button class="admin-save-btn" onclick="addArticleToLocker()" style="width:auto;padding:9px 22px;">➕ Add to Locker</button>
+          </div>
+
+          <!-- Queue -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.5px;">ARTICLE QUEUE <span id="artQueueCount" style="font-weight:400;color:var(--muted-2);"></span></div>
+            <div style="font-size:11px;color:var(--muted-2);">🔴 = currently showing &nbsp;·&nbsp; drag to reorder</div>
+          </div>
+          <div id="artQueueList" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
 
         <div id="adminTabLayout" class="admin-tab-panel">
@@ -5240,7 +5392,7 @@ When answering:
   const JB_MAIN_BIN      = '69b2cd77aa77b81da9dbc6e6';
   const JB_PHOTO_BIN_KEY          = 'mymedi_jb_photo_bin_id';
   const JB_PHOTO_BIN_HARDCODED = '69b2da94c3097a1dd51cd2cf';
-  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}}, snu_videos:[], snu_friday_meetings:[], snu_layout_order:[], snu_layout_vis:{} };
+  const JB_EMPTY         = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
 
   // ── Generic bin helpers ────────────────────────────────────────
   async function jbReadBin(id) {
@@ -5338,10 +5490,6 @@ When answering:
     if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
     if (record.snu_trip?.agents?.length) localStorage.setItem('snu_trip_v1', JSON.stringify(record.snu_trip));
-    if (Array.isArray(record.snu_videos)) localStorage.setItem('videos_v1', JSON.stringify(record.snu_videos));
-    if (Array.isArray(record.snu_friday_meetings)) localStorage.setItem('friday_meetings_v1', JSON.stringify(record.snu_friday_meetings));
-    if (Array.isArray(record.snu_layout_order)) localStorage.setItem('medi_section_order_v2', JSON.stringify(record.snu_layout_order));
-    if (record.snu_layout_vis && typeof record.snu_layout_vis === 'object') localStorage.setItem('medi_section_vis_v2', JSON.stringify(record.snu_layout_vis));
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
@@ -5352,7 +5500,7 @@ When answering:
 
   // ── Save a field ──────────────────────────────────────────────
   window.jbSave = async function(field, value) {
-    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1', snu_videos:'videos_v1', snu_friday_meetings:'friday_meetings_v1', snu_layout_order:'medi_section_order_v2', snu_layout_vis:'medi_section_vis_v2' };
+    const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
     if (lsMap[field]) { try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {} }
 
     // Save photos to photo bin
@@ -6172,10 +6320,6 @@ When answering:
           _updates = window._jb_updates_override;
           if (typeof renderFeedFromStorage === 'function') renderFeedFromStorage();
         }
-        if (typeof initVideos === 'function') initVideos();
-        if (typeof initFridayMeetings === 'function') initFridayMeetings();
-        if (typeof applySectionOrder === 'function') applySectionOrder();
-        if (typeof renderLayoutAdmin === 'function') renderLayoutAdmin();
       }
     })();
     loadWeeklyArticle();
@@ -6524,6 +6668,7 @@ When answering:
     window._snuState.data = data;
     renderSnuLeaderboard(data);
     renderSnuExecs(data);
+    advanceArticleQueue();   // auto-advance spotlight on each SNU save
     closeAdmin();
     showSnuToast('✓ SNU data published!');
   }
@@ -7675,37 +7820,56 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       localVideos = JSON.parse(localStorage.getItem(VID_STORAGE_KEY) || '[]');
       if (!Array.isArray(localVideos)) localVideos = [];
     } catch(e) { localVideos = []; }
-
-    const cloudVideos = Array.isArray(window._jbRecord?.snu_videos) ? window._jbRecord.snu_videos : null;
-    _videos = cloudVideos || localVideos;
-    try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
+    _videos = localVideos;
     renderVideoGrid();
     refreshAdminVideosList();
+
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
+      headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
+    })
+    .then(r => r.json())
+    .then(rows => {
+      const cloudData = rows.length ? JSON.parse(rows[0].data) : [];
+      if (cloudData.length > 0 || localVideos.length === 0) {
+        _videos = cloudData;
+        try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
+      }
+      renderVideoGrid();
+      refreshAdminVideosList();
+    })
+    .catch(() => {
+      _videos = localVideos;
+      renderVideoGrid();
+      refreshAdminVideosList();
+    });
   }
 
-  // ── Save videos to shared hub record ─────────────────────────────────────
+  // ── Save to JSONBin ────────────────────────────────────────────────────────
   function saveVideos(onSuccess) {
     try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
     if (_videosSaving) return;
     _videosSaving = true;
-
-    const done = (ok) => {
+    const payload = JSON.stringify(_videos);
+    fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
+      method: 'DELETE',
+      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY }
+    })
+    .then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
+      method: 'POST',
+      headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ hub: VID_HUB, data: payload })
+    }))
+    .then(r => {
       _videosSaving = false;
-      if (ok) {
+      if (r.ok || r.status === 201) {
+        console.log('[VID SAVE] OK');
         if (onSuccess) onSuccess();
       } else {
-        showSnuToast('⚠ Save failed.');
+        r.text().then(t => console.error('[VID SAVE] ERROR', r.status, t));
+        showSnuToast('\u26a0 Save error ' + r.status);
       }
-    };
-
-    if (typeof jbSave === 'function') {
-      Promise.resolve(jbSave('snu_videos', _videos))
-        .then(() => done(true))
-        .catch(err => { console.error('[VID SAVE]', err); done(false); });
-      return;
-    }
-
-    done(false);
+    })
+    .catch(e => { _videosSaving = false; console.error('[VID SAVE]', e); showSnuToast('\u26a0 Save failed \u2014 check connection.'); });
   }
 
   // ── Render the public video grid ───────────────────────────────────────────
@@ -8415,46 +8579,55 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const FRIDAY_STORAGE_KEY = 'friday_meetings_v1';
   let _fridayMeetings = [];
 
-  function syncFridayDate(val) {
-    const picker = document.getElementById('fridayDatePicker');
-    const hidden = document.getElementById('fridayDate');
-    const raw = val || picker?.value || '';
-    if (hidden) hidden.value = raw;
-  }
-
-  function formatFridayDate(raw) {
-    if (!raw) return '';
-    const d = new Date(raw + 'T00:00:00');
-    if (isNaN(d.getTime())) return raw;
-    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  }
-
   function initFridayMeetings() {
     let localMeetings = [];
     try {
       localMeetings = JSON.parse(localStorage.getItem(FRIDAY_STORAGE_KEY) || '[]');
       if (!Array.isArray(localMeetings)) localMeetings = [];
     } catch(e) { localMeetings = []; }
+    _fridayMeetings = localMeetings;
+    renderFridayMeetings(); renderFridayAdminList();
 
-    const cloudMeetings = Array.isArray(window._jbRecord?.snu_friday_meetings) ? window._jbRecord.snu_friday_meetings : null;
-    _fridayMeetings = cloudMeetings || localMeetings;
-    try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
-
-    renderFridayMeetings(); 
-    renderFridayAdminList();
+    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi&select=data`, {
+      headers: { 'apikey': FM_SUPA_KEY, 'Authorization': 'Bearer ' + FM_SUPA_KEY, 'Cache-Control': 'no-cache' }
+    })
+    .then(r => r.json())
+    .then(rows => {
+      const cloudData = rows.length && rows[0].data ? JSON.parse(rows[0].data) : [];
+      if (cloudData.length > 0 || localMeetings.length === 0) {
+        _fridayMeetings = cloudData;
+        try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
+      }
+      renderFridayMeetings(); renderFridayAdminList();
+    })
+    .catch(() => {
+      _fridayMeetings = localMeetings;
+      renderFridayMeetings(); renderFridayAdminList();
+    });
   }
 
   function saveFridayMeetings(onSuccess) {
     try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
-
-    if (typeof jbSave === 'function') {
-      Promise.resolve(jbSave('snu_friday_meetings', _fridayMeetings))
-        .then(() => { if (onSuccess) onSuccess(); })
-        .catch(err => { console.error('[FM SAVE]', err); showSnuToast('⚠ Save failed.'); });
-      return;
-    }
-
-    showSnuToast('⚠ Save failed.');
+    const payload = JSON.stringify(_fridayMeetings);
+    fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi`, {
+      method: 'DELETE',
+      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY }
+    })
+    .then(() => fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings`, {
+      method: 'POST',
+      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ hub: 'medi', data: payload })
+    }))
+    .then(r => {
+      if (r.ok || r.status === 201) {
+        console.log('[FM SAVE] OK');
+        if (onSuccess) onSuccess();
+      } else {
+        r.text().then(t => console.error('[FM SAVE] ERROR', r.status, t));
+        showSnuToast('\u26a0 Save error ' + r.status);
+      }
+    })
+    .catch(e => { console.error('[FM SAVE]', e); showSnuToast('\u26a0 Save failed.'); });
   }
 
   function renderFridayMeetings() {
@@ -8470,7 +8643,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
           <div style="font-size:22px;">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'}</div>
           <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
-          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${pesc(formatFridayDate(m.date||''))}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${pesc(m.date||'')}</div>
         </div>
         <div style="flex:1;">
           <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
@@ -8491,7 +8664,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     el.innerHTML = _fridayMeetings.map((m,i) => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
         <div><div style="font-size:13px;font-weight:700;color:var(--text);">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'} ${pesc(m.topic||'Meeting')}</div>
-        <div style="font-size:11px;color:var(--muted-2);">${pesc(formatFridayDate(m.date||''))} ${m.time?'\u00b7 '+pesc(m.time):''}</div></div>
+        <div style="font-size:11px;color:var(--muted-2);">${pesc(m.date||'')} ${m.time?'\u00b7 '+pesc(m.time):''}</div></div>
         <button class="admin-remove-btn" onclick="deleteFridayMeeting(${i})" title="Remove">\u2715</button>
       </div>`).join('');
   }
@@ -8514,8 +8687,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const gv = id => document.getElementById(id)?.value?.trim()||'';
     const topic = gv('fridayTopic');
     if (!topic) { showSnuToast('\u26a0 Please enter a meeting topic.'); return; }
-    _fridayMeetings.push({ id: Date.now(), date: (document.getElementById('fridayDatePicker')?.value || gv('fridayDate')), time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), type: _fridayType });
-    ['fridayDate','fridayDatePicker','fridayTime','fridayTopic','fridayNotes','fridayLink'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+    _fridayMeetings.push({ id: Date.now(), date: gv('fridayDate'), time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), type: _fridayType });
+    ['fridayDate','fridayTime','fridayTopic','fridayNotes','fridayLink'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
     setFridayType('in-person');
     renderFridayMeetings(); renderFridayAdminList();
     showSnuToast('\u23f3 Saving...');
@@ -8535,20 +8708,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   <script id="layout-manager-script">
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
-    { id: 'industry-spotlight', label: '💡 Industry Spotlight' },
-    { id: 'agent-of-the-month', label: '🏅 Agent of the Month' },
-    { id: 'agent-spotlight',    label: '⭐ Agent Spotlight' },
-    { id: 'libraries',          label: '📚 Agent Libraries' },
-    { id: 'cert-tracker',       label: '🎓 Cert Tracker' },
-    { id: 'friday-meetings',    label: '📅 Friday Meetings' },
-    { id: 'leaderboard',        label: '🏆 SNU / Leaderboard' },
-    { id: 'agent-tools',        label: '🛠 Agent Tools' },
-    { id: 'quick-access',       label: '🔗 Quick Access Portals' },
-    { id: 'video-library',      label: '🎬 Video Library' },
-    { id: 'practice-client',    label: '🎯 Practice Client' },
-    { id: 'updates',            label: '📡 Updates Feed' },
-    { id: 'trip-tracker',       label: '🏝️ Trip Tracker' },
-    { id: 'operations-ai',      label: '🤖 Agent Assistant' },
+    { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
+    { id: 'friday-meetings',  label: '📅 Friday Meetings' },
+    { id: 'leaderboard',      label: '🏆 SNU / Leaderboard' },
+    { id: 'agent-tools',      label: '🛠 Agent Tools' },
+    { id: 'quick-access',     label: '🔗 Quick Access Portals' },
+    { id: 'video-library',    label: '🎬 Video Library' },
+    { id: 'practice-client',  label: '🎯 Practice Client' },
+    { id: 'updates',          label: '📡 Updates Feed' },
+    { id: 'trip-tracker',     label: '🏝️ Trip Tracker' },
+    { id: 'agent-spotlight',  label: '⭐ Agent Spotlight' },
+    { id: 'operations-ai',    label: '🤖 Agent Assistant' },
   ];
   const LAYOUT_KEY     = 'medi_section_order_v2';
   const LAYOUT_VIS_KEY = 'medi_section_vis_v2';
@@ -8569,31 +8739,36 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function getSectionVis() {
     try {
       const saved = JSON.parse(localStorage.getItem(LAYOUT_VIS_KEY) || '{}');
-      return saved && typeof saved === 'object' ? saved : {};
+      return saved;
     } catch(e) { return {}; }
   }
 
   function saveSectionVis(vis) {
     try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
-    if (typeof jbSave === 'function') jbSave('snu_layout_vis', vis);
   }
 
   function applySectionOrder() {
     const order = getSectionOrder();
     const vis   = getSectionVis();
 
+    // Get the direct-child footer of .page as our anchor
     const page = document.querySelector('.page');
     if (!page) return;
-    const footer = page.querySelector(':scope > footer');
+    let footer = null;
+    for (const child of page.children) {
+      if (child.tagName === 'FOOTER') { footer = child; break; }
+    }
     if (!footer) return;
 
-    const frag = document.createDocumentFragment();
-    order.forEach(id => {
+    // Move each section (in reverse order) to just before footer
+    // Reversing ensures final order matches the desired order array
+    const reversed = [...order].reverse();
+    reversed.forEach(id => {
       const el = document.getElementById(id);
-      if (el && el.parentElement === page) frag.appendChild(el);
+      if (el) page.insertBefore(el, footer);
     });
-    page.insertBefore(frag, footer);
 
+    // Apply visibility
     LAYOUT_SECTIONS.forEach(s => {
       const el = document.getElementById(s.id);
       if (!el) return;
@@ -8613,20 +8788,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveSectionOrder(order) {
     try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(order)); } catch(e) {}
-    if (typeof jbSave === 'function') jbSave('snu_layout_order', order);
   }
 
   function resetSectionOrder() {
     localStorage.removeItem(LAYOUT_KEY);
     localStorage.removeItem(LAYOUT_VIS_KEY);
-    const defaultOrder = LAYOUT_SECTIONS.map(s => s.id);
-    const defaultVis = {};
-    try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(defaultOrder)); } catch(e) {}
-    try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(defaultVis)); } catch(e) {}
-    if (typeof jbSave === 'function') {
-      jbSave('snu_layout_order', defaultOrder);
-      jbSave('snu_layout_vis', defaultVis);
-    }
     applySectionOrder();
     renderLayoutAdmin();
     showSnuToast('↺ Layout reset to default.');
@@ -8727,12 +8893,15 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function loadCertData() {
     try {
       const raw = localStorage.getItem(CERT_KEY);
-      if (!raw) return;
-      const d = JSON.parse(raw);
-      _certAgents = Array.isArray(d.agents) ? d.agents : [];
-      _certMeta   = d.meta || {};
+      if (raw) {
+        const d = JSON.parse(raw);
+        _certAgents = Array.isArray(d.agents) ? d.agents : [];
+        _certMeta   = d.meta || {};
+        renderCertTracker();
+      }
     } catch(e) {}
-    renderCertTracker();
+    // Always fetch from Supabase for latest data
+    loadCertDataFromSupabase();
   }
 
   function renderCertTracker() {
@@ -8895,14 +9064,39 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     s.onload = cb; document.head.appendChild(s);
   }
 
+  const CERT_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const CERT_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const CERT_HUB = 'medi';
+
+  function loadCertDataFromSupabase() {
+    fetch(`${CERT_SUPA_URL}/rest/v1/cert_tracker?hub=eq.${CERT_HUB}&select=data`, {
+      headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const d = JSON.parse(rows[0].data);
+        _certAgents = Array.isArray(d.agents) ? d.agents : [];
+        _certMeta   = d.meta || {};
+        try { localStorage.setItem(CERT_KEY, JSON.stringify({agents: _certAgents, meta: _certMeta})); } catch(e) {}
+        renderCertTracker();
+      }
+    }).catch(() => {});
+  }
+
   function saveCertData() {
     if (!_certAgents.length) { alert('No data to save. Upload a file first.'); return; }
     const year = _certAgents[0]?.year || new Date().getFullYear();
     _certMeta = { year, updatedAt: new Date().toISOString() };
     const data = { agents: _certAgents, meta: _certMeta };
     localStorage.setItem(CERT_KEY, JSON.stringify(data));
-    renderCertTracker();
-    alert('✅ Certification data saved!');
+    const payload = JSON.stringify(data);
+    fetch(`${CERT_SUPA_URL}/rest/v1/cert_tracker?hub=eq.${CERT_HUB}`, {
+      method: 'DELETE', headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY }
+    }).then(() => fetch(`${CERT_SUPA_URL}/rest/v1/cert_tracker`, {
+      method: 'POST',
+      headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ hub: CERT_HUB, data: payload })
+    })).then(() => { renderCertTracker(); alert('✅ Certification data saved and synced!'); })
+    .catch(() => { renderCertTracker(); alert('✅ Saved locally (cloud sync failed).'); });
     const inp = document.getElementById('certCsvInput'); if (inp) inp.value = '';
     const status = document.getElementById('certCsvStatus'); if (status) { status.textContent=''; status.className='csv-status'; }
     const preview = document.getElementById('certAdminPreview'); if (preview) preview.style.display = 'none';
@@ -8930,6 +9124,511 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         if (file) handleCertCsvFile(file);
       });
     }
+  });
+  </script>
+
+  <script id="extra-features-script">
+  // ══════════════════════════════════════════════════════════════
+  //  EXTRA FEATURES: MAPD Modal · Medicare Updates · President Note
+  // ══════════════════════════════════════════════════════════════
+
+  const SUPA_BASE = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+
+  // ── MAPD / PDP Compliance Script Modal ───────────────────────────────────
+  function openMapdScriptModal() {
+    let modal = document.getElementById('mapdModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'mapdModal';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);';
+      modal.innerHTML = `
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;width:min(700px,94vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);">
+            <div style="font-size:16px;font-weight:800;color:var(--text);">📜 MAPD/PDP Compliance Script by State</div>
+            <button onclick="document.getElementById('mapdModal').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;">×</button>
+          </div>
+          <div style="padding:16px 22px;border-bottom:1px solid var(--border);">
+            <select id="mapdStateSelect" class="admin-input" onchange="renderMapdScript()" style="max-width:260px;">
+              <option value="">— Select a State —</option>
+              ${['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'].map(s=>`<option value="${s}">${s}</option>`).join('')}
+            </select>
+          </div>
+          <div id="mapdScriptBody" style="padding:22px;overflow-y:auto;flex:1;font-size:13px;line-height:1.8;color:var(--muted);">
+            Select a state above to view the compliance script.
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    }
+  }
+
+  function renderMapdScript() {
+    const state = document.getElementById('mapdStateSelect')?.value;
+    const body  = document.getElementById('mapdScriptBody');
+    if (!body) return;
+    if (!state) { body.innerHTML = '<span style="color:var(--muted)">Select a state above to view the compliance script.</span>'; return; }
+    const scripts = {
+      default: `<strong>Opening Disclosure (All States)</strong><br>
+"Before we get started, I want to let you know that I am a licensed insurance agent and I may be compensated if you enroll in a plan. The information I provide today is for educational purposes. I represent multiple insurance companies."<br><br>
+<strong>Standard MAPD Script</strong><br>
+"I'd like to share information about Medicare Advantage plans available in your area. These plans combine your Medicare Part A, Part B, and often Part D coverage into one plan offered by a private insurance company approved by Medicare."<br><br>
+<strong>PDP Script</strong><br>
+"A Medicare Part D Prescription Drug Plan helps cover the cost of your prescription medications. Plans vary by premium, deductible, and formulary — let's find one that fits your medications and budget."<br><br>
+<strong>Closing / Scope of Appointment Reminder</strong><br>
+"Do I have your permission to discuss Medicare Advantage and/or Part D plans with you today? This conversation is being recorded/documented as required by CMS."`,
+      CA: `<strong>California — Additional Disclosure Required</strong><br>
+"I am licensed in the state of California. In addition to the standard Medicare disclosures, California law requires that I inform you that you have the right to receive information in a language other than English."<br><br>`,
+      NJ: `<strong>New Jersey — Additional Disclosure Required</strong><br>
+"I am licensed in the state of New Jersey. Please note that New Jersey has additional consumer protections for Medicare beneficiaries. You have the right to a copy of any materials presented today."<br><br>`,
+      FL: `<strong>Florida — Additional Disclosure Required</strong><br>
+"I am licensed in the state of Florida. Florida law requires me to inform you that you have a free look period on any Medicare Supplement or Advantage plan enrollment."<br><br>`,
+      NY: `<strong>New York — Additional Disclosure Required</strong><br>
+"I am licensed in the state of New York. New York has specific regulations regarding Medicare Advantage marketing — I am only permitted to discuss plans for which you have expressed interest via a valid Scope of Appointment."<br><br>`,
+    };
+    const stateScript = scripts[state] || '';
+    body.innerHTML = (stateScript || '') + scripts.default;
+  }
+
+  // ── MEDICARE UPDATES (Libraries section) ─────────────────────────────────
+  const MED_UPD_KEY  = 'med_updates_v1';
+  const MED_UPD_HUB  = 'medi';
+  let _medUpdates    = [];
+  let _medUpdDragSrc = null;
+  let _medUpdFile64  = null;
+  let _medUpdFileType= null;
+  let _medUpdFileName= null;
+
+  function loadMedUpdates() {
+    try {
+      const raw = localStorage.getItem(MED_UPD_KEY);
+      if (raw) { _medUpdates = JSON.parse(raw) || []; renderMedUpdates(); }
+    } catch(e) {}
+    fetch(`${SUPA_BASE}/rest/v1/med_updates?hub=eq.${MED_UPD_HUB}&select=data`, {
+      headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const cloud = JSON.parse(rows[0].data);
+        if (cloud.length > 0 || _medUpdates.length === 0) {
+          _medUpdates = cloud;
+          try { localStorage.setItem(MED_UPD_KEY, JSON.stringify(_medUpdates)); } catch(e) {}
+          renderMedUpdates();
+        }
+      }
+    }).catch(() => {});
+  }
+
+  function saveMedUpdates(cb) {
+    try { localStorage.setItem(MED_UPD_KEY, JSON.stringify(_medUpdates)); } catch(e) {}
+    const payload = JSON.stringify(_medUpdates);
+    fetch(`${SUPA_BASE}/rest/v1/med_updates?hub=eq.${MED_UPD_HUB}`, {
+      method: 'DELETE', headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2 }
+    }).then(() => fetch(`${SUPA_BASE}/rest/v1/med_updates`, {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ hub: MED_UPD_HUB, data: payload })
+    })).then(() => { if (cb) cb(); }).catch(() => { if (cb) cb(); });
+  }
+
+  function renderMedUpdates() {
+    const el    = document.getElementById('medUpdList');
+    const badge = document.getElementById('medUpdCount');
+    if (!el) return;
+    if (badge) badge.textContent = _medUpdates.length + ' document' + (_medUpdates.length !== 1 ? 's' : '');
+    if (!_medUpdates.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-size:13px;font-style:italic;">No Medicare updates posted yet.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = _medUpdates.map(u => {
+      const hasFile = u.file64 && u.fileType;
+      const hasUrl  = u.url;
+      let clickAttr = '';
+      if (hasFile) {
+        if (u.fileType === 'application/pdf') clickAttr = `onclick="openLightbox('${u.file64}','${u.fileType}','${pesc(u.title)}')"`;
+        else clickAttr = `onclick="openLightbox('${u.file64}','${u.fileType}','${pesc(u.title)}')"`;
+      } else if (hasUrl) {
+        clickAttr = `onclick="window.open('${u.url}','_blank')"`;
+      }
+      return `<div ${clickAttr} style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;cursor:${(hasFile||hasUrl)?'pointer':'default'};transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.07)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
+        <div style="font-size:24px;flex-shrink:0;">${u.fileType==='application/pdf'?'📄':(u.fileType&&u.fileType.startsWith('image/'))?'🖼️':'🔗'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pesc(u.title||'Untitled')}</div>
+          ${u.desc ? `<div style="font-size:11px;color:var(--muted-2);margin-top:2px;">${pesc(u.desc)}</div>` : ''}
+          ${u.tag  ? `<span style="font-size:10px;font-weight:700;color:var(--accent);background:rgba(99,179,237,.12);border-radius:4px;padding:2px 6px;display:inline-block;margin-top:4px;">${pesc(u.tag)}</span>` : ''}
+        </div>
+        ${(hasFile||hasUrl) ? '<span style="color:var(--muted-2);font-size:16px;">↗</span>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function renderMedUpdatesAdmin() {
+    const el    = document.getElementById('medUpdAdminList');
+    const count = document.getElementById('medUpdAdminCount');
+    if (!el) return;
+    if (count) count.textContent = `(${_medUpdates.length})`;
+    if (!_medUpdates.length) { el.innerHTML = '<div style="color:var(--muted-2);font-size:12px;font-style:italic;padding:8px 0;">No updates yet.</div>'; return; }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = _medUpdates.map((u, i) => `
+      <div draggable="true" data-idx="${i}" class="med-upd-row"
+           ondragstart="medUpdDragStart(event)" ondragover="medUpdDragOver(event)"
+           ondrop="medUpdDrop(event)" ondragend="medUpdDragEnd(event)"
+           style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;cursor:grab;">
+        <span style="color:var(--muted-2);font-size:16px;">⠿</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);">${pesc(u.title||'Untitled')}</div>
+          ${u.tag ? `<span style="font-size:10px;color:var(--accent);">${pesc(u.tag)}</span>` : ''}
+        </div>
+        <button onclick="deleteMedUpdate(${i})" class="admin-remove-btn" title="Delete">✕</button>
+      </div>`).join('');
+  }
+
+  function addMedUpdate() {
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const title = gv('medUpdTitle');
+    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
+    _medUpdates.push({ id: Date.now(), title, desc: gv('medUpdDesc'), tag: gv('medUpdTag'), url: gv('medUpdUrl'),
+      file64: _medUpdFile64 || null, fileType: _medUpdFileType || null, fileName: _medUpdFileName || null });
+    saveMedUpdates(() => {
+      renderMedUpdates();
+      renderMedUpdatesAdmin();
+      ['medUpdTitle','medUpdDesc','medUpdTag','medUpdUrl'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+      _medUpdFile64 = null; _medUpdFileType = null; _medUpdFileName = null;
+      const st = document.getElementById('medUpdFileStatus'); if (st) { st.textContent=''; st.className='csv-status'; }
+      showSnuToast('✓ Medicare update added.');
+    });
+  }
+
+  function deleteMedUpdate(i) {
+    if (!confirm('Delete this update?')) return;
+    _medUpdates.splice(i, 1);
+    saveMedUpdates(() => { renderMedUpdates(); renderMedUpdatesAdmin(); });
+  }
+
+  function handleMedUpdFile(file) {
+    if (!file) return;
+    const status = document.getElementById('medUpdFileStatus');
+    const reader = new FileReader();
+    reader.onload = e => {
+      _medUpdFile64 = e.target.result;
+      _medUpdFileType = file.type;
+      _medUpdFileName = file.name;
+      if (status) { status.textContent = '✓ ' + file.name; status.className = 'csv-status ok'; }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function medUpdDragStart(e) { _medUpdDragSrc = e.currentTarget; e.dataTransfer.effectAllowed='move'; setTimeout(()=>{if(_medUpdDragSrc)_medUpdDragSrc.style.opacity='.4';},0); }
+  function medUpdDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.med-upd-row').forEach(r=>r.style.borderColor='var(--border)'); e.currentTarget.style.borderColor='var(--accent)'; }
+  function medUpdDrop(e) {
+    e.preventDefault();
+    if (!_medUpdDragSrc || _medUpdDragSrc===e.currentTarget) return;
+    const from = parseInt(_medUpdDragSrc.dataset.idx);
+    const to   = parseInt(e.currentTarget.dataset.idx);
+    const moved = _medUpdates.splice(from,1)[0];
+    _medUpdates.splice(to,0,moved);
+    saveMedUpdates(() => { renderMedUpdates(); renderMedUpdatesAdmin(); });
+  }
+  function medUpdDragEnd(e) { document.querySelectorAll('.med-upd-row').forEach(r=>{r.style.opacity='';r.style.borderColor='var(--border)';}); _medUpdDragSrc=null; }
+
+  // ── NOTE FROM THE PRESIDENT ───────────────────────────────────────────────
+  const PRES_KEY  = 'president_note_v1';
+  const PRES_HUB  = 'medi';
+
+  function loadPresidentNote() {
+    try {
+      const raw = localStorage.getItem(PRES_KEY);
+      if (raw) { renderPresidentNote(JSON.parse(raw)); }
+    } catch(e) {}
+    fetch(`${SUPA_BASE}/rest/v1/president_note?hub=eq.${PRES_HUB}&select=data`, {
+      headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const note = JSON.parse(rows[0].data);
+        try { localStorage.setItem(PRES_KEY, JSON.stringify(note)); } catch(e) {}
+        renderPresidentNote(note);
+        // Populate admin fields
+        const pt = document.getElementById('presTitle');
+        const pm = document.getElementById('presMessage');
+        const pd = document.getElementById('presDate');
+        if (pt) pt.value = note.title || '';
+        if (pm) pm.value = note.message || '';
+        if (pd) pd.value = note.date || '';
+      }
+    }).catch(() => {});
+  }
+
+  function renderPresidentNote(note) {
+    const card  = document.getElementById('presidentNoteCard');
+    const title = document.getElementById('presidentNoteTitle');
+    const msg   = document.getElementById('presidentNoteMsg');
+    const meta  = document.getElementById('presidentNoteMeta');
+    if (!card) return;
+    if (!note || !note.title) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    if (title) title.textContent = note.title || '';
+    if (msg)   msg.textContent   = note.message || '';
+    if (meta)  meta.textContent  = note.date ? '📅 ' + note.date : '';
+  }
+
+  function savePresidentNote() {
+    const title   = document.getElementById('presTitle')?.value?.trim() || '';
+    const message = document.getElementById('presMessage')?.value?.trim() || '';
+    const date    = document.getElementById('presDate')?.value?.trim() || '';
+    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
+    const note = { title, message, date };
+    try { localStorage.setItem(PRES_KEY, JSON.stringify(note)); } catch(e) {}
+    renderPresidentNote(note);
+    const payload = JSON.stringify(note);
+    fetch(`${SUPA_BASE}/rest/v1/president_note?hub=eq.${PRES_HUB}`, {
+      method: 'DELETE', headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2 }
+    }).then(() => fetch(`${SUPA_BASE}/rest/v1/president_note`, {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ hub: PRES_HUB, data: payload })
+    })).then(() => showSnuToast('✓ Note from the President saved!'))
+    .catch(() => showSnuToast('⚠ Saved locally; cloud sync failed.'));
+  }
+
+  function clearPresidentNote() {
+    if (!confirm('Clear the Note from the President?')) return;
+    try { localStorage.removeItem(PRES_KEY); } catch(e) {}
+    renderPresidentNote(null);
+    ['presTitle','presMessage','presDate'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+    fetch(`${SUPA_BASE}/rest/v1/president_note?hub=eq.${PRES_HUB}`, {
+      method: 'DELETE', headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2 }
+    }).then(() => showSnuToast('↺ Note cleared.')).catch(() => {});
+  }
+
+  // ── Hook renderMedUpdatesAdmin into switchAdminTab ───────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    loadMedUpdates();
+    loadPresidentNote();
+    // Drag-drop for med updates drop zone
+    const zone = document.getElementById('medUpdDrop');
+    if (zone) {
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor='var(--accent)'; });
+      zone.addEventListener('dragleave', () => zone.style.borderColor='');
+      zone.addEventListener('drop', e => { e.preventDefault(); zone.style.borderColor=''; const f=e.dataTransfer.files[0]; if(f) handleMedUpdFile(f); });
+    }
+    const origSwitch = window.switchAdminTab;
+    window.switchAdminTab = function(tab, el) {
+      origSwitch(tab, el);
+      if (tab === 'medupdates') renderMedUpdatesAdmin();
+    };
+  });
+  </script>
+
+  <script id="article-locker-script">
+  // ══════════════════════════════════════════════════════════════
+  //  ARTICLE LOCKER
+  //  Storage: Supabase table `article_locker` (hub = 'medi')
+  //  localStorage key: article_locker_v1
+  //  Active index key: article_locker_idx_v1
+  // ══════════════════════════════════════════════════════════════
+  const ART_KEY      = 'article_locker_v1';
+  const ART_IDX_KEY  = 'article_locker_idx_v1';
+  const ART_HUB      = 'medi';
+  const ART_SUPA     = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const ART_SKEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+
+  let _artLocker  = [];   // [{id, title, url, summary, thumb, category, addedAt}]
+  let _artIdx     = 0;    // index of currently displayed article
+  let _artDragSrc = null;
+
+  // ── Load ──────────────────────────────────────────────────────
+  function loadArticleLocker() {
+    try {
+      const raw = localStorage.getItem(ART_KEY);
+      if (raw) { _artLocker = JSON.parse(raw) || []; }
+      const idx = localStorage.getItem(ART_IDX_KEY);
+      if (idx !== null) _artIdx = parseInt(idx) || 0;
+    } catch(e) {}
+    // Fetch from Supabase
+    fetch(`${ART_SUPA}/rest/v1/article_locker?hub=eq.${ART_HUB}&select=data`, {
+      headers: { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const d = JSON.parse(rows[0].data);
+        _artLocker = d.articles || [];
+        _artIdx    = d.activeIdx || 0;
+        try {
+          localStorage.setItem(ART_KEY, JSON.stringify(_artLocker));
+          localStorage.setItem(ART_IDX_KEY, String(_artIdx));
+        } catch(e) {}
+        renderActiveArticle();
+      }
+    }).catch(() => {}).finally(() => { renderActiveArticle(); });
+  }
+
+  function saveArticleLocker(cb) {
+    try {
+      localStorage.setItem(ART_KEY, JSON.stringify(_artLocker));
+      localStorage.setItem(ART_IDX_KEY, String(_artIdx));
+    } catch(e) {}
+    const payload = JSON.stringify({ articles: _artLocker, activeIdx: _artIdx });
+    fetch(`${ART_SUPA}/rest/v1/article_locker?hub=eq.${ART_HUB}`, {
+      method: 'DELETE', headers: { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY }
+    }).then(() => fetch(`${ART_SUPA}/rest/v1/article_locker`, {
+      method: 'POST',
+      headers: { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ hub: ART_HUB, data: payload })
+    })).then(() => { if (cb) cb(); }).catch(() => { if (cb) cb(); });
+  }
+
+  // ── Auto-advance: called every time SNU leaderboard is saved ─
+  function advanceArticleQueue() {
+    if (!_artLocker.length) return;
+    _artIdx = (_artIdx + 1) % _artLocker.length;
+    saveArticleLocker(() => renderActiveArticle());
+  }
+
+  // ── Render the active article into the Industry Spotlight ─────
+  function renderActiveArticle() {
+    if (!_artLocker.length) return;
+    _artIdx = Math.min(_artIdx, _artLocker.length - 1);
+    const a = _artLocker[_artIdx];
+    if (!a) return;
+
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const catColors = {
+      health:   { bg:'rgba(52,211,153,.12)',  border:'rgba(52,211,153,.3)',  text:'#34d399' },
+      life:     { bg:'rgba(167,139,250,.12)', border:'rgba(167,139,250,.3)', text:'#a78bfa' },
+      annuity:  { bg:'rgba(251,191,36,.12)',  border:'rgba(251,191,36,.3)',  text:'var(--gold)' },
+      industry: { bg:'rgba(59,130,246,.12)',  border:'rgba(59,130,246,.3)',  text:'var(--accent-2)' },
+    };
+    const cc = catColors[a.category] || catColors.industry;
+
+    // Update the tag badge
+    const tagEl = document.getElementById('snuArticleTag');
+    if (tagEl) tagEl.textContent = a.category === 'health' ? 'Medicare / Health' : a.category === 'life' ? 'Life Insurance' : a.category === 'annuity' ? 'Annuities' : 'Industry Trends';
+
+    // Update teaser card on dashboard
+    const teaser = document.getElementById('industryTeaserCard');
+    if (teaser) {
+      teaser.onclick = a.url ? () => window.open(a.url, '_blank') : () => openSnuPrint();
+      teaser.innerHTML = `
+        ${a.thumb ? `<img src="${pesc(a.thumb)}" alt="" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px 10px 0 0;display:block;margin-bottom:14px;" onerror="this.style.display='none'">` : '<div class="industry-teaser-icon">📰</div>'}
+        <div class="industry-teaser-content">
+          <span class="industry-teaser-cat ${a.category||'industry'}" style="background:${cc.bg};border:1px solid ${cc.border};color:${cc.text};padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:8px;">${tagEl ? tagEl.textContent : a.category}</span>
+          <div class="industry-teaser-headline">${pesc(a.title||'')}</div>
+          <div class="industry-teaser-excerpt">${pesc(a.summary||'')}</div>
+          ${a.url ? `<div class="industry-teaser-cta">Read full article <span class="industry-teaser-arrow">→</span></div>` : '<div class="industry-teaser-cta">View in SNU <span class="industry-teaser-arrow">→</span></div>'}
+        </div>`;
+    }
+
+    // Update SNU article body
+    const body = document.getElementById('snuArticleBody');
+    if (body) {
+      body.innerHTML = `
+        <div class="snu-article-headline">${pesc(a.title||'')}</div>
+        <span class="snu-article-category ${a.category||'industry'}">${tagEl ? tagEl.textContent : a.category}</span>
+        ${a.thumb ? `<img src="${pesc(a.thumb)}" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin:14px 0;" onerror="this.style.display='none'">` : ''}
+        <div class="snu-article-text"><p>${pesc(a.summary||'')}</p></div>
+        ${a.url ? `<a href="${pesc(a.url)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:9px 18px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">Read Full Article ↗</a>` : ''}`;
+    }
+  }
+
+  // ── Admin: render queue list ──────────────────────────────────
+  function renderArtQueueAdmin() {
+    const el    = document.getElementById('artQueueList');
+    const count = document.getElementById('artQueueCount');
+    if (!el) return;
+    if (count) count.textContent = `(${_artLocker.length})`;
+    if (!_artLocker.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-size:12px;font-style:italic;padding:8px 0;">No articles yet — add some above.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = _artLocker.map((a, i) => `
+      <div draggable="true" data-idx="${i}" class="art-queue-row"
+           ondragstart="artDragStart(event)" ondragover="artDragOver(event)"
+           ondrop="artDrop(event)" ondragend="artDragEnd(event)"
+           style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${i===_artIdx?'rgba(99,179,237,.12)':'rgba(255,255,255,.04)'};border:1px solid ${i===_artIdx?'var(--accent)':'var(--border)'};border-radius:10px;cursor:grab;margin-bottom:0;">
+        <span style="color:var(--muted-2);font-size:16px;flex-shrink:0;">⠿</span>
+        ${a.thumb ? `<img src="${pesc(a.thumb)}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">` : `<div style="width:40px;height:40px;background:rgba(255,255,255,.06);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">📰</div>`}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:700;color:${i===_artIdx?'var(--accent-2)':'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i===_artIdx?'🔴 ':''}${pesc(a.title||'Untitled')}</div>
+          <div style="font-size:10px;color:var(--muted-2);margin-top:2px;">${pesc(a.category||'')}${a.url?' · '+pesc(a.url.replace(/^https?:\/\//,'').split('/')[0]):''}</div>
+        </div>
+        <button onclick="setActiveArticle(${i})" title="Show this now" style="padding:4px 10px;border-radius:6px;border:1px solid var(--accent);background:${i===_artIdx?'var(--accent)':'transparent'};color:${i===_artIdx?'#fff':'var(--accent)'};font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">${i===_artIdx?'Active':'Show'}</button>
+        <button onclick="deleteArticle(${i})" class="admin-remove-btn" title="Delete" style="flex-shrink:0;">✕</button>
+      </div>`).join('');
+  }
+
+  function addArticleToLocker() {
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const title = gv('artTitle');
+    if (!title) { showSnuToast('⚠ Please enter a headline.'); return; }
+    _artLocker.push({
+      id: Date.now(), title, url: gv('artUrl'), summary: gv('artSummary'),
+      thumb: gv('artThumb'), category: gv('artCategory') || 'industry',
+      addedAt: new Date().toISOString()
+    });
+    saveArticleLocker(() => {
+      renderArtQueueAdmin();
+      renderActiveArticle();
+      ['artUrl','artTitle','artSummary','artThumb'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+      document.getElementById('artCategory').selectedIndex = 0;
+      showSnuToast('✓ Article added to locker.');
+    });
+  }
+
+  function setActiveArticle(i) {
+    _artIdx = i;
+    saveArticleLocker(() => { renderArtQueueAdmin(); renderActiveArticle(); showSnuToast('✓ Article updated on hub.'); });
+  }
+
+  function deleteArticle(i) {
+    if (!confirm('Remove this article from the locker?')) return;
+    _artLocker.splice(i, 1);
+    if (_artIdx >= _artLocker.length) _artIdx = Math.max(0, _artLocker.length - 1);
+    saveArticleLocker(() => { renderArtQueueAdmin(); renderActiveArticle(); });
+  }
+
+  function prefillArticleFromUrl() {
+    const url = document.getElementById('artUrl')?.value?.trim();
+    if (!url) return;
+    // Try to extract domain as a starting point for title
+    try {
+      const domain = new URL(url).hostname.replace('www.','');
+      const titleEl = document.getElementById('artTitle');
+      if (titleEl && !titleEl.value) titleEl.value = domain;
+      titleEl?.focus();
+      showSnuToast('Paste a URL — fill in the title, summary, and image URL manually.');
+    } catch(e) {
+      showSnuToast('⚠ Invalid URL format.');
+    }
+  }
+
+  // ── Drag-to-reorder ───────────────────────────────────────────
+  function artDragStart(e) { _artDragSrc = e.currentTarget; e.dataTransfer.effectAllowed='move'; setTimeout(()=>{if(_artDragSrc)_artDragSrc.style.opacity='.4';},0); }
+  function artDragOver(e)  { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.art-queue-row').forEach(r=>r.style.borderColor='var(--border)'); e.currentTarget.style.borderColor='var(--accent)'; }
+  function artDrop(e) {
+    e.preventDefault();
+    if (!_artDragSrc || _artDragSrc===e.currentTarget) return;
+    const from = parseInt(_artDragSrc.dataset.idx);
+    const to   = parseInt(e.currentTarget.dataset.idx);
+    const activeId = _artLocker[_artIdx]?.id;
+    const moved = _artLocker.splice(from, 1)[0];
+    _artLocker.splice(to, 0, moved);
+    // Keep _artIdx pointing to the same article after reorder
+    if (activeId) _artIdx = _artLocker.findIndex(a => a.id === activeId);
+    saveArticleLocker(() => { renderArtQueueAdmin(); renderActiveArticle(); });
+  }
+  function artDragEnd(e) {
+    document.querySelectorAll('.art-queue-row').forEach(r=>{r.style.opacity='';r.style.borderColor='var(--border)';});
+    _artDragSrc = null;
+  }
+
+  // ── Init ──────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    loadArticleLocker();
+    const origSwitch = window.switchAdminTab;
+    window.switchAdminTab = function(tab, el) {
+      origSwitch(tab, el);
+      if (tab === 'articles') renderArtQueueAdmin();
+    };
   });
   </script>
 
