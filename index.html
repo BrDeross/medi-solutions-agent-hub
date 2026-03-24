@@ -8805,34 +8805,58 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   ];
   const LAYOUT_KEY     = 'medi_section_order_v2';
   const LAYOUT_VIS_KEY = 'medi_section_vis_v2';
+  let _layoutOrder = null;  // in-memory, loaded from Supabase
+  let _layoutVis   = {};    // in-memory, loaded from Supabase
+  const LAYOUT_SUPA    = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const LAYOUT_SKEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+
+  // ── Load layout from Supabase and apply ────────────────────────────────────
+  function loadLayoutFromCloud() {
+    fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.layout&select=data`, {
+      headers: { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (d.order && d.order.length) { _layoutOrder = d.order; }
+        if (d.vis) { _layoutVis = d.vis; }
+        applySectionOrder();
+        renderLayoutAdmin();
+      }
+    }).catch(() => {});
+  }
+
+  // ── Save layout to Supabase ────────────────────────────────────────────────
+  function saveLayoutToCloud(order, vis) {
+    const payload = JSON.stringify({ order, vis });
+    const headers = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.layout`, {
+      method: 'PATCH', headers, body: JSON.stringify({ data: payload })
+    }).then(r => r.text()).then(t => {
+      if (t === '[]' || t === '') {
+        return fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
+          method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key: 'layout', data: payload })
+        });
+      }
+    }).catch(() => {});
+  }
 
   function getSectionOrder() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || '[]');
-      if (saved.length) {
-        const known = LAYOUT_SECTIONS.map(s => s.id);
-        const valid = saved.filter(id => known.includes(id));
-        const missing = known.filter(id => !valid.includes(id));
-        return [...valid, ...missing];
-      }
-    } catch(e) {}
     return LAYOUT_SECTIONS.map(s => s.id);
   }
 
   function getSectionVis() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(LAYOUT_VIS_KEY) || '{}');
-      return saved;
-    } catch(e) { return {}; }
+    return _layoutVis || {};
   }
 
   function saveSectionVis(vis) {
-    try { localStorage.setItem(LAYOUT_VIS_KEY, JSON.stringify(vis)); } catch(e) {}
+    _layoutVis = vis;
+    saveLayoutToCloud(_layoutOrder, vis);
   }
 
   function applySectionOrder() {
-    const order = getSectionOrder();
-    const vis   = getSectionVis();
+    const order = _layoutOrder && _layoutOrder.length ? _layoutOrder : LAYOUT_SECTIONS.map(s => s.id);
+    const vis   = _layoutVis || {};
 
     // Get the direct-child footer of .page as our anchor
     const page = document.querySelector('.page');
@@ -8870,12 +8894,14 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function saveSectionOrder(order) {
-    try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(order)); } catch(e) {}
+    _layoutOrder = order;
+    saveLayoutToCloud(order, getSectionVis());
   }
 
   function resetSectionOrder() {
-    localStorage.removeItem(LAYOUT_KEY);
-    localStorage.removeItem(LAYOUT_VIS_KEY);
+    _layoutOrder = LAYOUT_SECTIONS.map(s => s.id);
+    _layoutVis   = {};
+    saveLayoutToCloud(_layoutOrder, _layoutVis);
     applySectionOrder();
     renderLayoutAdmin();
     showSnuToast('↺ Layout reset to default.');
@@ -8949,9 +8975,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     _layoutDragSrc = null;
   }
 
-  // Apply on load
+  // Apply default order on load, then fetch from Supabase and re-apply
   document.addEventListener('DOMContentLoaded', () => {
     applySectionOrder();
+    loadLayoutFromCloud();
   });
 
   // Hook into switchAdminTab
@@ -9305,10 +9332,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function loadMedUpdates() {
-    try {
-      const raw = localStorage.getItem(MED_UPD_KEY);
-      if (raw) { _medUpdates = JSON.parse(raw) || []; renderMedUpdates(); }
-    } catch(e) {}
     fetch(`${SUPA_BASE}/rest/v1/med_updates?hub=eq.${MED_UPD_HUB}&select=data`, {
       headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Cache-Control': 'no-cache' }
     }).then(r => r.json()).then(rows => {
@@ -9317,7 +9340,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         const cloud = typeof rawCloud === 'string' ? JSON.parse(rawCloud) : rawCloud;
         if (Array.isArray(cloud) && (cloud.length > 0 || _medUpdates.length === 0)) {
           _medUpdates = cloud;
-          try { localStorage.setItem(MED_UPD_KEY, JSON.stringify(_medUpdates)); } catch(e) {}
           renderMedUpdates();
         }
       }
@@ -9325,15 +9347,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function saveMedUpdates(cb) {
-    try { localStorage.setItem(MED_UPD_KEY, JSON.stringify(_medUpdates)); } catch(e) {}
     const payload = JSON.stringify(_medUpdates);
+    const hdrs = { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
     fetch(`${SUPA_BASE}/rest/v1/med_updates?hub=eq.${MED_UPD_HUB}`, {
-      method: 'DELETE', headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2 }
-    }).then(() => fetch(`${SUPA_BASE}/rest/v1/med_updates`, {
-      method: 'POST',
-      headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: MED_UPD_HUB, data: payload })
-    })).then(() => { if (cb) cb(); }).catch(() => { if (cb) cb(); });
+      method: 'PATCH', headers: hdrs, body: JSON.stringify({ data: payload })
+    }).then(r => r.text()).then(t => {
+      if (t === '[]' || t === '') {
+        return fetch(`${SUPA_BASE}/rest/v1/med_updates`, {
+          method: 'POST', headers: hdrs, body: JSON.stringify({ hub: MED_UPD_HUB, data: payload })
+        });
+      }
+    }).then(() => { if (cb) cb(); }).catch(() => { if (cb) cb(); });
   }
 
   function renderMedUpdates() {
@@ -9444,17 +9468,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const PRES_HUB  = 'medi';
 
   function loadPresidentNote() {
-    try {
-      const raw = localStorage.getItem(PRES_KEY);
-      if (raw) { renderPresidentNote(JSON.parse(raw)); }
-    } catch(e) {}
     fetch(`${SUPA_BASE}/rest/v1/president_note?hub=eq.${PRES_HUB}&select=data`, {
       headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Cache-Control': 'no-cache' }
     }).then(r => r.json()).then(rows => {
       if (rows && rows.length && rows[0].data) {
         const rawNote = rows[0].data;
         const note = typeof rawNote === 'string' ? JSON.parse(rawNote) : rawNote;
-        try { localStorage.setItem(PRES_KEY, JSON.stringify(note)); } catch(e) {}
         renderPresidentNote(note);
         // Populate admin fields
         const pt = document.getElementById('presTitle');
@@ -9486,22 +9505,23 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const date    = document.getElementById('presDate')?.value?.trim() || '';
     if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
     const note = { title, message, date };
-    try { localStorage.setItem(PRES_KEY, JSON.stringify(note)); } catch(e) {}
     renderPresidentNote(note);
     const payload = JSON.stringify(note);
+    const presHdrs = { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
     fetch(`${SUPA_BASE}/rest/v1/president_note?hub=eq.${PRES_HUB}`, {
-      method: 'DELETE', headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2 }
-    }).then(() => fetch(`${SUPA_BASE}/rest/v1/president_note`, {
-      method: 'POST',
-      headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: PRES_HUB, data: payload })
-    })).then(() => showSnuToast('✓ Note from the President saved!'))
+      method: 'PATCH', headers: presHdrs, body: JSON.stringify({ data: payload })
+    }).then(r => r.text()).then(t => {
+      if (t === '[]' || t === '') {
+        return fetch(`${SUPA_BASE}/rest/v1/president_note`, {
+          method: 'POST', headers: presHdrs, body: JSON.stringify({ hub: PRES_HUB, data: payload })
+        });
+      }
+    }).then(() => showSnuToast('✓ Note from the President saved!'))
     .catch(() => showSnuToast('⚠ Saved locally; cloud sync failed.'));
   }
 
   function clearPresidentNote() {
     if (!confirm('Clear the Note from the President?')) return;
-    try { localStorage.removeItem(PRES_KEY); } catch(e) {}
     renderPresidentNote(null);
     ['presTitle','presMessage','presDate'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
     fetch(`${SUPA_BASE}/rest/v1/president_note?hub=eq.${PRES_HUB}`, {
@@ -9547,12 +9567,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Load ──────────────────────────────────────────────────────
   function loadArticleLocker() {
-    try {
-      const raw = localStorage.getItem(ART_KEY);
-      if (raw) { _artLocker = JSON.parse(raw) || []; }
-      const idx = localStorage.getItem(ART_IDX_KEY);
-      if (idx !== null) _artIdx = parseInt(idx) || 0;
-    } catch(e) {}
     // Fetch from Supabase
     fetch(`${ART_SUPA}/rest/v1/article_locker?hub=eq.${ART_HUB}&select=data`, {
       headers: { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY, 'Cache-Control': 'no-cache' }
@@ -9561,20 +9575,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         const d = JSON.parse(rows[0].data);
         _artLocker = d.articles || [];
         _artIdx    = d.activeIdx || 0;
-        try {
-          localStorage.setItem(ART_KEY, JSON.stringify(_artLocker));
-          localStorage.setItem(ART_IDX_KEY, String(_artIdx));
-        } catch(e) {}
         renderActiveArticle();
       }
     }).catch(() => {}).finally(() => { renderActiveArticle(); });
   }
 
   function saveArticleLocker(cb) {
-    try {
-      localStorage.setItem(ART_KEY, JSON.stringify(_artLocker));
-      localStorage.setItem(ART_IDX_KEY, String(_artIdx));
-    } catch(e) {}
     const payload = JSON.stringify({ articles: _artLocker, activeIdx: _artIdx });
     fetch(`${ART_SUPA}/rest/v1/article_locker?hub=eq.${ART_HUB}`, {
       method: 'DELETE', headers: { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY }
@@ -9754,19 +9760,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   // ── Load both tiles from Supabase on page load ───────────────
   function loadTileContent() {
     ['alliance','census'].forEach(key => {
-      // localStorage first
-      try {
-        const raw = localStorage.getItem('tile_' + key + '_v1');
-        if (raw) { _tileData[key] = JSON.parse(raw); }
-      } catch(e) {}
-
       fetch(`${TILE_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.${key}&select=data`, {
         headers: { 'apikey': TILE_KEY2, 'Authorization': 'Bearer ' + TILE_KEY2, 'Cache-Control': 'no-cache' }
       }).then(r => r.json()).then(rows => {
         if (rows && rows.length && rows[0].data) {
           const raw = rows[0].data;
           _tileData[key] = typeof raw === 'string' ? JSON.parse(raw) : raw;
-          try { localStorage.setItem('tile_' + key + '_v1', JSON.stringify(_tileData[key])); } catch(e) {}
           updateTileCardDesc(key);
         }
       }).catch(() => {});
@@ -9790,7 +9789,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       url:   gv(key + 'Url'),
     };
     _tileData[key] = data;
-    try { localStorage.setItem('tile_' + key + '_v1', JSON.stringify(data)); } catch(e) {}
     updateTileCardDesc(key);
     const payload = JSON.stringify(data);
     const headers = { 'apikey': TILE_KEY2, 'Authorization': 'Bearer ' + TILE_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
