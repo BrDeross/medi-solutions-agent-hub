@@ -6396,15 +6396,7 @@ When answering:
         renderSnuExecs(window._snuState.data);
       }
     } catch(e) { console.warn('SNU data parse error', e); }
-    try {
-      const artRaw = localStorage.getItem(ARTICLE_KEY);
-      if (artRaw) {
-        const cached = JSON.parse(artRaw);
-        // If cached article has no body content, clear it so it re-renders
-        if (!cached.body || !cached.body.length) localStorage.removeItem(ARTICLE_KEY);
-        else { window._snuState.article = cached; renderArticle(cached); }
-      }
-    } catch(e) { console.warn('SNU article parse error', e); }
+    // Article display handled by Article Locker (article-locker-script)
   }
 
   function renderSnuExecs(data) {
@@ -6467,114 +6459,8 @@ When answering:
   }
 
   // ── WEEKLY ARTICLE ─────────────────────────────────────────────────────────
-  async function loadWeeklyArticle() {
-    const body   = document.getElementById('snuArticleBody');
-    const tagEl  = document.getElementById('snuArticleTag');
-    if (!body) return;
-
-    // Check cache — only regenerate once per week
-    const weekNum = getWeekNumber();
-    const cached  = localStorage.getItem(ARTICLE_KEY);
-    if (cached) {
-      try {
-        const c = JSON.parse(cached);
-        if (c.week === weekNum) { renderArticle(c); return; }
-      } catch(e) {}
-    }
-
-    // Pick topic by week rotation
-    const topics = [
-      { category: 'health',   tag: 'Medicare / Health', prompt: 'Write a 200-word educational article for Medicare insurance agents about a current topic in Medicare Advantage, AEP strategy, or CMS regulations. Make it practical and actionable. Include a key takeaway for agents.' },
-      { category: 'life',     tag: 'Life Insurance',    prompt: 'Write a 200-word educational article for insurance agents about a relevant topic in life insurance — such as term vs whole life trends, IUL strategies, or underwriting tips. Make it practical for agents talking to clients.' },
-      { category: 'annuity',  tag: 'Annuities',         prompt: 'Write a 200-word educational article for insurance agents about annuities — such as FIA trends, MYGA rates, or how to position annuities for retirement income. Keep it practical and client-focused.' },
-      { category: 'industry', tag: 'Industry Trends',   prompt: 'Write a 200-word article for insurance agents about a current trend or development in the insurance industry — technology, regulation, market trends, or agent best practices. Keep it insightful and forward-looking.' },
-    ];
-    const topic = topics[weekNum % topics.length];
-    if (tagEl) tagEl.textContent = topic.tag;
-
-    // Rotating library of pre-written articles — one per topic category
-    const articles = {
-      health: {
-        headline: 'Medicare Advantage in 2025: What Every Agent Needs to Know',
-        body: [
-          'CMS continues to tighten Medicare Advantage oversight, with increased scrutiny on prior authorization practices and supplemental benefits. Agents who stay current on plan benefit changes will be best positioned to serve their clients during AEP and OEP.',
-          'One of the most significant shifts this year is the growing importance of DSNP (Dual Special Needs Plans) as states expand integrated care programs. Agents who understand how dual-eligible clients qualify and enroll will unlock a high-need, underserved market.',
-          'Key takeaway: Review your top carriers\' 2025 benefit summaries now. Clients are comparing plans online — your value is in simplifying that process and matching benefits to their actual health needs.'
-        ]
-      },
-      life: {
-        headline: 'IUL Growth Continues: How to Position Index Universal Life for Modern Clients',
-        body: [
-          'Index Universal Life insurance remains one of the fastest-growing product categories, with carriers competing aggressively on cap rates, participation rates, and multiplier strategies. Understanding the mechanics behind each illustration is essential before presenting to clients.',
-          'The IUL conversation has shifted — clients are now asking specifically about downside protection and tax-free retirement income. Lead with the floor (typically 0%), not the upside, to build trust. Overpromising on returns remains the #1 regulatory concern.',
-          'Key takeaway: Always run three scenarios — conservative, moderate, and illustrated — and walk clients through what each means for their retirement income. Transparency builds long-term relationships and protects you from suitability issues.'
-        ]
-      },
-      annuity: {
-        headline: 'MYGA Rates Are High — Here\'s How to Start the Annuity Conversation',
-        body: [
-          'Multi-Year Guaranteed Annuity (MYGA) rates have remained elevated, making them one of the most compelling fixed-income alternatives available to clients sitting on idle CDs or savings accounts. A straightforward rate comparison often opens the door.',
-          'Fixed Indexed Annuities (FIAs) continue to see strong sales, driven by clients wanting principal protection with upside potential. The key is matching the product to the client\'s time horizon — a 5-year FIA for a 78-year-old is a suitability red flag.',
-          'Key takeaway: Start the annuity conversation by asking: "Is there money sitting in a savings account or CD earning less than 3%?" That one question can uncover significant rollover and new premium opportunities in your existing book.'
-        ]
-      },
-      industry: {
-        headline: 'The Digital-First Agent: Technology Habits That Are Growing Books of Business',
-        body: [
-          'Agents who have adopted CRM tools, automated follow-up sequences, and digital quoting platforms are consistently outperforming those who rely solely on manual processes. The barrier to entry for these tools has never been lower — most integrate directly with carrier portals.',
-          'Video communication is now a standard client expectation. Agents using short screen-share videos to explain plan comparisons, policy documents, or enrollment steps report significantly higher client confidence and fewer post-enrollment calls.',
-          'Key takeaway: You don\'t need to overhaul your entire workflow. Pick one technology — a CRM, a scheduling tool, or a video messenger — and master it this quarter. Small digital upgrades, applied consistently, compound into a major competitive advantage.'
-        ]
-      }
-    };
-
-    const article = {
-      week: weekNum,
-      category: topic.category,
-      tag: topic.tag,
-      ...articles[topic.category]
-    };
-
-    localStorage.setItem(ARTICLE_KEY, JSON.stringify(article));
-    if (typeof jbSave === 'function') jbSave('snu_article', article);
-    renderArticle(article);
-  }
-
-  function renderArticle(a) {
-    window._snuState.article = a;
-
-    const tagEl = document.getElementById('snuArticleTag');
-    if (tagEl && a.tag) tagEl.textContent = a.tag;
-
-    // ── Write to the SNU article card on dashboard ──
-    const body = document.getElementById('snuArticleBody');
-    if (body) {
-      const cat = a.category || 'industry';
-      body.innerHTML = `
-        <div class="snu-article-headline">${esc(a.headline || '')}</div>
-        <span class="snu-article-category ${cat}">${esc(a.tag || cat)}</span>
-        <div class="snu-article-text">
-          ${(a.body || []).map(p => `<p>${esc(p)}</p>`).join('')}
-        </div>`;
-    }
-
-    // ── Teaser card on dashboard (if present) ──
-    const teaser = document.getElementById('industryTeaserCard');
-    if (teaser) {
-      const cat     = a.category || 'industry';
-      const excerpt = a.body?.[0] || '';
-      teaser.onclick = () => openSnuPrint();
-      teaser.innerHTML = `
-        <div class="industry-teaser-icon">📰</div>
-        <div class="industry-teaser-content">
-          <span class="industry-teaser-cat ${cat}">${esc(a.tag || cat)}</span>
-          <div class="industry-teaser-headline">${esc(a.headline || '')}</div>
-          <div class="industry-teaser-excerpt">${esc(excerpt)}</div>
-          <div class="industry-teaser-cta">Read full article in SNU <span class="industry-teaser-arrow">→</span></div>
-        </div>`;
-    }
-  }
-
+  // loadWeeklyArticle removed — Article Locker handles spotlight
+  // renderArticle removed — Article Locker uses renderActiveArticle
   function getWeekNumber() {
     const d = new Date();
     const start = new Date(d.getFullYear(), 0, 1);
@@ -8792,17 +8678,20 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   <script id="layout-manager-script">
   // ── SECTION LAYOUT MANAGER ────────────────────────────────────────────────
   const LAYOUT_SECTIONS = [
-    { id: 'cert-tracker',     label: '🎓 Cert Tracker' },
-    { id: 'friday-meetings',  label: '📅 Friday Meetings' },
-    { id: 'leaderboard',      label: '🏆 SNU / Leaderboard' },
-    { id: 'agent-tools',      label: '🛠 Agent Tools' },
-    { id: 'quick-access',     label: '🔗 Quick Access Portals' },
-    { id: 'video-library',    label: '🎬 Video Library' },
-    { id: 'practice-client',  label: '🎯 Practice Client' },
-    { id: 'updates',          label: '📡 Updates Feed' },
-    { id: 'trip-tracker',     label: '🏝️ Trip Tracker' },
-    { id: 'agent-spotlight',  label: '⭐ Agent Spotlight' },
-    { id: 'operations-ai',    label: '🤖 Agent Assistant' },
+    { id: 'agent-tools',         label: '🛠 Agent Tools' },
+    { id: 'quick-access',        label: '🔗 Quick Access Portals' },
+    { id: 'libraries',           label: '📚 Agent Libraries' },
+    { id: 'video-library',       label: '🎬 Video Library' },
+    { id: 'practice-client',     label: '🎯 Practice Client' },
+    { id: 'updates',             label: '📡 Updates Feed' },
+    { id: 'cert-tracker',        label: '🎓 Cert Tracker' },
+    { id: 'friday-meetings',     label: '📅 Friday Meetings' },
+    { id: 'leaderboard',         label: '🏆 SNU / Leaderboard' },
+    { id: 'trip-tracker',        label: '🏝️ Trip Tracker' },
+    { id: 'industry-spotlight',  label: '📰 Industry Spotlight' },
+    { id: 'agent-spotlight',     label: '⭐ Agent Spotlight' },
+    { id: 'agent-of-the-month',  label: '🗓️ Agent of the Month' },
+    { id: 'operations-ai',       label: '🤖 Agent Assistant' },
   ];
   const LAYOUT_KEY     = 'medi_section_order_v2';
   const LAYOUT_VIS_KEY = 'medi_section_vis_v2';
@@ -9537,7 +9426,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const origSwitch = window.switchAdminTab;
     window.switchAdminTab = function(tab, el) {
       origSwitch(tab, el);
-      if (tab === 'medupdates') renderMedUpdatesAdmin();
+      if (tab === 'medupdates') { loadMedUpdates(); }
     };
   });
   </script>
