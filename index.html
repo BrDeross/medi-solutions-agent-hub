@@ -7781,7 +7781,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     let m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
     if (m) return 'https://www.youtube.com/embed/' + m[1] + '?rel=0&modestbranding=1';
     m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-    if (m) return 'https://player.vimeo.com/video/' + m[1];
+    if (m) return 'https://player.vimeo.com/video/' + m[1] + '?title=0&byline=0&portrait=0';
     return null;
   }
 
@@ -9333,10 +9333,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       const hasUrl  = u.url;
       let clickAttr = '';
       if (hasFile) {
-        if (u.fileType === 'application/pdf') clickAttr = `onclick="openLightbox('${u.file64}','${u.fileType}','${pesc(u.title)}')"`;
-        else clickAttr = `onclick="openLightbox('${u.file64}','${u.fileType}','${pesc(u.title)}')"`;
+        if (u.fileType === 'application/pdf') clickAttr = `onclick="document.getElementById('medUpdModal')?.remove();openLightbox('${u.file64}','${u.fileType}','${pesc(u.title)}')"`;
+        else clickAttr = `onclick="document.getElementById('medUpdModal')?.remove();openLightbox('${u.file64}','${u.fileType}','${pesc(u.title)}')"`;
       } else if (hasUrl) {
-        clickAttr = `onclick="window.open('${u.url}','_blank')"`;
+        clickAttr = `onclick="document.getElementById('medUpdModal')?.remove();window.open('${u.url}','_blank')"`;
       }
       return `<div ${clickAttr} style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;cursor:${(hasFile||hasUrl)?'pointer':'default'};transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.07)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
         <div style="font-size:24px;flex-shrink:0;">${u.fileType==='application/pdf'?'📄':(u.fileType&&u.fileType.startsWith('image/'))?'🖼️':'🔗'}</div>
@@ -9556,7 +9556,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Render the active article into the Industry Spotlight ─────
   function renderActiveArticle() {
-    if (!_artLocker.length) return;
+    if (!_artLocker.length) {
+      // Show placeholder in SNU article body
+      const body = document.getElementById('snuArticleBody');
+      if (body) body.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;padding:12px 0;">No article set — add one in Admin → Article Locker.</div>';
+      return;
+    }
     _artIdx = Math.min(_artIdx, _artLocker.length - 1);
     const a = _artLocker[_artIdx];
     if (!a) return;
