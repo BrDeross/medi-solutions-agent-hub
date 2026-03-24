@@ -4026,6 +4026,24 @@
             <span class="card-tag">Compliance</span>
           </div>
 
+          <div class="card" data-color="gold" onclick="openAllianceProgramModal()" style="cursor:pointer;">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">🤝</div>
+            <h3>Alliance Program</h3>
+            <p id="allianceCardDesc">Office Alliance Program details, requirements, and resources.</p>
+            <span class="card-tag">Program</span>
+          </div>
+
+          <div class="card" data-color="teal" onclick="openCensusFormModal()" style="cursor:pointer;">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">📋</div>
+            <h3>Group Health Census</h3>
+            <p id="censusCardDesc">Fillable group health census form for employer group submissions.</p>
+            <span class="card-tag">Forms</span>
+          </div>
+
         </div>
 
       </div>
@@ -4460,6 +4478,8 @@
           <button class="admin-tab" onclick="switchAdminTab('friday',this)">📅 Meetings</button>
           <button class="admin-tab" onclick="switchAdminTab('certs',this)">🎓 Certs</button>
           <button class="admin-tab" onclick="switchAdminTab('medupdates',this)">📰 Med Updates</button>
+          <button class="admin-tab" onclick="switchAdminTab('alliance',this)">🤝 Alliance</button>
+          <button class="admin-tab" onclick="switchAdminTab('census',this)">📋 Census Form</button>
           <button class="admin-tab" onclick="switchAdminTab('articles',this)">📚 Article Locker</button>
           <button class="admin-tab" onclick="switchAdminTab('layout',this)">🔀 Layout</button>
         </div>
@@ -5012,6 +5032,50 @@
           <button class="admin-save-btn" onclick="addFridayMeeting()" style="width:auto;padding:10px 24px;">➕ Add Meeting</button>
           <div class="admin-section-title" style="margin-top:20px;">📋 Scheduled Meetings <span id="fridayAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
           <div id="fridayAdminList"></div>
+        </div>
+
+        <div id="adminTabAlliance" class="admin-tab-panel">
+          <div class="admin-section-title">🤝 Alliance Program</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Set the content and link that appears in the Alliance Program tile. Agents will see this when they click the tile.</p>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Title</label>
+            <input class="admin-input" id="allianceTitle" placeholder="Alliance Program">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Description (shows on tile)</label>
+            <input class="admin-input" id="allianceDesc" placeholder="Office Alliance Program details…">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Body / Content</label>
+            <textarea class="admin-input" id="allianceBody" rows="5" placeholder="Program overview, requirements, benefits…" style="resize:vertical;"></textarea>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Link URL (optional — opens external page)</label>
+            <input class="admin-input" id="allianceUrl" placeholder="https://…">
+          </div>
+          <button class="admin-save-btn" onclick="saveTileContent('alliance')" style="width:auto;padding:10px 24px;">💾 Save & Publish</button>
+        </div>
+
+        <div id="adminTabCensus" class="admin-tab-panel">
+          <div class="admin-section-title">📋 Group Health Census Form</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Set the content and link for the Group Health Census tile. You can link to an external form or paste instructions.</p>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Title</label>
+            <input class="admin-input" id="censusTitle" placeholder="Group Health Census Form">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Description (shows on tile)</label>
+            <input class="admin-input" id="censusDesc" placeholder="Fillable group health census form…">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Body / Instructions</label>
+            <textarea class="admin-input" id="censusBody" rows="5" placeholder="Instructions, required fields, submission process…" style="resize:vertical;"></textarea>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Link URL (optional — opens external form)</label>
+            <input class="admin-input" id="censusUrl" placeholder="https://…">
+          </div>
+          <button class="admin-save-btn" onclick="saveTileContent('census')" style="width:auto;padding:10px 24px;">💾 Save & Publish</button>
         </div>
 
         <div id="adminTabArticles" class="admin-tab-panel">
@@ -8593,7 +8657,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     })
     .then(r => r.json())
     .then(rows => {
-      const cloudData = rows.length && rows[0].data ? JSON.parse(rows[0].data) : [];
+      let cloudData = [];
+      if (rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (!Array.isArray(cloudData)) cloudData = [];
+      }
       if (cloudData.length > 0 || localMeetings.length === 0) {
         _fridayMeetings = cloudData;
         try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
@@ -8609,25 +8678,38 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function saveFridayMeetings(onSuccess) {
     try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
     const payload = JSON.stringify(_fridayMeetings);
+    // Safe upsert: try PATCH first, fall back to POST if no row exists
+    const headers = { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
     fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi`, {
-      method: 'DELETE',
-      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY }
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ data: payload })
     })
-    .then(() => fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings`, {
-      method: 'POST',
-      headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: 'medi', data: payload })
-    }))
     .then(r => {
-      if (r.ok || r.status === 201) {
-        console.log('[FM SAVE] OK');
-        if (onSuccess) onSuccess();
-      } else {
-        r.text().then(t => console.error('[FM SAVE] ERROR', r.status, t));
-        showSnuToast('\u26a0 Save error ' + r.status);
-      }
+      if (r.status === 404 || r.status === 0) throw new Error('no row');
+      return r;
     })
-    .catch(e => { console.error('[FM SAVE]', e); showSnuToast('\u26a0 Save failed.'); });
+    .then(r => r.text().then(t => {
+      // PATCH matched 0 rows — need to INSERT instead
+      if (t === '[]' || t === '') {
+        return fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings`, {
+          method: 'POST', headers,
+          body: JSON.stringify({ hub: 'medi', data: payload })
+        });
+      }
+      return r;
+    }))
+    .then(() => { if (onSuccess) onSuccess(); })
+    .catch(() => {
+      // Last resort: DELETE then INSERT
+      fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi`, {
+        method: 'DELETE', headers: { 'apikey': FM_SVC_KEY, 'Authorization': 'Bearer ' + FM_SVC_KEY }
+      }).then(() => fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ hub: 'medi', data: payload })
+      })).then(() => { if (onSuccess) onSuccess(); })
+      .catch(e => { console.error('[FM SAVE]', e); showSnuToast('\u26a0 Save failed — check connection.'); });
+    });
   }
 
   function renderFridayMeetings() {
@@ -9344,7 +9426,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       headers: { 'apikey': SUPA_KEY2, 'Authorization': 'Bearer ' + SUPA_KEY2, 'Cache-Control': 'no-cache' }
     }).then(r => r.json()).then(rows => {
       if (rows && rows.length && rows[0].data) {
-        const note = JSON.parse(rows[0].data);
+        const rawNote = rows[0].data;
+        const note = typeof rawNote === 'string' ? JSON.parse(rawNote) : rawNote;
         try { localStorage.setItem(PRES_KEY, JSON.stringify(note)); } catch(e) {}
         renderPresidentNote(note);
         // Populate admin fields
@@ -9628,6 +9711,129 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     window.switchAdminTab = function(tab, el) {
       origSwitch(tab, el);
       if (tab === 'articles') renderArtQueueAdmin();
+    };
+  });
+  </script>
+
+  <script id="tile-content-script">
+  // ══════════════════════════════════════════════════════════════
+  //  ALLIANCE PROGRAM + GROUP HEALTH CENSUS — admin-editable tiles
+  //  Supabase table: tile_content  hub+key unique
+  // ══════════════════════════════════════════════════════════════
+  const TILE_SUPA = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const TILE_KEY2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+
+  const _tileData = { alliance: {}, census: {} };
+
+  // ── Load both tiles from Supabase on page load ───────────────
+  function loadTileContent() {
+    ['alliance','census'].forEach(key => {
+      // localStorage first
+      try {
+        const raw = localStorage.getItem('tile_' + key + '_v1');
+        if (raw) { _tileData[key] = JSON.parse(raw); }
+      } catch(e) {}
+
+      fetch(`${TILE_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.${key}&select=data`, {
+        headers: { 'apikey': TILE_KEY2, 'Authorization': 'Bearer ' + TILE_KEY2, 'Cache-Control': 'no-cache' }
+      }).then(r => r.json()).then(rows => {
+        if (rows && rows.length && rows[0].data) {
+          const raw = rows[0].data;
+          _tileData[key] = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          try { localStorage.setItem('tile_' + key + '_v1', JSON.stringify(_tileData[key])); } catch(e) {}
+          updateTileCardDesc(key);
+        }
+      }).catch(() => {});
+    });
+  }
+
+  function updateTileCardDesc(key) {
+    const d = _tileData[key];
+    if (!d) return;
+    const descEl = document.getElementById(key + 'CardDesc');
+    if (descEl && d.desc) descEl.textContent = d.desc;
+  }
+
+  // ── Save tile content from admin ─────────────────────────────
+  function saveTileContent(key) {
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const data = {
+      title: gv(key + 'Title') || (key === 'alliance' ? 'Alliance Program' : 'Group Health Census'),
+      desc:  gv(key + 'Desc'),
+      body:  gv(key + 'Body'),
+      url:   gv(key + 'Url'),
+    };
+    _tileData[key] = data;
+    try { localStorage.setItem('tile_' + key + '_v1', JSON.stringify(data)); } catch(e) {}
+    updateTileCardDesc(key);
+    const payload = JSON.stringify(data);
+    const headers = { 'apikey': TILE_KEY2, 'Authorization': 'Bearer ' + TILE_KEY2, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    // PATCH first, POST if no row
+    fetch(`${TILE_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.${key}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ data: payload })
+    }).then(r => r.text()).then(t => {
+      if (t === '[]' || t === '') {
+        return fetch(`${TILE_SUPA}/rest/v1/tile_content`, {
+          method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key, data: payload })
+        });
+      }
+    }).then(() => showSnuToast('✓ ' + (key === 'alliance' ? 'Alliance Program' : 'Census Form') + ' saved!'))
+    .catch(() => showSnuToast('⚠ Save failed.'));
+  }
+
+  // ── Modal opener for Alliance Program ────────────────────────
+  function openAllianceProgramModal() {
+    const d = _tileData.alliance || {};
+    openTileModal('🤝 Alliance Program', d);
+  }
+
+  // ── Modal opener for Census Form ─────────────────────────────
+  function openCensusFormModal() {
+    const d = _tileData.census || {};
+    openTileModal('📋 Group Health Census Form', d);
+  }
+
+  function openTileModal(heading, d) {
+    let modal = document.getElementById('tileContentModal');
+    if (modal) modal.remove();
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    modal = document.createElement('div');
+    modal.id = 'tileContentModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);';
+    modal.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;width:min(600px,93vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);">
+          <div style="font-size:16px;font-weight:800;color:var(--text);">${pesc(heading)}</div>
+          <button onclick="document.getElementById('tileContentModal').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;">×</button>
+        </div>
+        <div style="padding:22px 24px;overflow-y:auto;flex:1;">
+          ${d.title ? `<div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:14px;">${pesc(d.title)}</div>` : ''}
+          ${d.body ? `<div style="font-size:14px;color:var(--muted);line-height:1.8;white-space:pre-wrap;margin-bottom:18px;">${pesc(d.body)}</div>` : '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No content yet — admin can add details in the Alliance or Census admin tab.</div>'}
+          ${d.url ? `<a href="${pesc(d.url)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--accent);color:#fff;border-radius:9px;font-size:13px;font-weight:700;text-decoration:none;">Open Form / Resource ↗</a>` : ''}
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  }
+
+  // ── Populate admin fields when tab opens ─────────────────────
+  function populateTileAdminFields(key) {
+    const d = _tileData[key] || {};
+    const gEl = id => document.getElementById(id);
+    if (gEl(key+'Title'))  gEl(key+'Title').value  = d.title || '';
+    if (gEl(key+'Desc'))   gEl(key+'Desc').value   = d.desc  || '';
+    if (gEl(key+'Body'))   gEl(key+'Body').value   = d.body  || '';
+    if (gEl(key+'Url'))    gEl(key+'Url').value    = d.url   || '';
+  }
+
+  // ── Init ──────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    loadTileContent();
+    const origSwitch = window.switchAdminTab;
+    window.switchAdminTab = function(tab, el) {
+      origSwitch(tab, el);
+      if (tab === 'alliance') populateTileAdminFields('alliance');
+      if (tab === 'census')   populateTileAdminFields('census');
     };
   });
   </script>
