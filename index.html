@@ -9156,7 +9156,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Cache-Control': 'no-cache' }
     }).then(r => r.json()).then(rows => {
       if (rows && rows.length && rows[0].data) {
-        const d = JSON.parse(rows[0].data);
+        const raw = rows[0].data;
+        const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
         _certAgents = Array.isArray(d.agents) ? d.agents : [];
         _certMeta   = d.meta || {};
         try { localStorage.setItem(CERT_KEY, JSON.stringify({agents: _certAgents, meta: _certMeta})); } catch(e) {}
