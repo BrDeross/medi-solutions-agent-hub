@@ -4816,6 +4816,45 @@
             <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No updates yet.</div>
           </div>
 
+          <!-- ── Medicare Updates sub-section ── -->
+          <div style="margin-top:28px;border-top:1px solid var(--border);padding-top:24px;">
+            <div class="admin-section-title">📰 Medicare Updates</div>
+            <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add documents, links, or files to the Medicare Updates tile. Agents click the tile in the Updates section to view these.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Title</label>
+                <input class="admin-input" id="medUpdTitle" placeholder="e.g. 2026 MAPD Changes Summary">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Category / Tag</label>
+                <input class="admin-input" id="medUpdTag" placeholder="e.g. CMS, Carrier, Policy">
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Description (optional)</label>
+              <textarea class="admin-input" id="medUpdDesc" rows="2" placeholder="Brief description…" style="resize:vertical;"></textarea>
+            </div>
+            <div style="margin-bottom:12px;">
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Link URL (optional)</label>
+              <input class="admin-input" id="medUpdUrl" placeholder="https://…">
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Attach PDF or Image (optional)</label>
+              <div class="csv-drop-zone" id="medUpdDrop" onclick="document.getElementById('medUpdFile').click()" style="padding:14px;">
+                <div class="csv-drop-icon" style="font-size:20px;">📎</div>
+                <div class="csv-drop-text">Drop file or <span>click to browse</span></div>
+                <input type="file" id="medUpdFile" accept=".pdf,image/*" style="display:none" onchange="handleMedUpdFile(this.files[0])">
+              </div>
+              <div class="csv-status" id="medUpdFileStatus"></div>
+            </div>
+            <button class="admin-save-btn" onclick="addMedUpdate()" style="width:auto;padding:10px 24px;">➕ Add Medicare Update</button>
+
+            <div class="admin-section-title" style="margin-top:20px;">📋 Current Medicare Updates <span id="medUpdAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+            <p style="font-size:11px;color:var(--muted-2);margin-bottom:10px;">Drag to reorder.</p>
+            <div id="medUpdAdminList"></div>
+          </div>
+
         </div>
         </div><!-- /adminTabUpdates -->
 
@@ -7733,30 +7772,23 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Load from JSONBin ──────────────────────────────────────────────────────
   function initVideos() {
-    let localVideos = [];
-    try {
-      localVideos = JSON.parse(localStorage.getItem(VID_STORAGE_KEY) || '[]');
-      if (!Array.isArray(localVideos)) localVideos = [];
-    } catch(e) { localVideos = []; }
-    _videos = localVideos;
-    renderVideoGrid();
-    refreshAdminVideosList();
-
+    // Always load from Supabase — no localStorage cache
     fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
       headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
     .then(rows => {
-      const cloudData = rows.length ? JSON.parse(rows[0].data) : [];
-      if (cloudData.length > 0 || localVideos.length === 0) {
-        _videos = cloudData;
-        try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        _videos = Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
+      } else {
+        _videos = [];
       }
       renderVideoGrid();
       refreshAdminVideosList();
     })
     .catch(() => {
-      _videos = localVideos;
+      _videos = [];
       renderVideoGrid();
       refreshAdminVideosList();
     });
@@ -7764,7 +7796,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Save to JSONBin ────────────────────────────────────────────────────────
   function saveVideos(onSuccess) {
-    try { localStorage.setItem(VID_STORAGE_KEY, JSON.stringify(_videos)); } catch(e) {}
     if (_videosSaving) return;
     _videosSaving = true;
     const payload = JSON.stringify(_videos);
@@ -8860,6 +8891,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     window.switchAdminTab = function(tab, el) {
       origFn(tab, el);
       if (tab === 'layout') renderLayoutAdmin();
+      if (tab === 'updates') loadMedUpdates();
     };
   });
   </script>
@@ -9415,7 +9447,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const origSwitch = window.switchAdminTab;
     window.switchAdminTab = function(tab, el) {
       origSwitch(tab, el);
-      if (tab === 'medupdates') { loadMedUpdates(); }
+      if (tab === 'updates') { loadMedUpdates(); }
     };
   });
   </script>
