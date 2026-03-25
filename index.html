@@ -8692,7 +8692,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
           <div style="font-size:22px;">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'}</div>
           <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
-          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${pesc(m.date||'')}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
         </div>
         <div style="flex:1;">
           <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
@@ -8732,7 +8732,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const m = _fridayMeetings[idx];
     if (!m) return;
     const s = id => document.getElementById(id);
-    if (s('fridayDate'))  s('fridayDate').value  = m.date  || '';
+    // Store the formatted date text in a data attribute on the picker for display
+    const dp2 = s('fridayDatePicker');
+    if (dp2) { dp2.value = ''; dp2.placeholder = m.date || ''; dp2.title = m.date ? 'Current: ' + m.date + ' — pick a new date or leave blank to keep' : ''; }
+    // Store original date so save can fall back to it if picker left blank
+    if (dp2) dp2.dataset.originalDate = m.date || '';
     if (s('fridayTime'))  s('fridayTime').value  = m.time  || '';
     if (s('fridayTopic')) s('fridayTopic').value = m.topic || '';
     if (s('fridayNotes')) s('fridayNotes').value = m.notes || '';
@@ -8746,6 +8750,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   let _fridayType = 'in-person';
+  function syncFridayDate(val) { /* date synced directly from fridayDatePicker */ }
   function setFridayType(type) {
     _fridayType = type;
     const ip = document.getElementById('fridayTypeInPerson');
@@ -8763,8 +8768,14 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const gv = id => document.getElementById(id)?.value?.trim()||'';
     const topic = gv('fridayTopic');
     if (!topic) { showSnuToast('\u26a0 Please enter a meeting topic.'); return; }
-    _fridayMeetings.push({ id: Date.now(), date: gv('fridayDate'), time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), type: _fridayType });
-    ['fridayDate','fridayTime','fridayTopic','fridayNotes','fridayLink'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+    const _dp = document.getElementById('fridayDatePicker');
+    const rawDate = _dp?.value || '';
+    const origDate = _dp?.dataset?.originalDate || '';
+    const fmtDate = rawDate ? new Date(rawDate + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : origDate;
+    if (_dp) { _dp.dataset.originalDate = ''; _dp.title = ''; }
+    _fridayMeetings.push({ id: Date.now(), date: fmtDate, time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), type: _fridayType });
+    ['fridayTime','fridayTopic','fridayNotes','fridayLink'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
+    const dp = document.getElementById('fridayDatePicker'); if (dp) dp.value = '';
     setFridayType('in-person');
     renderFridayMeetings(); renderFridayAdminList();
     showSnuToast('\u23f3 Saving...');
