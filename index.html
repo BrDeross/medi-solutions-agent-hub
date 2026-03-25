@@ -8711,11 +8711,38 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!_fridayMeetings.length) { el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No meetings yet.</div>'; return; }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     el.innerHTML = _fridayMeetings.map((m,i) => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div><div style="font-size:13px;font-weight:700;color:var(--text);">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'} ${pesc(m.topic||'Meeting')}</div>
-        <div style="font-size:11px;color:var(--muted-2);">${pesc(m.date||'')} ${m.time?'\u00b7 '+pesc(m.time):''}</div></div>
-        <button class="admin-remove-btn" onclick="deleteFridayMeeting(${i})" title="Remove">\u2715</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;margin-bottom:6px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);">${m.type==='virtual'?'💻':'🏢'} ${pesc(m.topic||'Meeting')}</div>
+          <div style="font-size:11px;color:var(--muted-2);margin-top:3px;">
+            ${m.date ? `📅 ${pesc(m.date)}` : '<span style="color:var(--muted-2);font-style:italic;">No date set</span>'}
+            ${m.time ? ` &nbsp;·&nbsp; ⏰ ${pesc(m.time)}` : ''}
+            ${m.notes ? `<br><span style="color:var(--muted);">${pesc(m.notes)}</span>` : ''}
+            ${m.link ? `<br><a href="${pesc(m.link)}" target="_blank" style="color:var(--accent-2);font-size:10px;">🔗 Join Link</a>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button onclick="editFridayMeeting(${i})" style="padding:5px 12px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️ Edit</button>
+          <button class="admin-remove-btn" onclick="deleteFridayMeeting(${i})" title="Remove">✕</button>
+        </div>
       </div>`).join('');
+  }
+
+  function editFridayMeeting(idx) {
+    const m = _fridayMeetings[idx];
+    if (!m) return;
+    const s = id => document.getElementById(id);
+    if (s('fridayDate'))  s('fridayDate').value  = m.date  || '';
+    if (s('fridayTime'))  s('fridayTime').value  = m.time  || '';
+    if (s('fridayTopic')) s('fridayTopic').value = m.topic || '';
+    if (s('fridayNotes')) s('fridayNotes').value = m.notes || '';
+    if (s('fridayLink'))  s('fridayLink').value  = m.link  || '';
+    setFridayType(m.type || 'in-person');
+    _fridayMeetings.splice(idx, 1);
+    renderFridayAdminList();
+    s('fridayTopic')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    s('fridayTopic')?.focus();
+    showSnuToast('✏️ Edit the fields above and click Add Meeting to save.');
   }
 
   let _fridayType = 'in-person';
