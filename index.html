@@ -4379,7 +4379,7 @@
 
           <!-- Right col: Article -->
           <div class="snu-right-col">
-            <div class="snu-article-card" id="snuArticleCard">
+            <div class="snu-article-card" id="snuArticleCard" onclick="(function(){const a=window._snuState?.article;if(a?.url)window.open(a.url,'_blank');else openSnuPrint();})()" style="cursor:pointer;" title="Click to read full article">
               <div class="snu-article-header">
                 <div class="snu-article-title-bar">
                   <span class="snu-article-tag" id="snuArticleTag">Weekly</span>
@@ -5581,7 +5581,7 @@ When answering:
     if (record.snu_article  && Object.keys(record.snu_article).length)  localStorage.setItem('snu_article_v1',   JSON.stringify(record.snu_article));
     if (record.snu_spotlight?.name)                                      localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
     if (record.snu_aom      && Object.keys(record.snu_aom).length)      localStorage.setItem('snu_aom_v1',       JSON.stringify(record.snu_aom));
-    if (record.snu_trip?.agents?.length) localStorage.setItem('snu_trip_v1', JSON.stringify(record.snu_trip));
+    // snu_trip now handled by Supabase trip_tracker table
 
     if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
     if (typeof renderAllAomCards    === 'function') renderAllAomCards();
@@ -6863,7 +6863,17 @@ When answering:
     const tx = g('magArticleText');
     const ac = g('magArticleCat');
     if (hl) hl.textContent = article?.headline || "No article set — add one in Admin → Article Locker.";
-    if (tx) tx.innerHTML = article?.body?.length ? article.body.map(p => `<p>${pesc(p)}</p>`).join('') : (article?.headline ? '<p style="color:var(--muted-2);font-style:italic;">Visit the full article for more details.</p>' : '<p style="color:var(--muted-2);font-style:italic;">Add an article in Admin → Article Locker to populate this section.</p>');
+    if (tx) {
+      if (article?.body?.length) {
+        tx.innerHTML = article.body.map(p => `<p>${pesc(p)}</p>`).join('');
+      } else if (article?.headline) {
+        tx.innerHTML = article?.url
+          ? `<p style="color:var(--muted-2);font-style:italic;">Summary not available.</p><a href="${pesc(article.url)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:#1a2340;color:#7eb3f5;border:1px solid rgba(99,179,237,.3);border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;">Read Full Article ↗</a>`
+          : '<p style="color:var(--muted-2);font-style:italic;">Summary not available.</p>';
+      } else {
+        tx.innerHTML = '<p style="color:var(--muted-2);font-style:italic;">Add an article in Admin → Article Locker to populate this section.</p>';
+      }
+    }
     if (ac && article?.category) { ac.className = 'mag-article-cat ' + article.category; ac.textContent = article.category === 'health' ? 'Medicare / Health' : article.category === 'life' ? 'Life Insurance' : article.category === 'annuity' ? 'Annuities' : 'Industry Trends'; }
 
     // ── Populate Agent Spotlight spread ──────────────────────────────────────
@@ -8184,14 +8194,18 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   // ── Load & Render ──────────────────────────────────────────────────────────
   function loadTripData() {
-    try {
-      const raw = localStorage.getItem(TRIP_KEY);
-      if (!raw) return;
-      const d = JSON.parse(raw);
-      _tripAgents = Array.isArray(d.agents) ? d.agents : [];
-      _tripMeta   = d.meta || {};
-    } catch(e) {}
-    renderTripTracker();
+    // Load from Supabase only
+    fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data', {
+      headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        _tripAgents = Array.isArray(d.agents) ? d.agents : [];
+        _tripMeta   = d.meta || {};
+      }
+      renderTripTracker();
+    }).catch(() => { renderTripTracker(); });
   }
 
   function renderTripTracker() {
@@ -8325,11 +8339,16 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || '';
     _tripMeta = { qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
     const data = { agents: _tripAgents, meta: _tripMeta };
-    localStorage.setItem(TRIP_KEY, JSON.stringify(data));
     renderTripTracker();
-    // Save to JSONbin
-    if (typeof jbSave === 'function') jbSave('snu_trip', data);
-    alert('✅ Trip data saved!');
+    const _tripPayload = JSON.stringify(data);
+    const _tripHdrs = { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi', {
+      method: 'DELETE', headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q' }
+    }).then(() => fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker', {
+      method: 'POST', headers: _tripHdrs,
+      body: JSON.stringify({ hub: 'medi', data: _tripPayload })
+    })).then(() => showSnuToast('✓ Trip data saved!'))
+    .catch(() => showSnuToast('⚠ Save failed — check connection.'));
     // Reset CSV input
     const inp = document.getElementById('tripCsvInput');
     if (inp) inp.value = '';
@@ -8343,10 +8362,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!confirm('Clear all trip tracker data? This cannot be undone.')) return;
     _tripAgents = [];
     _tripMeta = {};
-    localStorage.removeItem(TRIP_KEY);
     renderTripTracker();
-    if (typeof jbSave === 'function') jbSave('snu_trip', { agents:[], meta:{} });
-    alert('Trip data cleared.');
+    fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi', {
+      method: 'DELETE', headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q' }
+    }).then(() => showSnuToast('↺ Trip data cleared.'))
+    .catch(() => showSnuToast('⚠ Clear failed.'));
   }
 
   // Drag-and-drop on the trip drop zone
@@ -9677,7 +9697,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         <span class="snu-article-category ${a.category||'industry'}">${tagEl ? tagEl.textContent : a.category}</span>
         ${a.thumb ? `<img src="${pesc(a.thumb)}" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin:14px 0;" onerror="this.style.display='none'">` : ''}
         <div class="snu-article-text"><p>${pesc(a.summary||'')}</p></div>
-        ${a.url ? `<a href="${pesc(a.url)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:9px 18px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">Read Full Article ↗</a>` : ''}`;
+        ${a.url ? `<a href="${pesc(a.url)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:9px 18px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">Read Full Article ↗</a>` : `<button onclick="event.stopPropagation();openSnuPrint()" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:9px 18px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;">🗞️ View Full SNU</button>`}`;
     }
   }
 
