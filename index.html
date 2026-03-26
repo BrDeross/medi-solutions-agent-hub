@@ -10444,31 +10444,30 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const FORMS_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
   const FORMS_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
   const FORMS_HUB      = 'medi';
-  const FORMS_LS_KEY   = 'medi_forms_locker_v1';
   let _forms = [];
   let _formsSaving = false;
   let _formsEditId = null;
 
-  // ── Load ──────────────────────────────────────────────────────────────────
+  // ── Load — always fetch from Supabase, no localStorage ────────────────────
   function initFormsLocker() {
-    try { const r = localStorage.getItem(FORMS_LS_KEY); if (r) _forms = JSON.parse(r); } catch(e) {}
     fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}&select=data`, {
       headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY, 'Cache-Control': 'no-cache' }
     }).then(r => r.json()).then(rows => {
       if (rows && rows.length && rows[0].data) {
         const raw = rows[0].data;
         _forms = Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
-        try { localStorage.setItem(FORMS_LS_KEY, JSON.stringify(_forms)); } catch(e) {}
+      } else {
+        _forms = [];
       }
       refreshFormsAdminList();
-    }).catch(() => { refreshFormsAdminList(); });
+      renderFormsList(_forms);
+    }).catch(() => { _forms = []; refreshFormsAdminList(); });
   }
 
-  // ── Save ──────────────────────────────────────────────────────────────────
+  // ── Save — Supabase only ──────────────────────────────────────────────────
   function saveForms(onSuccess) {
     if (_formsSaving) return;
     _formsSaving = true;
-    try { localStorage.setItem(FORMS_LS_KEY, JSON.stringify(_forms)); } catch(e) {}
     const payload = JSON.stringify(_forms);
     fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}`, {
       method: 'DELETE', headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY }
@@ -10585,7 +10584,18 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     document.body.style.overflow = 'hidden';
     const search = document.getElementById('formsSearch');
     if (search) search.value = '';
-    renderFormsList(_forms);
+    // Always fetch fresh so agents see latest without refreshing page
+    const listEl = document.getElementById('formsModalList');
+    if (listEl) listEl.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;text-align:center;padding:32px 0;">Loading…</div>';
+    fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}&select=data`, {
+      headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        _forms = Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
+      } else { _forms = []; }
+      renderFormsList(_forms);
+    }).catch(() => renderFormsList(_forms));
   }
   function closeFormsLockerModal() {
     const overlay = document.getElementById('formsLockerOverlay');
