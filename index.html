@@ -3956,7 +3956,7 @@
               <p>Coaching, marketing, and planning resources</p>
             </div>
           </div>
-          <span class="count-chip">7 tools</span>
+          <span class="count-chip">8 tools</span>
         </div>
 
         <!-- Tool Cards -->
@@ -4042,6 +4042,15 @@
             <div class="card-icon-wrap">📋</div>
             <h3>Group Health Census</h3>
             <p id="censusCardDesc">Fillable group health census form for employer group submissions.</p>
+            <span class="card-tag">Forms</span>
+          </div>
+
+          <div class="card" data-color="purple" style="cursor:pointer;" onclick="openFormsLockerModal()">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">📁</div>
+            <h3>Forms Locker</h3>
+            <p>Quick access to all agency forms — census, enrollment, SOA, and more.</p>
             <span class="card-tag">Forms</span>
           </div>
 
@@ -4494,6 +4503,7 @@
           <button class="admin-tab" onclick="switchAdminTab('alliance',this)">🤝 Alliance</button>
           <button class="admin-tab" onclick="switchAdminTab('census',this)">📋 Census Form</button>
           <button class="admin-tab" onclick="switchAdminTab('articles',this)">📚 Article Locker</button>
+          <button class="admin-tab" onclick="switchAdminTab('forms',this)">📁 Forms Locker</button>
           <button class="admin-tab" onclick="switchAdminTab('layout',this)">🔀 Layout</button>
         </div>
 
@@ -5159,6 +5169,44 @@
           <div id="artQueueList" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
 
+        <div id="adminTabForms" class="admin-tab-panel">
+        <div class="admin-body">
+          <div class="admin-section-title">📁 Forms Locker</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add forms agents can access during calls. Drag rows to reorder. Click ✏️ to edit an existing form.</p>
+
+          <!-- Add / Edit form -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:12px;padding:16px;margin-bottom:16px;">
+            <div class="admin-section-title" id="formsFormTitle" style="margin-bottom:10px;font-size:11px;">➕ New Form</div>
+            <input type="hidden" id="formsEditId">
+            <div class="admin-week-row" style="margin-bottom:10px;">
+              <div class="admin-field">
+                <label>Form Name</label>
+                <input class="admin-input" id="formsName" placeholder="e.g. SOA Form 2026">
+              </div>
+              <div class="admin-field">
+                <label>Category Tag</label>
+                <input class="admin-input" id="formsCategory" placeholder="e.g. Medicare, Group, Enrollment">
+              </div>
+            </div>
+            <div class="admin-field" style="margin-bottom:10px;">
+              <label>Description (optional)</label>
+              <input class="admin-input" id="formsDesc" placeholder="Brief description of this form…">
+            </div>
+            <div class="admin-field" style="margin-bottom:14px;">
+              <label>Link URL</label>
+              <input class="admin-input" id="formsUrl" placeholder="https://…">
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="admin-save-btn" id="formsSubmitBtn" style="width:auto;padding:10px 24px;" onclick="submitFormEntry()">➕ Add Form</button>
+              <button id="formsCancelEdit" style="display:none;padding:10px 18px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="cancelFormsEdit()">✕ Cancel</button>
+            </div>
+          </div>
+
+          <div class="admin-section-title" style="margin-top:4px;">📋 Current Forms <span id="formsAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+          <p style="font-size:11px;color:var(--muted-2);margin-bottom:8px;">Drag ⠿ to reorder.</p>
+          <div id="formsAdminList"></div>
+        </div>
+        </div><!-- /adminTabForms -->
         <div id="adminTabLayout" class="admin-tab-panel">
           <div class="admin-section-title">🔀 Section Order</div>
           <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Drag to reorder sections. Changes apply instantly and are saved to your browser.</p>
@@ -7719,7 +7767,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     }).join('');
   }
 
-  // ── Refresh admin list ────────────────────────────────────────────────────
+  // ── Refresh admin list (with edit + drag-reorder) ────────────────────────
   function refreshAdminUpdatesList() {
     const el    = document.getElementById('adminUpdatesList');
     const count = document.getElementById('updCount');
@@ -7730,21 +7778,29 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       return;
     }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const sorted = [..._updates].map((u,i) => ({...u, _i: i})).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
-    el.innerHTML = sorted.map(u => `
-      <div class="admin-update-item">
-        <div>
-          <div class="admin-update-title">${pesc(u.title || 'Untitled')}</div>
-          <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(u.message || '')}</div>
-          <div class="admin-update-meta">
-            <span class="admin-update-type">${pesc(u.type || 'Update')}</span>
-            ${u.date     ? `<span>\ud83d\udcc5 ${pesc(u.date)}</span>`     : ''}
-            ${u.priority ? `<span>\ud83d\udea6 ${pesc(u.priority)}</span>` : ''}
-            ${u.btnText  ? `<span>\ud83d\udd17 ${pesc(u.btnText)}</span>`  : ''}
-            ${u.attachName ? `<span>\ud83d\udcce ${pesc(u.attachName)}</span>` : ''}
+    el.innerHTML = _updates.map((u, i) => `
+      <div class="admin-update-item" draggable="true"
+        data-uid="${u.id}" data-uidx="${i}"
+        ondragstart="updOnDragStart(event,this)" ondragover="updOnDragOver(event,this)" ondrop="updOnDrop(event,this)" ondragend="updOnDragEnd()"
+        style="cursor:grab;">
+        <div style="display:flex;align-items:flex-start;gap:8px;width:100%;">
+          <span style="color:var(--muted-2);font-size:16px;cursor:grab;flex-shrink:0;padding-top:2px;">⠿</span>
+          <div style="flex:1;min-width:0;">
+            <div class="admin-update-title">${pesc(u.title || 'Untitled')}</div>
+            <div style="font-size:12px;color:var(--muted);margin:2px 0 4px;">${pesc(u.message || '')}</div>
+            <div class="admin-update-meta">
+              <span class="admin-update-type">${pesc(u.type || 'Update')}</span>
+              ${u.date     ? `<span>\ud83d\udcc5 ${pesc(u.date)}</span>`     : ''}
+              ${u.priority ? `<span>\ud83d\udea6 ${pesc(u.priority)}</span>` : ''}
+              ${u.btnText  ? `<span>\ud83d\udd17 ${pesc(u.btnText)}</span>`  : ''}
+              ${u.attachName ? `<span>\ud83d\udcce ${pesc(u.attachName)}</span>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button onclick="editUpdate(${u.id})" style="padding:5px 12px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️ Edit</button>
+            <button class="admin-update-del" onclick="deleteUpdate(${i})">\ud83d\uddd1 Delete</button>
           </div>
         </div>
-        <button class="admin-update-del" onclick="deleteUpdate(${u._i})">\ud83d\uddd1 Delete</button>
       </div>`).join('');
   }
 
@@ -7799,6 +7855,76 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     refreshAdminUpdatesList();
     showSnuToast('\u23f3 Removing update...');
     saveUpdates(() => showSnuToast('\ud83d\uddd1 Update removed for everyone.'));
+  }
+
+  // ── Drag-to-reorder for updates admin list ────────────────────────────────
+  let _updDragIdx = null;
+  function updOnDragStart(e, el) { _updDragIdx = parseInt(el.dataset.uidx); el.style.opacity = '.4'; }
+  function updOnDragOver(e, el)  { e.preventDefault(); el.style.borderTop = '2px solid var(--accent)'; }
+  function updOnDrop(e, el) {
+    e.preventDefault(); el.style.borderTop = '';
+    const toIdx = parseInt(el.dataset.uidx);
+    if (_updDragIdx === null || _updDragIdx === toIdx) return;
+    const moved = _updates.splice(_updDragIdx, 1)[0];
+    _updates.splice(toIdx, 0, moved);
+    renderFeedFromStorage();
+    refreshAdminUpdatesList();
+    showSnuToast('⏳ Saving order...');
+    saveUpdates(() => showSnuToast('✓ Order saved!'));
+  }
+  function updOnDragEnd() {
+    _updDragIdx = null;
+    document.querySelectorAll('#adminUpdatesList .admin-update-item').forEach(el => { el.style.opacity = ''; el.style.borderTop = ''; });
+  }
+
+  // ── Edit an update ────────────────────────────────────────────────────────
+  let _updEditId = null;
+  function editUpdate(id) {
+    const u = _updates.find(x => x.id === id); if (!u) return;
+    _updEditId = id;
+    const sv = (elId, val) => { const e = document.getElementById(elId); if (e) e.value = val || ''; };
+    sv('updTitle', u.title); sv('updMessage', u.message); sv('updDate', u.date);
+    sv('updBtnText', u.btnText); sv('updBtnUrl', u.btnUrl);
+    // Set selects
+    const typeEl = document.getElementById('updType');
+    if (typeEl) for (let i=0; i<typeEl.options.length; i++) { if (typeEl.options[i].value === u.type || typeEl.options[i].text === u.type) { typeEl.selectedIndex = i; break; } }
+    const priEl = document.getElementById('updPriority');
+    if (priEl) for (let i=0; i<priEl.options.length; i++) { if (priEl.options[i].value === u.priority) { priEl.selectedIndex = i; break; } }
+    // Restore attachment preview
+    _updAttachBase64 = u.attachBase64 || null;
+    _updAttachType   = u.attachType   || null;
+    _updAttachName   = u.attachName   || null;
+    const fn = document.getElementById('updAttachFilename');
+    if (fn && u.attachName) { fn.textContent = '📎 ' + u.attachName; fn.style.display = 'block'; }
+    // Update button
+    const addBtn = document.querySelector('[onclick="addUpdate()"]');
+    if (addBtn) { addBtn.textContent = '💾 Save Changes'; addBtn.setAttribute('onclick', 'saveEditedUpdate()'); }
+    document.getElementById('updTitle')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('updTitle')?.focus();
+    showSnuToast('✏️ Editing update — make changes and click Save Changes.');
+  }
+
+  function saveEditedUpdate() {
+    if (!_updEditId) { addUpdate(); return; }
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const title = gv('updTitle');
+    if (!title) { showSnuToast('⚠ Please enter a title.'); return; }
+    const idx = _updates.findIndex(x => x.id === _updEditId);
+    if (idx < 0) { addUpdate(); return; }
+    _updates[idx] = { ..._updates[idx], title, type: gv('updType') || 'Announcement', message: gv('updMessage'), date: gv('updDate'), priority: gv('updPriority'), btnText: gv('updBtnText'), btnUrl: gv('updBtnUrl'), attachBase64: _updAttachBase64 || _updates[idx].attachBase64 || null, attachType: _updAttachType || _updates[idx].attachType || null, attachName: _updAttachName || _updates[idx].attachName || null };
+    _updEditId = null;
+    renderFeedFromStorage(); refreshAdminUpdatesList();
+    // Reset form + button
+    ['updTitle','updMessage','updDate','updBtnText','updBtnUrl'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+    ['updType','updPriority'].forEach(id => { const e = document.getElementById(id); if (e) e.selectedIndex = 0; });
+    _updAttachBase64 = null; _updAttachType = null; _updAttachName = null;
+    const prev = document.getElementById('updAttachPreview'); if (prev) { prev.src = ''; prev.classList.remove('visible'); }
+    const ph = document.getElementById('updAttachPlaceholder'); if (ph) ph.style.display = '';
+    const fn = document.getElementById('updAttachFilename'); if (fn) { fn.textContent = ''; fn.style.display = 'none'; }
+    const zone = document.getElementById('updAttachZone'); if (zone) zone.classList.remove('has-photo');
+    const addBtn = document.querySelector('[onclick="saveEditedUpdate()"]');
+    if (addBtn) { addBtn.textContent = '➕ Add Update'; addBtn.setAttribute('onclick', 'addUpdate()'); }
+    showSnuToast('⏳ Saving changes...'); saveUpdates(() => showSnuToast('✓ Update saved!'));
   }
 
   </script>
@@ -10293,6 +10419,228 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     w.focus();
     setTimeout(() => { w.print(); }, 400);
   }
+  </script>
+
+
+  <!-- FORMS LOCKER MODAL -->
+  <div id="formsLockerOverlay" onclick="if(event.target===this)closeFormsLockerModal()" style="display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px;">
+    <div style="width:100%;max-width:680px;max-height:90vh;background:rgba(18,36,72,.97);border:1px solid var(--border-2);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div style="font-size:16px;font-weight:700;color:#fff;">📁 Forms Locker</div>
+        <button onclick="closeFormsLockerModal()" style="width:34px;height:34px;border-radius:8px;border:none;background:rgba(255,255,255,.08);color:var(--text);font-size:16px;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:14px 24px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <input id="formsSearch" class="admin-input" placeholder="🔍 Search forms…" oninput="filterFormsList(this.value)" style="width:100%;">
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:16px 24px;" id="formsModalList">
+        <div style="color:var(--muted-2);font-style:italic;font-size:13px;text-align:center;padding:32px 0;">No forms yet — admin can add them in the Forms Locker tab.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <script id="forms-locker-script">
+  // ── FORMS LOCKER ─────────────────────────────────────────────────────────
+  const FORMS_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const FORMS_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const FORMS_HUB      = 'medi';
+  const FORMS_LS_KEY   = 'medi_forms_locker_v1';
+  let _forms = [];
+  let _formsSaving = false;
+  let _formsEditId = null;
+
+  // ── Load ──────────────────────────────────────────────────────────────────
+  function initFormsLocker() {
+    try { const r = localStorage.getItem(FORMS_LS_KEY); if (r) _forms = JSON.parse(r); } catch(e) {}
+    fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}&select=data`, {
+      headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        _forms = Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
+        try { localStorage.setItem(FORMS_LS_KEY, JSON.stringify(_forms)); } catch(e) {}
+      }
+      refreshFormsAdminList();
+    }).catch(() => { refreshFormsAdminList(); });
+  }
+
+  // ── Save ──────────────────────────────────────────────────────────────────
+  function saveForms(onSuccess) {
+    if (_formsSaving) return;
+    _formsSaving = true;
+    try { localStorage.setItem(FORMS_LS_KEY, JSON.stringify(_forms)); } catch(e) {}
+    const payload = JSON.stringify(_forms);
+    fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}`, {
+      method: 'DELETE', headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY }
+    }).then(() => fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker`, {
+      method: 'POST',
+      headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ hub: FORMS_HUB, data: payload })
+    })).then(() => { _formsSaving = false; if (onSuccess) onSuccess(); })
+    .catch(() => { _formsSaving = false; if (typeof showSnuToast === 'function') showSnuToast('⚠ Save failed.'); });
+  }
+
+  // ── Admin: add or update ───────────────────────────────────────────────────
+  function submitFormEntry() {
+    const gv = id => document.getElementById(id)?.value?.trim() || '';
+    const name = gv('formsName');
+    if (!name) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Form name is required.'); return; }
+    const entry = { id: _formsEditId || Date.now(), name, category: gv('formsCategory'), desc: gv('formsDesc'), url: gv('formsUrl') };
+    if (_formsEditId) {
+      const idx = _forms.findIndex(f => f.id === _formsEditId);
+      if (idx >= 0) _forms[idx] = entry; else _forms.push(entry);
+    } else {
+      _forms.push(entry);
+    }
+    refreshFormsAdminList();
+    cancelFormsEdit();
+    if (typeof showSnuToast === 'function') showSnuToast('⏳ Saving form...');
+    saveForms(() => { if (typeof showSnuToast === 'function') showSnuToast('✓ Form saved!'); });
+  }
+
+  function editFormEntry(id) {
+    const f = _forms.find(x => x.id === id); if (!f) return;
+    _formsEditId = id;
+    const sv = (elId, val) => { const e = document.getElementById(elId); if (e) e.value = val || ''; };
+    sv('formsName', f.name); sv('formsCategory', f.category); sv('formsDesc', f.desc); sv('formsUrl', f.url);
+    document.getElementById('formsEditId').value = id;
+    document.getElementById('formsFormTitle').textContent = '✏️ Editing Form';
+    document.getElementById('formsSubmitBtn').textContent = '💾 Save Changes';
+    const cancel = document.getElementById('formsCancelEdit');
+    if (cancel) cancel.style.display = '';
+    document.getElementById('formsName')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('formsName')?.focus();
+  }
+
+  function cancelFormsEdit() {
+    _formsEditId = null;
+    ['formsName','formsCategory','formsDesc','formsUrl','formsEditId'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+    const title = document.getElementById('formsFormTitle'); if (title) title.textContent = '➕ New Form';
+    const btn = document.getElementById('formsSubmitBtn'); if (btn) btn.textContent = '➕ Add Form';
+    const cancel = document.getElementById('formsCancelEdit'); if (cancel) cancel.style.display = 'none';
+  }
+
+  function deleteFormEntry(id) {
+    _forms = _forms.filter(f => f.id !== id);
+    refreshFormsAdminList();
+    if (typeof showSnuToast === 'function') showSnuToast('⏳ Removing form...');
+    saveForms(() => { if (typeof showSnuToast === 'function') showSnuToast('🗑 Form removed.'); });
+  }
+
+  // ── Admin list with drag-to-reorder ───────────────────────────────────────
+  function refreshFormsAdminList() {
+    const el    = document.getElementById('formsAdminList');
+    const count = document.getElementById('formsAdminCount');
+    if (!el) return;
+    if (count) count.textContent = '(' + _forms.length + ')';
+    if (!_forms.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No forms yet.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = _forms.map((f, i) => `
+      <div class="admin-update-item" draggable="true"
+        data-fid="${f.id}" data-fidx="${i}"
+        ondragstart="formsOnDragStart(event,this)" ondragover="formsOnDragOver(event,this)" ondrop="formsOnDrop(event,this)" ondragend="formsOnDragEnd()"
+        style="cursor:grab;display:flex;align-items:center;gap:8px;">
+        <span style="color:var(--muted-2);font-size:16px;cursor:grab;flex-shrink:0;">⠿</span>
+        <div style="flex:1;min-width:0;">
+          <div class="admin-update-title">${pesc(f.name)}</div>
+          <div class="admin-update-meta">
+            ${f.category ? `<span class="admin-update-type">${pesc(f.category)}</span>` : ''}
+            ${f.desc ? `<span style="color:var(--muted-2);">${pesc(f.desc)}</span>` : ''}
+            ${f.url ? `<span style="color:var(--accent-2);">🔗 Link</span>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button onclick="editFormEntry(${f.id})" style="padding:5px 12px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️ Edit</button>
+          <button class="admin-update-del" onclick="deleteFormEntry(${f.id})">🗑 Delete</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // Drag-to-reorder for forms list
+  let _formsDragIdx = null;
+  function formsOnDragStart(e, el) { _formsDragIdx = parseInt(el.dataset.fidx); el.style.opacity = '.4'; }
+  function formsOnDragOver(e, el) { e.preventDefault(); el.style.borderTop = '2px solid var(--accent)'; }
+  function formsOnDrop(e, el) {
+    e.preventDefault(); el.style.borderTop = '';
+    const toIdx = parseInt(el.dataset.fidx);
+    if (_formsDragIdx === null || _formsDragIdx === toIdx) return;
+    const moved = _forms.splice(_formsDragIdx, 1)[0];
+    _forms.splice(toIdx, 0, moved);
+    refreshFormsAdminList();
+    if (typeof showSnuToast === 'function') showSnuToast('⏳ Saving order...');
+    saveForms(() => { if (typeof showSnuToast === 'function') showSnuToast('✓ Order saved!'); });
+  }
+  function formsOnDragEnd() {
+    _formsDragIdx = null;
+    document.querySelectorAll('#formsAdminList .admin-update-item').forEach(el => { el.style.opacity = ''; el.style.borderTop = ''; });
+  }
+
+  // ── Modal viewer ──────────────────────────────────────────────────────────
+  function openFormsLockerModal() {
+    const overlay = document.getElementById('formsLockerOverlay');
+    if (overlay) overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    const search = document.getElementById('formsSearch');
+    if (search) search.value = '';
+    renderFormsList(_forms);
+  }
+  function closeFormsLockerModal() {
+    const overlay = document.getElementById('formsLockerOverlay');
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function filterFormsList(q) {
+    const lower = q.toLowerCase().trim();
+    if (!lower) { renderFormsList(_forms); return; }
+    renderFormsList(_forms.filter(f =>
+      (f.name||'').toLowerCase().includes(lower) ||
+      (f.category||'').toLowerCase().includes(lower) ||
+      (f.desc||'').toLowerCase().includes(lower)
+    ));
+  }
+  function renderFormsList(list) {
+    const el = document.getElementById('formsModalList');
+    if (!el) return;
+    if (!list.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;text-align:center;padding:32px 0;">No forms found.</div>';
+      return;
+    }
+    const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // Group by category
+    const groups = {};
+    list.forEach(f => { const cat = f.category || 'General'; if (!groups[cat]) groups[cat] = []; groups[cat].push(f); });
+    el.innerHTML = Object.entries(groups).map(([cat, items]) => `
+      <div style="margin-bottom:20px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">${pesc(cat)}</div>
+        ${items.map(f => `
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:10px;margin-bottom:6px;background:rgba(255,255,255,.04);border:1px solid var(--border);transition:background .15s;"
+            onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
+            <div style="min-width:0;">
+              <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;">${pesc(f.name)}</div>
+              ${f.desc ? `<div style="font-size:12px;color:var(--muted-2);">${pesc(f.desc)}</div>` : ''}
+            </div>
+            ${f.url ? `<a href="${f.url}" target="_blank" rel="noopener noreferrer"
+              style="flex-shrink:0;padding:7px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">
+              Open ↗
+            </a>` : `<span style="font-size:11px;color:var(--muted-2);font-style:italic;">No link</span>`}
+          </div>`).join('')}
+      </div>`).join('');
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', initFormsLocker);
+
+  // Hook into switchAdminTab so forms list refreshes when tab opens
+  (function() {
+    const _orig = window.switchAdminTab;
+    window.switchAdminTab = function(tab, el) {
+      if (_orig) _orig(tab, el);
+      if (tab === 'forms') { cancelFormsEdit(); refreshFormsAdminList(); }
+    };
+  })();
   </script>
 
 </body>
