@@ -4054,6 +4054,15 @@
             <span class="card-tag">Forms</span>
           </div>
 
+          <div class="card" data-color="green" style="cursor:pointer;" onclick="openReferralModal()">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">📋</div>
+            <h3>Submit a Referral</h3>
+            <p>Refer a client to Medi Solutions and submit their info for a gift card reward.</p>
+            <span class="card-tag">Referrals</span>
+          </div>
+
         </div>
 
       </div>
@@ -10658,6 +10667,187 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     };
   })();
   </script>
+
+
+<!-- ── REFERRAL MODAL ─────────────────────────────────────────── -->
+<div id="referralOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,20,50,.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#1e3a6e;border:1px solid rgba(255,255,255,.18);border-radius:18px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6);">
+
+    <!-- Header -->
+    <div style="background:#0f2147;border-radius:18px 18px 0 0;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.1);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:#1d9e75;display:flex;align-items:center;justify-content:center;font-size:18px;">📋</div>
+        <div>
+          <div style="color:#fff;font-size:16px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">Submit a Referral</div>
+          <div style="color:#9fe1cb;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">Medi Solutions Insurance</div>
+        </div>
+      </div>
+      <button onclick="closeReferralModal()" style="background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.5);font-size:22px;line-height:1;padding:0;">&times;</button>
+    </div>
+
+    <!-- Body -->
+    <div id="referralFormBody" style="padding:20px 24px;">
+
+      <!-- Gift Card Recipient -->
+      <div style="background:rgba(29,158,117,.12);border-left:3px solid #1d9e75;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#9fe1cb;font-family:'Plus Jakarta Sans',sans-serif;">🎁 Gift Card Recipient</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-family:'Plus Jakarta Sans',sans-serif;margin-top:2px;">The person making the referral</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Referring person name <span style="color:#fb7185;">*</span></label>
+          <input id="rf_referrer" type="text" placeholder="Full name" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Phone</label>
+          <input id="rf_referrer_phone" type="tel" placeholder="(000) 000-0000" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Email</label>
+          <input id="rf_referrer_email" type="email" placeholder="referrer@example.com" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Address</label>
+          <input id="rf_referrer_address" type="text" placeholder="Street, City, State, ZIP" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+      </div>
+
+      <div style="border-top:1px solid rgba(255,255,255,.1);margin:16px 0;"></div>
+
+      <!-- Person Being Referred -->
+      <div style="background:rgba(59,130,246,.12);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7dd3fc;font-family:'Plus Jakarta Sans',sans-serif;">👤 Person Being Referred</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-family:'Plus Jakarta Sans',sans-serif;margin-top:2px;">The prospective client</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Client name <span style="color:#fb7185;">*</span></label>
+          <input id="rf_name" type="text" placeholder="Full name" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Date of birth <span style="color:#fb7185;">*</span></label>
+          <input id="rf_dob" type="date" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;color-scheme:dark;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Client phone <span style="color:#fb7185;">*</span></label>
+          <input id="rf_phone" type="tel" placeholder="(000) 000-0000" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Client email</label>
+          <input id="rf_email" type="email" placeholder="client@example.com" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Client address</label>
+          <input id="rf_address" type="text" placeholder="Street, City, State, ZIP" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+      </div>
+
+      <div style="border-top:1px solid rgba(255,255,255,.1);margin:16px 0;"></div>
+
+      <!-- Referral Details -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Agent name <span style="color:#fb7185;">*</span></label>
+          <input id="rf_agent" type="text" placeholder="Assigned agent" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Products referred for <span style="color:#fb7185;">*</span></label>
+          <div id="rf_products" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
+            <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#f0f6ff;font-family:'Plus Jakarta Sans',sans-serif;"><input type="checkbox" value="Medicare Advantage"> Medicare Advantage</label>
+            <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#f0f6ff;font-family:'Plus Jakarta Sans',sans-serif;"><input type="checkbox" value="Medicare Supplement"> Medicare Supplement</label>
+            <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#f0f6ff;font-family:'Plus Jakarta Sans',sans-serif;"><input type="checkbox" value="Part D / PDP"> Part D / PDP</label>
+            <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#f0f6ff;font-family:'Plus Jakarta Sans',sans-serif;"><input type="checkbox" value="Life Insurance"> Life Insurance</label>
+            <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#f0f6ff;font-family:'Plus Jakarta Sans',sans-serif;"><input type="checkbox" value="Dental/Vision/Hearing"> Dental / Vision / Hearing</label>
+            <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#f0f6ff;font-family:'Plus Jakarta Sans',sans-serif;"><input type="checkbox" value="Other"> Other</label>
+          </div>
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;">Additional notes</label>
+          <textarea id="rf_notes" rows="3" placeholder="Any extra context for this referral..." style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea>
+        </div>
+      </div>
+
+      <div id="rf_err" style="display:none;margin-top:12px;padding:9px 14px;background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.3);border-radius:8px;font-size:13px;color:#fb7185;font-family:'Plus Jakarta Sans',sans-serif;"></div>
+
+      <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+        <button onclick="closeReferralModal()" style="padding:9px 20px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#b8d4ee;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;cursor:pointer;">Cancel</button>
+        <button onclick="submitReferralForm()" style="padding:9px 24px;border-radius:9px;border:none;background:#1d9e75;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Send Referral ✉</button>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div id="referralSuccess" style="display:none;padding:40px 24px;text-align:center;">
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(29,158,117,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;">✅</div>
+      <div style="font-size:17px;font-weight:700;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:6px;">Referral sent!</div>
+      <div style="font-size:13px;color:#b8d4ee;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:20px;">Your referral has been emailed to the Medi Solutions team.</div>
+      <button onclick="resetReferralForm()" style="padding:9px 20px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#b8d4ee;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;cursor:pointer;">Submit another</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function openReferralModal() {
+    const o = document.getElementById('referralOverlay');
+    if (o) { o.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+  }
+  function closeReferralModal() {
+    const o = document.getElementById('referralOverlay');
+    if (o) { o.style.display = 'none'; document.body.style.overflow = ''; }
+  }
+  function submitReferralForm() {
+    const g = id => (document.getElementById(id)?.value?.trim() || '');
+    const referrer = g('rf_referrer'), name = g('rf_name'), dob = g('rf_dob'),
+          phone = g('rf_phone'), agent = g('rf_agent');
+    const checked = [...document.querySelectorAll('#rf_products input:checked')].map(c => c.value);
+    const err = document.getElementById('rf_err');
+    if (!referrer || !name || !dob || !phone || !agent || !checked.length) {
+      err.style.display = 'block';
+      err.textContent = 'Please fill in all required fields and select at least one product.';
+      return;
+    }
+    err.style.display = 'none';
+    const subject = encodeURIComponent('New Referral: ' + name + ' (referred by ' + referrer + ')');
+    const body = encodeURIComponent(
+      'NEW REFERRAL SUBMISSION\n========================\n\n' +
+      'GIFT CARD RECIPIENT (Referring Person)\n--------------------------------------\n' +
+      'Name:             ' + referrer + '\n' +
+      'Phone:            ' + (g('rf_referrer_phone') || 'N/A') + '\n' +
+      'Email:            ' + (g('rf_referrer_email') || 'N/A') + '\n' +
+      'Address:          ' + (g('rf_referrer_address') || 'N/A') + '\n\n' +
+      'PERSON BEING REFERRED (Prospective Client)\n------------------------------------------\n' +
+      'Client Name:      ' + name + '\n' +
+      'Date of Birth:    ' + dob + '\n' +
+      'Phone:            ' + phone + '\n' +
+      'Email:            ' + (g('rf_email') || 'N/A') + '\n' +
+      'Address:          ' + (g('rf_address') || 'N/A') + '\n\n' +
+      'REFERRAL DETAILS\n----------------\n' +
+      'Agent Name:       ' + agent + '\n' +
+      'Products:         ' + checked.join(', ') + '\n\n' +
+      'Notes:\n' + (g('rf_notes') || 'None') + '\n\n' +
+      '========================\nSubmitted via Medi Solutions Agent Hub'
+    );
+    window.location.href = 'mailto:info@medisolins.com?subject=' + subject + '&body=' + body;
+    setTimeout(() => {
+      document.getElementById('referralFormBody').style.display = 'none';
+      document.getElementById('referralSuccess').style.display = 'block';
+    }, 800);
+  }
+  function resetReferralForm() {
+    ['rf_referrer','rf_referrer_phone','rf_referrer_email','rf_referrer_address',
+     'rf_name','rf_dob','rf_phone','rf_email','rf_address','rf_agent','rf_notes']
+      .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+    document.querySelectorAll('#rf_products input').forEach(c => c.checked = false);
+    document.getElementById('referralSuccess').style.display = 'none';
+    document.getElementById('referralFormBody').style.display = 'block';
+  }
+  document.getElementById('referralOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeReferralModal();
+  });
+</script>
+<!-- ── END REFERRAL MODAL ──────────────────────────────────────── -->
 
 </body>
 </html>
