@@ -10469,14 +10469,20 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (_formsSaving) return;
     _formsSaving = true;
     const payload = JSON.stringify(_forms);
+    const hdrs = { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    // PATCH existing row first; if nothing matched (empty body), INSERT instead
     fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}`, {
-      method: 'DELETE', headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY }
-    }).then(() => fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker`, {
-      method: 'POST',
-      headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ hub: FORMS_HUB, data: payload })
-    })).then(() => { _formsSaving = false; if (onSuccess) onSuccess(); })
-    .catch(() => { _formsSaving = false; if (typeof showSnuToast === 'function') showSnuToast('⚠ Save failed.'); });
+      method: 'PATCH', headers: hdrs, body: JSON.stringify({ data: payload })
+    }).then(r => r.text()).then(t => {
+      if (t === '[]' || t === '' || t === 'null') {
+        // No existing row — INSERT
+        return fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker`, {
+          method: 'POST', headers: hdrs,
+          body: JSON.stringify({ hub: FORMS_HUB, data: payload })
+        });
+      }
+    }).then(() => { _formsSaving = false; if (onSuccess) onSuccess(); })
+    .catch(() => { _formsSaving = false; if (typeof showSnuToast === 'function') showSnuToast('⚠ Save failed — check connection.'); });
   }
 
   // ── Admin: add or update ───────────────────────────────────────────────────
