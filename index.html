@@ -7470,6 +7470,102 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
+
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
+
 </body></html>`;
 
     const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
@@ -8878,7 +8974,103 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const ifr  = body.querySelector('iframe');
     if (img) {
       const w = window.open('');
-      w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${img.src}" style="max-width:100%;"></body></html>`);
+      w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${img.src}" style="max-width:100%;">
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
+
+</body></html>`);
       w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
     } else if (ifr) {
       // base64 PDFs can't be printed via contentWindow.print() — open in new tab instead
@@ -9050,14 +9242,206 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function openCheatSheet() {
     const w = window.open('', '_blank', 'width=960,height=720');
     if (!w) { showSnuToast('\u26a0 Allow pop-ups to open PDFs.'); return; }
-    w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_CHEAT_DATA + '" type="application/pdf" width="100%" height="100%"></body></html>');
+    w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_CHEAT_DATA + '" type="application/pdf" width="100%" height="100%">
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
+
+</body></html>');
     w.document.close();
   }
 
   function openFullBooklet() {
     const w = window.open('', '_blank', 'width=960,height=720');
     if (!w) { showSnuToast('\u26a0 Allow pop-ups to open PDFs.'); return; }
-    w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_FULL_DATA + '" type="application/pdf" width="100%" height="100%"></body></html>');
+    w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_FULL_DATA + '" type="application/pdf" width="100%" height="100%">
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
+
+</body></html>');
     w.document.close();
   }
   function openSepModal() {
@@ -9843,7 +10227,103 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       .title{font-weight:700;font-size:14px;margin-bottom:4px;}
       .tag{display:inline-block;background:#e8f0fe;color:#1a2340;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-bottom:6px;}
       @page{margin:.75in}</style></head>
-      <body><h1>📰 Medicare Updates</h1>${el.innerHTML}</body></html>`);
+      <body><h1>📰 Medicare Updates</h1>${el.innerHTML}
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(),400);
   }
 
@@ -10575,7 +11055,103 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         body { font-family: Georgia, serif; color: #1a1a2e; margin: 0; padding: 0; font-size: 13px; }
         * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       </style>
-    </head><body>${body.innerHTML}</body></html>`);
+    </head><body>${body.innerHTML}
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
+
+</body></html>`);
     w.document.close();
     w.focus();
     setTimeout(() => { w.print(); }, 400);
@@ -10758,7 +11334,103 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         table { page-break-inside: auto; }
         tr { page-break-inside: avoid; }
       </style>
-    </head><body>${body.innerHTML}</body></html>`);
+    </head><body>${body.innerHTML}
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
+
+</body></html>`);
     w.document.close();
     w.focus();
     setTimeout(() => { w.print(); }, 400);
@@ -11362,6 +12034,102 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
   document.addEventListener('DOMContentLoaded', loadHeroAdminConfig);
   </script>
+
+
+<script id="hero-header-favorites-fix">
+(function(){
+  const FAV_KEY = 'medi_agent_favorites_v1';
+  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
+  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+  function toggleFav(id){
+    let favs = getFavs();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setFavs(favs);
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+  }
+  window.toggleHeroFavorite = toggleFav;
+
+  function sectionCards(){
+    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
+      const id = section.id;
+      const head = section.querySelector('.section-head');
+      if (!head) return null;
+      const title = (head.querySelector('h2')?.textContent || id).trim();
+      const desc = (head.querySelector('p')?.textContent || '').trim();
+      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
+      return { id, title, desc, icon, href:'#' + id };
+    }).filter(Boolean);
+  }
+
+  function decorateSectionHeaders(){
+    const favs = getFavs();
+    sectionCards().forEach(card => {
+      const section = document.getElementById(card.id);
+      const head = section?.querySelector('.section-head');
+      if (!head) return;
+      let actions = head.querySelector('.section-head-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'section-head-actions';
+        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        head.appendChild(actions);
+      }
+      let btn = head.querySelector('.section-fav-btn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-fav-btn';
+        btn.setAttribute('aria-label', 'Save section to Hero quick access');
+        btn.title = 'Save to Hero quick access';
+        btn.innerHTML = '<span>★</span>';
+        actions.prepend(btn);
+      }
+      btn.classList.toggle('active', favs.includes(card.id));
+      btn.onclick = () => toggleFav(card.id);
+    });
+  }
+
+  function renderHeroQuickAccessOnly(){
+    const favs = getFavs();
+    const sections = sectionCards();
+    const favCards = sections.filter(s => favs.includes(s.id));
+    const grid = document.getElementById('heroQuickAccessGrid');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favCards.length);
+    if (summary) {
+      summary.innerHTML = favCards.length
+        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
+        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+    }
+    if (grid) {
+      grid.innerHTML = favCards.length
+        ? favCards.map(s => `
+          <a class="hero-quick-card" href="${s.href}">
+            <div class="hero-quick-top">
+              <div class="hero-quick-icon">${s.icon}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc || 'Quick access to this section.'}</p>
+            <div class="hero-quick-link">Open Section ↗</div>
+          </a>`).join('')
+        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+    }
+  }
+
+  function hideUnusedHeroTiles(){
+    const tileGrid = document.getElementById('heroTileGrid');
+    if (tileGrid) tileGrid.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    decorateSectionHeaders();
+    renderHeroQuickAccessOnly();
+    hideUnusedHeroTiles();
+  });
+})();
+</script>
 
 </body>
 </html>
