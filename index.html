@@ -3817,6 +3817,217 @@
     }
     .trip-legend-dot.q  { background: #22c55e; }
     .trip-legend-dot.nq { background: #3b82f6; }
+
+    /* ══════════════════════════════════════════════
+       HERO DASHBOARD REBUILD
+    ══════════════════════════════════════════════ */
+    .hero-dashboard-shell { padding-top: 34px; }
+    .hero-dashboard { padding: 34px 34px 30px !important; }
+    .hero-dashboard-top {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+      z-index: 2;
+    }
+    .hero-dashboard-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .hero-action-btn {
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .18s, background .18s, border-color .18s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .hero-action-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.28); }
+    .hero-action-btn.ghost { background: rgba(0,0,0,.16); }
+    .hero-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-kpi-tile {
+      text-decoration: none;
+      color: inherit;
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      min-height: 108px;
+    }
+    .hero-kpi-tile:hover {
+      transform: translateY(-3px);
+      border-color: rgba(125,211,252,.55);
+      box-shadow: 0 12px 28px rgba(0,0,0,.28);
+    }
+    .hero-kpi-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .9px; color: var(--muted-2); margin-bottom: 10px; }
+    .hero-kpi-value { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 800; color: #fff; line-height: 1; }
+    .hero-kpi-meta { margin-top: 10px; font-size: 12px; color: var(--muted); }
+    .hero-dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.45fr) minmax(280px,.8fr);
+      gap: 18px;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-main-panel, .hero-panel-card {
+      background: rgba(8,20,42,.34);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+    }
+    .hero-main-panel { padding: 18px; }
+    .hero-panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .hero-panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: #fff; }
+    .hero-panel-sub { font-size: 12px; color: var(--muted-2); margin-top: 4px; }
+    .hero-filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .hero-filter {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .18s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .hero-filter.active, .hero-filter:hover { background: rgba(125,211,252,.16); color: #fff; border-color: rgba(125,211,252,.4); }
+    .hero-chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .hero-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; color: var(--accent-2);
+      padding: 6px 10px; border-radius: 999px;
+      background: rgba(59,130,246,.14); border: 1px solid rgba(59,130,246,.24);
+    }
+    .hero-dashboard-tiles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+    .hero-tile {
+      position: relative;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      min-height: 166px;
+      overflow: hidden;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+    .hero-tile:hover { transform: translateY(-3px); border-color: rgba(125,211,252,.42); box-shadow: 0 14px 28px rgba(0,0,0,.22); }
+    .hero-tile-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .hero-tile-icon {
+      width: 42px; height: 42px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.3);
+      font-size: 20px; flex-shrink: 0;
+    }
+    .hero-tile-star {
+      width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06); color: rgba(255,255,255,.6);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: all .18s; font-size: 15px;
+    }
+    .hero-tile-star.active { color: var(--gold); background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.35); }
+    .hero-tile-star:hover { transform: scale(1.04); }
+    .hero-tile h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: #fff; margin-bottom: 6px; }
+    .hero-tile p { font-size: 12.5px; line-height: 1.65; color: var(--muted); margin-bottom: 12px; }
+    .hero-tile-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .hero-tile-tag {
+      font-size: 10px; font-weight: 800; letter-spacing: .55px; text-transform: uppercase;
+      padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.08); color: var(--muted-2);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .hero-tile-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
+    .hero-tile-link {
+      display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #fff;
+      font-size: 12px; font-weight: 800; padding: 9px 12px; border-radius: 10px;
+      background: rgba(59,130,246,.18); border: 1px solid rgba(59,130,246,.3);
+    }
+    .hero-tile-state { font-size: 11px; color: var(--muted-2); text-align: right; }
+    .hero-side-panel { display: flex; flex-direction: column; gap: 14px; }
+    .hero-panel-card { padding: 16px; }
+    .hero-ai-list, .hero-mini-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .hero-ai-item, .hero-mini-item {
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .hero-ai-item strong, .hero-mini-item strong { display: block; color: #fff; font-size: 13px; margin-bottom: 5px; }
+    .hero-ai-item span, .hero-mini-item span { font-size: 12px; color: var(--muted); line-height: 1.55; }
+    .hero-mini-link { margin-top: 8px; display: inline-flex; text-decoration: none; color: var(--accent-2); font-size: 11px; font-weight: 800; }
+    .hero-empty { font-size: 12px; color: var(--muted-2); font-style: italic; }
+    .hero-pill-inline { display:inline-flex; gap:6px; align-items:center; }
+    .hero-admin-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.62); backdrop-filter: blur(6px);
+      z-index: 2400; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .hero-admin-overlay.open { opacity: 1; pointer-events: all; }
+    .hero-admin-modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(.96);
+      width: min(760px, 94vw); max-height: 88vh; overflow: auto; z-index: 2401;
+      background: linear-gradient(160deg, #183766 0%, #1c437a 100%);
+      border: 1px solid rgba(255,255,255,.16); border-radius: 22px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: all .22s;
+      padding: 0;
+    }
+    .hero-admin-modal.open { opacity: 1; pointer-events: all; transform: translate(-50%,-50%) scale(1); }
+    .hero-admin-head { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .hero-admin-body { padding: 20px 24px 24px; }
+    .hero-admin-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 14px; }
+    .hero-admin-option {
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      padding: 13px 14px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+    }
+    .hero-admin-option strong { display:block; color:#fff; font-size: 13px; margin-bottom:4px; }
+    .hero-admin-option span { display:block; color: var(--muted-2); font-size:11px; line-height:1.5; }
+    .hero-admin-check { margin-top: 3px; transform: scale(1.05); }
+    .hero-admin-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; }
+    .hero-admin-save, .hero-admin-close {
+      border: none; border-radius: 12px; padding: 11px 18px; font-size: 13px; font-weight: 800; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .hero-admin-save { background: var(--accent); color:#fff; }
+    .hero-admin-close { background: rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.12); }
+    @media (max-width: 1024px) {
+      .hero-kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .hero-dashboard-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .hero-dashboard { padding: 24px 18px 20px !important; }
+      .hero-dashboard-top { flex-direction: column; }
+      .hero-dashboard-actions { justify-content: flex-start; }
+      .hero-dashboard-tiles { grid-template-columns: 1fr; }
+      .hero-admin-grid { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body>
@@ -3908,38 +4119,91 @@
     </header>
 
     <!-- HERO -->
-    <section class="hero">
+    <section class="hero hero-dashboard-shell">
       <div class="wrap">
-        <div class="hero-inner">
+        <div class="hero-inner hero-dashboard">
           <div class="hero-grid-bg"></div>
           <div class="hero-corner hero-corner-tl"></div>
           <div class="hero-corner hero-corner-br"></div>
           <div class="hero-orb hero-orb-1"></div>
           <div class="hero-orb hero-orb-2"></div>
           <div class="hero-orb hero-orb-3"></div>
-          <div class="hero-layout">
+
+          <div class="hero-dashboard-top">
             <div>
               <div class="eyebrow">
                 <span class="eyebrow-dot"></span>
                 Agent Command Center
               </div>
               <h1>Your central hub for<br><em>smarter agent work</em></h1>
-              <p>Access tools, searchable libraries, calculators, leaderboard visibility, and operations support — all in one place. Leads and pipeline live in AgencyBloc.</p>
+              <p>Pin favorites, surface admin-priority tools, filter the hub by what matters now, and use AI suggestions to jump into the next best section faster.</p>
             </div>
-            <div class="hero-stats">
-              <a class="hstat" href="#agent-tools">
-                <div class="hstat-val">8</div>
-                <div class="hstat-lbl">Core Tools ↓</div>
-              </a>
-              <a class="hstat" href="#libraries">
-                <div class="hstat-val">5</div>
-                <div class="hstat-lbl">Libraries ↓</div>
-              </a>
-              <a class="hstat" href="#operations-ai">
-                <div class="hstat-val">Live</div>
-                <div class="hstat-lbl">Agent AI ↓</div>
-              </a>
+            <div class="hero-dashboard-actions">
+              <button class="hero-action-btn" type="button" onclick="openHeroAdmin()">⚙️ Hero Manager</button>
+              <button class="hero-action-btn ghost" type="button" onclick="scrollToHeroTiles()">⬇ Explore Tiles</button>
             </div>
+          </div>
+
+          <div class="hero-kpi-grid">
+            <a class="hero-kpi-tile" href="#trip-tracker">
+              <div class="hero-kpi-label">Qualified</div>
+              <div class="hero-kpi-value" id="heroQualifiedCount">0</div>
+              <div class="hero-kpi-meta">Trip qualifiers</div>
+            </a>
+            <a class="hero-kpi-tile" href="#trip-tracker">
+              <div class="hero-kpi-label">Program Month</div>
+              <div class="hero-kpi-value" id="heroMonthProgress">0/18</div>
+              <div class="hero-kpi-meta" id="heroMonthLabel">Progress window</div>
+            </a>
+            <a class="hero-kpi-tile" href="#friday-meetings">
+              <div class="hero-kpi-label">Meetings</div>
+              <div class="hero-kpi-value" id="heroMeetingCount">0</div>
+              <div class="hero-kpi-meta">Upcoming Fridays</div>
+            </a>
+            <a class="hero-kpi-tile" href="#updates">
+              <div class="hero-kpi-label">Favorites</div>
+              <div class="hero-kpi-value" id="heroFavoritesCount">0</div>
+              <div class="hero-kpi-meta">Saved to this browser</div>
+            </a>
+          </div>
+
+          <div class="hero-dashboard-grid">
+            <div class="hero-main-panel">
+              <div class="hero-panel-head">
+                <div>
+                  <div class="hero-panel-title">Dashboard Tiles</div>
+                  <div class="hero-panel-sub">Favorite sections stay personal. Admin quick access stays global.</div>
+                </div>
+                <div class="hero-filter-row" id="heroFilterRow">
+                  <button class="hero-filter active" data-filter="all" onclick="setHeroFilter('all')">All</button>
+                  <button class="hero-filter" data-filter="favorites" onclick="setHeroFilter('favorites')">Favorites</button>
+                  <button class="hero-filter" data-filter="admin" onclick="setHeroFilter('admin')">Admin Picks</button>
+                  <button class="hero-filter" data-filter="action" onclick="setHeroFilter('action')">Action Needed</button>
+                  <button class="hero-filter" data-filter="learning" onclick="setHeroFilter('learning')">Learning</button>
+                  <button class="hero-filter" data-filter="growth" onclick="setHeroFilter('growth')">Growth</button>
+                </div>
+              </div>
+              <div class="hero-chip-row" id="heroQuickAccessSummary"></div>
+              <div class="hero-dashboard-tiles" id="heroTileGrid"></div>
+            </div>
+
+            <aside class="hero-side-panel">
+              <div class="hero-panel-card">
+                <div class="hero-panel-title">AI Suggestions</div>
+                <div class="hero-panel-sub">Rule-based prompts from live hub data</div>
+                <div class="hero-ai-list" id="heroAiList"></div>
+              </div>
+              <div class="hero-panel-card">
+                <div class="hero-panel-title">Your Favorites</div>
+                <div class="hero-panel-sub">Stored on this browser for each agent</div>
+                <div class="hero-mini-list" id="heroFavoriteList"></div>
+              </div>
+              <div class="hero-panel-card">
+                <div class="hero-panel-title">Admin Quick Access</div>
+                <div class="hero-panel-sub">Global picks shown to everyone</div>
+                <div class="hero-mini-list" id="heroAdminList"></div>
+              </div>
+            </aside>
           </div>
         </div>
       </div>
@@ -7174,6 +7438,9 @@ When answering:
 </table>
 ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + notes + '</p>' : ''}
 <div class="note">This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation.</div>
+
+
+
 </body></html>`;
 
     const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
@@ -8369,6 +8636,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!_tripAgents.length) {
       list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
       if (qCount) qCount.textContent = '0 qualified';
+      if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
+      if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
       return;
     }
 
@@ -8377,12 +8646,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const qualified = sorted.filter(a => (a.production||0) >= goal).length;
 
     if (qCount) qCount.textContent = qualified + ' qualified';
-    if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
+    if (updLabel) {
+      const monthLabel = _tripMeta.monthLabel ? ('Updated: ' + _tripMeta.monthLabel) : ('Program month ' + currentTripMonth() + ' of 18');
+      updLabel.textContent = monthLabel;
+    }
 
     // Overall team goal bar — % of agents qualified
     const teamPct = sorted.length ? Math.round(qualified / sorted.length * 100) : 0;
     if (goalBar) goalBar.style.width = teamPct + '%';
     if (goalPct) goalPct.textContent = teamPct + '% qualifying';
+    if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
+    if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
 
     const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
     list.innerHTML = sorted.map((a, i) => {
@@ -8851,25 +9125,47 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const el = document.getElementById('fridayMeetingList');
     const badge = document.getElementById('fridayMeetingCount');
     if (!el) return;
-    const meetings = [..._fridayMeetings].sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
+    const parseMeetingDate = m => {
+      if (!m?.date) return null;
+      const dt = new Date(m.date);
+      if (!isNaN(dt)) { dt.setHours(0,0,0,0); return dt; }
+      return null;
+    };
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const meetings = [..._fridayMeetings]
+      .map(m => ({...m, _parsedDate: parseMeetingDate(m)}))
+      .filter(m => !m._parsedDate || m._parsedDate >= today)
+      .sort((a,b) => {
+        const ad = a._parsedDate ? a._parsedDate.getTime() : Number.MAX_SAFE_INTEGER;
+        const bd = b._parsedDate ? b._parsedDate.getTime() : Number.MAX_SAFE_INTEGER;
+        return ad - bd;
+      });
     if (badge) badge.textContent = meetings.length + ' meeting' + (meetings.length!==1?'s':'');
-    if (!meetings.length) { el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings scheduled yet.</div>'; return; }
+    if (!meetings.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled yet.</div>';
+      if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
+      if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
+      return;
+    }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     el.innerHTML = meetings.map(m => `
       <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
         <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
-          <div style="font-size:22px;">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'}</div>
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
           <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
           <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
         </div>
         <div style="flex:1;">
           <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
-          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">\u23f0 ${pesc(m.time)}</div>`:''}
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
           ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
-          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udcf9 Join Meeting</a>`:''}
-          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udd17 Resource / Login</a>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
         </div>
       </div>`).join('');
+    if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
+    if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
   }
 
   function renderFridayAdminList() {
@@ -10858,6 +11154,208 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   });
 </script>
 <!-- ── END REFERRAL MODAL ──────────────────────────────────────── -->
+
+
+  <div class="hero-admin-overlay" id="heroAdminOverlay" onclick="if(event.target===this)closeHeroAdmin()"></div>
+  <div class="hero-admin-modal" id="heroAdminModal" aria-hidden="true">
+    <div class="hero-admin-head">
+      <div>
+        <div class="hero-panel-title">Hero Quick Access Manager</div>
+        <div class="hero-panel-sub">Admin picks are global. Agent favorites stay separate on each browser.</div>
+      </div>
+      <button class="hero-admin-close" type="button" onclick="closeHeroAdmin()">✕</button>
+    </div>
+    <div class="hero-admin-body">
+      <div class="hero-panel-sub">Select up to 6 sections to show in the Admin Quick Access strip.</div>
+      <div class="hero-admin-grid" id="heroAdminGrid"></div>
+      <div class="hero-admin-actions">
+        <button class="hero-admin-close" type="button" onclick="closeHeroAdmin()">Cancel</button>
+        <button class="hero-admin-save" type="button" onclick="saveHeroAdminConfig()">Save Quick Access</button>
+      </div>
+    </div>
+  </div>
+
+  <script id="hero-dashboard-script">
+  const HERO_SUPA = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const HERO_SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HERO_FAV_KEY = 'medi_agent_favorites_v1';
+  const HERO_DEFAULT_ADMIN = ['quick-access','agent-tools','trip-tracker','friday-meetings'];
+  let _heroAdminPicks = [...HERO_DEFAULT_ADMIN];
+  let _heroFilter = 'all';
+
+  const HERO_SECTIONS = [
+    { id:'agent-tools', icon:'🛠', title:'Agent Tools', desc:'Coaching, calculators, planning, and sales utilities for everyday work.', category:'learning', tags:['Tools','Daily'], href:'#agent-tools', metric:() => countCards('#agent-tools .card-grid .card') + ' tools', state:() => 'Start with high-use tools', ai:'Use this when you need sales support, calculators, or fast coaching help.' },
+    { id:'quick-access', icon:'🔗', title:'Quick Access Portals', desc:'Fast links into the systems agents use most.', category:'action', tags:['Portal','Login'], href:'#quick-access', metric:() => countCards('#quick-access .card-grid .card') + ' links', state:() => 'Best for daily jump-ins', ai:'Open your most-used portals here instead of hunting through bookmarks.' },
+    { id:'libraries', icon:'📚', title:'Agent Libraries', desc:'Reference materials, product resources, and searchable learning content.', category:'learning', tags:['Library','Reference'], href:'#libraries', metric:() => countCards('#libraries .card-grid .card') + ' libraries', state:() => 'Great for lookup work', ai:'Search here when you need scripts, docs, or carrier reference material.' },
+    { id:'updates', icon:'📡', title:'Updates Feed', desc:'The latest internal updates and notices published on the hub.', category:'action', tags:['Feed','News'], href:'#updates', metric:() => textCount('#feed-list .feed-card','updates'), state:() => 'Stay current today', ai:'Check this first if you need the newest internal update before calling or emailing.' },
+    { id:'cert-tracker', icon:'🎓', title:'Certification Tracker', desc:'See agent certification status by carrier for the current plan year.', category:'action', tags:['Compliance','Certs'], href:'#cert-tracker', metric:() => getText('#certAgentCount','0 agents'), state:() => 'Review certification coverage', ai:'Useful before writing new business or assigning carrier-specific work.' },
+    { id:'friday-meetings', icon:'📅', title:'Friday Meetings', desc:'Upcoming Friday team meetings, formats, and join links.', category:'action', tags:['Meetings','Schedule'], href:'#friday-meetings', metric:() => getText('#fridayMeetingCount','0 meetings'), state:() => upcomingMeetingState(), ai:'Use this tile before Friday to grab the meeting topic, time, and link.' },
+    { id:'leaderboard', icon:'🏆', title:'SNU Leaderboard', desc:'Weekly production leaders, consecutive executives, and visibility on momentum.', category:'growth', tags:['Leaderboard','SNU'], href:'#leaderboard', metric:() => textCount('#snuLbList .snu-lb-row','leaders'), state:() => 'Track weekly momentum', ai:'Open this when you want visibility into performance trends and top movement.' },
+    { id:'trip-tracker', icon:'🏝️', title:'Incentive Trip Tracker', desc:'Track who is qualifying, who is close, and the current program progress month.', category:'growth', tags:['Trip','Production'], href:'#trip-tracker', metric:() => getText('#tripQualifiedCount','0 qualified'), state:() => getText('#tripUpdatedLabel','Upload monthly CSV in Admin to update'), ai:'This is your fastest read on qualification pace and who is closest to the line.' },
+    { id:'video-library', icon:'🎬', title:'Video Library', desc:'Training videos and walkthrough content for agent development.', category:'learning', tags:['Videos','Training'], href:'#video-library', metric:() => textCount('#videoLibraryGrid .video-card','videos'), state:() => 'Watch-on-demand training', ai:'Use this when someone needs a walkthrough instead of a written SOP.' },
+    { id:'practice-client', icon:'🎯', title:'Practice Client', desc:'Scenario-based practice and role-play preparation tools.', category:'learning', tags:['Practice','Coaching'], href:'#practice-client', metric:() => sectionVisible('#practice-client') ? 'Live practice zone' : 'Hidden section', state:() => 'Prep before live calls', ai:'Good for rehearsing before high-stakes client conversations.' },
+    { id:'operations-ai', icon:'🤖', title:'Agent Assistant AI', desc:'Ask questions, generate drafts, and get help navigating common workflows.', category:'action', tags:['AI','Assistant'], href:'#operations-ai', metric:() => 'Live assistant', state:() => 'Use for guided help', ai:'Start here when you need a draft, explanation, or next-step recommendation.' }
+  ];
+
+  function getHeroFavorites(){
+    try { return JSON.parse(localStorage.getItem(HERO_FAV_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function setHeroFavorites(arr){ localStorage.setItem(HERO_FAV_KEY, JSON.stringify(arr)); }
+  function toggleHeroFavorite(id){
+    let favs = getHeroFavorites();
+    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+    setHeroFavorites(favs);
+    renderHeroDashboard();
+  }
+  function setHeroFilter(filter){
+    _heroFilter = filter;
+    document.querySelectorAll('.hero-filter').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === filter));
+    renderHeroTiles();
+  }
+  function scrollToHeroTiles(){ document.getElementById('heroTileGrid')?.scrollIntoView({behavior:'smooth', block:'start'}); }
+  function getText(sel, fallback=''){ const el = document.querySelector(sel); return el ? (el.textContent || '').trim() : fallback; }
+  function textCount(sel, suffix){ const count = document.querySelectorAll(sel).length; return count + ' ' + suffix; }
+  function countCards(sel){ return document.querySelectorAll(sel).length; }
+  function sectionVisible(id){ const el = document.querySelector(id); return !!(el && getComputedStyle(el).display !== 'none'); }
+  function currentTripMonth(){
+    const start = new Date('2026-01-01T00:00:00');
+    const now = new Date();
+    let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()) + 1;
+    months = Math.max(0, Math.min(18, months));
+    return months;
+  }
+  function updateHeroMonthMetric(label){
+    const month = currentTripMonth();
+    const val = month + '/18';
+    const hp = document.getElementById('heroMonthProgress');
+    const tl = document.getElementById('heroMonthLabel');
+    if (hp) hp.textContent = val;
+    if (tl) tl.textContent = label || 'Program progress';
+  }
+  function upcomingMeetingState(){
+    const cnt = parseInt((getText('#fridayMeetingCount','0') || '0').match(/\d+/)?.[0] || '0', 10);
+    return cnt ? 'Upcoming meetings ready' : 'No upcoming Friday meetings';
+  }
+  function heroTileData(){
+    const favs = getHeroFavorites();
+    return HERO_SECTIONS.filter(s => document.getElementById(s.id)).map(s => ({
+      ...s,
+      favorite: favs.includes(s.id),
+      admin: _heroAdminPicks.includes(s.id),
+      metricText: typeof s.metric === 'function' ? s.metric() : '',
+      stateText: typeof s.state === 'function' ? s.state() : ''
+    }));
+  }
+  function tileMatchesFilter(tile){
+    if (_heroFilter === 'all') return true;
+    if (_heroFilter === 'favorites') return tile.favorite;
+    if (_heroFilter === 'admin') return tile.admin;
+    return tile.category === _heroFilter;
+  }
+  function renderHeroTiles(){
+    const el = document.getElementById('heroTileGrid');
+    if (!el) return;
+    const tiles = heroTileData().filter(tileMatchesFilter).sort((a,b) => Number(b.favorite||b.admin) - Number(a.favorite||a.admin));
+    if (!tiles.length) { el.innerHTML = '<div class="hero-empty">No sections match this filter yet.</div>'; return; }
+    el.innerHTML = tiles.map(t => `
+      <div class="hero-tile">
+        <div class="hero-tile-top">
+          <div class="hero-tile-icon">${t.icon}</div>
+          <button class="hero-tile-star ${t.favorite ? 'active' : ''}" type="button" aria-label="Toggle favorite" onclick="toggleHeroFavorite('${t.id}')">★</button>
+        </div>
+        <h3>${t.title}</h3>
+        <p>${t.desc}</p>
+        <div class="hero-tile-meta">
+          ${t.tags.map(tag => `<span class="hero-tile-tag">${tag}</span>`).join('')}
+          ${t.admin ? '<span class="hero-tile-tag">Admin Pick</span>' : ''}
+          ${t.favorite ? '<span class="hero-tile-tag">Favorite</span>' : ''}
+        </div>
+        <div class="hero-tile-footer">
+          <a class="hero-tile-link" href="${t.href}">Open Section ↗</a>
+          <div class="hero-tile-state"><div>${t.metricText}</div><div>${t.stateText}</div></div>
+        </div>
+      </div>`).join('');
+  }
+  function renderHeroLists(){
+    const favWrap = document.getElementById('heroFavoriteList');
+    const adminWrap = document.getElementById('heroAdminList');
+    const summary = document.getElementById('heroQuickAccessSummary');
+    const tiles = heroTileData();
+    const favs = tiles.filter(t => t.favorite);
+    const admins = tiles.filter(t => t.admin);
+    const favCount = document.getElementById('heroFavoritesCount');
+    if (favCount) favCount.textContent = String(favs.length);
+    favWrap.innerHTML = favs.length ? favs.map(t => `<div class="hero-mini-item"><strong>${t.icon} ${t.title}</strong><span>${t.metricText}</span><a class="hero-mini-link" href="${t.href}">Jump to section ↗</a></div>`).join('') : '<div class="hero-empty">Nothing starred yet. Tap ★ on any tile to save it to this browser.</div>';
+    adminWrap.innerHTML = admins.length ? admins.map(t => `<div class="hero-mini-item"><strong>${t.icon} ${t.title}</strong><span>${t.stateText || t.metricText}</span><a class="hero-mini-link" href="${t.href}">Open section ↗</a></div>`).join('') : '<div class="hero-empty">No admin quick access picks saved yet.</div>';
+    summary.innerHTML = admins.length ? admins.map(t => `<span class="hero-chip">${t.icon} ${t.title}</span>`).join('') : '<span class="hero-chip">No admin picks selected</span>';
+  }
+  function renderHeroAi(){
+    const aiWrap = document.getElementById('heroAiList');
+    if (!aiWrap) return;
+    const tiles = heroTileData();
+    const suggestions = [];
+    const qualified = parseInt((getText('#tripQualifiedCount','0') || '0').match(/\d+/)?.[0] || '0', 10);
+    const meetings = parseInt((getText('#fridayMeetingCount','0') || '0').match(/\d+/)?.[0] || '0', 10);
+    const month = currentTripMonth();
+    if (qualified === 0) suggestions.push({title:'Trip tracker needs attention', body:'Nobody is currently marked qualified. Review the Trip Tracker upload and latest production totals.' , href:'#trip-tracker'});
+    else suggestions.push({title:'Trip momentum snapshot', body:`${qualified} agents are currently qualified and the program is in month ${month} of 18. Use Trip Tracker to spot who is next in line.`, href:'#trip-tracker'});
+    if (meetings > 0) suggestions.push({title:'Friday meeting prep', body:`There ${meetings === 1 ? 'is' : 'are'} ${meetings} upcoming Friday meeting${meetings === 1 ? '' : 's'} on the hub. Review details before the week closes.`, href:'#friday-meetings'});
+    else suggestions.push({title:'No Friday meeting posted', body:'The public meeting list is clear right now. Add a future meeting in admin when you are ready.', href:'#friday-meetings'});
+    const favs = getHeroFavorites();
+    if (!favs.length) suggestions.push({title:'Personalize your hub', body:'Star the sections you use most. Those favorites stay on that agent’s browser and are not replaced by admin picks.', href:'#heroTileGrid'});
+    else suggestions.push({title:'Use your saved workflow', body:`You already have ${favs.length} saved favorite${favs.length === 1 ? '' : 's'}. Filter to Favorites for a faster daily view.`, href:'#heroTileGrid'});
+    const updatesCount = document.querySelectorAll('#feed-list .feed-card').length;
+    if (updatesCount > 0) suggestions.push({title:'Check recent updates', body:`There ${updatesCount === 1 ? 'is' : 'are'} ${updatesCount} visible update${updatesCount === 1 ? '' : 's'} in the feed. Review those before outreach or coaching.`, href:'#updates'});
+    aiWrap.innerHTML = suggestions.slice(0,4).map(s => `<div class="hero-ai-item"><strong>${s.title}</strong><span>${s.body}</span><a class="hero-mini-link" href="${s.href}">Open ↗</a></div>`).join('');
+  }
+  function syncHeroKPIs(){
+    const qualified = (getText('#tripQualifiedCount','0').match(/\d+/)||['0'])[0];
+    const hq = document.getElementById('heroQualifiedCount');
+    const hm = document.getElementById('heroMeetingCount');
+    if (hq) hq.textContent = qualified;
+    if (hm) hm.textContent = (getText('#fridayMeetingCount','0').match(/\d+/)||['0'])[0];
+    updateHeroMonthMetric(getText('#tripUpdatedLabel','Program progress'));
+  }
+  function renderHeroDashboard(){ syncHeroKPIs(); renderHeroTiles(); renderHeroLists(); renderHeroAi(); }
+  function openHeroAdmin(){ renderHeroAdminGrid(); document.getElementById('heroAdminOverlay')?.classList.add('open'); document.getElementById('heroAdminModal')?.classList.add('open'); }
+  function closeHeroAdmin(){ document.getElementById('heroAdminOverlay')?.classList.remove('open'); document.getElementById('heroAdminModal')?.classList.remove('open'); }
+  function renderHeroAdminGrid(){
+    const wrap = document.getElementById('heroAdminGrid');
+    if (!wrap) return;
+    wrap.innerHTML = HERO_SECTIONS.filter(s => document.getElementById(s.id)).map(s => `
+      <label class="hero-admin-option">
+        <div><strong>${s.icon} ${s.title}</strong><span>${s.desc}</span></div>
+        <input class="hero-admin-check" type="checkbox" value="${s.id}" ${_heroAdminPicks.includes(s.id) ? 'checked' : ''}>
+      </label>`).join('');
+  }
+  function loadHeroAdminConfig(){
+    fetch(`${HERO_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.hero_dashboard&select=data`, {
+      headers: { 'apikey': HERO_SKEY, 'Authorization': 'Bearer ' + HERO_SKEY, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (Array.isArray(d.adminQuickAccess) && d.adminQuickAccess.length) _heroAdminPicks = d.adminQuickAccess;
+      }
+      renderHeroDashboard();
+    }).catch(() => renderHeroDashboard());
+  }
+  function saveHeroAdminConfig(){
+    const picks = Array.from(document.querySelectorAll('#heroAdminGrid input[type="checkbox"]:checked')).map(i => i.value).slice(0,6);
+    _heroAdminPicks = picks;
+    const payload = { hub: 'medi', key: 'hero_dashboard', data: { adminQuickAccess: picks } };
+    fetch(`${HERO_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.hero_dashboard`, {
+      method: 'DELETE', headers: { 'apikey': HERO_SKEY, 'Authorization': 'Bearer ' + HERO_SKEY }
+    }).then(() => fetch(`${HERO_SUPA}/rest/v1/tile_content`, {
+      method: 'POST',
+      headers: { 'apikey': HERO_SKEY, 'Authorization': 'Bearer ' + HERO_SKEY, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
+      body: JSON.stringify(payload)
+    })).then(() => { closeHeroAdmin(); if (typeof showSnuToast === 'function') showSnuToast('✓ Hero quick access saved.'); renderHeroDashboard(); })
+      .catch(() => { if (typeof showSnuToast === 'function') showSnuToast('⚠ Could not save Hero quick access.'); renderHeroDashboard(); closeHeroAdmin(); });
+  }
+  document.addEventListener('DOMContentLoaded', loadHeroAdminConfig);
+  </script>
 
 </body>
 </html>
