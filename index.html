@@ -4016,6 +4016,53 @@
     }
     .hero-admin-save { background: var(--accent); color:#fff; }
     .hero-admin-close { background: rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.12); }
+
+    /* ── HERO QUICK ACCESS REWORK ── */
+    .hero-dashboard-grid-simple { grid-template-columns: minmax(0,1.2fr) minmax(280px,.8fr); }
+    .hero-quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .hero-quick-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 16px;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+    .hero-quick-card:hover { transform: translateY(-3px); border-color: rgba(125,211,252,.42); box-shadow: 0 14px 28px rgba(0,0,0,.22); }
+    .hero-quick-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .hero-quick-icon {
+      width: 42px; height: 42px; border-radius: 13px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.3);
+      font-size: 20px; flex-shrink: 0;
+    }
+    .hero-quick-meta { display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 12px; }
+    .hero-quick-meta .hero-tile-tag { margin: 0; }
+    .hero-quick-link { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color: var(--accent-2); }
+    .hero-quick-empty {
+      padding: 18px; border-radius: 18px; border: 1px dashed rgba(255,255,255,.16);
+      color: var(--muted-2); font-size: 13px; line-height: 1.7; background: rgba(255,255,255,.03);
+    }
+    .section-head-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .section-fav-btn {
+      width: 38px; height: 38px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.62);
+      display:inline-flex; align-items:center; justify-content:center;
+      cursor:pointer; font-size: 16px; transition: all .18s;
+      flex-shrink: 0;
+    }
+    .section-fav-btn:hover { transform: scale(1.04); border-color: rgba(251,191,36,.32); }
+    .section-fav-btn.active { color: var(--gold); background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.35); }
+    .section-fav-btn span { pointer-events:none; }
     @media (max-width: 1024px) {
       .hero-kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .hero-dashboard-grid { grid-template-columns: 1fr; }
@@ -4133,14 +4180,14 @@
             <div>
               <div class="eyebrow">
                 <span class="eyebrow-dot"></span>
-                Agent Command Center
+                Agent Quick Access
               </div>
-              <h1>Your central hub for<br><em>smarter agent work</em></h1>
-              <p>Pin favorites, surface admin-priority tools, filter the hub by what matters now, and use AI suggestions to jump into the next best section faster.</p>
+              <h1>Your central hub for<br><em>faster daily access</em></h1>
+              <p>Star any section header as you scroll. Those starred sections live here in Hero Quick Access for that agent on that browser. Admin quick access stays separate and does not remove personal stars.</p>
             </div>
             <div class="hero-dashboard-actions">
               <button class="hero-action-btn" type="button" onclick="openHeroAdmin()">⚙️ Hero Manager</button>
-              <button class="hero-action-btn ghost" type="button" onclick="scrollToHeroTiles()">⬇ Explore Tiles</button>
+              <a class="hero-action-btn ghost" href="#quick-access">⬇ Browse Sections</a>
             </div>
           </div>
 
@@ -4167,40 +4214,22 @@
             </a>
           </div>
 
-          <div class="hero-dashboard-grid">
+          <div class="hero-dashboard-grid hero-dashboard-grid-simple">
             <div class="hero-main-panel">
               <div class="hero-panel-head">
                 <div>
-                  <div class="hero-panel-title">Dashboard Tiles</div>
-                  <div class="hero-panel-sub">Favorite sections stay personal. Admin quick access stays global.</div>
-                </div>
-                <div class="hero-filter-row" id="heroFilterRow">
-                  <button class="hero-filter active" data-filter="all" onclick="setHeroFilter('all')">All</button>
-                  <button class="hero-filter" data-filter="favorites" onclick="setHeroFilter('favorites')">Favorites</button>
-                  <button class="hero-filter" data-filter="admin" onclick="setHeroFilter('admin')">Admin Picks</button>
-                  <button class="hero-filter" data-filter="action" onclick="setHeroFilter('action')">Action Needed</button>
-                  <button class="hero-filter" data-filter="learning" onclick="setHeroFilter('learning')">Learning</button>
-                  <button class="hero-filter" data-filter="growth" onclick="setHeroFilter('growth')">Growth</button>
+                  <div class="hero-panel-title">Hero Quick Access</div>
+                  <div class="hero-panel-sub">Click the star on any section header below and it will appear here for that agent.</div>
                 </div>
               </div>
               <div class="hero-chip-row" id="heroQuickAccessSummary"></div>
-              <div class="hero-dashboard-tiles" id="heroTileGrid"></div>
+              <div class="hero-quick-grid" id="heroQuickAccessGrid"></div>
             </div>
 
             <aside class="hero-side-panel">
               <div class="hero-panel-card">
-                <div class="hero-panel-title">AI Suggestions</div>
-                <div class="hero-panel-sub">Rule-based prompts from live hub data</div>
-                <div class="hero-ai-list" id="heroAiList"></div>
-              </div>
-              <div class="hero-panel-card">
-                <div class="hero-panel-title">Your Favorites</div>
-                <div class="hero-panel-sub">Stored on this browser for each agent</div>
-                <div class="hero-mini-list" id="heroFavoriteList"></div>
-              </div>
-              <div class="hero-panel-card">
                 <div class="hero-panel-title">Admin Quick Access</div>
-                <div class="hero-panel-sub">Global picks shown to everyone</div>
+                <div class="hero-panel-sub">Global picks shown to everyone. Agent stars stay separate.</div>
                 <div class="hero-mini-list" id="heroAdminList"></div>
               </div>
             </aside>
@@ -5234,13 +5263,13 @@
             <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
               Drop a CSV or Excel file each month with agent production totals. Columns needed:
               <code>Name</code>, <code>Production</code> (cumulative total for the trip period).
-              Optionally include <code>Goal</code> to override the default qualifying goal.
+              Include <code>Goal</code> in the file or set a global Qualifying Goal below. The hub will not count qualifiers until a goal is set.
             </p>
 
             <div class="admin-field" style="margin-bottom:12px;">
               <label>Qualifying Goal (pts per agent)</label>
               <input class="admin-input" id="tripGoalInput" type="number" min="1" step="1000"
-                placeholder="e.g. 50000"
+                placeholder="required if CSV has no Goal column"
                 value="">
             </div>
 
@@ -8602,7 +8631,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const TRIP_KEY       = 'snu_trip_v1';
   const TRIP_START     = new Date('2026-01-01');
   const TRIP_END       = new Date('2027-06-30');
-  const DEFAULT_GOAL   = 50000;  // pts — change to match your actual qualifying bar
+  const DEFAULT_GOAL   = 0;  // leave at 0 so qualifiers are only counted when a goal is explicitly set
 
   let _tripAgents = [];  // [{name, production, goal?}]
   let _tripMeta   = {};  // {monthLabel, qualifyingGoal, updatedAt}
@@ -8624,7 +8653,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function renderTripTracker() {
-    const goal = Number(_tripMeta.qualifyingGoal) || DEFAULT_GOAL;
+    const goal = Number(_tripMeta.qualifyingGoal) || 0;
     const list = document.getElementById('tripList');
     const qCount = document.getElementById('tripQualifiedCount');
     const updLabel = document.getElementById('tripUpdatedLabel');
@@ -8643,7 +8672,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
     // Sort by production desc
     const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
-    const qualified = sorted.filter(a => (a.production||0) >= goal).length;
+    const qualified = sorted.filter(a => { const agentGoal = Number(a.goal) || goal; return agentGoal > 0 && (Number(a.production) || 0) >= agentGoal; }).length;
 
     if (qCount) qCount.textContent = qualified + ' qualified';
     if (updLabel) {
@@ -8662,17 +8691,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     list.innerHTML = sorted.map((a, i) => {
       const prod = Number(a.production) || 0;
       const agentGoal = Number(a.goal) || goal;
-      const pct = Math.min(100, Math.round(prod / agentGoal * 100));
-      const isQ = prod >= agentGoal;
+      const pct = agentGoal > 0 ? Math.min(100, Math.round(prod / agentGoal * 100)) : 0;
+      const isQ = agentGoal > 0 && prod >= agentGoal;
       const cls = isQ ? 'q' : 'nq';
       const rankCls = i < 3 && isQ ? 'top' : (isQ ? 'q' : 'nq');
-      const remaining = isQ ? '' : `${(agentGoal - prod).toLocaleString()} pts to go`;
+      const remaining = agentGoal <= 0 ? 'Set qualifying goal in Admin' : (isQ ? '' : `${Math.max(agentGoal - prod, 0).toLocaleString()} pts to go`);
       return `
         <div class="trip-row">
           <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
           <div>
             <div class="trip-agent-name">${pesc(a.name || '—')}</div>
-            ${remaining ? `<div class="trip-agent-sub">${remaining}</div>` : '<div class="trip-agent-sub">✅ Qualified!</div>'}
+            ${isQ ? '<div class="trip-agent-sub">✅ Qualified!</div>' : `<div class="trip-agent-sub">${remaining}</div>`}
           </div>
           <div class="trip-progress-col">
             <div class="trip-mini-bar">
@@ -8740,7 +8769,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         if (preview && previewRows) {
           preview.style.display = 'block';
           if (previewCount) previewCount.textContent = agents.length;
-          const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
+          const goal = Number(document.getElementById('tripGoalInput')?.value) || 0;
           previewRows.innerHTML = agents.map(a => {
             const isQ = a.production >= (a.goal || goal);
             return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
@@ -8757,7 +8786,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveTripData() {
     if (!_tripAgents.length) { alert('No data to save. Upload a CSV first.'); return; }
-    const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
+    const goal = Number(document.getElementById('tripGoalInput')?.value) || 0;
     const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || '';
     _tripMeta = { qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
     const data = { agents: _tripAgents, meta: _tripMeta };
@@ -11278,36 +11307,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       </div>`).join('');
   }
   function renderHeroLists(){
-    const favWrap = document.getElementById('heroFavoriteList');
     const adminWrap = document.getElementById('heroAdminList');
-    const summary = document.getElementById('heroQuickAccessSummary');
+    const favCount = document.getElementById('heroFavoritesCount');
     const tiles = heroTileData();
     const favs = tiles.filter(t => t.favorite);
     const admins = tiles.filter(t => t.admin);
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favs.length);
-    favWrap.innerHTML = favs.length ? favs.map(t => `<div class="hero-mini-item"><strong>${t.icon} ${t.title}</strong><span>${t.metricText}</span><a class="hero-mini-link" href="${t.href}">Jump to section ↗</a></div>`).join('') : '<div class="hero-empty">Nothing starred yet. Tap ★ on any tile to save it to this browser.</div>';
-    adminWrap.innerHTML = admins.length ? admins.map(t => `<div class="hero-mini-item"><strong>${t.icon} ${t.title}</strong><span>${t.stateText || t.metricText}</span><a class="hero-mini-link" href="${t.href}">Open section ↗</a></div>`).join('') : '<div class="hero-empty">No admin quick access picks saved yet.</div>';
-    summary.innerHTML = admins.length ? admins.map(t => `<span class="hero-chip">${t.icon} ${t.title}</span>`).join('') : '<span class="hero-chip">No admin picks selected</span>';
-  }
-  function renderHeroAi(){
-    const aiWrap = document.getElementById('heroAiList');
-    if (!aiWrap) return;
-    const tiles = heroTileData();
-    const suggestions = [];
-    const qualified = parseInt((getText('#tripQualifiedCount','0') || '0').match(/\d+/)?.[0] || '0', 10);
-    const meetings = parseInt((getText('#fridayMeetingCount','0') || '0').match(/\d+/)?.[0] || '0', 10);
-    const month = currentTripMonth();
-    if (qualified === 0) suggestions.push({title:'Trip tracker needs attention', body:'Nobody is currently marked qualified. Review the Trip Tracker upload and latest production totals.' , href:'#trip-tracker'});
-    else suggestions.push({title:'Trip momentum snapshot', body:`${qualified} agents are currently qualified and the program is in month ${month} of 18. Use Trip Tracker to spot who is next in line.`, href:'#trip-tracker'});
-    if (meetings > 0) suggestions.push({title:'Friday meeting prep', body:`There ${meetings === 1 ? 'is' : 'are'} ${meetings} upcoming Friday meeting${meetings === 1 ? '' : 's'} on the hub. Review details before the week closes.`, href:'#friday-meetings'});
-    else suggestions.push({title:'No Friday meeting posted', body:'The public meeting list is clear right now. Add a future meeting in admin when you are ready.', href:'#friday-meetings'});
-    const favs = getHeroFavorites();
-    if (!favs.length) suggestions.push({title:'Personalize your hub', body:'Star the sections you use most. Those favorites stay on that agent’s browser and are not replaced by admin picks.', href:'#heroTileGrid'});
-    else suggestions.push({title:'Use your saved workflow', body:`You already have ${favs.length} saved favorite${favs.length === 1 ? '' : 's'}. Filter to Favorites for a faster daily view.`, href:'#heroTileGrid'});
-    const updatesCount = document.querySelectorAll('#feed-list .feed-card').length;
-    if (updatesCount > 0) suggestions.push({title:'Check recent updates', body:`There ${updatesCount === 1 ? 'is' : 'are'} ${updatesCount} visible update${updatesCount === 1 ? '' : 's'} in the feed. Review those before outreach or coaching.`, href:'#updates'});
-    aiWrap.innerHTML = suggestions.slice(0,4).map(s => `<div class="hero-ai-item"><strong>${s.title}</strong><span>${s.body}</span><a class="hero-mini-link" href="${s.href}">Open ↗</a></div>`).join('');
+    if (favCount) favCount.textContent = favs.length;
+    if (adminWrap) adminWrap.innerHTML = admins.length ? admins.map(t => `<div class="hero-mini-item"><strong>${t.icon} ${t.title}</strong><span>${t.stateText || t.metricText}</span><a class="hero-mini-link" href="${t.href}">Open section ↗</a></div>`).join('') : '<div class="hero-empty">No admin quick access picks saved yet.</div>';
   }
   function syncHeroKPIs(){
     const qualified = (getText('#tripQualifiedCount','0').match(/\d+/)||['0'])[0];
@@ -11317,7 +11323,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (hm) hm.textContent = (getText('#fridayMeetingCount','0').match(/\d+/)||['0'])[0];
     updateHeroMonthMetric(getText('#tripUpdatedLabel','Program progress'));
   }
-  function renderHeroDashboard(){ syncHeroKPIs(); renderHeroTiles(); renderHeroLists(); renderHeroAi(); }
+  function renderHeroDashboard(){ syncHeroKPIs(); renderHeroTiles(); renderHeroLists(); }
   function openHeroAdmin(){ renderHeroAdminGrid(); document.getElementById('heroAdminOverlay')?.classList.add('open'); document.getElementById('heroAdminModal')?.classList.add('open'); }
   function closeHeroAdmin(){ document.getElementById('heroAdminOverlay')?.classList.remove('open'); document.getElementById('heroAdminModal')?.classList.remove('open'); }
   function renderHeroAdminGrid(){
