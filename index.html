@@ -4171,6 +4171,12 @@
               </a>
             </div>
           </div>
+          <div id="starStrip" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:rgba(255,255,255,.4);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+              <span style="color:#fbbf24;">★</span> My pinned sections
+            </div>
+            <div id="starStripItems" style="display:flex;flex-wrap:wrap;gap:7px;"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -11455,30 +11461,19 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function renderStarStrip() {
-    let strip = document.getElementById('starStrip');
+    const strip = document.getElementById('starStrip');
+    const items = document.getElementById('starStripItems');
+    if (!strip || !items) return;
     if (!_starred.length) {
-      if (strip) strip.style.display = 'none';
+      strip.style.display = 'none';
       return;
     }
-    if (!strip) {
-      strip = document.createElement('div');
-      strip.id = 'starStrip';
-      // Insert after announcement banner
-      const banner = document.getElementById('announcementBanner');
-      if (banner && banner.parentNode) {
-        banner.parentNode.insertBefore(strip, banner.nextSibling);
-      } else {
-        document.body.prepend(strip);
-      }
-    }
-    strip.style.cssText = 'position:sticky;top:132px;z-index:489;background:rgba(10,25,55,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.1);padding:0 24px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;min-height:40px;';
-    const items = _starred.map(id => {
+    items.innerHTML = _starred.map(id => {
       const sec = STAR_SECTIONS.find(s => s.id === id);
       if (!sec) return '';
-      return `<a href="#${id}" style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.14)'" onmouseout="this.style.background='rgba(255,255,255,.07)'">${sec.label}</a>`;
+      return `<a href="#${id}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#fff;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.09)'">${sec.label}</a>`;
     }).join('');
-    strip.innerHTML = `<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);margin-right:4px;white-space:nowrap;flex-shrink:0;">★ Pinned</span>${items}`;
-    strip.style.display = 'flex';
+    strip.style.display = 'block';
   }
 
   document.addEventListener('DOMContentLoaded', () => {
