@@ -37,7 +37,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; max-width: 100%; }
 
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -45,6 +45,8 @@
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
+      width: 100%;
+      max-width: 100vw;
     }
 
     /* grain overlay */
@@ -4019,6 +4021,20 @@
     @media (max-width: 768px) {
       .mobile-bottom-nav { display:block; }
       body { padding-bottom:56px; }
+      html, body { overflow-x: hidden; width: 100%; max-width: 100%; position: relative; }
+      .page, .topbar, .wrap, .hero-inner, .ops-block, .trip-card, .card-grid, .feed-grid, .snu-grid, .video-grid, .dir-grid, .carrier-grid { max-width: 100%; }
+      #checklistWidget {
+        left: 12px;
+        right: auto;
+        bottom: calc(68px + env(safe-area-inset-bottom,0px));
+        align-items: flex-start;
+        max-width: calc(100vw - 24px);
+      }
+      #checklistPanel {
+        width: min(320px, calc(100vw - 24px));
+        max-width: calc(100vw - 24px);
+        max-height: min(520px, calc(100vh - 150px));
+      }
     }
 
     /* ── SHARED MODAL OVERRIDES for new modals ── */
@@ -4045,7 +4061,9 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 8px;
+      touch-action: none;
     }
+    #checklistWidget.dragging { cursor: grabbing; }
     #checklistPill {
       display: flex;
       align-items: center;
@@ -4054,7 +4072,7 @@
       background: #1e3a6e;
       border: 1px solid rgba(255,255,255,.2);
       border-radius: 24px;
-      cursor: pointer;
+      cursor: grab;
       box-shadow: 0 4px 24px rgba(0,0,0,.45);
       transition: background .15s, border-color .15s;
       white-space: nowrap;
@@ -11882,6 +11900,97 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   window.openTask  = function() { const p=document.getElementById('checklistPanel'); if(p&&!p.classList.contains('open')){initTasks();p.classList.add('open');} };
   window.closeTask = function() { const p=document.getElementById('checklistPanel'); if(p) p.classList.remove('open'); };
 
+
+  (function initChecklistDrag() {
+    const widget = document.getElementById('checklistWidget');
+    const pill = document.getElementById('checklistPill');
+    if (!widget || !pill) return;
+
+    const STORAGE_KEY = 'medi_checklist_widget_pos_v1';
+    let startX = 0, startY = 0, startLeft = 0, startTop = 0, dragged = false;
+
+    function getBounds() {
+      const rect = widget.getBoundingClientRect();
+      const panel = document.getElementById('checklistPanel');
+      const panelWidth = panel && panel.classList.contains('open') ? panel.offsetWidth : 0;
+      const width = Math.max(rect.width, pill.offsetWidth, panelWidth || 0);
+      const height = rect.height || pill.offsetHeight;
+      return { width, height };
+    }
+
+    function clampAndApply(left, top) {
+      const pad = 8;
+      const { width, height } = getBounds();
+      const maxLeft = Math.max(pad, window.innerWidth - width - pad);
+      const maxTop = Math.max(pad, window.innerHeight - height - pad);
+      const nextLeft = Math.min(Math.max(left, pad), maxLeft);
+      const nextTop = Math.min(Math.max(top, pad), maxTop);
+      widget.style.left = nextLeft + 'px';
+      widget.style.top = nextTop + 'px';
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+      widget.style.alignItems = 'flex-start';
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: nextLeft, top: nextTop })); } catch (e) {}
+    }
+
+    function setDefaultPosition() {
+      const pad = 12;
+      const bottomOffset = window.innerWidth <= 768 ? 68 : 24;
+      const { width, height } = getBounds();
+      clampAndApply(window.innerWidth - width - pad, window.innerHeight - height - bottomOffset);
+    }
+
+    function restorePosition() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) { setDefaultPosition(); return; }
+        const pos = JSON.parse(raw);
+        if (typeof pos.left !== 'number' || typeof pos.top !== 'number') { setDefaultPosition(); return; }
+        clampAndApply(pos.left, pos.top);
+      } catch (e) { setDefaultPosition(); }
+    }
+
+    function onStart(e) {
+      const touch = e.touches ? e.touches[0] : e;
+      startX = touch.clientX;
+      startY = touch.clientY;
+      const rect = widget.getBoundingClientRect();
+      startLeft = rect.left;
+      startTop = rect.top;
+      dragged = false;
+      widget.classList.add('dragging');
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onEnd);
+      if (e.cancelable) e.preventDefault();
+    }
+
+    function onMove(e) {
+      const touch = e.touches ? e.touches[0] : e;
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragged = true;
+      clampAndApply(startLeft + dx, startTop + dy);
+      if (e.cancelable) e.preventDefault();
+    }
+
+    function onEnd() {
+      widget.classList.remove('dragging');
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+      if (!dragged) window.toggleChecklist();
+    }
+
+    pill.removeAttribute('onclick');
+    pill.addEventListener('mousedown', onStart);
+    pill.addEventListener('touchstart', onStart, { passive: false });
+    window.addEventListener('resize', restorePosition);
+    setTimeout(restorePosition, 0);
+  })();
+
   window.submitTaskEntry=function(){
     const label=(document.getElementById('taskAdminLabel')?.value?.trim()||'');if(!label){toast('⚠ Label required.');return;}
     _taskItems.push({id:Date.now(),label});document.getElementById('taskAdminLabel').value='';
@@ -12146,7 +12255,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const ANN_DISMISS_KEY = 'ann_dismissed_medi';
 
   function loadBanner() {
-    fetch(`${ANN_SUPA_URL}/rest/v1/announcement?hub=eq.${ANN_HUB}&select=message,icon,color,id`, {
+    fetch(`${ANN_SUPA_URL}/rest/v1/announcement?hub=eq.${ANN_HUB}&select=message,icon,color,id&order=id.desc&limit=1`, {
       headers: { 'apikey': ANN_SUPA_KEY, 'Authorization': 'Bearer ' + ANN_SUPA_KEY, 'Cache-Control': 'no-cache' }
     })
     .then(r => r.json())
@@ -12154,7 +12263,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       if (!rows || !rows.length || !rows[0].message) return;
       const ann = rows[0];
       const dismissedId = sessionStorage.getItem(ANN_DISMISS_KEY);
-      if (dismissedId === String(ann.id)) return; // already dismissed this session
+      if (dismissedId === String(ann.id)) return;
       showBanner(ann.message, ann.icon || '📢', ann.color || 'gold', ann.id);
     })
     .catch(() => {});
@@ -12180,22 +12289,41 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   };
 
   // ── Admin: save banner ───────────────────────────────────────
-  window.saveBanner = function() {
+  window.saveBanner = async function() {
     const msg   = (document.getElementById('bannerText')?.value  || '').trim();
     const icon  = (document.getElementById('bannerIcon')?.value  || '📢').trim();
     const color = (document.getElementById('bannerColor')?.value || 'gold');
     if (!msg) { if (typeof showSnuToast==='function') showSnuToast('⚠ Message is required.'); return; }
-    const hdrs = { 'apikey': ANN_SUPA_KEY, 'Authorization': 'Bearer ' + ANN_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' };
+    const hdrs = { 'apikey': ANN_SUPA_KEY, 'Authorization': 'Bearer ' + ANN_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
     if (typeof showSnuToast==='function') showSnuToast('⏳ Publishing banner...');
-    fetch(`${ANN_SUPA_URL}/rest/v1/announcement`, {
-      method: 'POST', headers: hdrs,
-      body: JSON.stringify({ hub: ANN_HUB, message: msg, icon, color })
-    }).then(() => {
+    try {
+      const existingRes = await fetch(`${ANN_SUPA_URL}/rest/v1/announcement?hub=eq.${ANN_HUB}&select=id&order=id.desc&limit=1`, {
+        headers: { 'apikey': ANN_SUPA_KEY, 'Authorization': 'Bearer ' + ANN_SUPA_KEY, 'Cache-Control': 'no-cache' }
+      });
+      const existingRows = await existingRes.json();
+      let res;
+      if (Array.isArray(existingRows) && existingRows.length) {
+        res = await fetch(`${ANN_SUPA_URL}/rest/v1/announcement?hub=eq.${ANN_HUB}`, {
+          method: 'PATCH', headers: hdrs,
+          body: JSON.stringify({ message: msg, icon, color })
+        });
+      } else {
+        res = await fetch(`${ANN_SUPA_URL}/rest/v1/announcement`, {
+          method: 'POST', headers: hdrs,
+          body: JSON.stringify({ hub: ANN_HUB, message: msg, icon, color })
+        });
+      }
+      if (!res.ok) throw new Error('save failed');
+      const saved = await res.json().catch(() => []);
+      const savedId = Array.isArray(saved) && saved[0] && saved[0].id ? saved[0].id : Date.now();
       if (typeof showSnuToast==='function') showSnuToast('✓ Banner published!');
       sessionStorage.removeItem(ANN_DISMISS_KEY);
-      showBanner(msg, icon, color, Date.now());
+      showBanner(msg, icon, color, savedId);
       updateAdminPreview(msg, icon, color);
-    }).catch(() => { if (typeof showSnuToast==='function') showSnuToast('⚠ Save failed.'); });
+      loadBanner();
+    } catch (e) {
+      if (typeof showSnuToast==='function') showSnuToast('⚠ Save failed.');
+    }
   };
 
   window.clearBanner = function() {
