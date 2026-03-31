@@ -4033,6 +4033,99 @@
     .feature-modal-close { background:transparent; border:none; color:rgba(255,255,255,.45); font-size:20px; cursor:pointer; padding:0; line-height:1; }
     .feature-modal-close:hover { color:#fff; }
     .feature-modal-body { padding:20px 22px; max-height:70vh; overflow-y:auto; }
+
+    /* ── FLOATING CHECKLIST WIDGET ── */
+    #checklistWidget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9500;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    #checklistPill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #1e3a6e;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(0,0,0,.45);
+      transition: background .15s, border-color .15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    #checklistPill:hover { background: #264d8c; border-color: rgba(255,255,255,.35); }
+    #checklistPillIcon { font-size: 16px; }
+    #checklistPillLabel { font-size: 12px; font-weight: 700; color: #fff; }
+    #checklistPillProgress { font-size: 11px; color: var(--teal); font-weight: 700; }
+    #checklistPanel {
+      width: 320px;
+      background: #152d5a;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      box-shadow: 0 12px 48px rgba(0,0,0,.6);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      max-height: 520px;
+    }
+    #checklistPanel.open { display: flex; }
+    .cl-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #0f2147;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      flex-shrink: 0;
+    }
+    .cl-panel-title { font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 7px; }
+    .cl-panel-close { background: transparent; border: none; color: rgba(255,255,255,.45); font-size: 18px; cursor: pointer; padding: 0; line-height: 1; }
+    .cl-panel-close:hover { color: #fff; }
+    .cl-panel-body { overflow-y: auto; flex: 1; padding: 12px; }
+    .cl-section-label {
+      font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+      color: rgba(255,255,255,.35); margin: 8px 0 6px; padding-left: 2px;
+    }
+    .cl-progress-bar { height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; margin-bottom: 10px; overflow: hidden; }
+    .cl-progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--green)); border-radius: 2px; transition: width .3s; }
+    .cl-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px; border-radius: 8px; margin-bottom: 4px;
+      background: rgba(255,255,255,.04); border: 1px solid transparent;
+      transition: background .12s;
+    }
+    .cl-item:hover { background: rgba(255,255,255,.08); }
+    .cl-item.done { background: rgba(52,211,153,.07); border-color: rgba(52,211,153,.18); }
+    .cl-item input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--green); cursor: pointer; flex-shrink: 0; }
+    .cl-item-label { font-size: 12px; color: #fff; flex: 1; cursor: pointer; line-height: 1.35; }
+    .cl-item.done .cl-item-label { text-decoration: line-through; color: rgba(255,255,255,.4); }
+    .cl-item-del { background: transparent; border: none; color: rgba(255,255,255,.25); font-size: 14px; cursor: pointer; padding: 0; line-height: 1; flex-shrink: 0; }
+    .cl-item-del:hover { color: var(--rose); }
+    .cl-add-row {
+      display: flex; gap: 6px; margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .cl-add-input {
+      flex: 1; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+      border-radius: 8px; padding: 7px 10px; color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; outline: none;
+    }
+    .cl-add-input::placeholder { color: rgba(255,255,255,.3); }
+    .cl-add-btn {
+      padding: 7px 12px; border-radius: 8px; border: none;
+      background: var(--accent); color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+    }
+    .cl-add-btn:hover { background: #2563eb; }
+    .cl-empty { font-size: 12px; color: rgba(255,255,255,.3); font-style: italic; padding: 8px 2px; }
   </style>
 </head>
 <body>
@@ -4193,7 +4286,7 @@
               <p>Coaching, marketing, and planning resources</p>
             </div>
           </div>
-          <span class="count-chip">14 tools</span>
+          <span class="count-chip">13 tools</span>
           <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
         </div>
 
@@ -4317,15 +4410,6 @@
             <h3>Quick Reference</h3>
             <p>Medicare rules, SEP qualifiers, compliance facts, and key answers at a glance.</p>
             <span class="card-tag">Reference</span>
-          </div>
-
-          <div class="card" data-card-id="daily-tasks" data-color="teal" style="cursor:pointer;" onclick="openTask()">
-            <span class="card-arrow">↗</span>
-            <div class="card-shimmer"></div>
-            <div class="card-icon-wrap">✅</div>
-            <h3>Daily Checklist</h3>
-            <p>Your daily task list — track priorities and reset each morning automatically.</p>
-            <span class="card-tag">Tasks</span>
           </div>
 
           <div class="card" data-card-id="carrier-contacts" data-color="purple" style="cursor:pointer;" onclick="openCarrier()">
@@ -4864,6 +4948,34 @@
 
     <!-- ── NOTIFICATION TOAST CONTAINER ── -->
     <div class="notif-toast-wrap" id="notifToastWrap"></div>
+
+    <!-- ── FLOATING CHECKLIST WIDGET ── -->
+    <div id="checklistWidget">
+      <div id="checklistPanel">
+        <div class="cl-panel-header">
+          <div class="cl-panel-title">✅ Daily Checklist</div>
+          <button class="cl-panel-close" onclick="toggleChecklist()" aria-label="Close">✕</button>
+        </div>
+        <div class="cl-panel-body">
+          <div class="cl-section-label">Team Tasks</div>
+          <div class="cl-progress-bar"><div class="cl-progress-fill" id="clTeamFill" style="width:0%"></div></div>
+          <div id="clTeamList"></div>
+
+          <div class="cl-section-label" style="margin-top:14px;">My Tasks</div>
+          <div id="clMyList"></div>
+          <div class="cl-add-row">
+            <input class="cl-add-input" id="clMyInput" type="text" placeholder="Add a personal task…" onkeydown="if(event.key==='Enter')addMyTask()">
+            <button class="cl-add-btn" onclick="addMyTask()">+ Add</button>
+          </div>
+        </div>
+      </div>
+      <div id="checklistPill" onclick="toggleChecklist()" role="button" aria-label="Open daily checklist">
+        <span class="cl-pill-icon">✅</span>
+        <span id="checklistPillLabel">Daily Checklist</span>
+        <span id="checklistPillProgress"></span>
+      </div>
+    </div>
+    <!-- ── END FLOATING CHECKLIST WIDGET ── -->
 
     <!-- ADMIN OVERLAY -->
     <div class="admin-overlay" id="adminOverlay" onclick="closeAdmin()"></div>
@@ -11658,67 +11770,138 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   /* ════════════════════════════════
-     TASK CHECKLIST
+     TASK CHECKLIST — Floating Widget
   ════════════════════════════════ */
-  let _tasks = [], _taskItems = [], _taskAdminEditId = null;
-  const TASK_STORAGE = 'hub_tasks_medi_';
+  let _tasks = [], _taskItems = [], _myTasks = [];
+  const TASK_STORAGE    = 'hub_tasks_medi_';
+  const MY_TASK_STORAGE = 'hub_mytasks_medi';
 
   function getTodayKey() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
 
   function initTasks() {
     supaGet('task_list').then(rows=>{
       if(rows&&rows.length&&rows[0].data){const raw=rows[0].data;_taskItems=Array.isArray(raw)?raw:(typeof raw==='string'?JSON.parse(raw):[]);}else _taskItems=[];
-      loadTaskChecks(); renderTaskModal(); refreshTaskAdminList();
-    }).catch(()=>{});
+      loadTaskChecks(); renderChecklist(); refreshTaskAdminList();
+    }).catch(()=>{ loadTaskChecks(); renderChecklist(); refreshTaskAdminList(); });
   }
+
   function loadTaskChecks() {
-    const key=TASK_STORAGE+getTodayKey();
-    try{const s=localStorage.getItem(key);_tasks=s?JSON.parse(s):[];}catch(e){_tasks=[];}
+    try{const s=localStorage.getItem(TASK_STORAGE+getTodayKey());_tasks=s?JSON.parse(s):[];}catch(e){_tasks=[];}
+    try{const s=localStorage.getItem(MY_TASK_STORAGE);_myTasks=s?JSON.parse(s):[];}catch(e){_myTasks=[];}
   }
   function saveTaskChecks() { try{localStorage.setItem(TASK_STORAGE+getTodayKey(),JSON.stringify(_tasks));}catch(e){} }
-  function renderTaskModal() {
-    const el=document.getElementById('taskList');if(!el)return;
-    if(!_taskItems.length){el.innerHTML='<div class="dir-empty">No tasks yet. Add some in the admin panel.</div>';updateTaskProgress();return;}
-    el.innerHTML=_taskItems.map(t=>{
-      const done=_tasks.includes(t.id);
-      return `<div class="task-item${done?' done':''}" id="taskitem-${t.id}">
-        <input type="checkbox" ${done?'checked':''} onchange="toggleTask(${t.id},this.checked)">
-        <label class="task-item-label" onclick="toggleTask(${t.id},!document.querySelector('#taskitem-${t.id} input').checked)">${pesc(t.label)}</label>
+  function saveMyTasks()    { try{localStorage.setItem(MY_TASK_STORAGE,JSON.stringify(_myTasks));}catch(e){} }
+
+  function renderChecklist() {
+    renderTeamTasks(); renderMyTasks(); updateChecklistPill();
+  }
+
+  function renderTeamTasks() {
+    const el = document.getElementById('clTeamList'); if (!el) return;
+    if (!_taskItems.length) { el.innerHTML='<div class="cl-empty">No team tasks yet.</div>'; updateTeamProgress(); return; }
+    el.innerHTML = _taskItems.map(t => {
+      const done = _tasks.includes(t.id);
+      return `<div class="cl-item${done?' done':''}" id="clt-${t.id}">
+        <input type="checkbox" ${done?'checked':''} onchange="toggleTeamTask(${t.id},this.checked)">
+        <label class="cl-item-label" onclick="toggleTeamTask(${t.id},!document.querySelector('#clt-${t.id} input').checked)">${pesc(t.label)}</label>
       </div>`;
     }).join('');
-    updateTaskProgress();
+    updateTeamProgress();
   }
-  window.toggleTask=function(id,checked){
-    if(checked&&!_tasks.includes(id))_tasks.push(id);
-    else if(!checked)_tasks=_tasks.filter(x=>x!==id);
-    saveTaskChecks();
-    const item=document.getElementById('taskitem-'+id);
-    if(item){item.classList.toggle('done',checked);const inp=item.querySelector('input');if(inp)inp.checked=checked;}
-    updateTaskProgress();
+
+  function renderMyTasks() {
+    const el = document.getElementById('clMyList'); if (!el) return;
+    if (!_myTasks.length) { el.innerHTML='<div class="cl-empty">No personal tasks yet.</div>'; return; }
+    el.innerHTML = _myTasks.map(t => {
+      const done = t.done;
+      return `<div class="cl-item${done?' done':''}" id="clm-${t.id}">
+        <input type="checkbox" ${done?'checked':''} onchange="toggleMyTask(${t.id},this.checked)">
+        <label class="cl-item-label" onclick="toggleMyTask(${t.id},!document.querySelector('#clm-${t.id} input').checked)">${pesc(t.label)}</label>
+        <button class="cl-item-del" onclick="deleteMyTask(${t.id})" title="Remove">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function updateTeamProgress() {
+    const total=_taskItems.length, done=_tasks.filter(id=>_taskItems.some(t=>t.id===id)).length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    const fill = document.getElementById('clTeamFill'); if(fill) fill.style.width=pct+'%';
+  }
+
+  function updateChecklistPill() {
+    const teamTotal = _taskItems.length;
+    const teamDone  = _tasks.filter(id=>_taskItems.some(t=>t.id===id)).length;
+    const myTotal   = _myTasks.length;
+    const myDone    = _myTasks.filter(t=>t.done).length;
+    const total = teamTotal + myTotal, done = teamDone + myDone;
+    const lbl  = document.getElementById('checklistPillLabel');
+    const prog = document.getElementById('checklistPillProgress');
+    if (lbl)  lbl.textContent  = 'Daily Checklist';
+    if (prog) prog.textContent = total ? `${done}/${total}` : '';
+  }
+
+  window.toggleChecklist = function() {
+    const panel = document.getElementById('checklistPanel');
+    if (!panel) return;
+    const isOpen = panel.classList.contains('open');
+    if (!isOpen) { initTasks(); }
+    panel.classList.toggle('open');
   };
-  function updateTaskProgress(){
-    const total=_taskItems.length,done=_tasks.filter(id=>_taskItems.some(t=>t.id===id)).length;
-    const pct=total?Math.round(done/total*100):0;
-    const fill=document.getElementById('taskProgressFill');if(fill)fill.style.width=pct+'%';
-    const sub=document.getElementById('taskModalSub');if(sub)sub.textContent=`${done} of ${total} complete`;
-  }
-  window.resetTasks=function(){_tasks=[];saveTaskChecks();renderTaskModal();};
-  window.openTask=function(){document.getElementById('taskOverlay').classList.add('open');document.body.style.overflow='hidden';initTasks();};
-  window.closeTask=function(){document.getElementById('taskOverlay').classList.remove('open');document.body.style.overflow='';};
-  document.getElementById('taskOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTask();});
+
+  window.toggleTeamTask = function(id, checked) {
+    if(checked && !_tasks.includes(id)) _tasks.push(id);
+    else if(!checked) _tasks=_tasks.filter(x=>x!==id);
+    saveTaskChecks();
+    const item=document.getElementById('clt-'+id);
+    if(item){item.classList.toggle('done',checked);const inp=item.querySelector('input');if(inp)inp.checked=checked;}
+    updateTeamProgress(); updateChecklistPill();
+  };
+
+  window.toggleMyTask = function(id, checked) {
+    const t=_myTasks.find(x=>x.id===id); if(!t) return;
+    t.done=checked; saveMyTasks();
+    const item=document.getElementById('clm-'+id);
+    if(item){item.classList.toggle('done',checked);const inp=item.querySelector('input');if(inp)inp.checked=checked;}
+    updateChecklistPill();
+  };
+
+  window.addMyTask = function() {
+    const inp=document.getElementById('clMyInput'); if(!inp) return;
+    const label=(inp.value||'').trim(); if(!label) return;
+    _myTasks.push({id:Date.now(),label,done:false});
+    inp.value=''; saveMyTasks(); renderMyTasks(); updateChecklistPill();
+  };
+
+  window.deleteMyTask = function(id) {
+    _myTasks=_myTasks.filter(x=>x.id!==id); saveMyTasks(); renderMyTasks(); updateChecklistPill();
+  };
+
+  window.resetTasks=function(){_tasks=[];saveTaskChecks();renderTeamTasks();updateChecklistPill();};
+
+  // Keep openTask/closeTask working for global search
+  window.openTask  = function() { const p=document.getElementById('checklistPanel'); if(p&&!p.classList.contains('open')){initTasks();p.classList.add('open');} };
+  window.closeTask = function() { const p=document.getElementById('checklistPanel'); if(p) p.classList.remove('open'); };
 
   window.submitTaskEntry=function(){
     const label=(document.getElementById('taskAdminLabel')?.value?.trim()||'');if(!label){toast('⚠ Label required.');return;}
     _taskItems.push({id:Date.now(),label});document.getElementById('taskAdminLabel').value='';
-    refreshTaskAdminList();toast('⏳ Saving…');supaUpsert('task_list',_taskItems).then(()=>toast('✓ Saved!')).catch(()=>toast('⚠ Save failed.'));
+    refreshTaskAdminList(); renderTeamTasks(); updateChecklistPill();
+    toast('⏳ Saving…');supaUpsert('task_list',_taskItems).then(()=>toast('✓ Saved!')).catch(()=>toast('⚠ Save failed.'));
   };
-  window.deleteTaskEntry=function(id){_taskItems=_taskItems.filter(x=>x.id!==id);refreshTaskAdminList();toast('⏳ Removing…');supaUpsert('task_list',_taskItems).then(()=>toast('🗑 Removed.'));};
+  window.deleteTaskEntry=function(id){
+    _taskItems=_taskItems.filter(x=>x.id!==id);
+    refreshTaskAdminList(); renderTeamTasks(); updateChecklistPill();
+    toast('⏳ Removing…');supaUpsert('task_list',_taskItems).then(()=>toast('🗑 Removed.'));
+  };
   function refreshTaskAdminList(){
     const el=document.getElementById('taskAdminList'),ct=document.getElementById('taskAdminCount');if(!el)return;
     if(ct)ct.textContent=`(${_taskItems.length})`;
     if(!_taskItems.length){el.innerHTML='<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No tasks yet.</div>';return;}
     el.innerHTML=_taskItems.map(t=>`<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;"><div style="flex:1;" class="admin-update-title">${pesc(t.label)}</div><button onclick="deleteTaskEntry(${t.id})" class="admin-update-del">🗑</button></div>`).join('');
   }
+
+  // Init checklist pill on load
+  document.addEventListener('DOMContentLoaded', () => { loadTaskChecks(); updateChecklistPill(); });
 
   /* ════════════════════════════════
      CARRIER CONTACTS
