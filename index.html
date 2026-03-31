@@ -1186,7 +1186,7 @@
         border-left: none;
         padding: 6px 10px;
       }
-      #announcementBanner { top: 0; }
+      #announcementBanner { position: relative; top: auto; }
       #starStripItems {
         display: grid !important;
         grid-template-columns: 1fr 1fr;
@@ -3906,8 +3906,8 @@
 
     /* ── ANNOUNCEMENT BANNER ── */
     #announcementBanner {
-      position: sticky;
-      top: 132px;
+      position: relative;
+      top: auto;
       z-index: 490;
       width: 100%;
     }
@@ -4104,7 +4104,6 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 8px;
-      touch-action: none;
     }
     #checklistWidget.dragging { cursor: grabbing; }
     #checklistPill {
@@ -5746,6 +5745,19 @@
                 Preview — <span id="tripPreviewCount">0</span> agents
               </div>
               <div id="tripPreviewRows" style="max-height:240px;overflow-y:auto;"></div>
+            </div>
+
+            <div style="margin-top:22px;">
+              <div style="font-size:12px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
+                Current Agent Goals
+              </div>
+              <div id="tripAgentGoalEditor" style="border:1px solid var(--border);border-radius:12px;padding:10px 12px;max-height:320px;overflow-y:auto;background:rgba(255,255,255,.03);">
+                <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No trip agents loaded yet.</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+                <button class="admin-save-btn" style="width:auto;padding:10px 18px;" onclick="applyTripAgentGoalEdits()">✏️ Apply Agent Goal Edits</button>
+                <button class="admin-save-btn" style="width:auto;padding:10px 18px;background:rgba(255,255,255,.08);color:#fff;border:1px solid var(--border);box-shadow:none;" onclick="resetTripAgentGoalEditor()">↺ Reset Editor</button>
+              </div>
             </div>
           </div>
         </div>
@@ -9109,7 +9121,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         _tripMeta   = d.meta || {};
       }
       renderTripTracker();
-    }).catch(() => { renderTripTracker(); });
+      const goalInp = document.getElementById('tripGoalInput');
+      if (goalInp) goalInp.value = _tripMeta.qualifyingGoal || '';
+      const monthInp = document.getElementById('tripMonthLabel');
+      if (monthInp) monthInp.value = _tripMeta.monthLabel || '';
+      renderTripAdminEditor();
+    }).catch(() => { renderTripTracker(); renderTripAdminEditor(); });
   }
 
   function renderTripTracker() {
@@ -9165,6 +9182,51 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
           <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
         </div>`;
     }).join('');
+  }
+
+  function renderTripAdminEditor() {
+    const wrap = document.getElementById('tripAgentGoalEditor');
+    if (!wrap) return;
+    const baseGoal = Number(_tripMeta.qualifyingGoal) || DEFAULT_GOAL;
+    if (!_tripAgents.length) {
+      wrap.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No trip agents loaded yet.</div>';
+      return;
+    }
+    const rows = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
+    wrap.innerHTML = rows.map((a, i) => {
+      const goal = Number(a.goal) || baseGoal;
+      return `
+        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(110px,.7fr) minmax(120px,.7fr);gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+          <div style="min-width:0;">
+            <div style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i+1}. ${pesc(a.name || '—')}</div>
+            <div style="font-size:11px;color:var(--muted-2);">${Number(a.production||0).toLocaleString()} pts</div>
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Goal</label>
+            <input class="admin-input trip-agent-goal-input" type="number" min="0" step="1000" data-trip-agent="${pesc(a.name || '')}" value="${goal}" style="padding:8px 10px;font-size:12px;">
+          </div>
+          <div style="font-size:11px;color:${Number(a.production||0) >= goal ? '#22c55e' : '#7eb3f5'};font-weight:700;">${Number(a.production||0) >= goal ? 'Qualified' : 'In Progress'}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function resetTripAgentGoalEditor() {
+    renderTripAdminEditor();
+  }
+
+  function applyTripAgentGoalEdits() {
+    if (!_tripAgents.length) { showSnuToast('⚠ No trip agents loaded yet.'); return; }
+    const inputs = Array.from(document.querySelectorAll('#tripAgentGoalEditor .trip-agent-goal-input'));
+    if (!inputs.length) { showSnuToast('⚠ No agent goal fields found.'); return; }
+    const goalMap = new Map(inputs.map(inp => [String(inp.dataset.tripAgent || '').trim().toLowerCase(), Math.max(0, Number(inp.value) || 0)]));
+    _tripAgents = _tripAgents.map(agent => {
+      const key = String(agent.name || '').trim().toLowerCase();
+      const editedGoal = goalMap.get(key);
+      return { ...agent, ...(editedGoal ? { goal: editedGoal } : { goal: Number(agent.goal)||0 }) };
+    });
+    renderTripTracker();
+    renderTripAdminEditor();
+    showSnuToast('✓ Agent goals updated. Click Save & Publish to push live.');
   }
 
   // ── CSV Handling ───────────────────────────────────────────────────────────
@@ -9239,6 +9301,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveTripData() {
     if (!_tripAgents.length) { alert('No data to save. Upload a CSV first.'); return; }
+    applyTripAgentGoalEdits();
     const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
     const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || '';
     _tripMeta = { qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
@@ -9267,6 +9330,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     _tripAgents = [];
     _tripMeta = {};
     renderTripTracker();
+    renderTripAdminEditor();
     fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi', {
       method: 'DELETE', headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q' }
     }).then(() => showSnuToast('↺ Trip data cleared.'))
@@ -9286,9 +9350,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         if (f) { document.getElementById('tripCsvInput').files = e.dataTransfer.files; handleTripCsvFile(f); }
       });
     }
-    // Pre-fill goal input if stored
-    const goalInp = document.getElementById('tripGoalInput');
-    if (goalInp && _tripMeta.qualifyingGoal) goalInp.value = _tripMeta.qualifyingGoal;
+    renderTripAdminEditor();
   });
   </script>
 
@@ -11966,15 +12028,16 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const pill = document.getElementById('checklistPill');
     if (!widget || !pill) return;
 
-    const STORAGE_KEY = 'medi_checklist_widget_pos_v1';
-    let startX = 0, startY = 0, startLeft = 0, startTop = 0, dragged = false;
+    const STORAGE_KEY = 'medi_checklist_widget_pos_v2';
+    let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+    let dragged = false, dragging = false;
 
     function getBounds() {
       const rect = widget.getBoundingClientRect();
       const panel = document.getElementById('checklistPanel');
       const panelWidth = panel && panel.classList.contains('open') ? panel.offsetWidth : 0;
-      const width = Math.max(rect.width, pill.offsetWidth, panelWidth || 0);
-      const height = rect.height || pill.offsetHeight;
+      const width = Math.max(rect.width || 0, pill.offsetWidth || 0, panelWidth || 0, 120);
+      const height = Math.max(rect.height || 0, pill.offsetHeight || 0, 44);
       return { width, height };
     }
 
@@ -11995,9 +12058,9 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
     function setDefaultPosition() {
       const pad = 12;
-      const bottomOffset = window.innerWidth <= 768 ? 68 : 24;
+      const bottomOffset = window.innerWidth <= 768 ? 72 : 24;
       const { width, height } = getBounds();
-      clampAndApply(window.innerWidth - width - pad, window.innerHeight - height - bottomOffset);
+      clampAndApply(pad, window.innerHeight - height - bottomOffset);
     }
 
     function restorePosition() {
@@ -12007,10 +12070,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         const pos = JSON.parse(raw);
         if (typeof pos.left !== 'number' || typeof pos.top !== 'number') { setDefaultPosition(); return; }
         clampAndApply(pos.left, pos.top);
-      } catch (e) { setDefaultPosition(); }
+      } catch (e) {
+        setDefaultPosition();
+      }
     }
 
     function onStart(e) {
+      if (e.type === 'mousedown' && e.button !== 0) return;
       const touch = e.touches ? e.touches[0] : e;
       startX = touch.clientX;
       startY = touch.clientY;
@@ -12018,35 +12084,52 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       startLeft = rect.left;
       startTop = rect.top;
       dragged = false;
+      dragging = true;
       widget.classList.add('dragging');
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup', onEnd);
       document.addEventListener('touchmove', onMove, { passive: false });
       document.addEventListener('touchend', onEnd);
+      document.addEventListener('touchcancel', onEnd);
       if (e.cancelable) e.preventDefault();
     }
 
     function onMove(e) {
+      if (!dragging) return;
       const touch = e.touches ? e.touches[0] : e;
       const dx = touch.clientX - startX;
       const dy = touch.clientY - startY;
-      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragged = true;
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) dragged = true;
       clampAndApply(startLeft + dx, startTop + dy);
       if (e.cancelable) e.preventDefault();
     }
 
-    function onEnd() {
+    function onEnd(e) {
+      if (!dragging) return;
+      dragging = false;
       widget.classList.remove('dragging');
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onEnd);
       document.removeEventListener('touchmove', onMove);
       document.removeEventListener('touchend', onEnd);
+      document.removeEventListener('touchcancel', onEnd);
       if (!dragged) window.toggleChecklist();
+      if (e && e.cancelable) e.preventDefault();
     }
 
     pill.removeAttribute('onclick');
     pill.addEventListener('mousedown', onStart);
     pill.addEventListener('touchstart', onStart, { passive: false });
+    pill.addEventListener('click', function(e) {
+      if (dragged) {
+        dragged = false;
+        e.preventDefault();
+        return;
+      }
+      window.toggleChecklist();
+      e.preventDefault();
+    });
+
     window.addEventListener('resize', restorePosition);
     setTimeout(restorePosition, 0);
   })();
