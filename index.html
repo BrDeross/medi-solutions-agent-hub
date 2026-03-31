@@ -9722,10 +9722,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function loadTripData(opts = {}) {
     const silent = !!opts.silent;
+    const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
     fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data', {
       headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
+        'apikey': key,
+        'Authorization': 'Bearer ' + key,
         'Cache-Control': 'no-cache'
       }
     }).then(r => r.json()).then(async rows => {
@@ -9953,17 +9954,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const data = { agents: _tripAgents, meta: _tripMeta };
     _tripSaveCooldown = true;
     _tripSnapshot = tripSnapshot(data);
-    const hdrs = {
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates,return=minimal'
-    };
-    return fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker', {
-      method: 'POST', headers: hdrs,
-      body: JSON.stringify({ hub: 'medi', data })
-    }).then(r => {
-      if (!r.ok) throw new Error('save failed');
+    const url = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker';
+    const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+    const hdrs = { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    return fetch(url + '?hub=eq.medi', {
+      method: 'PATCH', headers: hdrs,
+      body: JSON.stringify({ data })
+    }).then(r => r.text()).then(t => {
+      if (t === '[]' || t === '' || t === 'null') {
+        return fetch(url, { method: 'POST', headers: hdrs, body: JSON.stringify({ hub: 'medi', data }) });
+      }
+    }).then(() => {
       renderTripTracker();
       renderTripAdminEditor();
       showSnuToast(successMsg || '✓ Trip data saved!');
@@ -10064,14 +10065,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     _tripSnapshot = tripSnapshot({ agents: [], meta: {} });
     renderTripTracker();
     renderTripAdminEditor();
+    const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
     fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi', {
-      method: 'DELETE', headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q'
-      }
+      method: 'DELETE', headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
     }).then(() => {
       showSnuToast('↺ Trip data cleared.');
-      loadTripData({ silent: true });
     }).catch(() => showSnuToast('⚠ Clear failed.'));
   }
 
