@@ -1,8 +1,4 @@
 
-2. Copy everything below and paste it into that file 👇
-
----
-
 # 📄 CLEAN `app.js` (Trip Tracker Only)
 
 ```javascript
