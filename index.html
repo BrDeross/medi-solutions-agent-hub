@@ -3817,262 +3817,100 @@
     }
     .trip-legend-dot.q  { background: #22c55e; }
     .trip-legend-dot.nq { background: #3b82f6; }
+  
 
-    /* ══════════════════════════════════════════════
-       HERO DASHBOARD REBUILD
-    ══════════════════════════════════════════════ */
-    .hero-dashboard-shell { padding-top: 34px; }
-    .hero-dashboard { padding: 34px 34px 30px !important; }
-    .hero-dashboard-top {
-      position: relative;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 24px;
-      z-index: 2;
+    /* ── HERO QUICK ACCESS FAVORITES ── */
+    .hero-favorites-wrap {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      max-width: 640px;
     }
-    .hero-dashboard-actions {
+    .hero-favorites-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-favorites-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--accent-2);
+    }
+    .hero-favorites-sub {
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+    .hero-favorites-grid {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      justify-content: flex-end;
     }
-    .hero-action-btn {
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      border-radius: 12px;
-      padding: 11px 16px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform .18s, background .18s, border-color .18s;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .hero-action-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.28); }
-    .hero-action-btn.ghost { background: rgba(0,0,0,.16); }
-    .hero-kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 2;
-    }
-    .hero-kpi-tile {
-      text-decoration: none;
-      color: inherit;
-      border-radius: 18px;
-      padding: 18px 18px 16px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.16);
-      transition: transform .2s, border-color .2s, box-shadow .2s;
-      min-height: 108px;
-    }
-    .hero-kpi-tile:hover {
-      transform: translateY(-3px);
-      border-color: rgba(125,211,252,.55);
-      box-shadow: 0 12px 28px rgba(0,0,0,.28);
-    }
-    .hero-kpi-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .9px; color: var(--muted-2); margin-bottom: 10px; }
-    .hero-kpi-value { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 800; color: #fff; line-height: 1; }
-    .hero-kpi-meta { margin-top: 10px; font-size: 12px; color: var(--muted); }
-    .hero-dashboard-grid {
-      display: grid;
-      grid-template-columns: minmax(0,1.45fr) minmax(280px,.8fr);
-      gap: 18px;
-      position: relative;
-      z-index: 2;
-    }
-    .hero-main-panel, .hero-panel-card {
-      background: rgba(8,20,42,.34);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 20px;
-      backdrop-filter: blur(8px);
-    }
-    .hero-main-panel { padding: 18px; }
-    .hero-panel-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .hero-panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: #fff; }
-    .hero-panel-sub { font-size: 12px; color: var(--muted-2); margin-top: 4px; }
-    .hero-filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .hero-filter {
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      color: var(--muted);
+    .hero-fav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
       border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .4px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all .18s;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .hero-filter.active, .hero-filter:hover { background: rgba(125,211,252,.16); color: #fff; border-color: rgba(125,211,252,.4); }
-    .hero-chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .hero-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 700; color: var(--accent-2);
-      padding: 6px 10px; border-radius: 999px;
-      background: rgba(59,130,246,.14); border: 1px solid rgba(59,130,246,.24);
-    }
-    .hero-dashboard-tiles {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-    }
-    .hero-tile {
-      position: relative;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      padding: 16px 16px 14px;
-      min-height: 166px;
-      overflow: hidden;
-      transition: transform .2s, border-color .2s, box-shadow .2s;
-    }
-    .hero-tile:hover { transform: translateY(-3px); border-color: rgba(125,211,252,.42); box-shadow: 0 14px 28px rgba(0,0,0,.22); }
-    .hero-tile-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-    .hero-tile-icon {
-      width: 42px; height: 42px; border-radius: 13px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.3);
-      font-size: 20px; flex-shrink: 0;
-    }
-    .hero-tile-star {
-      width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06); color: rgba(255,255,255,.6);
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      transition: all .18s; font-size: 15px;
-    }
-    .hero-tile-star.active { color: var(--gold); background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.35); }
-    .hero-tile-star:hover { transform: scale(1.04); }
-    .hero-tile h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: #fff; margin-bottom: 6px; }
-    .hero-tile p { font-size: 12.5px; line-height: 1.65; color: var(--muted); margin-bottom: 12px; }
-    .hero-tile-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-    .hero-tile-tag {
-      font-size: 10px; font-weight: 800; letter-spacing: .55px; text-transform: uppercase;
-      padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.08); color: var(--muted-2);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-    .hero-tile-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
-    .hero-tile-link {
-      display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #fff;
-      font-size: 12px; font-weight: 800; padding: 9px 12px; border-radius: 10px;
-      background: rgba(59,130,246,.18); border: 1px solid rgba(59,130,246,.3);
-    }
-    .hero-tile-state { font-size: 11px; color: var(--muted-2); text-align: right; }
-    .hero-side-panel { display: flex; flex-direction: column; gap: 14px; }
-    .hero-panel-card { padding: 16px; }
-    .hero-ai-list, .hero-mini-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
-    .hero-ai-item, .hero-mini-item {
-      padding: 12px 12px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.1);
-    }
-    .hero-ai-item strong, .hero-mini-item strong { display: block; color: #fff; font-size: 13px; margin-bottom: 5px; }
-    .hero-ai-item span, .hero-mini-item span { font-size: 12px; color: var(--muted); line-height: 1.55; }
-    .hero-mini-link { margin-top: 8px; display: inline-flex; text-decoration: none; color: var(--accent-2); font-size: 11px; font-weight: 800; }
-    .hero-empty { font-size: 12px; color: var(--muted-2); font-style: italic; }
-    .hero-pill-inline { display:inline-flex; gap:6px; align-items:center; }
-    .hero-admin-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.62); backdrop-filter: blur(6px);
-      z-index: 2400; opacity: 0; pointer-events: none; transition: opacity .2s;
-    }
-    .hero-admin-overlay.open { opacity: 1; pointer-events: all; }
-    .hero-admin-modal {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(.96);
-      width: min(760px, 94vw); max-height: 88vh; overflow: auto; z-index: 2401;
-      background: linear-gradient(160deg, #183766 0%, #1c437a 100%);
-      border: 1px solid rgba(255,255,255,.16); border-radius: 22px;
-      box-shadow: 0 30px 80px rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: all .22s;
-      padding: 0;
-    }
-    .hero-admin-modal.open { opacity: 1; pointer-events: all; transform: translate(-50%,-50%) scale(1); }
-    .hero-admin-head { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .hero-admin-body { padding: 20px 24px 24px; }
-    .hero-admin-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 14px; }
-    .hero-admin-option {
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-      padding: 13px 14px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
-    }
-    .hero-admin-option strong { display:block; color:#fff; font-size: 13px; margin-bottom:4px; }
-    .hero-admin-option span { display:block; color: var(--muted-2); font-size:11px; line-height:1.5; }
-    .hero-admin-check { margin-top: 3px; transform: scale(1.05); }
-    .hero-admin-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; }
-    .hero-admin-save, .hero-admin-close {
-      border: none; border-radius: 12px; padding: 11px 18px; font-size: 13px; font-weight: 800; cursor: pointer;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .hero-admin-save { background: var(--accent); color:#fff; }
-    .hero-admin-close { background: rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.12); }
-
-    /* ── HERO QUICK ACCESS REWORK ── */
-    .hero-dashboard-grid-simple { grid-template-columns: minmax(0,1.2fr) minmax(280px,.8fr); }
-    .hero-quick-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .hero-quick-card {
-      display: block;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.16);
+      color: #fff;
       text-decoration: none;
-      color: inherit;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      padding: 16px;
-      transition: transform .2s, border-color .2s, box-shadow .2s;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .18s, border-color .18s, transform .18s;
     }
-    .hero-quick-card:hover { transform: translateY(-3px); border-color: rgba(125,211,252,.42); box-shadow: 0 14px 28px rgba(0,0,0,.22); }
-    .hero-quick-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
-    .hero-quick-icon {
-      width: 42px; height: 42px; border-radius: 13px;
-      display:flex; align-items:center; justify-content:center;
-      background: rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.3);
-      font-size: 20px; flex-shrink: 0;
+    .hero-fav-pill:hover {
+      background: rgba(255,255,255,.16);
+      border-color: var(--accent-2);
+      transform: translateY(-1px);
     }
-    .hero-quick-meta { display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 12px; }
-    .hero-quick-meta .hero-tile-tag { margin: 0; }
-    .hero-quick-link { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color: var(--accent-2); }
-    .hero-quick-empty {
-      padding: 18px; border-radius: 18px; border: 1px dashed rgba(255,255,255,.16);
-      color: var(--muted-2); font-size: 13px; line-height: 1.7; background: rgba(255,255,255,.03);
+    .hero-favorites-empty {
+      font-size: 12px;
+      color: var(--muted-2);
+      font-style: italic;
     }
-    .section-head-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .section-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
     .section-fav-btn {
-      width: 38px; height: 38px; border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.12);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.05);
-      color: rgba(255,255,255,.62);
-      display:inline-flex; align-items:center; justify-content:center;
-      cursor:pointer; font-size: 16px; transition: all .18s;
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .18s, border-color .18s, transform .18s, box-shadow .18s;
       flex-shrink: 0;
     }
-    .section-fav-btn:hover { transform: scale(1.04); border-color: rgba(251,191,36,.32); }
-    .section-fav-btn.active { color: var(--gold); background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.35); }
-    .section-fav-btn span { pointer-events:none; }
-    @media (max-width: 1024px) {
-      .hero-kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .hero-dashboard-grid { grid-template-columns: 1fr; }
+    .section-fav-btn:hover {
+      background: rgba(251,191,36,.14);
+      border-color: rgba(251,191,36,.34);
+      transform: translateY(-1px);
     }
-    @media (max-width: 720px) {
-      .hero-dashboard { padding: 24px 18px 20px !important; }
-      .hero-dashboard-top { flex-direction: column; }
-      .hero-dashboard-actions { justify-content: flex-start; }
-      .hero-dashboard-tiles { grid-template-columns: 1fr; }
-      .hero-admin-grid { grid-template-columns: 1fr; }
+    .section-fav-btn.is-active {
+      background: rgba(251,191,36,.18);
+      border-color: rgba(251,191,36,.4);
+      box-shadow: 0 0 18px rgba(251,191,36,.18);
+    }
+    .trip-badge-group {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
     }
 
   </style>
@@ -4166,73 +4004,38 @@
     </header>
 
     <!-- HERO -->
-    <section class="hero hero-dashboard-shell">
+    <section class="hero">
       <div class="wrap">
-        <div class="hero-inner hero-dashboard">
+        <div class="hero-inner">
           <div class="hero-grid-bg"></div>
           <div class="hero-corner hero-corner-tl"></div>
           <div class="hero-corner hero-corner-br"></div>
           <div class="hero-orb hero-orb-1"></div>
           <div class="hero-orb hero-orb-2"></div>
           <div class="hero-orb hero-orb-3"></div>
-
-          <div class="hero-dashboard-top">
+          <div class="hero-layout">
             <div>
               <div class="eyebrow">
                 <span class="eyebrow-dot"></span>
-                Agent Quick Access
+                Agent Command Center
               </div>
-              <h1>Your central hub for<br><em>faster daily access</em></h1>
-              <p>Star any section header as you scroll. Those starred sections live here in Hero Quick Access for that agent on that browser. Admin quick access stays separate and does not remove personal stars.</p>
+              <h1>Your central hub for<br><em>smarter agent work</em></h1>
+              <p>Access tools, searchable libraries, calculators, leaderboard visibility, and operations support — all in one place. Leads and pipeline live in AgencyBloc.</p>
             </div>
-            <div class="hero-dashboard-actions">
-              <button class="hero-action-btn" type="button" onclick="openHeroAdmin()">⚙️ Hero Manager</button>
-              <a class="hero-action-btn ghost" href="#quick-access">⬇ Browse Sections</a>
+            <div class="hero-stats">
+              <a class="hstat" href="#agent-tools">
+                <div class="hstat-val">8</div>
+                <div class="hstat-lbl">Core Tools ↓</div>
+              </a>
+              <a class="hstat" href="#libraries">
+                <div class="hstat-val">5</div>
+                <div class="hstat-lbl">Libraries ↓</div>
+              </a>
+              <a class="hstat" href="#operations-ai">
+                <div class="hstat-val">Live</div>
+                <div class="hstat-lbl">Agent AI ↓</div>
+              </a>
             </div>
-          </div>
-
-          <div class="hero-kpi-grid">
-            <a class="hero-kpi-tile" href="#trip-tracker">
-              <div class="hero-kpi-label">Qualified</div>
-              <div class="hero-kpi-value" id="heroQualifiedCount">0</div>
-              <div class="hero-kpi-meta">Trip qualifiers</div>
-            </a>
-            <a class="hero-kpi-tile" href="#trip-tracker">
-              <div class="hero-kpi-label">Program Month</div>
-              <div class="hero-kpi-value" id="heroMonthProgress">0/18</div>
-              <div class="hero-kpi-meta" id="heroMonthLabel">Progress window</div>
-            </a>
-            <a class="hero-kpi-tile" href="#friday-meetings">
-              <div class="hero-kpi-label">Meetings</div>
-              <div class="hero-kpi-value" id="heroMeetingCount">0</div>
-              <div class="hero-kpi-meta">Upcoming Fridays</div>
-            </a>
-            <a class="hero-kpi-tile" href="#updates">
-              <div class="hero-kpi-label">Favorites</div>
-              <div class="hero-kpi-value" id="heroFavoritesCount">0</div>
-              <div class="hero-kpi-meta">Saved to this browser</div>
-            </a>
-          </div>
-
-          <div class="hero-dashboard-grid hero-dashboard-grid-simple">
-            <div class="hero-main-panel">
-              <div class="hero-panel-head">
-                <div>
-                  <div class="hero-panel-title">Hero Quick Access</div>
-                  <div class="hero-panel-sub">Click the star on any section header below and it will appear here for that agent.</div>
-                </div>
-              </div>
-              <div class="hero-chip-row" id="heroQuickAccessSummary"></div>
-              <div class="hero-quick-grid" id="heroQuickAccessGrid"></div>
-            </div>
-
-            <aside class="hero-side-panel">
-              <div class="hero-panel-card">
-                <div class="hero-panel-title">Admin Quick Access</div>
-                <div class="hero-panel-sub">Global picks shown to everyone. Agent stars stay separate.</div>
-                <div class="hero-mini-list" id="heroAdminList"></div>
-              </div>
-            </aside>
           </div>
         </div>
       </div>
@@ -5263,13 +5066,13 @@
             <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
               Drop a CSV or Excel file each month with agent production totals. Columns needed:
               <code>Name</code>, <code>Production</code> (cumulative total for the trip period).
-              Include <code>Goal</code> in the file or set a global Qualifying Goal below. The hub will not count qualifiers until a goal is set.
+              Optionally include <code>Goal</code> to override the default qualifying goal.
             </p>
 
             <div class="admin-field" style="margin-bottom:12px;">
               <label>Qualifying Goal (pts per agent)</label>
               <input class="admin-input" id="tripGoalInput" type="number" min="1" step="1000"
-                placeholder="required if CSV has no Goal column"
+                placeholder="e.g. 50000"
                 value="">
             </div>
 
@@ -7453,7 +7256,103 @@ When answering:
   tr.deduct td { color: #dc2626; background: #fff5f5; }
   .note { font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 8px; }
   @media print { body { padding: 20px; } }
-</style></head><body>
+
+
+    /* ── HERO QUICK ACCESS FAVORITES ── */
+    .hero-favorites-wrap {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      max-width: 640px;
+    }
+    .hero-favorites-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-favorites-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--accent-2);
+    }
+    .hero-favorites-sub {
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+    .hero-favorites-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-fav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.16);
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .hero-fav-pill:hover {
+      background: rgba(255,255,255,.16);
+      border-color: var(--accent-2);
+      transform: translateY(-1px);
+    }
+    .hero-favorites-empty {
+      font-size: 12px;
+      color: var(--muted-2);
+      font-style: italic;
+    }
+    .section-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .section-fav-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.05);
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .18s, border-color .18s, transform .18s, box-shadow .18s;
+      flex-shrink: 0;
+    }
+    .section-fav-btn:hover {
+      background: rgba(251,191,36,.14);
+      border-color: rgba(251,191,36,.34);
+      transform: translateY(-1px);
+    }
+    .section-fav-btn.is-active {
+      background: rgba(251,191,36,.18);
+      border-color: rgba(251,191,36,.4);
+      box-shadow: 0 0 18px rgba(251,191,36,.18);
+    }
+    .trip-badge-group {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+  </style></head><body>
 <h1>Life Insurance Needs Analysis</h1>
 <div class="sub">${name ? 'Client: ' + name + ' &nbsp;·&nbsp; ' : ''}Generated: ${date}</div>
 <div class="total-box"><div class="total-label">Recommended Coverage Need</div><div class="total-value">${total}</div></div>
@@ -7469,102 +7368,309 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 <div class="note">This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation.</div>
 
 
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
 
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
+  ];
 
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
   }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
+  }
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
+  }
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
+    const favs = getHeroFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+  }
+
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
+  }
+
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body></html>`;
 
@@ -8727,7 +8833,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const TRIP_KEY       = 'snu_trip_v1';
   const TRIP_START     = new Date('2026-01-01');
   const TRIP_END       = new Date('2027-06-30');
-  const DEFAULT_GOAL   = 0;  // leave at 0 so qualifiers are only counted when a goal is explicitly set
+  const DEFAULT_GOAL   = 50000;  // pts — change to match your actual qualifying bar
 
   let _tripAgents = [];  // [{name, production, goal?}]
   let _tripMeta   = {};  // {monthLabel, qualifyingGoal, updatedAt}
@@ -8749,7 +8855,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function renderTripTracker() {
-    const goal = Number(_tripMeta.qualifyingGoal) || 0;
+    const goal = Number(_tripMeta.qualifyingGoal) || DEFAULT_GOAL;
     const list = document.getElementById('tripList');
     const qCount = document.getElementById('tripQualifiedCount');
     const updLabel = document.getElementById('tripUpdatedLabel');
@@ -8761,43 +8867,36 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!_tripAgents.length) {
       list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
       if (qCount) qCount.textContent = '0 qualified';
-      if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
-      if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
       return;
     }
 
     // Sort by production desc
     const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
-    const qualified = sorted.filter(a => { const agentGoal = Number(a.goal) || goal; return agentGoal > 0 && (Number(a.production) || 0) >= agentGoal; }).length;
+    const qualified = sorted.filter(a => (a.production||0) >= goal).length;
 
     if (qCount) qCount.textContent = qualified + ' qualified';
-    if (updLabel) {
-      const monthLabel = _tripMeta.monthLabel ? ('Updated: ' + _tripMeta.monthLabel) : ('Program month ' + currentTripMonth() + ' of 18');
-      updLabel.textContent = monthLabel;
-    }
+    if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
 
     // Overall team goal bar — % of agents qualified
     const teamPct = sorted.length ? Math.round(qualified / sorted.length * 100) : 0;
     if (goalBar) goalBar.style.width = teamPct + '%';
     if (goalPct) goalPct.textContent = teamPct + '% qualifying';
-    if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
-    if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
 
     const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
     list.innerHTML = sorted.map((a, i) => {
       const prod = Number(a.production) || 0;
       const agentGoal = Number(a.goal) || goal;
-      const pct = agentGoal > 0 ? Math.min(100, Math.round(prod / agentGoal * 100)) : 0;
-      const isQ = agentGoal > 0 && prod >= agentGoal;
+      const pct = Math.min(100, Math.round(prod / agentGoal * 100));
+      const isQ = prod >= agentGoal;
       const cls = isQ ? 'q' : 'nq';
       const rankCls = i < 3 && isQ ? 'top' : (isQ ? 'q' : 'nq');
-      const remaining = agentGoal <= 0 ? 'Set qualifying goal in Admin' : (isQ ? '' : `${Math.max(agentGoal - prod, 0).toLocaleString()} pts to go`);
+      const remaining = isQ ? '' : `${(agentGoal - prod).toLocaleString()} pts to go`;
       return `
         <div class="trip-row">
           <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
           <div>
             <div class="trip-agent-name">${pesc(a.name || '—')}</div>
-            ${isQ ? '<div class="trip-agent-sub">✅ Qualified!</div>' : `<div class="trip-agent-sub">${remaining}</div>`}
+            ${remaining ? `<div class="trip-agent-sub">${remaining}</div>` : '<div class="trip-agent-sub">✅ Qualified!</div>'}
           </div>
           <div class="trip-progress-col">
             <div class="trip-mini-bar">
@@ -8865,7 +8964,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         if (preview && previewRows) {
           preview.style.display = 'block';
           if (previewCount) previewCount.textContent = agents.length;
-          const goal = Number(document.getElementById('tripGoalInput')?.value) || 0;
+          const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
           previewRows.innerHTML = agents.map(a => {
             const isQ = a.production >= (a.goal || goal);
             return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
@@ -8882,7 +8981,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveTripData() {
     if (!_tripAgents.length) { alert('No data to save. Upload a CSV first.'); return; }
-    const goal = Number(document.getElementById('tripGoalInput')?.value) || 0;
+    const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
     const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || '';
     _tripMeta = { qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
     const data = { agents: _tripAgents, meta: _tripMeta };
@@ -8975,100 +9074,310 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (img) {
       const w = window.open('');
       w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${img.src}" style="max-width:100%;">
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-  }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
+
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
+  ];
+
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
+  }
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
+  }
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
+    const favs = getHeroFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+  }
+
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
+  }
+
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body></html>`);
       w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
@@ -9243,100 +9552,310 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const w = window.open('', '_blank', 'width=960,height=720');
     if (!w) { showSnuToast('\u26a0 Allow pop-ups to open PDFs.'); return; }
     w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_CHEAT_DATA + '" type="application/pdf" width="100%" height="100%">
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-  }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
+
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
+  ];
+
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
+  }
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
+  }
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
+    const favs = getHeroFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+  }
+
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
+  }
+
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body></html>');
     w.document.close();
@@ -9346,100 +9865,310 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const w = window.open('', '_blank', 'width=960,height=720');
     if (!w) { showSnuToast('\u26a0 Allow pop-ups to open PDFs.'); return; }
     w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_FULL_DATA + '" type="application/pdf" width="100%" height="100%">
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-  }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
+
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
+  ];
+
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
+  }
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
+  }
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
+    const favs = getHeroFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+  }
+
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
+  }
+
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body></html>');
     w.document.close();
@@ -9538,47 +10267,25 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const el = document.getElementById('fridayMeetingList');
     const badge = document.getElementById('fridayMeetingCount');
     if (!el) return;
-    const parseMeetingDate = m => {
-      if (!m?.date) return null;
-      const dt = new Date(m.date);
-      if (!isNaN(dt)) { dt.setHours(0,0,0,0); return dt; }
-      return null;
-    };
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const meetings = [..._fridayMeetings]
-      .map(m => ({...m, _parsedDate: parseMeetingDate(m)}))
-      .filter(m => !m._parsedDate || m._parsedDate >= today)
-      .sort((a,b) => {
-        const ad = a._parsedDate ? a._parsedDate.getTime() : Number.MAX_SAFE_INTEGER;
-        const bd = b._parsedDate ? b._parsedDate.getTime() : Number.MAX_SAFE_INTEGER;
-        return ad - bd;
-      });
+    const meetings = [..._fridayMeetings].sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
     if (badge) badge.textContent = meetings.length + ' meeting' + (meetings.length!==1?'s':'');
-    if (!meetings.length) {
-      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled yet.</div>';
-      if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
-      if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
-      return;
-    }
+    if (!meetings.length) { el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings scheduled yet.</div>'; return; }
     const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     el.innerHTML = meetings.map(m => `
       <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
         <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
-          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:22px;">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'}</div>
           <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
           <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
         </div>
         <div style="flex:1;">
           <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
-          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">\u23f0 ${pesc(m.time)}</div>`:''}
           ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
-          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
-          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udcf9 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udd17 Resource / Login</a>`:''}
         </div>
       </div>`).join('');
-    if (typeof syncHeroKPIs === 'function') syncHeroKPIs();
-    if (typeof renderHeroDashboard === 'function') renderHeroDashboard();
   }
 
   function renderFridayAdminList() {
@@ -10226,102 +10933,408 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       .item{border:1px solid #ddd;border-radius:8px;padding:14px;margin-bottom:12px;}
       .title{font-weight:700;font-size:14px;margin-bottom:4px;}
       .tag{display:inline-block;background:#e8f0fe;color:#1a2340;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-bottom:6px;}
-      @page{margin:.75in}</style></head>
+      @page{margin:.75in}
+
+    /* ── HERO QUICK ACCESS FAVORITES ── */
+    .hero-favorites-wrap {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      max-width: 640px;
+    }
+    .hero-favorites-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-favorites-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--accent-2);
+    }
+    .hero-favorites-sub {
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+    .hero-favorites-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-fav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.16);
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .hero-fav-pill:hover {
+      background: rgba(255,255,255,.16);
+      border-color: var(--accent-2);
+      transform: translateY(-1px);
+    }
+    .hero-favorites-empty {
+      font-size: 12px;
+      color: var(--muted-2);
+      font-style: italic;
+    }
+    .section-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .section-fav-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.05);
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .18s, border-color .18s, transform .18s, box-shadow .18s;
+      flex-shrink: 0;
+    }
+    .section-fav-btn:hover {
+      background: rgba(251,191,36,.14);
+      border-color: rgba(251,191,36,.34);
+      transform: translateY(-1px);
+    }
+    .section-fav-btn.is-active {
+      background: rgba(251,191,36,.18);
+      border-color: rgba(251,191,36,.4);
+      box-shadow: 0 0 18px rgba(251,191,36,.18);
+    }
+    .trip-badge-group {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+  </style></head>
       <body><h1>📰 Medicare Updates</h1>${el.innerHTML}
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-  }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
+
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
+  ];
+
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
+  }
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
+  }
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
+    const favs = getHeroFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+  }
+
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
+  }
+
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(),400);
@@ -11054,102 +12067,408 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         @page { margin: 0.75in; }
         body { font-family: Georgia, serif; color: #1a1a2e; margin: 0; padding: 0; font-size: 13px; }
         * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      </style>
+      
+
+    /* ── HERO QUICK ACCESS FAVORITES ── */
+    .hero-favorites-wrap {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      max-width: 640px;
+    }
+    .hero-favorites-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-favorites-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--accent-2);
+    }
+    .hero-favorites-sub {
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+    .hero-favorites-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-fav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.16);
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .hero-fav-pill:hover {
+      background: rgba(255,255,255,.16);
+      border-color: var(--accent-2);
+      transform: translateY(-1px);
+    }
+    .hero-favorites-empty {
+      font-size: 12px;
+      color: var(--muted-2);
+      font-style: italic;
+    }
+    .section-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .section-fav-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.05);
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .18s, border-color .18s, transform .18s, box-shadow .18s;
+      flex-shrink: 0;
+    }
+    .section-fav-btn:hover {
+      background: rgba(251,191,36,.14);
+      border-color: rgba(251,191,36,.34);
+      transform: translateY(-1px);
+    }
+    .section-fav-btn.is-active {
+      background: rgba(251,191,36,.18);
+      border-color: rgba(251,191,36,.4);
+      box-shadow: 0 0 18px rgba(251,191,36,.18);
+    }
+    .trip-badge-group {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+  </style>
     </head><body>${body.innerHTML}
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-  }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
+
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
+  ];
+
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
+  }
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
+  }
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
+    const favs = getHeroFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+  }
+
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
+  }
+
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body></html>`);
     w.document.close();
@@ -11333,102 +12652,408 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         input[type=checkbox] { width: 12px; height: 12px; }
         table { page-break-inside: auto; }
         tr { page-break-inside: avoid; }
-      </style>
+      
+
+    /* ── HERO QUICK ACCESS FAVORITES ── */
+    .hero-favorites-wrap {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      max-width: 640px;
+    }
+    .hero-favorites-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-favorites-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--accent-2);
+    }
+    .hero-favorites-sub {
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+    .hero-favorites-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-fav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.16);
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .hero-fav-pill:hover {
+      background: rgba(255,255,255,.16);
+      border-color: var(--accent-2);
+      transform: translateY(-1px);
+    }
+    .hero-favorites-empty {
+      font-size: 12px;
+      color: var(--muted-2);
+      font-style: italic;
+    }
+    .section-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .section-fav-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.05);
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .18s, border-color .18s, transform .18s, box-shadow .18s;
+      flex-shrink: 0;
+    }
+    .section-fav-btn:hover {
+      background: rgba(251,191,36,.14);
+      border-color: rgba(251,191,36,.34);
+      transform: translateY(-1px);
+    }
+    .section-fav-btn.is-active {
+      background: rgba(251,191,36,.18);
+      border-color: rgba(251,191,36,.4);
+      box-shadow: 0 0 18px rgba(251,191,36,.18);
+    }
+    .trip-badge-group {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+  </style>
     </head><body>${body.innerHTML}
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-  }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
+
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
+  ];
+
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
+  }
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
+  }
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
+    const favs = getHeroFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+  }
+
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
+  }
+
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body></html>`);
     w.document.close();
@@ -11857,279 +13482,310 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 <!-- ── END REFERRAL MODAL ──────────────────────────────────────── -->
 
 
-  <div class="hero-admin-overlay" id="heroAdminOverlay" onclick="if(event.target===this)closeHeroAdmin()"></div>
-  <div class="hero-admin-modal" id="heroAdminModal" aria-hidden="true">
-    <div class="hero-admin-head">
-      <div>
-        <div class="hero-panel-title">Hero Quick Access Manager</div>
-        <div class="hero-panel-sub">Admin picks are global. Agent favorites stay separate on each browser.</div>
-      </div>
-      <button class="hero-admin-close" type="button" onclick="closeHeroAdmin()">✕</button>
-    </div>
-    <div class="hero-admin-body">
-      <div class="hero-panel-sub">Select up to 6 sections to show in the Admin Quick Access strip.</div>
-      <div class="hero-admin-grid" id="heroAdminGrid"></div>
-      <div class="hero-admin-actions">
-        <button class="hero-admin-close" type="button" onclick="closeHeroAdmin()">Cancel</button>
-        <button class="hero-admin-save" type="button" onclick="saveHeroAdminConfig()">Save Quick Access</button>
-      </div>
-    </div>
-  </div>
 
-  <script id="hero-dashboard-script">
-  const HERO_SUPA = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  const HERO_SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-  const HERO_FAV_KEY = 'medi_agent_favorites_v1';
-  const HERO_DEFAULT_ADMIN = ['quick-access','agent-tools','trip-tracker','friday-meetings'];
-  let _heroAdminPicks = [...HERO_DEFAULT_ADMIN];
-  let _heroFilter = 'all';
+  <script id="requested-updates-script">
+  // ── Minimal requested updates only: favorites in hero, accurate trip qualifiers,
+  //    trip month progress, and hide past Friday meetings from hub display.
 
-  const HERO_SECTIONS = [
-    { id:'agent-tools', icon:'🛠', title:'Agent Tools', desc:'Coaching, calculators, planning, and sales utilities for everyday work.', category:'learning', tags:['Tools','Daily'], href:'#agent-tools', metric:() => countCards('#agent-tools .card-grid .card') + ' tools', state:() => 'Start with high-use tools', ai:'Use this when you need sales support, calculators, or fast coaching help.' },
-    { id:'quick-access', icon:'🔗', title:'Quick Access Portals', desc:'Fast links into the systems agents use most.', category:'action', tags:['Portal','Login'], href:'#quick-access', metric:() => countCards('#quick-access .card-grid .card') + ' links', state:() => 'Best for daily jump-ins', ai:'Open your most-used portals here instead of hunting through bookmarks.' },
-    { id:'libraries', icon:'📚', title:'Agent Libraries', desc:'Reference materials, product resources, and searchable learning content.', category:'learning', tags:['Library','Reference'], href:'#libraries', metric:() => countCards('#libraries .card-grid .card') + ' libraries', state:() => 'Great for lookup work', ai:'Search here when you need scripts, docs, or carrier reference material.' },
-    { id:'updates', icon:'📡', title:'Updates Feed', desc:'The latest internal updates and notices published on the hub.', category:'action', tags:['Feed','News'], href:'#updates', metric:() => textCount('#feed-list .feed-card','updates'), state:() => 'Stay current today', ai:'Check this first if you need the newest internal update before calling or emailing.' },
-    { id:'cert-tracker', icon:'🎓', title:'Certification Tracker', desc:'See agent certification status by carrier for the current plan year.', category:'action', tags:['Compliance','Certs'], href:'#cert-tracker', metric:() => getText('#certAgentCount','0 agents'), state:() => 'Review certification coverage', ai:'Useful before writing new business or assigning carrier-specific work.' },
-    { id:'friday-meetings', icon:'📅', title:'Friday Meetings', desc:'Upcoming Friday team meetings, formats, and join links.', category:'action', tags:['Meetings','Schedule'], href:'#friday-meetings', metric:() => getText('#fridayMeetingCount','0 meetings'), state:() => upcomingMeetingState(), ai:'Use this tile before Friday to grab the meeting topic, time, and link.' },
-    { id:'leaderboard', icon:'🏆', title:'SNU Leaderboard', desc:'Weekly production leaders, consecutive executives, and visibility on momentum.', category:'growth', tags:['Leaderboard','SNU'], href:'#leaderboard', metric:() => textCount('#snuLbList .snu-lb-row','leaders'), state:() => 'Track weekly momentum', ai:'Open this when you want visibility into performance trends and top movement.' },
-    { id:'trip-tracker', icon:'🏝️', title:'Incentive Trip Tracker', desc:'Track who is qualifying, who is close, and the current program progress month.', category:'growth', tags:['Trip','Production'], href:'#trip-tracker', metric:() => getText('#tripQualifiedCount','0 qualified'), state:() => getText('#tripUpdatedLabel','Upload monthly CSV in Admin to update'), ai:'This is your fastest read on qualification pace and who is closest to the line.' },
-    { id:'video-library', icon:'🎬', title:'Video Library', desc:'Training videos and walkthrough content for agent development.', category:'learning', tags:['Videos','Training'], href:'#video-library', metric:() => textCount('#videoLibraryGrid .video-card','videos'), state:() => 'Watch-on-demand training', ai:'Use this when someone needs a walkthrough instead of a written SOP.' },
-    { id:'practice-client', icon:'🎯', title:'Practice Client', desc:'Scenario-based practice and role-play preparation tools.', category:'learning', tags:['Practice','Coaching'], href:'#practice-client', metric:() => sectionVisible('#practice-client') ? 'Live practice zone' : 'Hidden section', state:() => 'Prep before live calls', ai:'Good for rehearsing before high-stakes client conversations.' },
-    { id:'operations-ai', icon:'🤖', title:'Agent Assistant AI', desc:'Ask questions, generate drafts, and get help navigating common workflows.', category:'action', tags:['AI','Assistant'], href:'#operations-ai', metric:() => 'Live assistant', state:() => 'Use for guided help', ai:'Start here when you need a draft, explanation, or next-step recommendation.' }
+  const HERO_FAVORITES_KEY = 'medi_header_favorites_v1';
+  const HERO_FAVORITE_SECTION_IDS = [
+    'agent-tools','quick-access','libraries','video-library','practice-client','updates',
+    'leaderboard','trip-tracker','cert-tracker','friday-meetings','operations-ai',
+    'industry-spotlight','agent-spotlight','agent-of-the-month'
   ];
 
-  function getHeroFavorites(){
-    try { return JSON.parse(localStorage.getItem(HERO_FAV_KEY) || '[]'); }
-    catch(e){ return []; }
+  function getHeroFavorites() {
+    try {
+      const raw = localStorage.getItem(HERO_FAVORITES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
   }
-  function setHeroFavorites(arr){ localStorage.setItem(HERO_FAV_KEY, JSON.stringify(arr)); }
-  function toggleHeroFavorite(id){
-    let favs = getHeroFavorites();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setHeroFavorites(favs);
-    renderHeroDashboard();
+
+  function setHeroFavorites(favs) {
+    localStorage.setItem(HERO_FAVORITES_KEY, JSON.stringify([...new Set(favs)]));
   }
-  function setHeroFilter(filter){
-    _heroFilter = filter;
-    document.querySelectorAll('.hero-filter').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === filter));
-    renderHeroTiles();
+
+  function buildSectionLabel(section) {
+    const h2 = section?.querySelector('.section-head h2');
+    if (!h2) return section?.id || 'Section';
+    return (h2.textContent || section.id || 'Section').replace(/\s+/g, ' ').trim();
   }
-  function scrollToHeroTiles(){ document.getElementById('heroTileGrid')?.scrollIntoView({behavior:'smooth', block:'start'}); }
-  function getText(sel, fallback=''){ const el = document.querySelector(sel); return el ? (el.textContent || '').trim() : fallback; }
-  function textCount(sel, suffix){ const count = document.querySelectorAll(sel).length; return count + ' ' + suffix; }
-  function countCards(sel){ return document.querySelectorAll(sel).length; }
-  function sectionVisible(id){ const el = document.querySelector(id); return !!(el && getComputedStyle(el).display !== 'none'); }
-  function currentTripMonth(){
-    const start = new Date('2026-01-01T00:00:00');
-    const now = new Date();
-    let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()) + 1;
-    months = Math.max(0, Math.min(18, months));
-    return months;
+
+  function ensureHeroFavoritesShell() {
+    let wrap = document.getElementById('heroFavoritesWrap');
+    if (wrap) return wrap;
+    const heroTextCol = document.querySelector('.hero-layout > div:first-child');
+    if (!heroTextCol) return null;
+    wrap = document.createElement('div');
+    wrap.id = 'heroFavoritesWrap';
+    wrap.className = 'hero-favorites-wrap';
+    wrap.innerHTML = `
+      <div class="hero-favorites-head">
+        <div class="hero-favorites-title">Quick Access Favorites</div>
+        <div class="hero-favorites-sub">Star section headers below to pin them here.</div>
+      </div>
+      <div class="hero-favorites-grid" id="heroFavoritesGrid"></div>
+    `;
+    heroTextCol.appendChild(wrap);
+    return wrap;
   }
-  function updateHeroMonthMetric(label){
-    const month = currentTripMonth();
-    const val = month + '/18';
-    const hp = document.getElementById('heroMonthProgress');
-    const tl = document.getElementById('heroMonthLabel');
-    if (hp) hp.textContent = val;
-    if (tl) tl.textContent = label || 'Program progress';
-  }
-  function upcomingMeetingState(){
-    const cnt = parseInt((getText('#fridayMeetingCount','0') || '0').match(/\d+/)?.[0] || '0', 10);
-    return cnt ? 'Upcoming meetings ready' : 'No upcoming Friday meetings';
-  }
-  function heroTileData(){
+
+  function renderHeroFavorites() {
+    ensureHeroFavoritesShell();
+    const grid = document.getElementById('heroFavoritesGrid');
+    if (!grid) return;
     const favs = getHeroFavorites();
-    return HERO_SECTIONS.filter(s => document.getElementById(s.id)).map(s => ({
-      ...s,
-      favorite: favs.includes(s.id),
-      admin: _heroAdminPicks.includes(s.id),
-      metricText: typeof s.metric === 'function' ? s.metric() : '',
-      stateText: typeof s.state === 'function' ? s.state() : ''
-    }));
+    if (!favs.length) {
+      grid.innerHTML = '<div class="hero-favorites-empty">No favorites selected yet.</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(id => {
+      const section = document.getElementById(id);
+      if (!section) return '';
+      const label = buildSectionLabel(section);
+      return `<a class="hero-fav-pill" href="#${id}">⭐ ${pesc(label)}</a>`;
+    }).join('') || '<div class="hero-favorites-empty">No favorites selected yet.</div>';
   }
-  function tileMatchesFilter(tile){
-    if (_heroFilter === 'all') return true;
-    if (_heroFilter === 'favorites') return tile.favorite;
-    if (_heroFilter === 'admin') return tile.admin;
-    return tile.category === _heroFilter;
-  }
-  function renderHeroTiles(){
-    const el = document.getElementById('heroTileGrid');
-    if (!el) return;
-    const tiles = heroTileData().filter(tileMatchesFilter).sort((a,b) => Number(b.favorite||b.admin) - Number(a.favorite||a.admin));
-    if (!tiles.length) { el.innerHTML = '<div class="hero-empty">No sections match this filter yet.</div>'; return; }
-    el.innerHTML = tiles.map(t => `
-      <div class="hero-tile">
-        <div class="hero-tile-top">
-          <div class="hero-tile-icon">${t.icon}</div>
-          <button class="hero-tile-star ${t.favorite ? 'active' : ''}" type="button" aria-label="Toggle favorite" onclick="toggleHeroFavorite('${t.id}')">★</button>
-        </div>
-        <h3>${t.title}</h3>
-        <p>${t.desc}</p>
-        <div class="hero-tile-meta">
-          ${t.tags.map(tag => `<span class="hero-tile-tag">${tag}</span>`).join('')}
-          ${t.admin ? '<span class="hero-tile-tag">Admin Pick</span>' : ''}
-          ${t.favorite ? '<span class="hero-tile-tag">Favorite</span>' : ''}
-        </div>
-        <div class="hero-tile-footer">
-          <a class="hero-tile-link" href="${t.href}">Open Section ↗</a>
-          <div class="hero-tile-state"><div>${t.metricText}</div><div>${t.stateText}</div></div>
-        </div>
-      </div>`).join('');
-  }
-  function renderHeroLists(){
-    const adminWrap = document.getElementById('heroAdminList');
-    const favCount = document.getElementById('heroFavoritesCount');
-    const tiles = heroTileData();
-    const favs = tiles.filter(t => t.favorite);
-    const admins = tiles.filter(t => t.admin);
-    if (favCount) favCount.textContent = favs.length;
-    if (adminWrap) adminWrap.innerHTML = admins.length ? admins.map(t => `<div class="hero-mini-item"><strong>${t.icon} ${t.title}</strong><span>${t.stateText || t.metricText}</span><a class="hero-mini-link" href="${t.href}">Open section ↗</a></div>`).join('') : '<div class="hero-empty">No admin quick access picks saved yet.</div>';
-  }
-  function syncHeroKPIs(){
-    const qualified = (getText('#tripQualifiedCount','0').match(/\d+/)||['0'])[0];
-    const hq = document.getElementById('heroQualifiedCount');
-    const hm = document.getElementById('heroMeetingCount');
-    if (hq) hq.textContent = qualified;
-    if (hm) hm.textContent = (getText('#fridayMeetingCount','0').match(/\d+/)||['0'])[0];
-    updateHeroMonthMetric(getText('#tripUpdatedLabel','Program progress'));
-  }
-  function renderHeroDashboard(){ syncHeroKPIs(); renderHeroTiles(); renderHeroLists(); }
-  function openHeroAdmin(){ renderHeroAdminGrid(); document.getElementById('heroAdminOverlay')?.classList.add('open'); document.getElementById('heroAdminModal')?.classList.add('open'); }
-  function closeHeroAdmin(){ document.getElementById('heroAdminOverlay')?.classList.remove('open'); document.getElementById('heroAdminModal')?.classList.remove('open'); }
-  function renderHeroAdminGrid(){
-    const wrap = document.getElementById('heroAdminGrid');
-    if (!wrap) return;
-    wrap.innerHTML = HERO_SECTIONS.filter(s => document.getElementById(s.id)).map(s => `
-      <label class="hero-admin-option">
-        <div><strong>${s.icon} ${s.title}</strong><span>${s.desc}</span></div>
-        <input class="hero-admin-check" type="checkbox" value="${s.id}" ${_heroAdminPicks.includes(s.id) ? 'checked' : ''}>
-      </label>`).join('');
-  }
-  function loadHeroAdminConfig(){
-    fetch(`${HERO_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.hero_dashboard&select=data`, {
-      headers: { 'apikey': HERO_SKEY, 'Authorization': 'Bearer ' + HERO_SKEY, 'Cache-Control': 'no-cache' }
-    }).then(r => r.json()).then(rows => {
-      if (rows && rows.length && rows[0].data) {
-        const raw = rows[0].data;
-        const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        if (Array.isArray(d.adminQuickAccess) && d.adminQuickAccess.length) _heroAdminPicks = d.adminQuickAccess;
-      }
-      renderHeroDashboard();
-    }).catch(() => renderHeroDashboard());
-  }
-  function saveHeroAdminConfig(){
-    const picks = Array.from(document.querySelectorAll('#heroAdminGrid input[type="checkbox"]:checked')).map(i => i.value).slice(0,6);
-    _heroAdminPicks = picks;
-    const payload = { hub: 'medi', key: 'hero_dashboard', data: { adminQuickAccess: picks } };
-    fetch(`${HERO_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.hero_dashboard`, {
-      method: 'DELETE', headers: { 'apikey': HERO_SKEY, 'Authorization': 'Bearer ' + HERO_SKEY }
-    }).then(() => fetch(`${HERO_SUPA}/rest/v1/tile_content`, {
-      method: 'POST',
-      headers: { 'apikey': HERO_SKEY, 'Authorization': 'Bearer ' + HERO_SKEY, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
-      body: JSON.stringify(payload)
-    })).then(() => { closeHeroAdmin(); if (typeof showSnuToast === 'function') showSnuToast('✓ Hero quick access saved.'); renderHeroDashboard(); })
-      .catch(() => { if (typeof showSnuToast === 'function') showSnuToast('⚠ Could not save Hero quick access.'); renderHeroDashboard(); closeHeroAdmin(); });
-  }
-  document.addEventListener('DOMContentLoaded', loadHeroAdminConfig);
-  </script>
 
-
-<script id="hero-header-favorites-fix">
-(function(){
-  const FAV_KEY = 'medi_agent_favorites_v1';
-  function getFavs(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e){ return []; } }
-  function setFavs(v){ localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
-  function toggleFav(id){
-    let favs = getFavs();
-    favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-    setFavs(favs);
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
+  function refreshFavoriteButtons() {
+    const favs = new Set(getHeroFavorites());
+    document.querySelectorAll('.section-fav-btn[data-section-id]').forEach(btn => {
+      const active = favs.has(btn.dataset.sectionId);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? 'Remove from Hero Quick Access' : 'Add to Hero Quick Access';
+      btn.textContent = active ? '★' : '☆';
+    });
   }
-  window.toggleHeroFavorite = toggleFav;
 
-  function sectionCards(){
-    return Array.from(document.querySelectorAll('.section[id]')).map(section => {
-      const id = section.id;
+  function toggleSectionFavorite(sectionId) {
+    const favs = getHeroFavorites();
+    const idx = favs.indexOf(sectionId);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(sectionId);
+    setHeroFavorites(favs);
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+  }
+
+  function initHeaderFavoriteButtons() {
+    ensureHeroFavoritesShell();
+    document.querySelectorAll('.page > .section').forEach(section => {
+      if (!section.id || !HERO_FAVORITE_SECTION_IDS.includes(section.id)) return;
       const head = section.querySelector('.section-head');
-      if (!head) return null;
-      const title = (head.querySelector('h2')?.textContent || id).trim();
-      const desc = (head.querySelector('p')?.textContent || '').trim();
-      const icon = (head.querySelector('.sh-icon')?.textContent || '★').trim();
-      return { id, title, desc, icon, href:'#' + id };
-    }).filter(Boolean);
-  }
+      if (!head || head.querySelector('.section-fav-btn')) return;
 
-  function decorateSectionHeaders(){
-    const favs = getFavs();
-    sectionCards().forEach(card => {
-      const section = document.getElementById(card.id);
-      const head = section?.querySelector('.section-head');
-      if (!head) return;
       let actions = head.querySelector('.section-head-actions');
       if (!actions) {
         actions = document.createElement('div');
         actions.className = 'section-head-actions';
-        while (head.children.length > 1) actions.appendChild(head.lastElementChild);
+        const countChip = head.querySelector('.count-chip');
+        if (countChip) actions.appendChild(countChip);
         head.appendChild(actions);
       }
-      let btn = head.querySelector('.section-fav-btn');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'section-fav-btn';
-        btn.setAttribute('aria-label', 'Save section to Hero quick access');
-        btn.title = 'Save to Hero quick access';
-        btn.innerHTML = '<span>★</span>';
-        actions.prepend(btn);
-      }
-      btn.classList.toggle('active', favs.includes(card.id));
-      btn.onclick = () => toggleFav(card.id);
+
+      const btn = document.createElement('button');
+      btn.className = 'section-fav-btn';
+      btn.type = 'button';
+      btn.dataset.sectionId = section.id;
+      btn.setAttribute('aria-label', 'Toggle favorite for ' + buildSectionLabel(section));
+      btn.addEventListener('click', () => toggleSectionFavorite(section.id));
+      actions.insertBefore(btn, actions.firstChild);
     });
+    refreshFavoriteButtons();
+    renderHeroFavorites();
   }
 
-  function renderHeroQuickAccessOnly(){
-    const favs = getFavs();
-    const sections = sectionCards();
-    const favCards = sections.filter(s => favs.includes(s.id));
-    const grid = document.getElementById('heroQuickAccessGrid');
-    const summary = document.getElementById('heroQuickAccessSummary');
-    const favCount = document.getElementById('heroFavoritesCount');
-    if (favCount) favCount.textContent = String(favCards.length);
-    if (summary) {
-      summary.innerHTML = favCards.length
-        ? favCards.map(s => `<a class="hero-chip" href="${s.href}">${s.icon} ${s.title}</a>`).join('')
-        : '<span class="hero-chip">Star section headers below to pin them here</span>';
+  function computeTripProgress() {
+    const endDate = (typeof TRIP_END !== 'undefined' && TRIP_END instanceof Date) ? TRIP_END : new Date('2027-06-30');
+    const startDate = (typeof TRIP_START !== 'undefined' && TRIP_START instanceof Date) ? TRIP_START : new Date('2026-01-01');
+    let ref = new Date();
+    const label = String((_tripMeta && _tripMeta.monthLabel) || '').trim();
+    if (label) {
+      const parsed = new Date(label + ' 1');
+      if (!isNaN(parsed)) ref = parsed;
     }
-    if (grid) {
-      grid.innerHTML = favCards.length
-        ? favCards.map(s => `
-          <a class="hero-quick-card" href="${s.href}">
-            <div class="hero-quick-top">
-              <div class="hero-quick-icon">${s.icon}</div>
+    const totalMonths = Math.max(1, ((endDate.getFullYear() - startDate.getFullYear()) * 12) + (endDate.getMonth() - startDate.getMonth()) + 1);
+    let elapsed = ((ref.getFullYear() - startDate.getFullYear()) * 12) + (ref.getMonth() - startDate.getMonth()) + 1;
+    if (elapsed < 1) elapsed = 1;
+    if (elapsed > totalMonths) elapsed = totalMonths;
+    return { elapsed, totalMonths, text: `${elapsed}/${totalMonths}` };
+  }
+
+  function ensureTripProgressBadge() {
+    const header = document.querySelector('#trip-tracker .trip-header');
+    if (!header) return null;
+    let group = header.querySelector('.trip-badge-group');
+    const mainBadge = header.querySelector('.trip-dates-badge');
+    if (!group) {
+      group = document.createElement('div');
+      group.className = 'trip-badge-group';
+      if (mainBadge) group.appendChild(mainBadge);
+      header.appendChild(group);
+    }
+    let badge = document.getElementById('tripProgressBadge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'tripProgressBadge';
+      badge.className = 'trip-dates-badge';
+      group.appendChild(badge);
+    }
+    return badge;
+  }
+
+  function hasAnyTripGoal() {
+    if (Number(_tripMeta?.qualifyingGoal) > 0) return true;
+    return (_tripAgents || []).some(a => Number(a.goal) > 0);
+  }
+
+  function renderTripTracker() {
+    const list = document.getElementById('tripList');
+    const qCount = document.getElementById('tripQualifiedCount');
+    const updLabel = document.getElementById('tripUpdatedLabel');
+    const goalBar = document.getElementById('tripGoalBar');
+    const goalPct = document.getElementById('tripGoalPct');
+    const progressBadge = ensureTripProgressBadge();
+    if (!list) return;
+
+    const progress = computeTripProgress();
+    if (progressBadge) progressBadge.textContent = `${progress.text} of trip`;
+
+    if (!_tripAgents.length) {
+      list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
+      if (qCount) qCount.textContent = '0 qualified';
+      if (updLabel) updLabel.textContent = 'Upload monthly CSV in Admin to update';
+      if (goalBar) goalBar.style.width = '0%';
+      if (goalPct) goalPct.textContent = progress.text + ' months';
+      return;
+    }
+
+    const globalGoal = Number(_tripMeta?.qualifyingGoal) || 0;
+    const hasGoal = hasAnyTripGoal();
+    const sorted = [..._tripAgents].sort((a,b) => (Number(b.production)||0) - (Number(a.production)||0));
+    const maxProduction = Math.max(...sorted.map(a => Number(a.production)||0), 1);
+
+    const isQualified = (agent) => {
+      const prod = Number(agent.production) || 0;
+      const agentGoal = Number(agent.goal) || 0;
+      if (agentGoal > 0) return prod >= agentGoal;
+      if (globalGoal > 0) return prod >= globalGoal;
+      return false;
+    };
+
+    const qualified = hasGoal ? sorted.filter(isQualified).length : 0;
+    if (qCount) qCount.textContent = qualified + ' qualified';
+
+    if (updLabel) {
+      const label = String(_tripMeta?.monthLabel || '').trim();
+      updLabel.textContent = label
+        ? `Updated: ${label} • ${progress.text} months`
+        : `${progress.text} months reflected`;
+    }
+
+    const teamPct = hasGoal && sorted.length ? Math.round((qualified / sorted.length) * 100) : 0;
+    if (goalBar) goalBar.style.width = teamPct + '%';
+    if (goalPct) goalPct.textContent = hasGoal ? (teamPct + '% qualifying') : ('Set goal in Admin • ' + progress.text + ' months');
+
+    const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
+
+    list.innerHTML = sorted.map((a, i) => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal) || globalGoal || 0;
+      const qualifiedNow = hasGoal ? isQualified(a) : false;
+      const cls = qualifiedNow ? 'q' : 'nq';
+      const rankCls = i < 3 && qualifiedNow ? 'top' : (qualifiedNow ? 'q' : 'nq');
+      let pct = 0;
+      let sub = 'Goal not set yet';
+      if (agentGoal > 0) {
+        pct = Math.min(100, Math.round((prod / agentGoal) * 100));
+        sub = qualifiedNow ? '✅ Qualified!' : `${Math.max(0, agentGoal - prod).toLocaleString()} pts to go`;
+      } else {
+        pct = Math.round((prod / maxProduction) * 100);
+      }
+      return `
+        <div class="trip-row">
+          <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
+          <div>
+            <div class="trip-agent-name">${pesc(a.name || '—')}</div>
+            <div class="trip-agent-sub">${sub}</div>
+          </div>
+          <div class="trip-progress-col">
+            <div class="trip-mini-bar">
+              <div class="trip-mini-bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
-            <h3>${s.title}</h3>
-            <p>${s.desc || 'Quick access to this section.'}</p>
-            <div class="hero-quick-link">Open Section ↗</div>
-          </a>`).join('')
-        : '<div class="hero-quick-empty">No favorites saved yet. As agents scroll the hub, click the star on any section header and it will appear here.</div>';
+            <div class="trip-mini-pct">${agentGoal > 0 ? (pct + '%') : 'goal needed'}</div>
+          </div>
+          <div class="trip-pts ${cls}">${prod.toLocaleString()} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  function parseFridayMeetingDate(value) {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+    const direct = new Date(value);
+    if (!isNaN(direct)) return direct;
+    const cleaned = String(value).replace(/^[A-Za-z]{3},\s*/, '').trim();
+    const fallback = new Date(cleaned);
+    return isNaN(fallback) ? null : fallback;
+  }
+
+  function renderFridayMeetings() {
+    const el = document.getElementById('fridayMeetingList');
+    const badge = document.getElementById('fridayMeetingCount');
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const allMeetings = [...(_fridayMeetings || [])].sort((a,b) => {
+      const ad = parseFridayMeetingDate(a?.date)?.getTime() || 0;
+      const bd = parseFridayMeetingDate(b?.date)?.getTime() || 0;
+      return ad - bd;
+    });
+
+    const upcoming = allMeetings.filter(m => {
+      const dt = parseFridayMeetingDate(m?.date);
+      if (!dt) return true;
+      const cmp = new Date(dt);
+      cmp.setHours(0,0,0,0);
+      return cmp >= today;
+    });
+
+    if (badge) badge.textContent = upcoming.length + ' meeting' + (upcoming.length !== 1 ? 's' : '');
+    if (!upcoming.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No upcoming meetings scheduled.</div>';
+      return;
     }
+
+    el.innerHTML = upcoming.map(m => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
+          <div style="font-size:22px;">${m.type==='virtual'?'💻':'🏢'}</div>
+          <div style="font-size:10px;font-weight:700;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">${m.type==='virtual'?'Virtual':'In Person'}</div>
+          <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:4px;white-space:nowrap;">${m.date ? pesc(m.date) : 'Date TBD'}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">${pesc(m.topic||'Team Meeting')}</div>
+          ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">⏰ ${pesc(m.time)}</div>`:''}
+          ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
+          ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">📹 Join Meeting</a>`:''}
+          ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">🔗 Resource / Login</a>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  function hideUnusedHeroTiles(){
-    const tileGrid = document.getElementById('heroTileGrid');
-    if (tileGrid) tileGrid.style.display = 'none';
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    decorateSectionHeaders();
-    renderHeroQuickAccessOnly();
-    hideUnusedHeroTiles();
+  document.addEventListener('DOMContentLoaded', function() {
+    initHeaderFavoriteButtons();
+    renderHeroFavorites();
+    refreshFavoriteButtons();
+    ensureTripProgressBadge();
+    if (typeof renderTripTracker === 'function') renderTripTracker();
+    if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
   });
-})();
-</script>
+  </script>
 
 </body>
 </html>
