@@ -13932,11 +13932,14 @@ window.toggleTeamTask = function(id, checked) {
     const checked = [...document.querySelectorAll('#rf_products input:checked')].map(c => c.value);
     const err = document.getElementById('rf_err');
     if (!referrer || !name || !dob || !phone || !agent || !checked.length) {
-      err.style.display = 'block';
-      err.textContent = 'Please fill in all required fields and select at least one product.';
+      if (err) {
+        err.style.display = 'block';
+        err.textContent = 'Please fill in all required fields and select at least one product.';
+      }
       return;
     }
-    err.style.display = 'none';
+    if (err) err.style.display = 'none';
+
     const subject = encodeURIComponent('New Referral: ' + name + ' (referred by ' + referrer + ')');
     const body = encodeURIComponent(
       'NEW REFERRAL SUBMISSION\n========================\n\n' +
@@ -13957,25 +13960,37 @@ window.toggleTeamTask = function(id, checked) {
       'Notes:\n' + (g('rf_notes') || 'None') + '\n\n' +
       '========================\nSubmitted via Medi Solutions Agent Hub'
     );
+
     window.location.href = 'mailto:info@medisolins.com?subject=' + subject + '&body=' + body;
+
     setTimeout(() => {
-      document.getElementById('referralFormBody').style.display = 'none';
-      document.getElementById('referralSuccess').style.display = 'block';
+      const formBody = document.getElementById('referralFormBody');
+      const success = document.getElementById('referralSuccess');
+      if (formBody) formBody.style.display = 'none';
+      if (success) success.style.display = 'block';
     }, 800);
   }
   function resetReferralForm() {
-    ['rf_referrer','rf_referrer_phone','rf_referrer_email','rf_referrer_address',
-     'rf_name','rf_dob','rf_phone','rf_email','rf_address','rf_agent','rf_notes']
-      .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
-    document.querySelectorAll('#rf_products input').forEach(c => c.checked = false);
-    document.getElementById('referralSuccess').style.display = 'none';
-    document.getElementById('referralFormBody').style.display = 'block';
-  }
-  document.getElementById('referralOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeReferralModal();
-  });
-</script>
-<!-- ── END REFERRAL MODAL ──────────────────────────────────────── -->
+    [
+      'rf_referrer','rf_referrer_phone','rf_referrer_email','rf_referrer_address',
+      'rf_name','rf_dob','rf_phone','rf_email','rf_address','rf_agent','rf_notes'
+    ].forEach(id => {
+      const e = document.getElementById(id);
+      if (e) e.value = '';
+    });
 
-</body>
-</html>
+    document.querySelectorAll('#rf_products input').forEach(c => c.checked = false);
+
+    const success = document.getElementById('referralSuccess');
+    const formBody = document.getElementById('referralFormBody');
+    if (success) success.style.display = 'none';
+    if (formBody) formBody.style.display = 'block';
+  }
+
+  const referralOverlay = document.getElementById('referralOverlay');
+  if (referralOverlay) {
+    referralOverlay.addEventListener('click', function(e) {
+      if (e.target === this) closeReferralModal();
+    });
+  }
+</script>
