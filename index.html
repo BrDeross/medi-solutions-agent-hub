@@ -5843,39 +5843,74 @@
 
         <div id="adminTabTrip" class="admin-tab-panel">
           <div class="admin-body">
-            <div class="admin-section-title">🏝️ Incentive Trip — Monthly Update</div>
+            <div class="admin-section-title">🏝️ Incentive Trip Tracker</div>
             <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
-              Drop a CSV or Excel file each month with agent production totals. Columns needed:
-              <code>Name</code>, <code>Production</code> (cumulative total for the trip period).
-              Optionally include <code>Goal</code> to override the default qualifying goal.
+              Add agents manually below, or bulk-import via CSV/Excel. Edit any agent's name, production, or goal inline.
             </p>
 
             <div class="admin-field" style="margin-bottom:12px;">
-              <label>Qualifying Goal (pts per agent)</label>
+              <label>Default Qualifying Goal (pts per agent)</label>
               <input class="admin-input" id="tripGoalInput" type="number" min="1" step="1000"
                 placeholder="e.g. 50000"
                 value="">
             </div>
 
-            <div class="admin-field" style="margin-bottom:12px;">
+            <div class="admin-field" style="margin-bottom:16px;">
               <label>Last Updated Label (e.g. "March 2026")</label>
               <input class="admin-input" id="tripMonthLabel" type="text" placeholder="March 2026">
             </div>
 
-            <div class="csv-drop-zone" id="tripCsvDrop" onclick="document.getElementById('tripCsvInput').click()">
-              <div class="csv-drop-icon">📂</div>
-              <div class="csv-drop-text">Drop CSV/Excel here or <span>click to browse</span></div>
-              <div class="csv-drop-hint">Columns: <code>Name</code> &amp; <code>Production</code></div>
-              <input type="file" id="tripCsvInput" accept=".csv,.xlsx,.xls" style="display:none"
-                onchange="handleTripCsvFile(this.files[0])">
+            <!-- Manual Add Agent -->
+            <div style="border:1px solid var(--border);border-radius:12px;padding:14px;background:rgba(255,255,255,.03);margin-bottom:16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">➕ Add Agent</div>
+              <div style="display:grid;grid-template-columns:1fr .7fr .7fr auto;gap:8px;align-items:end;">
+                <div>
+                  <label style="display:block;font-size:10px;font-weight:700;color:var(--muted-2);margin-bottom:4px;">Name</label>
+                  <input class="admin-input" id="tripAddName" type="text" placeholder="Jane Smith" style="padding:8px 10px;font-size:12px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10px;font-weight:700;color:var(--muted-2);margin-bottom:4px;">Production</label>
+                  <input class="admin-input" id="tripAddProd" type="number" min="0" step="100" placeholder="0" style="padding:8px 10px;font-size:12px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10px;font-weight:700;color:var(--muted-2);margin-bottom:4px;">Goal (optional)</label>
+                  <input class="admin-input" id="tripAddGoal" type="number" min="0" step="1000" placeholder="Default" style="padding:8px 10px;font-size:12px;">
+                </div>
+                <button class="admin-save-btn" style="width:auto;padding:8px 16px;height:fit-content;" onclick="addTripAgent()">Add</button>
+              </div>
             </div>
-            <div class="csv-status" id="tripCsvStatus"></div>
 
-            <div style="display:flex;gap:10px;margin-top:16px;">
+            <!-- Agent Roster Editor -->
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
+                Agent Roster <span id="tripRosterCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span>
+              </div>
+              <div id="tripAgentGoalEditor" style="border:1px solid var(--border);border-radius:12px;padding:10px 12px;max-height:400px;overflow-y:auto;background:rgba(255,255,255,.03);">
+                <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No agents yet — add one above or import a CSV.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
               <button class="admin-save-btn" onclick="saveTripData()">💾 Save &amp; Publish</button>
               <button class="admin-save-btn" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#ef4444;"
-                onclick="clearTripData()">🗑️ Clear Trip Data</button>
+                onclick="clearTripData()">🗑️ Clear All</button>
             </div>
+
+            <!-- CSV Bulk Import (collapsed) -->
+            <details style="border:1px solid var(--border);border-radius:12px;padding:0;background:rgba(255,255,255,.02);">
+              <summary style="padding:12px 16px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;">📂 Bulk Import from CSV / Excel</summary>
+              <div style="padding:4px 16px 16px;">
+                <p style="font-size:11px;color:var(--muted-2);margin-bottom:12px;">Columns: <code>Name</code>, <code>Production</code>, optionally <code>Goal</code>. This replaces the current roster.</p>
+                <div class="csv-drop-zone" id="tripCsvDrop" onclick="document.getElementById('tripCsvInput').click()">
+                  <div class="csv-drop-icon">📂</div>
+                  <div class="csv-drop-text">Drop CSV/Excel here or <span>click to browse</span></div>
+                  <div class="csv-drop-hint">Columns: <code>Name</code> &amp; <code>Production</code></div>
+                  <input type="file" id="tripCsvInput" accept=".csv,.xlsx,.xls" style="display:none"
+                    onchange="handleTripCsvFile(this.files[0])">
+                </div>
+                <div class="csv-status" id="tripCsvStatus"></div>
+              </div>
+            </details>
 
             <!-- Preview -->
             <div id="tripAdminPreview" style="margin-top:20px;display:none;">
@@ -5885,18 +5920,6 @@
               <div id="tripPreviewRows" style="max-height:240px;overflow-y:auto;"></div>
             </div>
 
-            <div style="margin-top:22px;">
-              <div style="font-size:12px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
-                Current Agent Goals
-              </div>
-              <div id="tripAgentGoalEditor" style="border:1px solid var(--border);border-radius:12px;padding:10px 12px;max-height:320px;overflow-y:auto;background:rgba(255,255,255,.03);">
-                <div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No trip agents loaded yet.</div>
-              </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
-                <button class="admin-save-btn" style="width:auto;padding:10px 18px;" onclick="applyTripAgentGoalEdits()">✏️ Apply Agent Goal Edits</button>
-                <button class="admin-save-btn" style="width:auto;padding:10px 18px;background:rgba(255,255,255,.08);color:#fff;border:1px solid var(--border);box-shadow:none;" onclick="resetTripAgentGoalEditor()">↺ Reset Editor</button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -9837,26 +9860,82 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const wrap = document.getElementById('tripAgentGoalEditor');
     if (!wrap) return;
     const baseGoal = Number(_tripMeta.qualifyingGoal) || DEFAULT_GOAL;
+    const countEl = document.getElementById('tripRosterCount');
+    if (countEl) countEl.textContent = _tripAgents.length ? '(' + _tripAgents.length + ')' : '';
     if (!_tripAgents.length) {
-      wrap.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No trip agents loaded yet.</div>';
+      wrap.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No agents yet — add one above or import a CSV.</div>';
       return;
     }
     const rows = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
     wrap.innerHTML = rows.map((a, i) => {
       const goal = Number(a.goal) || baseGoal;
+      const prod = Number(a.production) || 0;
+      const isQ = goal > 0 && prod >= goal;
       return `
-        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(110px,.7fr) minmax(120px,.7fr);gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">
-          <div style="min-width:0;">
-            <div style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i+1}. ${pesc(a.name || '—')}</div>
-            <div style="font-size:11px;color:var(--muted-2);">${Number(a.production||0).toLocaleString()} pts</div>
+        <div class="trip-editor-row" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(90px,.6fr) minmax(90px,.6fr) auto;gap:8px;align-items:end;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:var(--muted-2);margin-bottom:3px;">Name</label>
+            <input class="admin-input trip-ed-name" type="text" value="${pesc(a.name || '')}" style="padding:7px 9px;font-size:12px;">
           </div>
           <div>
-            <label style="display:block;font-size:10px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Goal</label>
-            <input class="admin-input trip-agent-goal-input" type="number" min="0" step="1000" data-trip-agent="${pesc(a.name || '')}" value="${goal}" style="padding:8px 10px;font-size:12px;">
+            <label style="display:block;font-size:10px;font-weight:700;color:var(--muted-2);margin-bottom:3px;">Production</label>
+            <input class="admin-input trip-ed-prod" type="number" min="0" step="100" value="${prod}" style="padding:7px 9px;font-size:12px;">
           </div>
-          <div style="font-size:11px;color:${Number(a.production||0) >= goal ? '#22c55e' : '#7eb3f5'};font-weight:700;">${Number(a.production||0) >= goal ? 'Qualified' : 'In Progress'}</div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:${isQ ? '#22c55e' : 'var(--muted-2)'};margin-bottom:3px;">${isQ ? '✅ Goal' : 'Goal'}</label>
+            <input class="admin-input trip-ed-goal" type="number" min="0" step="1000" value="${goal}" style="padding:7px 9px;font-size:12px;">
+          </div>
+          <button onclick="deleteTripAgent(${i})" title="Remove agent" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1);color:#ef4444;font-size:14px;cursor:pointer;flex-shrink:0;">✕</button>
         </div>`;
     }).join('');
+  }
+
+  window.addTripAgent = function() {
+    const nameEl = document.getElementById('tripAddName');
+    const prodEl = document.getElementById('tripAddProd');
+    const goalEl = document.getElementById('tripAddGoal');
+    const name = (nameEl?.value || '').trim();
+    if (!name) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Agent name is required.'); return; }
+    const production = Math.max(0, Number(prodEl?.value) || 0);
+    const goal = Math.max(0, Number(goalEl?.value) || 0);
+    _tripAgents.push({ name, production, ...(goal ? { goal } : {}) });
+    if (nameEl) nameEl.value = '';
+    if (prodEl) prodEl.value = '';
+    if (goalEl) goalEl.value = '';
+    renderTripTracker();
+    renderTripAdminEditor();
+    if (typeof showSnuToast === 'function') showSnuToast('✓ Added ' + name + ' — remember to Save & Publish.');
+  };
+
+  window.deleteTripAgent = function(sortedIndex) {
+    const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
+    const agent = sorted[sortedIndex];
+    if (!agent) return;
+    const realIdx = _tripAgents.findIndex(a => a.name === agent.name && a.production === agent.production);
+    if (realIdx !== -1) _tripAgents.splice(realIdx, 1);
+    renderTripTracker();
+    renderTripAdminEditor();
+    if (typeof showSnuToast === 'function') showSnuToast('🗑 Removed ' + (agent.name || 'agent') + ' — Save & Publish to confirm.');
+  };
+
+  function collectTripEditorEdits() {
+    const editorRows = document.querySelectorAll('#tripAgentGoalEditor .trip-editor-row');
+    if (!editorRows.length) return;
+    const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
+    const updated = [];
+    editorRows.forEach((row, i) => {
+      const nameInput = row.querySelector('.trip-ed-name');
+      const prodInput = row.querySelector('.trip-ed-prod');
+      const goalInput = row.querySelector('.trip-ed-goal');
+      const name = (nameInput?.value || '').trim();
+      if (!name) return;
+      updated.push({
+        name,
+        production: Math.max(0, Number(prodInput?.value) || 0),
+        goal: Math.max(0, Number(goalInput?.value) || 0)
+      });
+    });
+    if (updated.length) _tripAgents = updated;
   }
 
   function resetTripAgentGoalEditor() {
@@ -9888,18 +9967,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function applyTripAgentGoalEdits() {
-    if (!_tripAgents.length) { showSnuToast('⚠ No trip agents loaded yet.'); return; }
-    const inputs = Array.from(document.querySelectorAll('#tripAgentGoalEditor .trip-agent-goal-input'));
-    if (!inputs.length) { showSnuToast('⚠ No agent goal fields found.'); return; }
-    const goalMap = new Map(inputs.map(inp => [String(inp.dataset.tripAgent || '').trim().toLowerCase(), Math.max(0, Number(inp.value) || 0)]));
-    _tripAgents = _tripAgents.map(agent => {
-      const key = String(agent.name || '').trim().toLowerCase();
-      const editedGoal = goalMap.get(key);
-      return { ...agent, goal: editedGoal != null ? editedGoal : (Number(agent.goal) || 0) };
-    });
+    collectTripEditorEdits();
     renderTripTracker();
     renderTripAdminEditor();
-    persistTripData('✓ Agent goals saved for everyone.');
+    persistTripData('✓ Changes saved for everyone.');
   }
 
   function handleTripCsvFile(file) {
@@ -9919,9 +9990,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
           rows = XLSX.utils.sheet_to_json(ws, {defval:''});
         } else {
           const text = e.target.result;
-          const lines = text.split(/
-?
-/).filter(l => l.trim());
+          const lines = text.split(/\r?\n/).filter(l => l.trim());
           const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
           rows = lines.slice(1).map(line => {
             const vals = smartSplitCsv(line);
@@ -9972,16 +10041,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   }
 
   function saveTripData() {
-    if (!_tripAgents.length) { alert('No data to save. Upload a CSV first.'); return; }
-    const inputs = Array.from(document.querySelectorAll('#tripAgentGoalEditor .trip-agent-goal-input'));
-    if (inputs.length) {
-      const goalMap = new Map(inputs.map(inp => [String(inp.dataset.tripAgent || '').trim().toLowerCase(), Math.max(0, Number(inp.value) || 0)]));
-      _tripAgents = _tripAgents.map(agent => {
-        const key = String(agent.name || '').trim().toLowerCase();
-        const editedGoal = goalMap.get(key);
-        return { ...agent, goal: editedGoal != null ? editedGoal : (Number(agent.goal) || 0) };
-      });
-    }
+    collectTripEditorEdits();
+    if (!_tripAgents.length) { alert('No agents to save. Add agents above first.'); return; }
     persistTripData('✓ Trip data saved!');
     const inp = document.getElementById('tripCsvInput');
     if (inp) inp.value = '';
