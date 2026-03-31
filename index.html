@@ -1032,28 +1032,7 @@
 
     .footer-note { font-size: 12px; color: var(--muted-2); margin-top: 3px; }
 
-    .footer-disclaimer {
-      border-top: 1px solid rgba(255,255,255,.07);
-      padding: 14px 0 18px;
-      max-width: 1320px;
-      margin: 0 auto;
-    }
 
-    .footer-disclaimer p {
-      font-size: 11px;
-      color: var(--muted-2);
-      line-height: 1.7;
-      text-align: center;
-      opacity: .85;
-    }
-
-    .footer-disclaimer strong {
-      color: var(--muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .4px;
-      font-size: 10px;
-    }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
@@ -6437,14 +6416,7 @@ When answering:
         </div>
         <div style="font-size:11px;color:var(--muted-2);">© 2025 My Medi</div>
       </div>
-      <div class="footer-disclaimer">
-        <p>
-          <strong>⚠ Agent Use Only</strong> &nbsp;·&nbsp;
-          This hub is intended for licensed insurance agent use only. All information, tools, and resources provided should be independently validated by the agent before use with clients.
-          The <strong>Agent Assistant AI</strong> tool is provided for general assistance and guidance purposes only — responses are not guaranteed to be 100% accurate, complete, or current.
-          Agents are solely responsible for verifying information and ensuring compliance with applicable laws, carrier guidelines, and CMS regulations.
-        </p>
-      </div>
+
     </footer>
 
   </div>
@@ -7887,7 +7859,19 @@ When answering:
     showSnuToast('✓ SNU data published!');
   }
 
-  function showSnuToast(msg) { return; }
+  function showSnuToast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    Object.assign(t.style, {
+      position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
+      background:'var(--accent)', color:'#fff', padding:'10px 22px',
+      borderRadius:'10px', fontWeight:'700', fontSize:'13px',
+      zIndex:'3000', boxShadow:'0 8px 24px rgba(59,130,246,.4)',
+      transition:'opacity .3s'
+    });
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+  }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAdmin(); });
   </script>
@@ -8416,35 +8400,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     }
   }
 
-  async function isApprovedHubUser(email) {
-    const normalized = String(email || '').trim().toLowerCase();
-    const ADMIN_ALLOW_EMAILS = ['brdeross@fjins.net'];
-    if (ADMIN_ALLOW_EMAILS.includes(normalized)) return true;
-
-    try {
-      const rows = await supaGet('agent_directory');
-      const list = (rows && rows.length && rows[0].data)
-        ? (Array.isArray(rows[0].data) ? rows[0].data : (typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : []))
-        : [];
-      const approvedEmails = list.map(x => String(x.email || '').trim().toLowerCase()).filter(Boolean);
-      if (approvedEmails.length) return approvedEmails.includes(normalized);
-    } catch (e) {}
-
-    return false;
-  }
-
-  window.submitHubGateLogin = async function() {
+  window.submitHubGateLogin = function() {
     const name = (document.getElementById('hubGateName')?.value || '').trim();
     const email = (document.getElementById('hubGateEmail')?.value || '').trim();
     const status = document.getElementById('hubGateStatus');
     if (!name || !email) {
       if (status) status.textContent = 'Name and email are required.';
-      return;
-    }
-    if (status) status.textContent = 'Checking access…';
-    const allowed = await isApprovedHubUser(email);
-    if (!allowed) {
-      if (status) status.textContent = 'Access denied. Use an approved agent email from the shared directory.';
       return;
     }
     const session = { name, email, signedInAt: new Date().toISOString() };
@@ -8512,132 +8473,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       wrapTrackedOpen('openTask', 'open_modal', 'daily_checklist');
     }
   });
-})();
-</script>
-
-
-<script>
-(function(){
-  // --- Agent login modal repair ---
-  window.openAgentLogin = function() {
-    const overlay = document.getElementById('agentLoginOverlay');
-    const session = (() => { try { return JSON.parse(sessionStorage.getItem('medi_hub_session') || 'null'); } catch(e) { return null; } })() || {};
-    const nameEl = document.getElementById('agentLoginName');
-    const emailEl = document.getElementById('agentLoginEmail');
-    const statusEl = document.getElementById('agentLoginStatus');
-    if (nameEl) nameEl.value = session.name || '';
-    if (emailEl) emailEl.value = session.email || '';
-    if (statusEl) statusEl.textContent = '';
-    if (overlay) {
-      overlay.style.display = 'flex';
-      overlay.classList.add('open');
-    }
-  };
-  window.closeAgentLogin = function() {
-    const overlay = document.getElementById('agentLoginOverlay');
-    if (overlay) {
-      overlay.style.display = 'none';
-      overlay.classList.remove('open');
-    }
-  };
-
-  // --- Checklist repair: use the existing task modal reliably on desktop + mobile ---
-  function renderTaskOverlayContent() {
-    const list = document.getElementById('taskList');
-    const fill = document.getElementById('taskProgressFill');
-    if (!list) return;
-    if (!Array.isArray(window._taskItems)) window._taskItems = [];
-    if (!Array.isArray(window._tasks)) window._tasks = [];
-
-    if (!window._taskItems.length) {
-      list.innerHTML = '<div class="task-empty">No team tasks yet.</div>';
-      if (fill) fill.style.width = '0%';
-      return;
-    }
-
-    list.innerHTML = window._taskItems.map(t => {
-      const done = window._tasks.includes(t.id);
-      return '<label class="task-item' + (done ? ' done' : '') + '" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:8px;border:1px solid ' + (done ? 'rgba(52,211,153,.2)' : 'transparent') + ';cursor:pointer;">'
-        + '<input type="checkbox" ' + (done ? 'checked' : '') + ' data-task-id="' + t.id + '" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;">'
-        + '<span style="color:#fff;font-size:12px;line-height:1.35;' + (done ? 'text-decoration:line-through;opacity:.55;' : '') + '">' + String(t.label || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>'
-        + '</label>';
-    }).join('');
-
-    const doneCount = window._tasks.filter(id => window._taskItems.some(t => t.id === id)).length;
-    const pct = window._taskItems.length ? Math.round((doneCount / window._taskItems.length) * 100) : 0;
-    if (fill) fill.style.width = pct + '%';
-
-    list.querySelectorAll('input[data-task-id]').forEach(inp => {
-      inp.addEventListener('change', function() {
-        const id = Number(this.getAttribute('data-task-id'));
-        if (this.checked && !window._tasks.includes(id)) window._tasks.push(id);
-        if (!this.checked) window._tasks = window._tasks.filter(x => x !== id);
-        if (typeof saveTaskChecks === 'function') saveTaskChecks();
-        if (typeof updateChecklistPill === 'function') updateChecklistPill();
-        renderTaskOverlayContent();
-      });
-    });
-  }
-
-  window.toggleChecklist = function(forceOpen) {
-    const overlay = document.getElementById('taskOverlay');
-    if (!overlay) return;
-    const willOpen = typeof forceOpen === 'boolean' ? forceOpen : !overlay.classList.contains('open');
-    if (willOpen && typeof initTasks === 'function') initTasks();
-    if (willOpen) renderTaskOverlayContent();
-    overlay.classList.toggle('open', willOpen);
-    overlay.style.display = willOpen ? 'flex' : 'none';
-  };
-  window.openTask = function() { window.toggleChecklist(true); };
-  window.closeTask = function() { window.toggleChecklist(false); };
-
-  const origResetTasks = window.resetTasks;
-  window.resetTasks = function() {
-    if (typeof origResetTasks === 'function') origResetTasks();
-    renderTaskOverlayContent();
-  };
-
-  // --- Admin button reliability repair ---
-  function wireAdminButtons() {
-    const notifBtn = document.querySelector('button[onclick="pushNotification()"]');
-    if (notifBtn) notifBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.pushNotification && window.pushNotification(); };
-
-    const taskBtn = document.querySelector('button[onclick="submitTaskEntry()"]');
-    if (taskBtn) taskBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.submitTaskEntry && window.submitTaskEntry(); };
-
-    document.querySelectorAll('#adminForm button[onclick]').forEach(btn => {
-      btn.style.pointerEvents = 'auto';
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const desktopBtn = document.getElementById('desktopChecklistBtn');
-    const mobileBtn = document.getElementById('mobileChecklistBtn');
-    if (desktopBtn) desktopBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.openTask(); };
-    if (mobileBtn) mobileBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.openTask(); };
-
-    const taskOverlay = document.getElementById('taskOverlay');
-    if (taskOverlay) {
-      taskOverlay.addEventListener('click', function(e){
-        if (e.target === taskOverlay) window.closeTask();
-      });
-    }
-
-    const agentOverlay = document.getElementById('agentLoginOverlay');
-    if (agentOverlay) {
-      agentOverlay.addEventListener('click', function(e){
-        if (e.target === agentOverlay) window.closeAgentLogin();
-      });
-      agentOverlay.querySelectorAll('.feature-close,.feature-modal-close').forEach(btn => {
-        btn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.closeAgentLogin(); };
-      });
-    }
-
-    wireAdminButtons();
-  });
-
-  // Make sure shared admin updates don't get blocked by stale display layers.
-  window.showSnuToast = function() { return; };
 })();
 </script>
 
@@ -13932,14 +13767,11 @@ window.toggleTeamTask = function(id, checked) {
     const checked = [...document.querySelectorAll('#rf_products input:checked')].map(c => c.value);
     const err = document.getElementById('rf_err');
     if (!referrer || !name || !dob || !phone || !agent || !checked.length) {
-      if (err) {
-        err.style.display = 'block';
-        err.textContent = 'Please fill in all required fields and select at least one product.';
-      }
+      err.style.display = 'block';
+      err.textContent = 'Please fill in all required fields and select at least one product.';
       return;
     }
-    if (err) err.style.display = 'none';
-
+    err.style.display = 'none';
     const subject = encodeURIComponent('New Referral: ' + name + ' (referred by ' + referrer + ')');
     const body = encodeURIComponent(
       'NEW REFERRAL SUBMISSION\n========================\n\n' +
@@ -13960,37 +13792,25 @@ window.toggleTeamTask = function(id, checked) {
       'Notes:\n' + (g('rf_notes') || 'None') + '\n\n' +
       '========================\nSubmitted via Medi Solutions Agent Hub'
     );
-
     window.location.href = 'mailto:info@medisolins.com?subject=' + subject + '&body=' + body;
-
     setTimeout(() => {
-      const formBody = document.getElementById('referralFormBody');
-      const success = document.getElementById('referralSuccess');
-      if (formBody) formBody.style.display = 'none';
-      if (success) success.style.display = 'block';
+      document.getElementById('referralFormBody').style.display = 'none';
+      document.getElementById('referralSuccess').style.display = 'block';
     }, 800);
   }
   function resetReferralForm() {
-    [
-      'rf_referrer','rf_referrer_phone','rf_referrer_email','rf_referrer_address',
-      'rf_name','rf_dob','rf_phone','rf_email','rf_address','rf_agent','rf_notes'
-    ].forEach(id => {
-      const e = document.getElementById(id);
-      if (e) e.value = '';
-    });
-
+    ['rf_referrer','rf_referrer_phone','rf_referrer_email','rf_referrer_address',
+     'rf_name','rf_dob','rf_phone','rf_email','rf_address','rf_agent','rf_notes']
+      .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
     document.querySelectorAll('#rf_products input').forEach(c => c.checked = false);
-
-    const success = document.getElementById('referralSuccess');
-    const formBody = document.getElementById('referralFormBody');
-    if (success) success.style.display = 'none';
-    if (formBody) formBody.style.display = 'block';
+    document.getElementById('referralSuccess').style.display = 'none';
+    document.getElementById('referralFormBody').style.display = 'block';
   }
-
-  const referralOverlay = document.getElementById('referralOverlay');
-  if (referralOverlay) {
-    referralOverlay.addEventListener('click', function(e) {
-      if (e.target === this) closeReferralModal();
-    });
-  }
+  document.getElementById('referralOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeReferralModal();
+  });
 </script>
+<!-- ── END REFERRAL MODAL ──────────────────────────────────────── -->
+
+</body>
+</html>
