@@ -5139,6 +5139,7 @@
           <button class="admin-tab" onclick="switchAdminTab('tasks',this)">✅ Tasks</button>
           <button class="admin-tab" onclick="switchAdminTab('carriers',this)">📞 Carriers</button>
           <button class="admin-tab" onclick="switchAdminTab('onboarding',this)">🚀 Onboarding</button>
+          <button class="admin-tab" onclick="switchAdminTab('ownership',this)">📝 Ownership</button>
           <button class="admin-tab active" onclick="switchAdminTab('snu',this)">🏆 SNU Data</button>
           <button class="admin-tab" onclick="switchAdminTab('spotlight',this)">⭐ Agent Spotlight</button>
           <button class="admin-tab" onclick="switchAdminTab('aom',this)">🗓️ Agent of Month</button>
@@ -5286,6 +5287,43 @@
           <div id="onboardAdminList" style="margin-top:8px;"></div>
         </div>
         </div><!-- /adminTabOnboarding -->
+        <!-- ── Tab: Ownership Sign-Up ── -->
+        <div id="adminTabOwnership" class="admin-tab-panel">
+        <div class="admin-body">
+          <div class="admin-section-title">📝 Section Ownership Sign-Up</div>
+          <p style="font-size:12px;color:var(--muted-2);margin-bottom:14px;">Use this shared sign-up to claim one or multiple hub sections your team member will own.</p>
+
+          <div style="display:grid;gap:10px;margin-bottom:14px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Name *</label>
+                <input id="ownerAdminName" type="text" placeholder="Jane Smith" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;">
+              </div>
+              <div>
+                <label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Email / Contact</label>
+                <input id="ownerAdminContact" type="text" placeholder="jane@example.com" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;">
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Sections Owned *</label>
+              <div id="ownershipOptions" style="margin-top:6px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+            <button onclick="submitOwnershipEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">✅ Save Ownership</button>
+            <button onclick="cancelOwnershipEdit()" id="ownershipCancelBtn" style="display:none;padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">Cancel</button>
+          </div>
+
+          <div id="ownershipAdminStatus" style="font-size:11px;color:var(--muted-2);margin-bottom:14px;min-height:16px;"></div>
+
+          <div class="admin-section-title" style="margin-top:4px;">📋 Current Owners <span id="ownershipAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+          <div id="ownershipAdminList" style="margin-top:8px;"></div>
+        </div>
+        </div><!-- /adminTabOwnership -->
+
+
 
         <!-- ── Tab: Announcement Banner ── -->
         <div id="adminTabAnnouncement" class="admin-tab-panel">
@@ -7459,7 +7497,204 @@ When answering:
         execs.forEach(e => addExecRow(e));
       }
     }
+
+    initOwnership();
   }
+
+
+  /* ════════════════════════════════
+     SECTION OWNERSHIP SIGN-UP
+  ════════════════════════════════ */
+  const OWNERSHIP_SECTIONS = [
+    'Hero / Quick Access',
+    'Banner',
+    'Agent Directory',
+    'Carrier Contacts',
+    'Agent Onboarding',
+    'Tasks / Checklist',
+    'SNU Data',
+    'Agent Spotlight',
+    'Agent of Month',
+    'Updates Feed',
+    'Video Library',
+    'Trip Tracker',
+    'Friday Meetings',
+    'Certifications',
+    'Alliance',
+    'Census Form',
+    'Article Locker',
+    'Forms Locker',
+    'Layout / Links',
+    'Notifications'
+  ];
+
+  let _ownership = [], _ownershipEditId = null;
+
+  function initOwnership() {
+    const box = document.getElementById('ownershipOptions');
+    if (box && !box.dataset.ready) {
+      box.innerHTML = OWNERSHIP_SECTIONS.map(section => `
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:9px 10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;cursor:pointer;">
+          <input type="checkbox" class="ownership-section-cb" value="${esc(section)}" style="margin-top:2px;accent-color:var(--teal);">
+          <span style="font-size:12px;color:#fff;line-height:1.35;">${esc(section)}</span>
+        </label>
+      `).join('');
+      box.dataset.ready = '1';
+    }
+
+    supaGet('section_ownership').then(rows => {
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        _ownership = Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
+      } else {
+        _ownership = [];
+      }
+      renderOwnershipAdminList();
+    }).catch(() => {
+      _ownership = [];
+      renderOwnershipAdminList();
+    });
+  }
+
+  function getSelectedOwnershipSections() {
+    return Array.from(document.querySelectorAll('.ownership-section-cb:checked')).map(cb => cb.value);
+  }
+
+  function setSelectedOwnershipSections(selected) {
+    const picked = new Set(selected || []);
+    document.querySelectorAll('.ownership-section-cb').forEach(cb => {
+      cb.checked = picked.has(cb.value);
+    });
+  }
+
+  function renderOwnershipAdminList() {
+    const el = document.getElementById('ownershipAdminList');
+    const countEl = document.getElementById('ownershipAdminCount');
+    if (!el) return;
+    if (countEl) countEl.textContent = _ownership.length ? `(${_ownership.length})` : '';
+
+    if (!_ownership.length) {
+      el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No ownership sign-ups yet.</div>';
+      return;
+    }
+
+    el.innerHTML = _ownership.map(entry => `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="min-width:0;flex:1;">
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#fff;">${pesc(entry.name || '')}</div>
+            ${entry.contact ? `<div style="font-size:11px;color:var(--accent-2);margin-top:2px;">${pesc(entry.contact)}</div>` : ''}
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+              ${(entry.sections || []).map(section => `<span style="display:inline-flex;padding:4px 9px;border-radius:999px;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.22);color:#bff8ee;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;">${pesc(section)}</span>`).join('')}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button onclick="editOwnershipEntry('${esc(entry.id)}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(59,130,246,.25);background:rgba(59,130,246,.12);color:var(--accent-2);font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">Edit</button>
+            <button onclick="deleteOwnershipEntry('${esc(entry.id)}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(251,113,133,.25);background:rgba(251,113,133,.12);color:var(--rose);font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function clearOwnershipForm() {
+    const nameEl = document.getElementById('ownerAdminName');
+    const contactEl = document.getElementById('ownerAdminContact');
+    const cancelBtn = document.getElementById('ownershipCancelBtn');
+    const statusEl = document.getElementById('ownershipAdminStatus');
+    if (nameEl) nameEl.value = '';
+    if (contactEl) contactEl.value = '';
+    setSelectedOwnershipSections([]);
+    _ownershipEditId = null;
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (statusEl) statusEl.textContent = '';
+  }
+
+  window.cancelOwnershipEdit = function() {
+    clearOwnershipForm();
+  };
+
+  window.editOwnershipEntry = function(id) {
+    const entry = _ownership.find(x => String(x.id) === String(id));
+    if (!entry) return;
+    _ownershipEditId = entry.id;
+    const nameEl = document.getElementById('ownerAdminName');
+    const contactEl = document.getElementById('ownerAdminContact');
+    const cancelBtn = document.getElementById('ownershipCancelBtn');
+    const statusEl = document.getElementById('ownershipAdminStatus');
+    if (nameEl) nameEl.value = entry.name || '';
+    if (contactEl) contactEl.value = entry.contact || '';
+    setSelectedOwnershipSections(entry.sections || []);
+    if (cancelBtn) cancelBtn.style.display = '';
+    if (statusEl) statusEl.textContent = 'Editing ownership entry…';
+  };
+
+  window.deleteOwnershipEntry = function(id) {
+    _ownership = _ownership.filter(x => String(x.id) !== String(id));
+    renderOwnershipAdminList();
+    supaUpsert('section_ownership', _ownership)
+      .then(() => {
+        const statusEl = document.getElementById('ownershipAdminStatus');
+        if (statusEl) statusEl.textContent = '✓ Ownership entry removed.';
+      })
+      .catch(() => {
+        const statusEl = document.getElementById('ownershipAdminStatus');
+        if (statusEl) statusEl.textContent = '⚠ Removed locally, but cloud save failed.';
+      });
+    if (String(_ownershipEditId) == String(id)) clearOwnershipForm();
+  };
+
+  window.submitOwnershipEntry = function() {
+    const nameEl = document.getElementById('ownerAdminName');
+    const contactEl = document.getElementById('ownerAdminContact');
+    const statusEl = document.getElementById('ownershipAdminStatus');
+    const cancelBtn = document.getElementById('ownershipCancelBtn');
+
+    const name = (nameEl?.value || '').trim();
+    const contact = (contactEl?.value || '').trim();
+    const sections = getSelectedOwnershipSections();
+
+    if (!name) {
+      if (statusEl) statusEl.textContent = '✗ Name is required.';
+      nameEl?.focus();
+      return;
+    }
+    if (!sections.length) {
+      if (statusEl) statusEl.textContent = '✗ Select at least one section.';
+      return;
+    }
+
+    const entry = {
+      id: _ownershipEditId || ('own_' + Date.now()),
+      name,
+      contact,
+      sections
+    };
+
+    if (_ownershipEditId) {
+      _ownership = _ownership.map(x => String(x.id) === String(_ownershipEditId) ? entry : x);
+    } else {
+      _ownership.push(entry);
+    }
+
+    renderOwnershipAdminList();
+    if (statusEl) statusEl.textContent = '⏳ Saving ownership sign-up…';
+
+    supaUpsert('section_ownership', _ownership)
+      .then(() => {
+        if (statusEl) statusEl.textContent = '✓ Ownership sign-up saved.';
+      })
+      .catch(() => {
+        if (statusEl) statusEl.textContent = '⚠ Saved locally, but cloud save failed.';
+      });
+
+    _ownershipEditId = null;
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (nameEl) nameEl.value = '';
+    if (contactEl) contactEl.value = '';
+    setSelectedOwnershipSections([]);
+  };
+
 
   function addAgentRow(a) {
     a = a || {};
