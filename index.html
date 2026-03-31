@@ -7887,19 +7887,7 @@ When answering:
     showSnuToast('✓ SNU data published!');
   }
 
-  function showSnuToast(msg) {
-    const t = document.createElement('div');
-    t.textContent = msg;
-    Object.assign(t.style, {
-      position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
-      background:'var(--accent)', color:'#fff', padding:'10px 22px',
-      borderRadius:'10px', fontWeight:'700', fontSize:'13px',
-      zIndex:'3000', boxShadow:'0 8px 24px rgba(59,130,246,.4)',
-      transition:'opacity .3s'
-    });
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
-  }
+  function showSnuToast(msg) { return; }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAdmin(); });
   </script>
@@ -8428,12 +8416,35 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     }
   }
 
-  window.submitHubGateLogin = function() {
+  async function isApprovedHubUser(email) {
+    const normalized = String(email || '').trim().toLowerCase();
+    const ADMIN_ALLOW_EMAILS = ['brdeross@fjins.net'];
+    if (ADMIN_ALLOW_EMAILS.includes(normalized)) return true;
+
+    try {
+      const rows = await supaGet('agent_directory');
+      const list = (rows && rows.length && rows[0].data)
+        ? (Array.isArray(rows[0].data) ? rows[0].data : (typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : []))
+        : [];
+      const approvedEmails = list.map(x => String(x.email || '').trim().toLowerCase()).filter(Boolean);
+      if (approvedEmails.length) return approvedEmails.includes(normalized);
+    } catch (e) {}
+
+    return false;
+  }
+
+  window.submitHubGateLogin = async function() {
     const name = (document.getElementById('hubGateName')?.value || '').trim();
     const email = (document.getElementById('hubGateEmail')?.value || '').trim();
     const status = document.getElementById('hubGateStatus');
     if (!name || !email) {
       if (status) status.textContent = 'Name and email are required.';
+      return;
+    }
+    if (status) status.textContent = 'Checking access…';
+    const allowed = await isApprovedHubUser(email);
+    if (!allowed) {
+      if (status) status.textContent = 'Access denied. Use an approved agent email from the shared directory.';
       return;
     }
     const session = { name, email, signedInAt: new Date().toISOString() };
@@ -8501,6 +8512,132 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       wrapTrackedOpen('openTask', 'open_modal', 'daily_checklist');
     }
   });
+})();
+</script>
+
+
+<script>
+(function(){
+  // --- Agent login modal repair ---
+  window.openAgentLogin = function() {
+    const overlay = document.getElementById('agentLoginOverlay');
+    const session = (() => { try { return JSON.parse(sessionStorage.getItem('medi_hub_session') || 'null'); } catch(e) { return null; } })() || {};
+    const nameEl = document.getElementById('agentLoginName');
+    const emailEl = document.getElementById('agentLoginEmail');
+    const statusEl = document.getElementById('agentLoginStatus');
+    if (nameEl) nameEl.value = session.name || '';
+    if (emailEl) emailEl.value = session.email || '';
+    if (statusEl) statusEl.textContent = '';
+    if (overlay) {
+      overlay.style.display = 'flex';
+      overlay.classList.add('open');
+    }
+  };
+  window.closeAgentLogin = function() {
+    const overlay = document.getElementById('agentLoginOverlay');
+    if (overlay) {
+      overlay.style.display = 'none';
+      overlay.classList.remove('open');
+    }
+  };
+
+  // --- Checklist repair: use the existing task modal reliably on desktop + mobile ---
+  function renderTaskOverlayContent() {
+    const list = document.getElementById('taskList');
+    const fill = document.getElementById('taskProgressFill');
+    if (!list) return;
+    if (!Array.isArray(window._taskItems)) window._taskItems = [];
+    if (!Array.isArray(window._tasks)) window._tasks = [];
+
+    if (!window._taskItems.length) {
+      list.innerHTML = '<div class="task-empty">No team tasks yet.</div>';
+      if (fill) fill.style.width = '0%';
+      return;
+    }
+
+    list.innerHTML = window._taskItems.map(t => {
+      const done = window._tasks.includes(t.id);
+      return '<label class="task-item' + (done ? ' done' : '') + '" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:8px;border:1px solid ' + (done ? 'rgba(52,211,153,.2)' : 'transparent') + ';cursor:pointer;">'
+        + '<input type="checkbox" ' + (done ? 'checked' : '') + ' data-task-id="' + t.id + '" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;">'
+        + '<span style="color:#fff;font-size:12px;line-height:1.35;' + (done ? 'text-decoration:line-through;opacity:.55;' : '') + '">' + String(t.label || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>'
+        + '</label>';
+    }).join('');
+
+    const doneCount = window._tasks.filter(id => window._taskItems.some(t => t.id === id)).length;
+    const pct = window._taskItems.length ? Math.round((doneCount / window._taskItems.length) * 100) : 0;
+    if (fill) fill.style.width = pct + '%';
+
+    list.querySelectorAll('input[data-task-id]').forEach(inp => {
+      inp.addEventListener('change', function() {
+        const id = Number(this.getAttribute('data-task-id'));
+        if (this.checked && !window._tasks.includes(id)) window._tasks.push(id);
+        if (!this.checked) window._tasks = window._tasks.filter(x => x !== id);
+        if (typeof saveTaskChecks === 'function') saveTaskChecks();
+        if (typeof updateChecklistPill === 'function') updateChecklistPill();
+        renderTaskOverlayContent();
+      });
+    });
+  }
+
+  window.toggleChecklist = function(forceOpen) {
+    const overlay = document.getElementById('taskOverlay');
+    if (!overlay) return;
+    const willOpen = typeof forceOpen === 'boolean' ? forceOpen : !overlay.classList.contains('open');
+    if (willOpen && typeof initTasks === 'function') initTasks();
+    if (willOpen) renderTaskOverlayContent();
+    overlay.classList.toggle('open', willOpen);
+    overlay.style.display = willOpen ? 'flex' : 'none';
+  };
+  window.openTask = function() { window.toggleChecklist(true); };
+  window.closeTask = function() { window.toggleChecklist(false); };
+
+  const origResetTasks = window.resetTasks;
+  window.resetTasks = function() {
+    if (typeof origResetTasks === 'function') origResetTasks();
+    renderTaskOverlayContent();
+  };
+
+  // --- Admin button reliability repair ---
+  function wireAdminButtons() {
+    const notifBtn = document.querySelector('button[onclick="pushNotification()"]');
+    if (notifBtn) notifBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.pushNotification && window.pushNotification(); };
+
+    const taskBtn = document.querySelector('button[onclick="submitTaskEntry()"]');
+    if (taskBtn) taskBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.submitTaskEntry && window.submitTaskEntry(); };
+
+    document.querySelectorAll('#adminForm button[onclick]').forEach(btn => {
+      btn.style.pointerEvents = 'auto';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const desktopBtn = document.getElementById('desktopChecklistBtn');
+    const mobileBtn = document.getElementById('mobileChecklistBtn');
+    if (desktopBtn) desktopBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.openTask(); };
+    if (mobileBtn) mobileBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.openTask(); };
+
+    const taskOverlay = document.getElementById('taskOverlay');
+    if (taskOverlay) {
+      taskOverlay.addEventListener('click', function(e){
+        if (e.target === taskOverlay) window.closeTask();
+      });
+    }
+
+    const agentOverlay = document.getElementById('agentLoginOverlay');
+    if (agentOverlay) {
+      agentOverlay.addEventListener('click', function(e){
+        if (e.target === agentOverlay) window.closeAgentLogin();
+      });
+      agentOverlay.querySelectorAll('.feature-close,.feature-modal-close').forEach(btn => {
+        btn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.closeAgentLogin(); };
+      });
+    }
+
+    wireAdminButtons();
+  });
+
+  // Make sure shared admin updates don't get blocked by stale display layers.
+  window.showSnuToast = function() { return; };
 })();
 </script>
 
