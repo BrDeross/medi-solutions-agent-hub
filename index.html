@@ -1230,14 +1230,17 @@
       #announcementBanner {
       position: static !important;
       display: none;
-      width: 100%;
+      width: 100% !important;
       top: auto !important;
       right: auto !important;
       bottom: auto !important;
       left: auto !important;
+      inset: auto !important;
       transform: none !important;
       z-index: 1 !important;
-      clear: both;
+      clear: both !important;
+      float: none !important;
+      margin: 0 !important;
     }
       #starStripItems {
         display: grid !important;
@@ -4009,6 +4012,11 @@
     }
     .announcement-inner {
       position: static !important;
+      top: auto !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      transform: none !important;
     }
     .announcement-inner {
       display: flex;
@@ -4271,7 +4279,21 @@
     .cl-empty { font-size: 12px; color: rgba(255,255,255,.3); font-style: italic; padding: 8px 2px; }
   </style>
 </head>
-<body>
+<body class="hub-login-pending">
+  <div id="hubLoginGate" style="position:fixed;inset:0;z-index:12000;background:rgba(8,15,32,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="width:min(460px,100%);background:#102245;border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:24px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:8px;">Agent Hub Login</div>
+      <div style="font-size:13px;color:var(--muted-2);margin-bottom:18px;">Enter your name and email before accessing the hub.</div>
+      <div style="display:grid;gap:12px;">
+        <input id="hubGateName" class="admin-input" type="text" placeholder="Full name">
+        <input id="hubGateEmail" class="admin-input" type="email" placeholder="Email address">
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+        <button class="admin-save-btn" style="width:auto;padding:10px 18px;" onclick="submitHubGateLogin()">Enter Hub</button>
+      </div>
+      <div id="hubGateStatus" style="margin-top:12px;font-size:12px;color:var(--muted-2);"></div>
+    </div>
+  </div>
 
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
@@ -8379,6 +8401,87 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 })();
 </script>
 
+
+<script>
+(function(){
+  const HUB_SESSION_KEY = 'medi_hub_session';
+
+  function readHubSession() {
+    try { return JSON.parse(sessionStorage.getItem(HUB_SESSION_KEY) || 'null'); } catch(e) { return null; }
+  }
+  function writeHubSession(data) {
+    try { sessionStorage.setItem(HUB_SESSION_KEY, JSON.stringify(data)); } catch(e) {}
+  }
+  function applyHubSessionUi() {
+    const gate = document.getElementById('hubLoginGate');
+    const session = readHubSession();
+    if (session && session.name && session.email) {
+      document.body.classList.remove('hub-login-pending');
+      if (gate) gate.style.display = 'none';
+      const badge = document.getElementById('agentLoginBadge');
+      const btn = document.getElementById('agentLoginBtn');
+      if (badge) badge.textContent = 'Signed in: ' + session.name;
+      if (btn) btn.textContent = '👤 ' + session.name;
+    } else {
+      document.body.classList.add('hub-login-pending');
+      if (gate) gate.style.display = 'flex';
+    }
+  }
+
+  window.submitHubGateLogin = function() {
+    const name = (document.getElementById('hubGateName')?.value || '').trim();
+    const email = (document.getElementById('hubGateEmail')?.value || '').trim();
+    const status = document.getElementById('hubGateStatus');
+    if (!name || !email) {
+      if (status) status.textContent = 'Name and email are required.';
+      return;
+    }
+    writeHubSession({ name, email, signedInAt: new Date().toISOString() });
+    const nameEl = document.getElementById('agentLoginName');
+    const emailEl = document.getElementById('agentLoginEmail');
+    if (nameEl) nameEl.value = name;
+    if (emailEl) emailEl.value = email;
+    applyHubSessionUi();
+  };
+
+  const prevOpenAgentLogin = window.openAgentLogin;
+  window.openAgentLogin = function() {
+    const session = readHubSession() || {};
+    const overlay = document.getElementById('agentLoginOverlay');
+    const nameEl = document.getElementById('agentLoginName');
+    const emailEl = document.getElementById('agentLoginEmail');
+    const statusEl = document.getElementById('agentLoginStatus');
+    if (nameEl) nameEl.value = session.name || '';
+    if (emailEl) emailEl.value = session.email || '';
+    if (statusEl) statusEl.textContent = '';
+    if (overlay) overlay.style.display = 'flex';
+  };
+
+  window.saveAgentLogin = function() {
+    const name = (document.getElementById('agentLoginName')?.value || '').trim();
+    const email = (document.getElementById('agentLoginEmail')?.value || '').trim();
+    const statusEl = document.getElementById('agentLoginStatus');
+    if (!name || !email) {
+      if (statusEl) statusEl.textContent = 'Name and email are required.';
+      return;
+    }
+    writeHubSession({ name, email, signedInAt: new Date().toISOString() });
+    applyHubSessionUi();
+    if (statusEl) statusEl.textContent = 'Saved for this session.';
+    setTimeout(function(){ window.closeAgentLogin && window.closeAgentLogin(); }, 350);
+  };
+
+  window.clearAgentLogin = function() {
+    try { sessionStorage.removeItem(HUB_SESSION_KEY); } catch(e) {}
+    applyHubSessionUi();
+    const overlay = document.getElementById('agentLoginOverlay');
+    if (overlay) overlay.style.display = 'none';
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){ applyHubSessionUi(); });
+})();
+</script>
+
 </body></html>`;
 
     const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
@@ -9576,7 +9679,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
         'Cache-Control': 'no-cache'
       }
-    }).then(r => r.json()).then(rows => {
+    }).then(r => r.json()).then(async rows => {
       let next = { agents: [], meta: {} };
       if (rows && rows.length && rows[0].data) {
         const raw = rows[0].data;
@@ -9585,6 +9688,18 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
           agents: Array.isArray(d.agents) ? d.agents : [],
           meta: d.meta || {}
         };
+      }
+      if ((!next.agents || !next.agents.length) && typeof jbReadBin === 'function' && typeof JB_MAIN_BIN !== 'undefined') {
+        try {
+          const rec = await jbReadBin(JB_MAIN_BIN);
+          const legacy = rec && rec.snu_trip;
+          if (legacy && typeof legacy === 'object') {
+            next = {
+              agents: Array.isArray(legacy.agents) ? legacy.agents : [],
+              meta: legacy.meta || {}
+            };
+          }
+        } catch (e) {}
       }
       const nextSnapshot = tripSnapshot(next);
       const changed = nextSnapshot !== _tripSnapshot;
@@ -12392,14 +12507,39 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   ════════════════════════════════ */
   let _dir = [], _dirEditId = null;
 
+
+  function parseSharedRows(rows) {
+    if (rows && rows.length && rows[0].data) {
+      const raw = rows[0].data;
+      return Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
+    }
+    return [];
+  }
+
+  let _dirSyncStarted = false, _carrierSyncStarted = false, _onboardSyncStarted = false;
+
+  function startDirLiveSync() {
+    if (_dirSyncStarted) return;
+    _dirSyncStarted = true;
+    setInterval(() => { supaGet('agent_directory').then(rows => { _dir = parseSharedRows(rows); renderDirModal(_dir); refreshDirAdminList(); }).catch(()=>{}); }, 10000);
+  }
+  function startCarrierLiveSync() {
+    if (_carrierSyncStarted) return;
+    _carrierSyncStarted = true;
+    setInterval(() => { supaGet('carrier_contacts').then(rows => { _carriers = parseSharedRows(rows); renderCarrierModal(_carriers); refreshCarrierAdminList(); }).catch(()=>{}); }, 10000);
+  }
+  function startOnboardLiveSync() {
+    if (_onboardSyncStarted) return;
+    _onboardSyncStarted = true;
+    setInterval(() => { supaGet('onboarding_steps').then(rows => { _onboard = parseSharedRows(rows); renderOnboardModal(); refreshOnboardAdminList(); }).catch(()=>{}); }, 10000);
+  }
+
   function initDir() {
     supaGet('agent_directory').then(rows => {
-      if (rows && rows.length && rows[0].data) {
-        const raw = rows[0].data;
-        _dir = Array.isArray(raw) ? raw : (typeof raw==='string' ? JSON.parse(raw) : []);
-      } else _dir = [];
+      _dir = parseSharedRows(rows);
       renderDirModal(_dir);
       refreshDirAdminList();
+      startDirLiveSync();
     }).catch(()=>{});
   }
 
@@ -12440,7 +12580,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const entry = { id: _dirEditId||Date.now(), name, title:g('dirAdminTitle'), phone:g('dirAdminPhone'), email:g('dirAdminEmail'), territory:g('dirAdminTerritory'), tag:g('dirAdminTag') };
     if (_dirEditId) { const i=_dir.findIndex(x=>x.id===_dirEditId); if(i>=0)_dir[i]=entry; else _dir.push(entry); } else _dir.push(entry);
     cancelDirEdit(); refreshDirAdminList(); toast('⏳ Saving…');
-    supaUpsert('agent_directory', _dir).then(()=>toast('✓ Directory saved!')).catch(()=>toast('⚠ Save failed.'));
+    supaUpsert('agent_directory', _dir).then(()=>{ initDir(); toast('✓ Directory saved!'); }).catch(()=>toast('⚠ Save failed.'));
   };
   window.editDirEntry = function(id) {
     const a=_dir.find(x=>x.id===id); if(!a) return; _dirEditId=id;
@@ -12449,7 +12589,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const cb=document.getElementById('dirCancelBtn'); if(cb) cb.style.display='';
     document.getElementById('dirAdminName')?.focus();
   };
-  window.deleteDirEntry = function(id) { _dir=_dir.filter(x=>x.id!==id); refreshDirAdminList(); toast('⏳ Removing…'); supaUpsert('agent_directory',_dir).then(()=>toast('🗑 Removed.')); };
+  window.deleteDirEntry = function(id) { _dir=_dir.filter(x=>x.id!==id); refreshDirAdminList(); toast('⏳ Removing…'); supaUpsert('agent_directory',_dir).then(()=>{ initDir(); toast('🗑 Removed.'); }); };
   window.cancelDirEdit = function() {
     _dirEditId=null;
     ['dirAdminName','dirAdminTitle','dirAdminPhone','dirAdminEmail','dirAdminTerritory','dirAdminTag'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -12736,8 +12876,8 @@ window.toggleTeamTask = function(id, checked) {
 
   function initCarriers(){
     supaGet('carrier_contacts').then(rows=>{
-      if(rows&&rows.length&&rows[0].data){const raw=rows[0].data;_carriers=Array.isArray(raw)?raw:(typeof raw==='string'?JSON.parse(raw):[]);}else _carriers=[];
-      renderCarrierModal(_carriers); refreshCarrierAdminList();
+      _carriers = parseSharedRows(rows);
+      renderCarrierModal(_carriers); refreshCarrierAdminList(); startCarrierLiveSync();
     }).catch(()=>{});
   }
   function renderCarrierModal(list){
@@ -12764,7 +12904,7 @@ window.toggleTeamTask = function(id, checked) {
     cancelCarrierEdit();refreshCarrierAdminList();toast('⏳ Saving…');supaUpsert('carrier_contacts',_carriers).then(()=>toast('✓ Saved!')).catch(()=>toast('⚠ Save failed.'));
   };
   window.editCarrierEntry=function(id){const c=_carriers.find(x=>x.id===id);if(!c)return;_carrierEditId=id;const sv=(eid,v)=>{const e=document.getElementById(eid);if(e)e.value=v||'';};sv('carrierAdminName',c.name);sv('carrierAdminPhone',c.phone);sv('carrierAdminAuth',c.auth);sv('carrierAdminUrl',c.url);sv('carrierAdminNotes',c.notes);const cb=document.getElementById('carrierCancelBtn');if(cb)cb.style.display='';document.getElementById('carrierAdminName')?.focus();};
-  window.deleteCarrierEntry=function(id){_carriers=_carriers.filter(x=>x.id!==id);refreshCarrierAdminList();toast('⏳ Removing…');supaUpsert('carrier_contacts',_carriers).then(()=>toast('🗑 Removed.'));};
+  window.deleteCarrierEntry=function(id){_carriers=_carriers.filter(x=>x.id!==id);refreshCarrierAdminList();toast('⏳ Removing…');supaUpsert('carrier_contacts',_carriers).then(()=>{ initCarriers(); toast('🗑 Removed.'); });};
   window.cancelCarrierEdit=function(){_carrierEditId=null;['carrierAdminName','carrierAdminPhone','carrierAdminAuth','carrierAdminUrl','carrierAdminNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});const cb=document.getElementById('carrierCancelBtn');if(cb)cb.style.display='none';};
   function refreshCarrierAdminList(){
     const el=document.getElementById('carrierAdminList'),ct=document.getElementById('carrierAdminCount');if(!el)return;
@@ -12781,9 +12921,9 @@ window.toggleTeamTask = function(id, checked) {
 
   function initOnboard(){
     supaGet('onboarding_steps').then(rows=>{
-      if(rows&&rows.length&&rows[0].data){const raw=rows[0].data;_onboard=Array.isArray(raw)?raw:(typeof raw==='string'?JSON.parse(raw):[]);}else _onboard=[];
+      _onboard = parseSharedRows(rows);
       try{const s=localStorage.getItem(OB_STORAGE);_onboardDone=s?JSON.parse(s):[];}catch(e){_onboardDone=[];}
-      renderOnboardModal();refreshOnboardAdminList();
+      renderOnboardModal();refreshOnboardAdminList(); startOnboardLiveSync();
     }).catch(()=>{});
   }
   function saveOnboardDone(){try{localStorage.setItem(OB_STORAGE,JSON.stringify(_onboardDone));}catch(e){}}
@@ -12832,7 +12972,7 @@ window.toggleTeamTask = function(id, checked) {
     cancelOnboardEdit();refreshOnboardAdminList();toast('⏳ Saving…');supaUpsert('onboarding_steps',_onboard).then(()=>toast('✓ Saved!')).catch(()=>toast('⚠ Save failed.'));
   };
   window.editOnboardEntry=function(id){const s=_onboard.find(x=>x.id===id);if(!s)return;_onboardEditId=id;const sv=(eid,v)=>{const e=document.getElementById(eid);if(e)e.value=v||'';};sv('onboardAdminPhase',s.phase);sv('onboardAdminLabel',s.label);sv('onboardAdminDesc',s.desc);sv('onboardAdminLink',s.link);const cb=document.getElementById('onboardCancelBtn');if(cb)cb.style.display='';document.getElementById('onboardAdminLabel')?.focus();};
-  window.deleteOnboardEntry=function(id){_onboard=_onboard.filter(x=>x.id!==id);refreshOnboardAdminList();toast('⏳ Removing…');supaUpsert('onboarding_steps',_onboard).then(()=>toast('🗑 Removed.'));};
+  window.deleteOnboardEntry=function(id){_onboard=_onboard.filter(x=>x.id!==id);refreshOnboardAdminList();toast('⏳ Removing…');supaUpsert('onboarding_steps',_onboard).then(()=>{ initOnboard(); toast('🗑 Removed.'); });};
   window.cancelOnboardEdit=function(){_onboardEditId=null;['onboardAdminPhase','onboardAdminLabel','onboardAdminDesc','onboardAdminLink'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});const cb=document.getElementById('onboardCancelBtn');if(cb)cb.style.display='none';};
   function refreshOnboardAdminList(){
     const el=document.getElementById('onboardAdminList'),ct=document.getElementById('onboardAdminCount');if(!el)return;
@@ -12868,7 +13008,7 @@ window.toggleTeamTask = function(id, checked) {
       refreshOnboardAdminList();
       renderOnboardModal();
       setOk('⏳ Importing ' + items.length + ' onboarding steps…');
-      supaUpsert('onboarding_steps', _onboard).then(()=>{ setOk('✓ Imported ' + items.length + ' onboarding steps.'); }).catch(()=>{ setErr('⚠ Imported locally but cloud save failed.'); });
+      supaUpsert('onboarding_steps', _onboard).then(()=>{ initOnboard(); setOk('✓ Imported ' + items.length + ' onboarding steps.'); }).catch(()=>{ setErr('⚠ Imported locally but cloud save failed.'); });
     };
     const name=(file.name||'').toLowerCase();
     if(name.endsWith('.csv')){
