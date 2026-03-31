@@ -2170,6 +2170,43 @@
       box-shadow: 0 0 14px rgba(251,191,36,.25);
     }
 
+    .checklist-trigger {
+      background: rgba(45,212,191,.14);
+      border: 1px solid rgba(45,212,191,.28);
+      border-radius: 10px;
+      padding: 6px 13px;
+      color: #bff8ee;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: background .15s, color .15s, box-shadow .15s, border-color .15s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      white-space: nowrap;
+      letter-spacing: .2px;
+      flex-shrink: 0;
+    }
+    .checklist-trigger:hover {
+      background: rgba(45,212,191,.24);
+      color: #fff;
+      border-color: rgba(45,212,191,.45);
+      box-shadow: 0 0 18px rgba(45,212,191,.18);
+    }
+    .checklist-trigger-icon {
+      font-size: 15px;
+      line-height: 1;
+      filter: drop-shadow(0 0 8px rgba(45,212,191,.25));
+    }
+    .checklist-trigger-count {
+      color: var(--teal);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
     @media (max-width: 860px) {
       .snu-grid { grid-template-columns: 1fr; }
       .snu-left-col { gap: 16px; }
@@ -4114,15 +4151,12 @@
       body { padding-bottom:56px; }
       html, body { overflow-x: hidden; width: 100%; max-width: 100%; position: relative; }
       .page, .topbar, .wrap, .hero-inner, .ops-block, .trip-card, .card-grid, .feed-grid, .snu-grid, .video-grid, .dir-grid, .carrier-grid { max-width: 100%; }
-      #checklistWidget {
-        left: 12px;
-        right: auto;
-        bottom: calc(68px + env(safe-area-inset-bottom,0px));
-        align-items: flex-start;
-        max-width: calc(100vw - 24px);
-      }
       #checklistPanel {
-        width: min(320px, calc(100vw - 24px));
+        top: auto;
+        right: 12px;
+        left: 12px;
+        bottom: calc(68px + env(safe-area-inset-bottom,0px));
+        width: auto;
         max-width: calc(100vw - 24px);
         max-height: min(520px, calc(100vh - 150px));
       }
@@ -4141,42 +4175,23 @@
     .feature-modal-close:hover { color:#fff; }
     .feature-modal-body { padding:20px 22px; max-height:70vh; overflow-y:auto; }
 
-    /* ── FLOATING CHECKLIST WIDGET ── */
+    /* ── CHECKLIST PANEL / TRIGGERS ── */
     #checklistWidget {
-      position: fixed;
-      touch-action: auto;
-      bottom: 24px;
-      right: 24px;
+      position: static;
       z-index: 9500;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
+      pointer-events: none;
     }
-    #checklistWidget.dragging { cursor: grabbing; }
-    #checklistPill {
-      display: flex;
-      touch-action: none;
-      pointer-events: auto;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: #1e3a6e;
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: 24px;
-      cursor: grab;
-      box-shadow: 0 4px 24px rgba(0,0,0,.45);
-      transition: background .15s, border-color .15s;
-      white-space: nowrap;
-      user-select: none;
-    }
-    #checklistPill:hover { background: #264d8c; border-color: rgba(255,255,255,.35); }
-    #checklistPillIcon { font-size: 16px; }
+    #checklistPill { display: none !important; }
     #checklistPillLabel { font-size: 12px; font-weight: 700; color: #fff; }
     #checklistPillProgress { font-size: 11px; color: var(--teal); font-weight: 700; }
     #checklistPanel {
-      width: 320px;
+      position: fixed;
+      top: 146px;
+      right: 24px;
+      left: auto;
+      bottom: auto;
+      width: min(340px, calc(100vw - 24px));
       pointer-events: auto;
       background: #152d5a;
       border: 1px solid rgba(255,255,255,.18);
@@ -4185,7 +4200,7 @@
       overflow: hidden;
       display: none;
       flex-direction: column;
-      max-height: 520px;
+      max-height: min(520px, calc(100vh - 170px));
     }
     #checklistPanel.open { display: flex; }
     .cl-panel-header {
@@ -4310,6 +4325,11 @@
             <span class="gsearch-icon">🔍</span>
             <div class="gsearch-dropdown" id="gsearchDropdown"></div>
           </div>
+          <button class="checklist-trigger" id="desktopChecklistBtn" onclick="toggleChecklist()" aria-label="Open daily checklist" aria-expanded="false">
+            <span class="checklist-trigger-icon">✅</span>
+            <span>Daily Checklist</span>
+            <span class="checklist-trigger-count" id="desktopChecklistProgress"></span>
+          </button>
           <button class="admin-trigger" onclick="openAdmin()">⚙️ SNU Admin</button>
           <div class="infobar-divider"></div>
           <div class="live-clock" id="liveClock">--:-- --</div>
@@ -4957,6 +4977,7 @@
         <a class="mbn-item" href="#agent-tools"><span class="mbn-item-icon">🛠</span>Tools</a>
         <a class="mbn-item" href="#quick-access"><span class="mbn-item-icon">🔗</span>Portals</a>
         <a class="mbn-item" href="#libraries"><span class="mbn-item-icon">📖</span>Library</a>
+        <button class="mbn-item" id="mobileChecklistBtn" onclick="toggleChecklist()" aria-label="Open daily checklist" aria-expanded="false"><span class="mbn-item-icon">✅</span>Check</button>
         <a class="mbn-item" href="#updates"><span class="mbn-item-icon">📡</span>Updates</a>
         <button class="mbn-item" onclick="openAdmin()"><span class="mbn-item-icon">⚙️</span>Admin</button>
       </div>
@@ -5072,7 +5093,7 @@
           </div>
         </div>
       </div>
-      <div id="checklistPill" onclick="toggleChecklist()" role="button" aria-label="Open daily checklist">
+      <div id="checklistPill" aria-hidden="true">
         <span class="cl-pill-icon">✅</span>
         <span id="checklistPillLabel">Daily Checklist</span>
         <span id="checklistPillProgress"></span>
@@ -12186,20 +12207,46 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const myTotal   = _myTasks.length;
     const myDone    = _myTasks.filter(t=>t.done).length;
     const total = teamTotal + myTotal, done = teamDone + myDone;
+    const progressText = total ? `${done}/${total}` : '';
     const lbl  = document.getElementById('checklistPillLabel');
     const prog = document.getElementById('checklistPillProgress');
+    const desktopProg = document.getElementById('desktopChecklistProgress');
+    const mobileBtn = document.getElementById('mobileChecklistBtn');
     if (lbl)  lbl.textContent  = 'Daily Checklist';
-    if (prog) prog.textContent = total ? `${done}/${total}` : '';
+    if (prog) prog.textContent = progressText;
+    if (desktopProg) desktopProg.textContent = progressText;
+    if (mobileBtn) mobileBtn.innerHTML = `<span class="mbn-item-icon">✅</span>Check${progressText ? '<span style="font-size:9px;color:var(--teal);margin-top:1px;">' + progressText + '</span>' : ''}`;
   }
 
-  window.toggleChecklist = function() {
+  function syncChecklistButtonState(isOpen) {
+    const desktopBtn = document.getElementById('desktopChecklistBtn');
+    const mobileBtn = document.getElementById('mobileChecklistBtn');
+    if (desktopBtn) desktopBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (mobileBtn) mobileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+
+  window.toggleChecklist = function(forceOpen) {
     const panel = document.getElementById('checklistPanel');
     if (!panel) return;
-    const isOpen = panel.classList.contains('open');
-    if (!isOpen) { initTasks(); }
-    panel.classList.toggle('open');
+    const willOpen = typeof forceOpen === 'boolean' ? forceOpen : !panel.classList.contains('open');
+    if (willOpen) { initTasks(); }
+    panel.classList.toggle('open', willOpen);
+    syncChecklistButtonState(willOpen);
   };
 
+
+  document.addEventListener('click', function(e) {
+    const panel = document.getElementById('checklistPanel');
+    if (!panel || !panel.classList.contains('open')) return;
+    const widget = document.getElementById('checklistWidget');
+    const desktopBtn = document.getElementById('desktopChecklistBtn');
+    const mobileBtn = document.getElementById('mobileChecklistBtn');
+    const clickedInside = panel.contains(e.target)
+      || (widget && widget.contains(e.target))
+      || (desktopBtn && desktopBtn.contains(e.target))
+      || (mobileBtn && mobileBtn.contains(e.target));
+    if (!clickedInside) window.toggleChecklist(false);
+  });
   window.toggleTeamTask = function(id, checked) {
     if(checked && !_tasks.includes(id)) _tasks.push(id);
     else if(!checked) _tasks=_tasks.filter(x=>x!==id);
@@ -12235,105 +12282,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   window.closeTask = function() { const p=document.getElementById('checklistPanel'); if(p) p.classList.remove('open'); };
 
 
-  (function initChecklistDrag() {
-    const widget = document.getElementById('checklistWidget');
-    const pill = document.getElementById('checklistPill');
-    if (!widget || !pill) return;
-
-    const STORAGE_KEY = 'medi_checklist_widget_pos_v3';
-    let startX = 0, startY = 0, startLeft = 0, startTop = 0;
-    let dragged = false, dragging = false, activePointerId = null;
-
-    function getBounds() {
-      const rect = widget.getBoundingClientRect();
-      const panel = document.getElementById('checklistPanel');
-      const panelWidth = panel && panel.classList.contains('open') ? panel.offsetWidth : 0;
-      const width = Math.max(rect.width || 0, pill.offsetWidth || 0, panelWidth || 0, 120);
-      const height = Math.max(rect.height || 0, pill.offsetHeight || 0, 44);
-      return { width, height };
-    }
-
-    function clampAndApply(left, top) {
-      const pad = 8;
-      const bottomOffset = window.innerWidth <= 768 ? 72 : 24;
-      const { width, height } = getBounds();
-      const maxLeft = Math.max(pad, window.innerWidth - width - pad);
-      const maxTop = Math.max(pad, window.innerHeight - height - pad);
-      const nextLeft = Math.min(Math.max(left, pad), maxLeft);
-      const nextTop = Math.min(Math.max(top, pad), maxTop);
-      widget.style.left = nextLeft + 'px';
-      widget.style.top = nextTop + 'px';
-      widget.style.right = 'auto';
-      widget.style.bottom = 'auto';
-      widget.style.alignItems = 'flex-start';
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: nextLeft, top: nextTop })); } catch (e) {}
-    }
-
-    function setDefaultPosition() {
-      const pad = 12;
-      const bottomOffset = window.innerWidth <= 768 ? 72 : 24;
-      const { width, height } = getBounds();
-      clampAndApply(pad, window.innerHeight - height - bottomOffset);
-    }
-
-    function restorePosition() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) { setDefaultPosition(); return; }
-        const pos = JSON.parse(raw);
-        if (typeof pos.left !== 'number' || typeof pos.top !== 'number') { setDefaultPosition(); return; }
-        clampAndApply(pos.left, pos.top);
-      } catch (e) {
-        setDefaultPosition();
-      }
-    }
-
-    function onPointerDown(e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      activePointerId = e.pointerId;
-      startX = e.clientX;
-      startY = e.clientY;
-      const rect = widget.getBoundingClientRect();
-      startLeft = rect.left;
-      startTop = rect.top;
-      dragged = false;
-      dragging = true;
-      widget.classList.add('dragging');
-      pill.setPointerCapture?.(e.pointerId);
-      e.preventDefault();
-    }
-
-    function onPointerMove(e) {
-      if (!dragging || e.pointerId !== activePointerId) return;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) dragged = true;
-      clampAndApply(startLeft + dx, startTop + dy);
-      e.preventDefault();
-    }
-
-    function onPointerUp(e) {
-      if (e.pointerId !== activePointerId) return;
-      dragging = false;
-      widget.classList.remove('dragging');
-      pill.releasePointerCapture?.(e.pointerId);
-      activePointerId = null;
-      if (!dragged) window.toggleChecklist();
-      setTimeout(() => { dragged = false; }, 0);
-      e.preventDefault();
-    }
-
-    pill.removeAttribute('onclick');
-    pill.style.cursor = 'grab';
-    pill.addEventListener('pointerdown', onPointerDown);
-    pill.addEventListener('pointermove', onPointerMove);
-    pill.addEventListener('pointerup', onPointerUp);
-    pill.addEventListener('pointercancel', onPointerUp);
-    window.addEventListener('resize', restorePosition);
-    setTimeout(restorePosition, 0);
-  })();
-
-  window.submitTaskEntry=function(){
+  (window.submitTaskEntry=function(){
     const label=(document.getElementById('taskAdminLabel')?.value?.trim()||'');if(!label){toast('⚠ Label required.');return;}
     _taskItems.push({id:Date.now(),label});document.getElementById('taskAdminLabel').value='';
     refreshTaskAdminList(); renderTeamTasks(); updateChecklistPill();
