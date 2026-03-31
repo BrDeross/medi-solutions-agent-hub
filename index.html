@@ -4186,7 +4186,7 @@
               <p>Coaching, marketing, and planning resources</p>
             </div>
           </div>
-          <span class="count-chip">8 tools</span>
+          <span class="count-chip">14 tools</span>
           <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
         </div>
 
@@ -4292,6 +4292,51 @@
             <h3>Submit a Referral</h3>
             <p>Refer a client to Medi Solutions and submit their info for a gift card reward.</p>
             <span class="card-tag">Referrals</span>
+          </div>
+
+          <div class="card" data-card-id="agent-directory" data-color="blue" style="cursor:pointer;" onclick="openDir()">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">👥</div>
+            <h3>Agent Directory</h3>
+            <p>Search and connect with agents on your team — phone, email, and territory.</p>
+            <span class="card-tag">Directory</span>
+          </div>
+
+          <div class="card" data-card-id="cheat-sheet" data-color="gold" style="cursor:pointer;" onclick="openCheat()">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">📌</div>
+            <h3>Quick Reference</h3>
+            <p>Medicare rules, SEP qualifiers, compliance facts, and key answers at a glance.</p>
+            <span class="card-tag">Reference</span>
+          </div>
+
+          <div class="card" data-card-id="daily-tasks" data-color="teal" style="cursor:pointer;" onclick="openTask()">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">✅</div>
+            <h3>Daily Checklist</h3>
+            <p>Your daily task list — track priorities and reset each morning automatically.</p>
+            <span class="card-tag">Tasks</span>
+          </div>
+
+          <div class="card" data-card-id="carrier-contacts" data-color="purple" style="cursor:pointer;" onclick="openCarrier()">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">📞</div>
+            <h3>Carrier Contacts</h3>
+            <p>Broker support lines, prior auth numbers, and portal links for every carrier.</p>
+            <span class="card-tag">Contacts</span>
+          </div>
+
+          <div class="card" data-card-id="onboarding" data-color="rose" style="cursor:pointer;" onclick="openOnboard()">
+            <span class="card-arrow">↗</span>
+            <div class="card-shimmer"></div>
+            <div class="card-icon-wrap">🚀</div>
+            <h3>Agent Onboarding</h3>
+            <p>Step-by-step setup guide for new agents — track your progress as you go.</p>
+            <span class="card-tag">Onboarding</span>
           </div>
 
         </div>
@@ -4890,7 +4935,10 @@
           <div style="display:flex;gap:8px;margin-bottom:16px;">
             <button onclick="submitDirEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">➕ Add Agent</button>
             <button onclick="cancelDirEdit()" id="dirCancelBtn" style="display:none;padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">Cancel</button>
+            <label style="padding:7px 18px;border-radius:8px;border:1px solid rgba(45,212,191,.3);background:rgba(45,212,191,.08);color:var(--teal);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📂 Import CSV<input type="file" accept=".csv" style="display:none;" onchange="csvImportDir(this)"></label>
+            <button onclick="csvExportDir()" style="padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">⬇ Export</button>
           </div>
+          <div style="font-size:10px;color:var(--muted-2);margin-bottom:12px;">CSV columns: <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">name, title, phone, email, territory, tag</code></div>
           <div class="admin-section-title" style="margin-top:4px;">📋 Current Agents <span id="dirAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
           <div id="dirAdminList" style="margin-top:8px;"></div>
         </div>
@@ -4909,7 +4957,10 @@
           <div style="display:flex;gap:8px;margin-bottom:16px;">
             <button onclick="submitCheatEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">➕ Add Item</button>
             <button onclick="cancelCheatEdit()" id="cheatCancelBtn" style="display:none;padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">Cancel</button>
+            <label style="padding:7px 18px;border-radius:8px;border:1px solid rgba(45,212,191,.3);background:rgba(45,212,191,.08);color:var(--teal);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📂 Import CSV<input type="file" accept=".csv" style="display:none;" onchange="csvImportCheat(this)"></label>
+            <button onclick="csvExportCheat()" style="padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">⬇ Export</button>
           </div>
+          <div style="font-size:10px;color:var(--muted-2);margin-bottom:12px;">CSV columns: <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">category, question, answer</code></div>
           <div class="admin-section-title" style="margin-top:4px;">📋 Current Items <span id="cheatAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
           <div id="cheatAdminList" style="margin-top:8px;"></div>
         </div>
@@ -4925,7 +4976,10 @@
           </div>
           <div style="display:flex;gap:8px;margin-bottom:16px;">
             <button onclick="submitTaskEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">➕ Add Task</button>
+            <label style="padding:7px 18px;border-radius:8px;border:1px solid rgba(45,212,191,.3);background:rgba(45,212,191,.08);color:var(--teal);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📂 Import CSV<input type="file" accept=".csv" style="display:none;" onchange="csvImportTasks(this)"></label>
+            <button onclick="csvExportTasks()" style="padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">⬇ Export</button>
           </div>
+          <div style="font-size:10px;color:var(--muted-2);margin-bottom:12px;">CSV columns: <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">label</code></div>
           <div class="admin-section-title" style="margin-top:4px;">📋 Current Tasks <span id="taskAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
           <div id="taskAdminList" style="margin-top:8px;"></div>
         </div>
@@ -4950,7 +5004,10 @@
           <div style="display:flex;gap:8px;margin-bottom:16px;">
             <button onclick="submitCarrierEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">➕ Add Carrier</button>
             <button onclick="cancelCarrierEdit()" id="carrierCancelBtn" style="display:none;padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">Cancel</button>
+            <label style="padding:7px 18px;border-radius:8px;border:1px solid rgba(45,212,191,.3);background:rgba(45,212,191,.08);color:var(--teal);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📂 Import CSV<input type="file" accept=".csv" style="display:none;" onchange="csvImportCarriers(this)"></label>
+            <button onclick="csvExportCarriers()" style="padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">⬇ Export</button>
           </div>
+          <div style="font-size:10px;color:var(--muted-2);margin-bottom:12px;">CSV columns: <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">name, phone, auth, url, notes</code></div>
           <div class="admin-section-title" style="margin-top:4px;">📋 Current Carriers <span id="carrierAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
           <div id="carrierAdminList" style="margin-top:8px;"></div>
         </div>
@@ -11192,6 +11249,257 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
+<!-- ── CSV IMPORT/EXPORT + STARRED SECTIONS ENGINE ───────────── -->
+<script>
+(function() {
+  /* ════════════════════════════════
+     CSV UTILITIES
+  ════════════════════════════════ */
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+    return lines.slice(1).map(line => {
+      const vals = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+        else cur += ch;
+      }
+      vals.push(cur.trim());
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = (vals[i] || '').replace(/^"|"$/g, ''));
+      return obj;
+    }).filter(r => Object.values(r).some(v => v));
+  }
+
+  function toCSV(rows, cols) {
+    const header = cols.join(',');
+    const body = rows.map(r => cols.map(c => `"${(r[c]||'').replace(/"/g,'""')}"`).join(','));
+    return [header, ...body].join('\n');
+  }
+
+  function downloadCSV(filename, content) {
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(content);
+    a.download = filename;
+    a.click();
+  }
+
+  function readFileText(input, cb) {
+    const file = input.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = e => cb(e.target.result);
+    r.readAsText(file);
+    input.value = '';
+  }
+
+  /* ── Directory CSV ── */
+  window.csvImportDir = function(input) {
+    readFileText(input, text => {
+      const rows = parseCSV(text);
+      if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
+      rows.forEach(r => {
+        if (!r.name) return;
+        window._dirData = window._dirData || [];
+        // push to _dir via the existing global
+      });
+      // access _dir from closure via window ref trick
+      const existing = typeof _dir !== 'undefined' ? _dir : [];
+      rows.forEach(r => { if (r.name) existing.push({ id: Date.now() + Math.random(), name:r.name, title:r.title||'', phone:r.phone||'', email:r.email||'', territory:r.territory||'', tag:r.tag||'' }); });
+      if (typeof refreshDirAdminList === 'function') refreshDirAdminList();
+      if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + rows.length + ' agents…');
+      if (typeof supaUpsertDir === 'function') supaUpsertDir();
+      else document.dispatchEvent(new CustomEvent('csvDirImport', { detail: existing }));
+    });
+  };
+  window.csvExportDir = function() {
+    const data = typeof _dir !== 'undefined' ? _dir : [];
+    if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No agents to export.'); return; }
+    downloadCSV('agent_directory.csv', toCSV(data, ['name','title','phone','email','territory','tag']));
+  };
+
+  /* ── Cheat Sheet CSV ── */
+  window.csvImportCheat = function(input) {
+    readFileText(input, text => {
+      const rows = parseCSV(text);
+      if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
+      const existing = typeof _cheat !== 'undefined' ? _cheat : [];
+      rows.forEach(r => {
+        const q = r.question || r.q;
+        const a = r.answer || r.a;
+        if (q && a) existing.push({ id: Date.now() + Math.random(), cat: r.category || r.cat || 'General', q, a });
+      });
+      if (typeof refreshCheatAdminList === 'function') refreshCheatAdminList();
+      if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + rows.length + ' items…');
+      document.dispatchEvent(new CustomEvent('csvCheatImport', { detail: existing }));
+    });
+  };
+  window.csvExportCheat = function() {
+    const data = typeof _cheat !== 'undefined' ? _cheat : [];
+    if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No items to export.'); return; }
+    downloadCSV('cheat_sheet.csv', toCSV(data.map(r=>({category:r.cat,question:r.q,answer:r.a})), ['category','question','answer']));
+  };
+
+  /* ── Tasks CSV ── */
+  window.csvImportTasks = function(input) {
+    readFileText(input, text => {
+      const rows = parseCSV(text);
+      if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
+      const existing = typeof _taskItems !== 'undefined' ? _taskItems : [];
+      rows.forEach(r => { if (r.label) existing.push({ id: Date.now() + Math.random() }); });
+      // Need labels — rebuild properly
+      const fresh = rows.filter(r=>r.label).map(r=>({ id: Date.now() + Math.random(), label: r.label }));
+      if (typeof _taskItems !== 'undefined') { fresh.forEach(t => _taskItems.push(t)); }
+      if (typeof refreshTaskAdminList === 'function') refreshTaskAdminList();
+      if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + fresh.length + ' tasks…');
+      document.dispatchEvent(new CustomEvent('csvTaskImport', { detail: fresh }));
+    });
+  };
+  window.csvExportTasks = function() {
+    const data = typeof _taskItems !== 'undefined' ? _taskItems : [];
+    if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No tasks to export.'); return; }
+    downloadCSV('daily_tasks.csv', toCSV(data, ['label']));
+  };
+
+  /* ── Carriers CSV ── */
+  window.csvImportCarriers = function(input) {
+    readFileText(input, text => {
+      const rows = parseCSV(text);
+      if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
+      const existing = typeof _carriers !== 'undefined' ? _carriers : [];
+      rows.forEach(r => { if (r.name) existing.push({ id: Date.now() + Math.random(), name:r.name, phone:r.phone||'', auth:r.auth||'', url:r.url||'', notes:r.notes||'' }); });
+      if (typeof refreshCarrierAdminList === 'function') refreshCarrierAdminList();
+      if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + rows.length + ' carriers…');
+      document.dispatchEvent(new CustomEvent('csvCarrierImport', { detail: existing }));
+    });
+  };
+  window.csvExportCarriers = function() {
+    const data = typeof _carriers !== 'undefined' ? _carriers : [];
+    if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No carriers to export.'); return; }
+    downloadCSV('carrier_contacts.csv', toCSV(data, ['name','phone','auth','url','notes']));
+  };
+
+  /* ════════════════════════════════
+     STARRED SECTIONS
+     - Per-agent, localStorage only
+     - Star icon on each section header
+     - Starred sections appear as quick-access strip below the announcement banner
+  ════════════════════════════════ */
+  const STAR_KEY = 'hub_starred_medi';
+  const STAR_SECTIONS = [
+    { id:'agent-tools',    label:'🛠 Agent Tools' },
+    { id:'quick-access',   label:'🔗 Portals' },
+    { id:'libraries',      label:'📖 Libraries' },
+    { id:'video-library',  label:'🎬 Videos' },
+    { id:'updates',        label:'📡 Updates' },
+    { id:'practice-client',label:'🎭 Practice Client' },
+    { id:'cert-tracker',   label:'🎓 Certs' },
+    { id:'friday-meetings',label:'📅 Meetings' },
+    { id:'leaderboard',    label:'🏆 Leaderboard' },
+    { id:'trip-tracker',   label:'🏝 Trip' },
+    { id:'agent-spotlight',label:'⭐ Spotlight' },
+  ];
+
+  let _starred = [];
+
+  function loadStarred() {
+    try { _starred = JSON.parse(localStorage.getItem(STAR_KEY) || '[]'); } catch(e) { _starred = []; }
+  }
+
+  function saveStarred() {
+    try { localStorage.setItem(STAR_KEY, JSON.stringify(_starred)); } catch(e) {}
+  }
+
+  function renderStarButtons() {
+    STAR_SECTIONS.forEach(sec => {
+      const section = document.getElementById(sec.id);
+      if (!section) return;
+      const head = section.querySelector('.section-head');
+      if (!head || head.querySelector('.star-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'star-btn';
+      btn.dataset.secId = sec.id;
+      btn.title = 'Star this section for quick access';
+      btn.setAttribute('aria-label', 'Star section');
+      btn.innerHTML = _starred.includes(sec.id) ? '★' : '☆';
+      btn.style.cssText = 'background:transparent;border:none;cursor:pointer;font-size:18px;color:' + (_starred.includes(sec.id) ? '#fbbf24' : 'rgba(255,255,255,.25)') + ';padding:0 4px;transition:color .15s;flex-shrink:0;';
+      btn.onmouseenter = () => { if (!_starred.includes(sec.id)) btn.style.color = 'rgba(251,191,36,.6)'; };
+      btn.onmouseleave = () => { if (!_starred.includes(sec.id)) btn.style.color = 'rgba(255,255,255,.25)'; };
+      btn.onclick = (e) => { e.preventDefault(); toggleStar(sec.id); };
+      head.appendChild(btn);
+    });
+  }
+
+  function toggleStar(id) {
+    if (_starred.includes(id)) {
+      _starred = _starred.filter(s => s !== id);
+    } else {
+      _starred.push(id);
+    }
+    saveStarred();
+    renderStarButtons();
+    renderStarStrip();
+    updateStarButtonAppearance(id);
+  }
+
+  function updateStarButtonAppearance(id) {
+    document.querySelectorAll('.star-btn').forEach(btn => {
+      const sid = btn.dataset.secId;
+      const active = _starred.includes(sid);
+      btn.innerHTML = active ? '★' : '☆';
+      btn.style.color = active ? '#fbbf24' : 'rgba(255,255,255,.25)';
+    });
+  }
+
+  function renderStarStrip() {
+    let strip = document.getElementById('starStrip');
+    if (!_starred.length) {
+      if (strip) strip.style.display = 'none';
+      return;
+    }
+    if (!strip) {
+      strip = document.createElement('div');
+      strip.id = 'starStrip';
+      // Insert after announcement banner
+      const banner = document.getElementById('announcementBanner');
+      if (banner && banner.parentNode) {
+        banner.parentNode.insertBefore(strip, banner.nextSibling);
+      } else {
+        document.body.prepend(strip);
+      }
+    }
+    strip.style.cssText = 'position:sticky;top:132px;z-index:489;background:rgba(10,25,55,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.1);padding:0 24px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;min-height:40px;';
+    const items = _starred.map(id => {
+      const sec = STAR_SECTIONS.find(s => s.id === id);
+      if (!sec) return '';
+      return `<a href="#${id}" style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.14)'" onmouseout="this.style.background='rgba(255,255,255,.07)'">${sec.label}</a>`;
+    }).join('');
+    strip.innerHTML = `<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);margin-right:4px;white-space:nowrap;flex-shrink:0;">★ Pinned</span>${items}`;
+    strip.style.display = 'flex';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadStarred();
+    // Defer star buttons so sections are fully rendered
+    setTimeout(() => {
+      renderStarButtons();
+      renderStarStrip();
+    }, 400);
+  });
+
+  // Also listen for CSV import events to trigger saves
+  document.addEventListener('csvDirImport', e => { if(typeof supaUpsert==='function' && typeof _dir!=='undefined') supaUpsert('agent_directory', _dir).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ '+e.detail.length+' agents imported!');}); });
+  document.addEventListener('csvCheatImport', e => { if(typeof supaUpsert==='function' && typeof _cheat!=='undefined') supaUpsert('cheat_sheet', _cheat).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ Items imported!');}); });
+  document.addEventListener('csvTaskImport', e => { if(typeof supaUpsert==='function' && typeof _taskItems!=='undefined') supaUpsert('task_list', _taskItems).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ Tasks imported!');}); });
+  document.addEventListener('csvCarrierImport', e => { if(typeof supaUpsert==='function' && typeof _carriers!=='undefined') supaUpsert('carrier_contacts', _carriers).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ Carriers imported!');}); });
+
+})();
+</script>
+<!-- ── END CSV + STARRED SECTIONS ENGINE ─────────────────────── -->
+
 <!-- ── NEW FEATURES ENGINE (Directory, Cheat Sheet, Tasks, Carriers, Onboarding, Notifications, Search) ── -->
 <script>
 (function() {
@@ -11207,7 +11515,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     return fetch(`${NF_URL}/rest/v1/${table}?hub=eq.${NF_HUB}&select=data${params}`, { headers: { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Cache-Control': 'no-cache' } }).then(r=>r.json());
   }
   function supaUpsert(table, data) {
-    return fetch(`${NF_URL}/rest/v1/${table}`, { method:'POST', headers: hdrs(), body: JSON.stringify({ hub: NF_HUB, data }) });
+    const h = { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    return fetch(`${NF_URL}/rest/v1/${table}?hub=eq.${NF_HUB}`, { method:'PATCH', headers: h, body: JSON.stringify({ data }) })
+      .then(r => r.text()).then(t => {
+        if (t === '[]' || t === '' || t === 'null') {
+          return fetch(`${NF_URL}/rest/v1/${table}`, { method:'POST', headers: h, body: JSON.stringify({ hub: NF_HUB, data }) });
+        }
+      });
   }
 
   /* ════════════════════════════════
