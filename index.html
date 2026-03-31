@@ -8436,12 +8436,16 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       if (status) status.textContent = 'Name and email are required.';
       return;
     }
-    writeHubSession({ name, email, signedInAt: new Date().toISOString() });
+    const session = { name, email, signedInAt: new Date().toISOString() };
+    writeHubSession(session);
     const nameEl = document.getElementById('agentLoginName');
     const emailEl = document.getElementById('agentLoginEmail');
     if (nameEl) nameEl.value = name;
     if (emailEl) emailEl.value = email;
     applyHubSessionUi();
+    if (typeof trackHubEvent === 'function') {
+      trackHubEvent('login', 'hub_gate', { signed_in_at: session.signedInAt });
+    }
   };
 
   const prevOpenAgentLogin = window.openAgentLogin;
@@ -8465,20 +8469,38 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       if (statusEl) statusEl.textContent = 'Name and email are required.';
       return;
     }
-    writeHubSession({ name, email, signedInAt: new Date().toISOString() });
+    const session = { name, email, signedInAt: new Date().toISOString() };
+    writeHubSession(session);
     applyHubSessionUi();
+    if (typeof trackHubEvent === 'function') {
+      trackHubEvent('profile_update', 'agent_login', { signed_in_at: session.signedInAt });
+    }
     if (statusEl) statusEl.textContent = 'Saved for this session.';
     setTimeout(function(){ window.closeAgentLogin && window.closeAgentLogin(); }, 350);
   };
 
   window.clearAgentLogin = function() {
+    const prior = readHubSession();
     try { sessionStorage.removeItem(HUB_SESSION_KEY); } catch(e) {}
+    if (prior && typeof trackHubEvent === 'function') {
+      trackHubEvent('logout', 'agent_login', { prior_name: prior.name || '', prior_email: prior.email || '' });
+    }
     applyHubSessionUi();
     const overlay = document.getElementById('agentLoginOverlay');
     if (overlay) overlay.style.display = 'none';
   };
 
-  document.addEventListener('DOMContentLoaded', function(){ applyHubSessionUi(); });
+  document.addEventListener('DOMContentLoaded', function(){
+    applyHubSessionUi();
+    if (typeof initHubTracking === 'function') initHubTracking();
+    if (typeof wrapTrackedOpen === 'function') {
+      wrapTrackedOpen('openDir', 'open_modal', 'agent_directory');
+      wrapTrackedOpen('openCarrier', 'open_modal', 'carrier_contacts');
+      wrapTrackedOpen('openOnboard', 'open_modal', 'agent_onboarding');
+      wrapTrackedOpen('openAdmin', 'open_modal', 'admin');
+      wrapTrackedOpen('openTask', 'open_modal', 'daily_checklist');
+    }
+  });
 })();
 </script>
 
@@ -12500,6 +12522,113 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
           return fetch(`${NF_URL}/rest/v1/${table}`, { method:'POST', headers: h, body: JSON.stringify({ hub: NF_HUB, data }) });
         }
       });
+  }
+  function supaAppend(table, data) {
+    const h = { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    return fetch(`${NF_URL}/rest/v1/${table}`, {
+      method:'POST',
+      headers: h,
+      body: JSON.stringify({ hub: NF_HUB, data })
+    });
+  }
+
+  /* ════════════════════════════════
+     HUB TRACKING
+  ════════════════════════════════ */
+  const HUB_TRACKING_TABLE = 'activity_log';
+  let _trackingSessionId = null;
+
+  function getTrackingSessionId() {
+    if (_trackingSessionId) return _trackingSessionId;
+    try {
+      const existing = sessionStorage.getItem('medi_tracking_session_id');
+      if (existing) {
+        _trackingSessionId = existing;
+        return existing;
+      }
+    } catch (e) {}
+    _trackingSessionId = 'trk_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+    try { sessionStorage.setItem('medi_tracking_session_id', _trackingSessionId); } catch (e) {}
+    return _trackingSessionId;
+  }
+
+  function getTrackingUser() {
+    try {
+      const raw = sessionStorage.getItem('medi_hub_session');
+      const s = raw ? JSON.parse(raw) : null;
+      if (s && (s.name || s.email)) return s;
+    } catch (e) {}
+    return null;
+  }
+
+  function trackHubEvent(eventType, section, meta) {
+    const user = getTrackingUser();
+    const payload = {
+      event_type: String(eventType || 'event'),
+      section: String(section || 'hub'),
+      path: location.pathname + location.hash,
+      page_title: document.title || 'Agent Hub',
+      user_name: user?.name || '',
+      email: user?.email || '',
+      occurred_at: new Date().toISOString(),
+      session_id: getTrackingSessionId(),
+      meta: meta && typeof meta === 'object' ? meta : {}
+    };
+    return supaAppend(HUB_TRACKING_TABLE, payload).catch(() => null);
+  }
+
+  function initHubTracking() {
+    if (window.__hubTrackingInitialized) return;
+    window.__hubTrackingInitialized = true;
+
+    const seenThisLoad = new Set();
+
+    function trackOnce(key, eventType, section, meta) {
+      if (seenThisLoad.has(key)) return;
+      seenThisLoad.add(key);
+      trackHubEvent(eventType, section, meta);
+    }
+
+    document.addEventListener('click', function(e) {
+      const card = e.target.closest('[data-card-id]');
+      if (card) {
+        const id = card.getAttribute('data-card-id') || 'unknown-card';
+        trackHubEvent('card_click', id, { label: card.textContent?.trim()?.slice(0, 120) || '' });
+        return;
+      }
+      const link = e.target.closest('a[href]');
+      if (link) {
+        const href = link.getAttribute('href') || '';
+        if (href.startsWith('#')) {
+          trackHubEvent('anchor_nav', href.replace(/^#/, '') || 'section', { href });
+        } else if (!href.startsWith('javascript:')) {
+          trackHubEvent('link_click', 'external_link', { href });
+        }
+      }
+    }, true);
+
+    window.addEventListener('hashchange', function() {
+      trackHubEvent('hash_change', location.hash.replace(/^#/, '') || 'top', {});
+    });
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') {
+        trackOnce('resume:' + location.hash, 'page_resume', location.hash.replace(/^#/, '') || 'hub', {});
+      }
+    });
+
+    trackOnce('page_view:' + location.pathname, 'page_view', location.hash.replace(/^#/, '') || 'hub', {});
+  }
+
+  function wrapTrackedOpen(fnName, eventType, section) {
+    const original = window[fnName];
+    if (typeof original !== 'function' || original.__trackedWrapped) return;
+    const wrapped = function(...args) {
+      trackHubEvent(eventType || 'open', section || fnName, {});
+      return original.apply(this, args);
+    };
+    wrapped.__trackedWrapped = true;
+    window[fnName] = wrapped;
   }
 
   /* ════════════════════════════════
