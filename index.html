@@ -631,6 +631,47 @@
       transition: transform .2s, color .2s;
       z-index: 1;
     }
+
+    .card.tile-starred {
+      border-color: rgba(251,191,36,.35);
+      box-shadow: 0 0 0 1px rgba(251,191,36,.12);
+    }
+
+    .tile-star-btn {
+      position: absolute;
+      top: 16px;
+      right: 42px;
+      z-index: 5;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,33,71,.72);
+      color: rgba(255,255,255,.45);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s, transform .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tile-star-btn:hover {
+      background: rgba(15,33,71,.92);
+      color: rgba(251,191,36,.8);
+      border-color: rgba(251,191,36,.35);
+      transform: scale(1.05);
+    }
+    .tile-star-btn.active {
+      color: #fbbf24;
+      border-color: rgba(251,191,36,.35);
+      background: rgba(251,191,36,.12);
+    }
+    .tile-star-btn:focus-visible {
+      outline: 2px solid rgba(125,211,252,.8);
+      outline-offset: 2px;
+    }
+
     .card:hover .card-arrow { transform: translate(2px,-2px); color: var(--accent-2); }
 
     /* staggered card animation */
@@ -4096,6 +4137,7 @@
     /* ── FLOATING CHECKLIST WIDGET ── */
     #checklistWidget {
       position: fixed;
+      touch-action: none;
       bottom: 24px;
       right: 24px;
       z-index: 9500;
@@ -4108,6 +4150,7 @@
     #checklistWidget.dragging { cursor: grabbing; }
     #checklistPill {
       display: flex;
+      touch-action: none;
       align-items: center;
       gap: 8px;
       padding: 8px 16px;
@@ -4454,7 +4497,7 @@
             <span class="card-tag">Referrals</span>
           </div>
 
-          <div class="card" data-card-id="agent-directory" data-color="blue" style="cursor:pointer;" onclick="openDir()">
+          <div class="card" data-card-id="agent-directory" data-color="blue" style="cursor:pointer;" onclick="openDir()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDir()}">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">👥</div>
@@ -4463,16 +4506,7 @@
             <span class="card-tag">Directory</span>
           </div>
 
-          <div class="card" data-card-id="cheat-sheet" data-color="gold" style="cursor:pointer;" onclick="openCheat()">
-            <span class="card-arrow">↗</span>
-            <div class="card-shimmer"></div>
-            <div class="card-icon-wrap">📌</div>
-            <h3>Quick Reference</h3>
-            <p>Medicare rules, SEP qualifiers, compliance facts, and key answers at a glance.</p>
-            <span class="card-tag">Reference</span>
-          </div>
-
-          <div class="card" data-card-id="carrier-contacts" data-color="purple" style="cursor:pointer;" onclick="openCarrier()">
+          <div class="card" data-card-id="carrier-contacts" data-color="purple" style="cursor:pointer;" onclick="openCarrier()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openCarrier()}">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">📞</div>
@@ -4481,7 +4515,7 @@
             <span class="card-tag">Contacts</span>
           </div>
 
-          <div class="card" data-card-id="onboarding" data-color="rose" style="cursor:pointer;" onclick="openOnboard()">
+          <div class="card" data-card-id="onboarding" data-color="rose" style="cursor:pointer;" onclick="openOnboard()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openOnboard()}">
             <span class="card-arrow">↗</span>
             <div class="card-shimmer"></div>
             <div class="card-icon-wrap">🚀</div>
@@ -9147,7 +9181,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
     // Sort by production desc
     const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
-    const qualified = sorted.filter(a => (a.production||0) >= goal).length;
+    const qualified = sorted.filter(a => {
+      const prod = Number(a.production) || 0;
+      const agentGoal = Number(a.goal);
+      const effectiveGoal = agentGoal > 0 ? agentGoal : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : 0);
+      return effectiveGoal > 0 && prod >= effectiveGoal;
+    }).length;
 
     if (qCount) qCount.textContent = qualified + ' qualified';
     if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
@@ -9160,12 +9199,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
     list.innerHTML = sorted.map((a, i) => {
       const prod = Number(a.production) || 0;
-      const agentGoal = Number(a.goal) || goal;
-      const pct = Math.min(100, Math.round(prod / agentGoal * 100));
-      const isQ = prod >= agentGoal;
+      const perAgentGoal = Number(a.goal);
+      const agentGoal = perAgentGoal > 0 ? perAgentGoal : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : 0);
+      const pct = agentGoal > 0 ? Math.min(100, Math.round(prod / agentGoal * 100)) : 0;
+      const isQ = agentGoal > 0 && prod >= agentGoal;
       const cls = isQ ? 'q' : 'nq';
       const rankCls = i < 3 && isQ ? 'top' : (isQ ? 'q' : 'nq');
-      const remaining = isQ ? '' : `${(agentGoal - prod).toLocaleString()} pts to go`;
+      const remaining = isQ ? '' : (agentGoal > 0 ? `${(agentGoal - prod).toLocaleString()} pts to go` : 'Goal not set');
       return `
         <div class="trip-row">
           <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
@@ -11632,10 +11672,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   };
 
   /* ════════════════════════════════
-     STARRED SECTIONS
+     STARRED QUICK ACCESS
      - Per-agent, localStorage only
-     - Star icon on each section header
-     - Starred sections appear as quick-access strip below the announcement banner
+     - Star section headers or individual tool / portal tiles
+     - Starred items appear in the Hero quick-access strip
   ════════════════════════════════ */
   const STAR_KEY = 'hub_starred_medi';
   const STAR_SECTIONS = [
@@ -11651,56 +11691,124 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     { id:'trip-tracker',   label:'🏝 Trip' },
     { id:'agent-spotlight',label:'⭐ Spotlight' },
   ];
+  const STAR_TILE_GRIDS = ['grid-agent-tools', 'grid-quick-access'];
 
   let _starred = [];
 
+  function normalizeStarred(items) {
+    if (!Array.isArray(items)) return [];
+    return items.filter(Boolean).map(item => {
+      if (typeof item === 'string') {
+        if (item.startsWith('sec:') || item.startsWith('tile:')) return item;
+        return `sec:${item}`;
+      }
+      return '';
+    }).filter(Boolean);
+  }
+
   function loadStarred() {
-    try { _starred = JSON.parse(localStorage.getItem(STAR_KEY) || localStorage.getItem('hub_starred_sections') || localStorage.getItem('favorites') || '[]'); } catch(e) { _starred = []; }
+    try {
+      const raw = JSON.parse(localStorage.getItem(STAR_KEY) || localStorage.getItem('hub_starred_sections') || localStorage.getItem('favorites') || '[]');
+      _starred = normalizeStarred(raw);
+    } catch(e) {
+      _starred = [];
+    }
   }
 
   function saveStarred() {
     try { localStorage.setItem(STAR_KEY, JSON.stringify(_starred)); } catch(e) {}
   }
 
-  function renderStarButtons() {
+  function isStarred(key) {
+    return _starred.includes(key);
+  }
+
+  function getSectionMeta(id) {
+    return STAR_SECTIONS.find(s => s.id === id);
+  }
+
+  function getTileMeta(card) {
+    if (!card) return null;
+    const id = card.dataset.cardId;
+    if (!id) return null;
+    const title = (card.querySelector('h3')?.textContent || 'Quick Link').trim();
+    const href = card.getAttribute('href');
+    const target = href || '#';
+    const icon = (card.querySelector('.card-icon-wrap')?.textContent || '⭐').trim();
+    return {
+      id,
+      key: `tile:${id}`,
+      label: `${icon} ${title}`,
+      target,
+      external: !!href,
+      action: href ? '' : (card.getAttribute('onclick') || ''),
+      sourceSection: card.closest('section')?.id || ''
+    };
+  }
+
+  function renderSectionStarButtons() {
     STAR_SECTIONS.forEach(sec => {
       const section = document.getElementById(sec.id);
       if (!section) return;
       const head = section.querySelector('.section-head');
-      if (!head || head.querySelector('.star-btn')) return;
-      const btn = document.createElement('button');
-      btn.className = 'star-btn';
-      btn.dataset.secId = sec.id;
-      btn.title = 'Star this section for quick access';
-      btn.setAttribute('aria-label', 'Star section');
-      btn.innerHTML = _starred.includes(sec.id) ? '★' : '☆';
-      btn.style.cssText = 'background:transparent;border:none;cursor:pointer;font-size:18px;color:' + (_starred.includes(sec.id) ? '#fbbf24' : 'rgba(255,255,255,.25)') + ';padding:0 4px;transition:color .15s;flex-shrink:0;';
-      btn.onmouseenter = () => { if (!_starred.includes(sec.id)) btn.style.color = 'rgba(251,191,36,.6)'; };
-      btn.onmouseleave = () => { if (!_starred.includes(sec.id)) btn.style.color = 'rgba(255,255,255,.25)'; };
-      btn.onclick = (e) => { e.preventDefault(); toggleStar(sec.id); };
-      head.appendChild(btn);
-    });
-  }
-
-  function toggleStar(id) {
-    if (_starred.includes(id)) {
-      _starred = _starred.filter(s => s !== id);
-    } else {
-      _starred.push(id);
-    }
-    saveStarred();
-    renderStarButtons();
-    renderStarStrip();
-    updateStarButtonAppearance(id);
-  }
-
-  function updateStarButtonAppearance(id) {
-    document.querySelectorAll('.star-btn').forEach(btn => {
-      const sid = btn.dataset.secId;
-      const active = _starred.includes(sid);
+      if (!head) return;
+      let btn = head.querySelector(`.star-btn[data-sec-id="${sec.id}"]`);
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.className = 'star-btn';
+        btn.dataset.secId = sec.id;
+        btn.title = 'Star this section for Hero quick access';
+        btn.setAttribute('aria-label', 'Star section');
+        btn.style.cssText = 'background:transparent;border:none;cursor:pointer;font-size:18px;color:rgba(255,255,255,.25);padding:0 4px;transition:color .15s;flex-shrink:0;';
+        btn.onmouseenter = () => { if (!isStarred(`sec:${sec.id}`)) btn.style.color = 'rgba(251,191,36,.6)'; };
+        btn.onmouseleave = () => { if (!isStarred(`sec:${sec.id}`)) btn.style.color = 'rgba(255,255,255,.25)'; };
+        btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); toggleStar(`sec:${sec.id}`); };
+        head.appendChild(btn);
+      }
+      const active = isStarred(`sec:${sec.id}`);
       btn.innerHTML = active ? '★' : '☆';
       btn.style.color = active ? '#fbbf24' : 'rgba(255,255,255,.25)';
     });
+  }
+
+  function renderTileStarButtons() {
+    STAR_TILE_GRIDS.forEach(gridId => {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.querySelectorAll('.card[data-card-id]').forEach(card => {
+        const meta = getTileMeta(card);
+        if (!meta) return;
+        let btn = card.querySelector('.tile-star-btn');
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.className = 'tile-star-btn';
+          btn.type = 'button';
+          btn.dataset.tileId = meta.id;
+          btn.title = 'Star this tile for Hero quick access';
+          btn.setAttribute('aria-label', `Star ${meta.label}`);
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleStar(`tile:${meta.id}`);
+          });
+          card.appendChild(btn);
+        }
+        const active = isStarred(`tile:${meta.id}`);
+        btn.innerHTML = active ? '★' : '☆';
+        btn.classList.toggle('active', active);
+        card.classList.toggle('tile-starred', active);
+      });
+    });
+  }
+
+  function toggleStar(key) {
+    if (isStarred(key)) {
+      _starred = _starred.filter(s => s !== key);
+    } else {
+      _starred.push(key);
+    }
+    saveStarred();
+    renderAllStarUi();
   }
 
   function renderStarStrip() {
@@ -11709,33 +11817,49 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!strip || !items) return;
     if (!_starred.length) {
       strip.style.display = 'none';
+      items.innerHTML = '';
       return;
     }
-    items.innerHTML = _starred.map(id => {
-      const sec = STAR_SECTIONS.find(s => s.id === id);
-      if (!sec) return '';
-      return `<a href="#${id}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#fff;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.09)'">${sec.label}</a>`;
-    }).join('');
-    strip.style.display = 'block';
+
+    const html = _starred.map(key => {
+      if (key.startsWith('sec:')) {
+        const id = key.replace('sec:', '');
+        const sec = getSectionMeta(id);
+        if (!sec || !document.getElementById(id)) return '';
+        return `<a href="#${id}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#fff;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.09)'">${sec.label}</a>`;
+      }
+      if (key.startsWith('tile:')) {
+        const id = key.replace('tile:', '');
+        const card = document.querySelector(`.card[data-card-id="${id}"]`);
+        const meta = getTileMeta(card);
+        if (!meta || !card) return '';
+        if (meta.external) {
+          return `<a href="${meta.target}" ${card.getAttribute('target') ? `target="${card.getAttribute('target')}"` : ''} ${card.getAttribute('rel') ? `rel="${card.getAttribute('rel')}"` : ''} style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#fff;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.09)'">${meta.label}</a>`;
+        }
+        return `<a href="#" onclick="event.preventDefault();document.querySelector('.card[data-card-id=\"${id}\"]')?.click();" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#fff;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.09)'">${meta.label}</a>`;
+      }
+      return '';
+    }).filter(Boolean).join('');
+
+    items.innerHTML = html;
+    strip.style.display = html ? 'block' : 'none';
+  }
+
+  function renderAllStarUi() {
+    renderSectionStarButtons();
+    renderTileStarButtons();
+    renderStarStrip();
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     loadStarred();
-    // Defer star buttons so sections are fully rendered
-    setTimeout(() => {
-      renderStarButtons();
-      renderStarStrip();
-    }, 400);
-    setTimeout(() => {
-      renderStarButtons();
-      renderStarStrip();
-    }, 1200);
+    setTimeout(renderAllStarUi, 400);
+    setTimeout(renderAllStarUi, 1200);
   });
 
   window.addEventListener('pageshow', () => {
     loadStarred();
-    renderStarButtons();
-    renderStarStrip();
+    renderAllStarUi();
   });
 
   // Also listen for CSV import events to trigger saves
@@ -12113,7 +12237,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       document.removeEventListener('touchmove', onMove);
       document.removeEventListener('touchend', onEnd);
       document.removeEventListener('touchcancel', onEnd);
-      if (!dragged) window.toggleChecklist();
       if (e && e.cancelable) e.preventDefault();
     }
 
