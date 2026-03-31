@@ -3947,10 +3947,17 @@
 
     /* ── ANNOUNCEMENT BANNER ── */
     #announcementBanner {
-      position: relative;
-      top: auto;
-      z-index: 490;
+      position: static !important;
+      top: auto !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      z-index: 1;
       width: 100%;
+      transform: none !important;
+    }
+    .announcement-inner {
+      position: static !important;
     }
     .announcement-inner {
       display: flex;
@@ -4137,7 +4144,7 @@
     /* ── FLOATING CHECKLIST WIDGET ── */
     #checklistWidget {
       position: fixed;
-      touch-action: none;
+      touch-action: auto;
       bottom: 24px;
       right: 24px;
       z-index: 9500;
@@ -4151,6 +4158,7 @@
     #checklistPill {
       display: flex;
       touch-action: none;
+      pointer-events: auto;
       align-items: center;
       gap: 8px;
       padding: 8px 16px;
@@ -4169,6 +4177,7 @@
     #checklistPillProgress { font-size: 11px; color: var(--teal); font-weight: 700; }
     #checklistPanel {
       width: 320px;
+      pointer-events: auto;
       background: #152d5a;
       border: 1px solid rgba(255,255,255,.18);
       border-radius: 16px;
@@ -4919,7 +4928,7 @@
           <div class="trip-body" id="tripOverallWrap" style="padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);">
             <div class="trip-goal-bar-wrap">
               <div class="trip-goal-label">
-                <span class="trip-goal-label-left">🎯 Team Goal Progress</span>
+                <span class="trip-goal-label-left">🎯 Team Progress to Goal</span>
                 <span class="trip-goal-label-right" id="tripGoalPct">0%</span>
               </div>
               <div class="trip-goal-bar">
@@ -9191,10 +9200,19 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (qCount) qCount.textContent = qualified + ' qualified';
     if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
 
-    // Overall team goal bar — % of agents qualified
-    const teamPct = sorted.length ? Math.round(qualified / sorted.length * 100) : 0;
-    if (goalBar) goalBar.style.width = teamPct + '%';
-    if (goalPct) goalPct.textContent = teamPct + '% qualifying';
+    // Overall team progress bar — average % on track across all agents
+    const avgProgress = sorted.length
+      ? Math.round(sorted.reduce((sum, a) => {
+          const prod = Number(a.production) || 0;
+          const agentGoal = Number(a.goal) > 0
+            ? Number(a.goal)
+            : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : 0);
+          if (agentGoal <= 0) return sum;
+          return sum + Math.min(100, (prod / agentGoal) * 100);
+        }, 0) / sorted.length)
+      : 0;
+    if (goalBar) goalBar.style.width = avgProgress + '%';
+    if (goalPct) goalPct.textContent = avgProgress + '% on track';
 
     const rankEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i+1);
     list.innerHTML = sorted.map((a, i) => {
@@ -9254,6 +9272,28 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     renderTripAdminEditor();
   }
 
+  function persistTripData(successMsg) {
+    const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || _tripMeta.monthLabel || '';
+    const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
+    _tripMeta = { ..._tripMeta, qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
+    const data = { agents: _tripAgents, meta: _tripMeta };
+    const hdrs = {
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates,return=minimal'
+    };
+    return fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker', {
+      method: 'POST', headers: hdrs,
+      body: JSON.stringify({ hub: 'medi', data })
+    }).then(r => {
+      if (!r.ok) throw new Error('save failed');
+      renderTripTracker();
+      renderTripAdminEditor();
+      showSnuToast(successMsg || '✓ Trip data saved!');
+    }).catch(() => showSnuToast('⚠ Save failed — check connection.'));
+  }
+
   function applyTripAgentGoalEdits() {
     if (!_tripAgents.length) { showSnuToast('⚠ No trip agents loaded yet.'); return; }
     const inputs = Array.from(document.querySelectorAll('#tripAgentGoalEditor .trip-agent-goal-input'));
@@ -9262,11 +9302,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     _tripAgents = _tripAgents.map(agent => {
       const key = String(agent.name || '').trim().toLowerCase();
       const editedGoal = goalMap.get(key);
-      return { ...agent, ...(editedGoal ? { goal: editedGoal } : { goal: Number(agent.goal)||0 }) };
+      return { ...agent, goal: editedGoal != null ? editedGoal : (Number(agent.goal) || 0) };
     });
     renderTripTracker();
     renderTripAdminEditor();
-    showSnuToast('✓ Agent goals updated. Click Save & Publish to push live.');
+    persistTripData('✓ Agent goals saved for everyone.');
   }
 
   // ── CSV Handling ───────────────────────────────────────────────────────────
@@ -9341,22 +9381,16 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function saveTripData() {
     if (!_tripAgents.length) { alert('No data to save. Upload a CSV first.'); return; }
-    applyTripAgentGoalEdits();
-    const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
-    const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || '';
-    _tripMeta = { qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
-    const data = { agents: _tripAgents, meta: _tripMeta };
-    renderTripTracker();
-    const _tripPayload = JSON.stringify(data);
-    const _tripHdrs = { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
-    fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi', {
-      method: 'DELETE', headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q' }
-    }).then(() => fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker', {
-      method: 'POST', headers: _tripHdrs,
-      body: JSON.stringify({ hub: 'medi', data: _tripPayload })
-    })).then(() => showSnuToast('✓ Trip data saved!'))
-    .catch(() => showSnuToast('⚠ Save failed — check connection.'));
-    // Reset CSV input
+    const inputs = Array.from(document.querySelectorAll('#tripAgentGoalEditor .trip-agent-goal-input'));
+    if (inputs.length) {
+      const goalMap = new Map(inputs.map(inp => [String(inp.dataset.tripAgent || '').trim().toLowerCase(), Math.max(0, Number(inp.value) || 0)]));
+      _tripAgents = _tripAgents.map(agent => {
+        const key = String(agent.name || '').trim().toLowerCase();
+        const editedGoal = goalMap.get(key);
+        return { ...agent, goal: editedGoal != null ? editedGoal : (Number(agent.goal) || 0) };
+      });
+    }
+    persistTripData('✓ Trip data saved!');
     const inp = document.getElementById('tripCsvInput');
     if (inp) inp.value = '';
     const status = document.getElementById('tripCsvStatus');
@@ -12042,11 +12076,65 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
   function getTodayKey() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
 
+  const LIVE_SYNC_MS = 5000;
+  let _taskLiveSyncStarted = false;
+  let _taskSnapshot = '[]';
+  let _taskFirstCloudLoad = true;
+
+  function normalizeTaskItems(raw){
+    if(Array.isArray(raw)) return raw;
+    if(typeof raw === 'string'){
+      try { const parsed = JSON.parse(raw); return Array.isArray(parsed) ? parsed : []; }
+      catch(e){ return []; }
+    }
+    return [];
+  }
+
+  function taskSnapshot(items){
+    return JSON.stringify((items||[]).map(t=>({id:t.id,label:t.label||''})).sort((a,b)=>String(a.id).localeCompare(String(b.id))));
+  }
+
+  function syncTasksFromCloud(opts={}) {
+    const { silent=false } = opts;
+    return supaGet('task_list').then(rows=>{
+      const nextItems = rows&&rows.length&&rows[0].data ? normalizeTaskItems(rows[0].data) : [];
+      const nextSnapshot = taskSnapshot(nextItems);
+      if(nextSnapshot === _taskSnapshot){
+        if(!_taskLiveSyncStarted && !_taskFirstCloudLoad){ renderChecklist(); refreshTaskAdminList(); }
+        return;
+      }
+      const prevCount = Array.isArray(_taskItems) ? _taskItems.length : 0;
+      _taskItems = nextItems;
+      _taskSnapshot = nextSnapshot;
+      renderChecklist();
+      refreshTaskAdminList();
+      if(!_taskFirstCloudLoad && !silent){
+        const diff = _taskItems.length - prevCount;
+        if(diff > 0){
+          showNotifToast('✅ Team tasks updated', diff === 1 ? 'A new team task was added.' : diff + ' new team tasks were added.', '✅');
+        } else if(diff < 0) {
+          showNotifToast('🗑 Team tasks updated', 'The team checklist was updated.', '🗑');
+        } else {
+          showNotifToast('✏️ Team tasks updated', 'The team checklist was updated.', '✏️');
+        }
+      }
+      _taskFirstCloudLoad = false;
+    }).catch(()=>{});
+  }
+
+  function startTaskLiveSync(){
+    if(_taskLiveSyncStarted) return;
+    _taskLiveSyncStarted = true;
+    syncTasksFromCloud({ silent:true });
+    setInterval(()=>syncTasksFromCloud(), LIVE_SYNC_MS);
+  }
+
   function initTasks() {
-    supaGet('task_list').then(rows=>{
-      if(rows&&rows.length&&rows[0].data){const raw=rows[0].data;_taskItems=Array.isArray(raw)?raw:(typeof raw==='string'?JSON.parse(raw):[]);}else _taskItems=[];
-      loadTaskChecks(); renderChecklist(); refreshTaskAdminList();
-    }).catch(()=>{ loadTaskChecks(); renderChecklist(); refreshTaskAdminList(); });
+    loadTaskChecks();
+    renderChecklist();
+    refreshTaskAdminList();
+    syncTasksFromCloud({ silent:true });
+    startTaskLiveSync();
   }
 
   function loadTaskChecks() {
@@ -12152,9 +12240,9 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const pill = document.getElementById('checklistPill');
     if (!widget || !pill) return;
 
-    const STORAGE_KEY = 'medi_checklist_widget_pos_v2';
+    const STORAGE_KEY = 'medi_checklist_widget_pos_v3';
     let startX = 0, startY = 0, startLeft = 0, startTop = 0;
-    let dragged = false, dragging = false;
+    let dragged = false, dragging = false, activePointerId = null;
 
     function getBounds() {
       const rect = widget.getBoundingClientRect();
@@ -12167,6 +12255,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
     function clampAndApply(left, top) {
       const pad = 8;
+      const bottomOffset = window.innerWidth <= 768 ? 72 : 24;
       const { width, height } = getBounds();
       const maxLeft = Math.max(pad, window.innerWidth - width - pad);
       const maxTop = Math.max(pad, window.innerHeight - height - pad);
@@ -12199,60 +12288,47 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       }
     }
 
-    function onStart(e) {
-      if (e.type === 'mousedown' && e.button !== 0) return;
-      const touch = e.touches ? e.touches[0] : e;
-      startX = touch.clientX;
-      startY = touch.clientY;
+    function onPointerDown(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      activePointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
       const rect = widget.getBoundingClientRect();
       startLeft = rect.left;
       startTop = rect.top;
       dragged = false;
       dragging = true;
       widget.classList.add('dragging');
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onEnd);
-      document.addEventListener('touchmove', onMove, { passive: false });
-      document.addEventListener('touchend', onEnd);
-      document.addEventListener('touchcancel', onEnd);
-      if (e.cancelable) e.preventDefault();
+      pill.setPointerCapture?.(e.pointerId);
+      e.preventDefault();
     }
 
-    function onMove(e) {
-      if (!dragging) return;
-      const touch = e.touches ? e.touches[0] : e;
-      const dx = touch.clientX - startX;
-      const dy = touch.clientY - startY;
+    function onPointerMove(e) {
+      if (!dragging || e.pointerId !== activePointerId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
       if (Math.abs(dx) > 6 || Math.abs(dy) > 6) dragged = true;
       clampAndApply(startLeft + dx, startTop + dy);
-      if (e.cancelable) e.preventDefault();
+      e.preventDefault();
     }
 
-    function onEnd(e) {
-      if (!dragging) return;
+    function onPointerUp(e) {
+      if (e.pointerId !== activePointerId) return;
       dragging = false;
       widget.classList.remove('dragging');
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onEnd);
-      document.removeEventListener('touchmove', onMove);
-      document.removeEventListener('touchend', onEnd);
-      document.removeEventListener('touchcancel', onEnd);
-      if (e && e.cancelable) e.preventDefault();
+      pill.releasePointerCapture?.(e.pointerId);
+      activePointerId = null;
+      if (!dragged) window.toggleChecklist();
+      setTimeout(() => { dragged = false; }, 0);
+      e.preventDefault();
     }
 
     pill.removeAttribute('onclick');
-    pill.addEventListener('mousedown', onStart);
-    pill.addEventListener('touchstart', onStart, { passive: false });
-    pill.addEventListener('click', function(e) {
-      if (dragged) {
-        dragged = false;
-        e.preventDefault();
-        return;
-      }
-      window.toggleChecklist();
-      e.preventDefault();
-    });
-
+    pill.style.cursor = 'grab';
+    pill.addEventListener('pointerdown', onPointerDown);
+    pill.addEventListener('pointermove', onPointerMove);
+    pill.addEventListener('pointerup', onPointerUp);
+    pill.addEventListener('pointercancel', onPointerUp);
     window.addEventListener('resize', restorePosition);
     setTimeout(restorePosition, 0);
   })();
@@ -12261,12 +12337,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const label=(document.getElementById('taskAdminLabel')?.value?.trim()||'');if(!label){toast('⚠ Label required.');return;}
     _taskItems.push({id:Date.now(),label});document.getElementById('taskAdminLabel').value='';
     refreshTaskAdminList(); renderTeamTasks(); updateChecklistPill();
-    toast('⏳ Saving…');supaUpsert('task_list',_taskItems).then(()=>toast('✓ Saved!')).catch(()=>toast('⚠ Save failed.'));
+    toast('⏳ Saving…');supaUpsert('task_list',_taskItems).then(()=>{toast('✓ Saved!');syncTasksFromCloud({ silent:true });}).catch(()=>toast('⚠ Save failed.'));
   };
   window.deleteTaskEntry=function(id){
     _taskItems=_taskItems.filter(x=>x.id!==id);
     refreshTaskAdminList(); renderTeamTasks(); updateChecklistPill();
-    toast('⏳ Removing…');supaUpsert('task_list',_taskItems).then(()=>toast('🗑 Removed.'));
+    toast('⏳ Removing…');supaUpsert('task_list',_taskItems).then(()=>{toast('🗑 Removed.');syncTasksFromCloud({ silent:true });});
   };
   function refreshTaskAdminList(){
     const el=document.getElementById('taskAdminList'),ct=document.getElementById('taskAdminCount');if(!el)return;
@@ -12473,21 +12549,43 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
      NOTIFICATION SYSTEM
   ════════════════════════════════ */
   const NOTIF_SEEN_KEY='hub_notif_seen_medi';
+  let _notifLiveSyncStarted = false;
+  let _notifFirstLoad = true;
 
-  function checkNotifications(){
-    fetch(`${NF_URL}/rest/v1/notifications?hub=eq.${NF_HUB}&select=id,title,message,icon&order=id.desc&limit=5`,{
+  function getSeenNotifications(){
+    try { return JSON.parse(sessionStorage.getItem(NOTIF_SEEN_KEY)||'[]'); }
+    catch(e){ return []; }
+  }
+  function setSeenNotifications(seen){
+    const deduped = Array.from(new Set((seen||[]).map(v=>Number(v)||v))).slice(-50);
+    sessionStorage.setItem(NOTIF_SEEN_KEY, JSON.stringify(deduped));
+  }
+
+  function checkNotifications(opts={}){
+    const { silent=false } = opts;
+    fetch(`${NF_URL}/rest/v1/notifications?hub=eq.${NF_HUB}&select=id,title,message,icon&order=id.desc&limit=10`,{
       headers:{'apikey':NF_KEY,'Authorization':'Bearer '+NF_KEY,'Cache-Control':'no-cache'}
     }).then(r=>r.json()).then(rows=>{
-      if(!Array.isArray(rows)||!rows.length)return;
-      let seen=[];try{seen=JSON.parse(sessionStorage.getItem(NOTIF_SEEN_KEY)||'[]');}catch(e){}
-      rows.forEach(n=>{
+      if(!Array.isArray(rows)||!rows.length){ if(_notifFirstLoad) _notifFirstLoad=false; return; }
+      let seen = getSeenNotifications();
+      rows.slice().reverse().forEach(n=>{
         if(!seen.includes(n.id)){
           seen.push(n.id);
-          setTimeout(()=>showNotifToast(n.title,n.message,n.icon||'🔔'),300);
+          if(!_notifFirstLoad && !silent){
+            setTimeout(()=>showNotifToast(n.title,n.message,n.icon||'🔔'),150);
+          }
         }
       });
-      sessionStorage.setItem(NOTIF_SEEN_KEY,JSON.stringify(seen));
+      setSeenNotifications(seen);
+      _notifFirstLoad = false;
     }).catch(()=>{});
+  }
+
+  function startNotificationLiveSync(){
+    if(_notifLiveSyncStarted) return;
+    _notifLiveSyncStarted = true;
+    checkNotifications({ silent:true });
+    setInterval(()=>checkNotifications(), LIVE_SYNC_MS);
   }
 
   window.showNotifToast=function(title,msg,icon='🔔'){
@@ -12504,7 +12602,13 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const icon=(document.getElementById('notifAdminIcon')?.value?.trim()||'🔔');
     if(!title||!msg){toast('⚠ Title and message required.');return;}
     fetch(`${NF_URL}/rest/v1/notifications`,{method:'POST',headers:hdrs(),body:JSON.stringify({hub:NF_HUB,title,message:msg,icon})})
-    .then(()=>{toast('✓ Notification pushed!');document.getElementById('notifAdminTitle').value='';document.getElementById('notifAdminMsg').value='';})
+    .then(()=>{
+      toast('✓ Notification pushed!');
+      showNotifToast(title,msg,icon);
+      document.getElementById('notifAdminTitle').value='';
+      document.getElementById('notifAdminMsg').value='';
+      checkNotifications({ silent:true });
+    })
     .catch(()=>toast('⚠ Push failed.'));
   };
 
@@ -12586,7 +12690,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     });
   });
 
-  document.addEventListener('DOMContentLoaded',()=>{ checkNotifications(); });
+  document.addEventListener('DOMContentLoaded',()=>{ initTasks(); startNotificationLiveSync(); });
 })();
 </script>
 <!-- ── END NEW FEATURES ENGINE ────────────────────────────────── -->
@@ -12623,6 +12727,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (iconEl) iconEl.textContent = icon;
     el.className = ''; el.classList.add('banner-' + color);
     el.style.display = 'block';
+    el.style.position = 'static';
+    el.style.top = 'auto';
     el.dataset.annId = id;
   }
 
