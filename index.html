@@ -1032,7 +1032,28 @@
 
     .footer-note { font-size: 12px; color: var(--muted-2); margin-top: 3px; }
 
+    .footer-disclaimer {
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding: 14px 0 18px;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
 
+    .footer-disclaimer p {
+      font-size: 11px;
+      color: var(--muted-2);
+      line-height: 1.7;
+      text-align: center;
+      opacity: .85;
+    }
+
+    .footer-disclaimer strong {
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      font-size: 10px;
+    }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
@@ -6416,7 +6437,14 @@ When answering:
         </div>
         <div style="font-size:11px;color:var(--muted-2);">© 2025 My Medi</div>
       </div>
-
+      <div class="footer-disclaimer">
+        <p>
+          <strong>⚠ Agent Use Only</strong> &nbsp;·&nbsp;
+          This hub is intended for licensed insurance agent use only. All information, tools, and resources provided should be independently validated by the agent before use with clients.
+          The <strong>Agent Assistant AI</strong> tool is provided for general assistance and guidance purposes only — responses are not guaranteed to be 100% accurate, complete, or current.
+          Agents are solely responsible for verifying information and ensuring compliance with applicable laws, carrier guidelines, and CMS regulations.
+        </p>
+      </div>
     </footer>
 
   </div>
@@ -8304,6 +8332,51 @@ When answering:
 </table>
 ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + notes + '</p>' : ''}
 <div class="note">This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation.</div>
+</body></html>`;
+
+    const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
+    if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+    w.focus(); setTimeout(() => w.print(), 500);
+  }
+
+  function copyLifeEmailBody() {
+    refreshLifePrintPanel();
+    const prev = document.getElementById('lifeEmailPreview');
+    if (!prev || prev.textContent === 'Calculate first to generate the email summary.') {
+      if (typeof showSnuToast === 'function') showSnuToast('\u26a0 Calculate first before copying.');
+      return;
+    }
+    navigator.clipboard.writeText(prev.textContent).then(() => {
+      if (typeof showSnuToast === 'function') showSnuToast('\u2713 Email summary copied to clipboard!');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = prev.textContent;
+      document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (typeof showSnuToast === 'function') showSnuToast('\u2713 Copied!');
+    });
+  }
+
+  function resetLifeInsuranceCalc() {
+    ['lifeIncome','lifeYears','lifeMortgage','lifeDebts','lifeFinal','lifeEmergency','lifeCollege','lifeWeddings','lifeProperties','lifeSavings','lifeExisting','lifeClientName','lifeNotes']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+    set('lifeIncomeNeed','$0'); set('lifeHomeNeed','$0'); set('lifeDebtNeed','$0');
+    set('lifeFamilyNeed','$0'); set('lifeFinalNeed','$0'); set('lifeOffsets','-$0');
+    set('lifeTotalNeed','$0');
+    set('lifeResultSub','Enter values above and click Calculate Need.');
+    window._lifeLastCalc = null;
+    const printBtn = document.getElementById('lifePrintTabBtn');
+    if (printBtn) printBtn.textContent = '\ud83d\udda8\ufe0f Print / Email';
+    const calcTab = document.querySelector('.life-share-tab');
+    if (calcTab) switchLifeTab('lifeCalcPanel', calcTab);
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSnuPrint(); closeLifeCalcModal(); } });
+  </script>
+
 
 <script>
 (function(){
@@ -8321,8 +8394,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const badge = document.getElementById('agentLoginBadge');
     const btn = document.getElementById('agentLoginBtn');
     const data = readAgentLogin();
-    if (badge) badge.textContent = data && data.name ? 'Signed in: ' + data.name : 'Not signed in';
-    if (btn) btn.textContent = data && data.name ? '👤 ' + data.name : '👤 Agent Login';
+    if (badge) badge.textContent = data && data.email ? data.email : '';
+    if (btn) btn.textContent = data && data.name ? '\ud83d\udc64 ' + data.name : '\ud83d\udc64 Agent Login';
   }
 
   window.openAgentLogin = function() {
@@ -8381,22 +8454,27 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   function readHubSession() {
     try { return JSON.parse(sessionStorage.getItem(HUB_SESSION_KEY) || 'null'); } catch(e) { return null; }
   }
+
   function writeHubSession(data) {
-    try { sessionStorage.setItem(HUB_SESSION_KEY, JSON.stringify(data)); } catch(e) {}
+    try { sessionStorage.setItem(HUB_SESSION_KEY, JSON.stringify(data || null)); } catch(e) {}
   }
+
   function applyHubSessionUi() {
-    const gate = document.getElementById('hubLoginGate');
     const session = readHubSession();
-    if (session && session.name && session.email) {
+    const gate = document.getElementById('hubLoginGate');
+    const badge = document.getElementById('agentLoginBadge');
+    const btn = document.getElementById('agentLoginBtn');
+
+    if (session && session.name) {
+      if (gate) { gate.style.display = 'none'; }
       document.body.classList.remove('hub-login-pending');
-      if (gate) gate.style.display = 'none';
-      const badge = document.getElementById('agentLoginBadge');
-      const btn = document.getElementById('agentLoginBtn');
-      if (badge) badge.textContent = 'Signed in: ' + session.name;
-      if (btn) btn.textContent = '👤 ' + session.name;
+      if (badge) badge.textContent = session.email || '';
+      if (btn) btn.textContent = '\ud83d\udc64 ' + session.name;
     } else {
+      if (gate) { gate.style.display = 'flex'; }
       document.body.classList.add('hub-login-pending');
-      if (gate) gate.style.display = 'flex';
+      if (badge) badge.textContent = '';
+      if (btn) btn.textContent = '\ud83d\udc64 Agent Login';
     }
   }
 
@@ -8475,53 +8553,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   });
 })();
 </script>
-
-</body></html>`;
-
-    const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
-    if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
-    w.document.open(); w.document.write(html); w.document.close();
-    w.focus(); setTimeout(() => w.print(), 500);
-  }
-
-  function copyLifeEmailBody() {
-    refreshLifePrintPanel();
-    const prev = document.getElementById('lifeEmailPreview');
-    if (!prev || prev.textContent === 'Calculate first to generate the email summary.') {
-      if (typeof showSnuToast === 'function') showSnuToast('⚠ Calculate first before copying.');
-      return;
-    }
-    navigator.clipboard.writeText(prev.textContent).then(() => {
-      if (typeof showSnuToast === 'function') showSnuToast('✓ Email summary copied to clipboard!');
-    }).catch(() => {
-      // Fallback for older browsers
-      const ta = document.createElement('textarea');
-      ta.value = prev.textContent;
-      document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy');
-      document.body.removeChild(ta);
-      if (typeof showSnuToast === 'function') showSnuToast('✓ Copied!');
-    });
-  }
-
-  function resetLifeInsuranceCalc() {
-    ['lifeIncome','lifeYears','lifeMortgage','lifeDebts','lifeFinal','lifeEmergency','lifeCollege','lifeWeddings','lifeProperties','lifeSavings','lifeExisting','lifeClientName','lifeNotes']
-      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
-    set('lifeIncomeNeed','$0'); set('lifeHomeNeed','$0'); set('lifeDebtNeed','$0');
-    set('lifeFamilyNeed','$0'); set('lifeFinalNeed','$0'); set('lifeOffsets','-$0');
-    set('lifeTotalNeed','$0');
-    set('lifeResultSub','Enter values above and click Calculate Need.');
-    window._lifeLastCalc = null;
-    const printBtn = document.getElementById('lifePrintTabBtn');
-    if (printBtn) printBtn.textContent = '🖨️ Print / Email';
-    // Reset to calculator tab
-    const calcTab = document.querySelector('.life-share-tab');
-    if (calcTab) switchLifeTab('lifeCalcPanel', calcTab);
-  }
-
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSnuPrint(); closeLifeCalcModal(); } });
-  </script>
 
 
   <script id="spotlight-script">
