@@ -12838,9 +12838,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       </div>`).join('');
   }
   window.toggleCheat = function(id) { document.getElementById('cheat-'+id)?.classList.toggle('open'); };
-  window.openCheat = function() { document.getElementById('cheatOverlay').classList.add('open'); document.body.style.overflow='hidden'; initCheat(); };
-  window.closeCheat = function() { document.getElementById('cheatOverlay').classList.remove('open'); document.body.style.overflow=''; };
-  document.getElementById('cheatOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeCheat(); });
+  window.openCheat = function() { const o=document.getElementById('cheatOverlay'); if(o){o.classList.add('open'); document.body.style.overflow='hidden'; initCheat();} };
+  window.closeCheat = function() { const o=document.getElementById('cheatOverlay'); if(o){o.classList.remove('open'); document.body.style.overflow='';} };
+  const _cheatOv = document.getElementById('cheatOverlay');
+  if (_cheatOv) _cheatOv.addEventListener('click', e=>{ if(e.target===e.currentTarget) closeCheat(); });
 
   window.submitCheatEntry = function() {
     const g=id=>(document.getElementById(id)?.value?.trim()||'');
