@@ -163,6 +163,7 @@
       font-weight: 700;
       color: #fff;
       line-height: 1.2;
+      min-width: 0;
     }
 
     .live-pill-value.gold  { color: var(--gold); }
@@ -1159,11 +1160,52 @@
       .brand-name { font-size: 14px; }
     }
 
+    @media (max-width: 640px) {
+      html, body, .page { max-width: 100%; overflow-x: hidden; }
+      .topbar-live { padding: 10px 14px; align-items: stretch; }
+      .topbar-live-left, .topbar-live-right {
+        width: 100%;
+        overflow: visible;
+        flex-wrap: wrap;
+      }
+      .topbar-live-right { justify-content: space-between; }
+      .live-pill {
+        flex: 1 1 48%;
+        min-width: 0;
+        border-right: none;
+        padding: 6px 10px;
+        height: auto;
+      }
+      .live-pill-body, .live-pill-value { min-width: 0; }
+      .live-pill-value {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.25;
+      }
+      .live-clock {
+        border-left: none;
+        padding: 6px 10px;
+      }
+      #announcementBanner { top: 0; }
+      #starStripItems {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px !important;
+      }
+      #starStripItems a {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        white-space: normal !important;
+      }
+    }
+
     /* ── FLOATING CHAT LAUNCHER ── */
     .chat-launcher {
       position: fixed;
       bottom: 28px;
-      right: 28px;
+      left: 28px;
+      right: auto;
       width: 72px;
       height: 72px;
       border-radius: 50%;
@@ -1231,7 +1273,8 @@
     .chat-tooltip {
       position: absolute;
       bottom: calc(100% + 12px);
-      right: 0;
+      left: 0;
+      right: auto;
       background: var(--ink-3);
       color: #fff;
       font-size: 12.5px; font-weight: 600;
@@ -5155,6 +5198,13 @@
         <div class="admin-body">
           <div class="admin-section-title">🚀 Agent Onboarding Checklist</div>
           <p style="font-size:12px;color:var(--muted-2);margin-bottom:14px;">Manage onboarding steps. Progress is saved per-browser for each agent.</p>
+          <div class="csv-drop-zone" id="onboardCsvDropZone" onclick="document.getElementById('onboardCsvFileInput').click()" style="margin-bottom:16px;">
+            <div class="csv-drop-icon">📂</div>
+            <div class="csv-drop-text">Drop onboarding CSV or Excel here, or <span>click to browse</span></div>
+            <div class="csv-drop-hint">Columns: <code>Phase</code>, <code>Label</code>, optional <code>Description</code>, <code>Link</code></div>
+            <input type="file" id="onboardCsvFileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleOnboardCsvFile(this.files[0])">
+          </div>
+          <div class="csv-status" id="onboardCsvStatus"></div>
           <div style="display:grid;gap:8px;margin-bottom:14px;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
               <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Phase / Group</label><input id="onboardAdminPhase" type="text" placeholder="e.g. Week 1, Licensing" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;"></div>
@@ -6558,9 +6608,9 @@ When answering:
       function setInitialPos() {
         const size = 72;
         const pad  = 28;
-        el.style.right  = null;
-        el.style.bottom = null;
-        el.style.left   = (window.innerWidth  - size - pad) + 'px';
+        el.style.right  = 'auto';
+        el.style.bottom = 'auto';
+        el.style.left   = pad + 'px';
         el.style.top    = (window.innerHeight - size - pad) + 'px';
       }
       setInitialPos();
@@ -6572,7 +6622,7 @@ When answering:
         const touch = e.touches ? e.touches[0] : e;
         startX    = touch.clientX;
         startY    = touch.clientY;
-        startLeft = parseInt(el.style.left)  || (window.innerWidth  - 100);
+        startLeft = parseInt(el.style.left)  || 28;
         startTop  = parseInt(el.style.top)   || (window.innerHeight - 100);
         dragged   = false;
         el.classList.add('dragging');
@@ -11543,7 +11593,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   let _starred = [];
 
   function loadStarred() {
-    try { _starred = JSON.parse(localStorage.getItem(STAR_KEY) || '[]'); } catch(e) { _starred = []; }
+    try { _starred = JSON.parse(localStorage.getItem(STAR_KEY) || localStorage.getItem('hub_starred_sections') || localStorage.getItem('favorites') || '[]'); } catch(e) { _starred = []; }
   }
 
   function saveStarred() {
@@ -11614,6 +11664,16 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       renderStarButtons();
       renderStarStrip();
     }, 400);
+    setTimeout(() => {
+      renderStarButtons();
+      renderStarStrip();
+    }, 1200);
+  });
+
+  window.addEventListener('pageshow', () => {
+    loadStarred();
+    renderStarButtons();
+    renderStarStrip();
   });
 
   // Also listen for CSV import events to trigger saves
@@ -12124,6 +12184,85 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     el.innerHTML=_onboard.map(s=>`<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;"><div style="flex:1;min-width:0;"><div class="admin-update-title">${pesc(s.label)}</div><div class="admin-update-meta"><span class="admin-update-type">${pesc(s.phase)}</span></div></div><div style="display:flex;gap:6px;flex-shrink:0;"><button onclick="editOnboardEntry(${s.id})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️</button><button onclick="deleteOnboardEntry(${s.id})" class="admin-update-del">🗑</button></div></div>`).join('');
   }
 
+  window.handleOnboardCsvFile=function(file){
+    if(!file) return;
+    const status=document.getElementById('onboardCsvStatus');
+    const setOk=msg=>{ if(status){ status.textContent=msg; status.className='csv-status ok'; } };
+    const setErr=msg=>{ if(status){ status.textContent=msg; status.className='csv-status err'; } };
+    const processRows=(rows)=>{
+      if(!Array.isArray(rows)||!rows.length){ setErr('✗ No rows found.'); return; }
+      const norm=rows.map(r=>{
+        const obj={}; Object.keys(r||{}).forEach(k=>obj[String(k).trim().toLowerCase()]=r[k]); return obj;
+      });
+      const items=[];
+      norm.forEach((r,idx)=>{
+        const label=String(r.label||r.step||r.task||'').trim();
+        if(!label) return;
+        items.push({
+          id: Date.now() + idx + Math.floor(Math.random()*1000),
+          phase: String(r.phase||r.group||r.section||'General').trim() || 'General',
+          label,
+          desc: String(r.description||r.desc||'').trim(),
+          link: String(r.link||r.url||'').trim()
+        });
+      });
+      if(!items.length){ setErr('✗ Could not find a Label or Step column with values.'); return; }
+      _onboard = items;
+      refreshOnboardAdminList();
+      renderOnboardModal();
+      setOk('⏳ Importing ' + items.length + ' onboarding steps…');
+      supaUpsert('onboarding_steps', _onboard).then(()=>{ setOk('✓ Imported ' + items.length + ' onboarding steps.'); }).catch(()=>{ setErr('⚠ Imported locally but cloud save failed.'); });
+    };
+    const name=(file.name||'').toLowerCase();
+    if(name.endsWith('.csv')){
+      const reader=new FileReader();
+      reader.onload=e=>{
+        try{
+          const lines=String(e.target.result||'').trim().split(/
+?
+/).filter(Boolean);
+          if(lines.length<2){ setErr('✗ File appears empty.'); return; }
+          const header=smartSplitCsv(lines[0]).map(h=>String(h).replace(/^"|"$/g,'').trim());
+          const rows=lines.slice(1).map(line=>{
+            const cols=smartSplitCsv(line);
+            const obj={};
+            header.forEach((h,i)=>obj[h]=String(cols[i]||'').replace(/^"|"$/g,'').trim());
+            return obj;
+          });
+          processRows(rows);
+        }catch(err){ setErr('✗ Could not parse CSV: ' + err.message); }
+      };
+      reader.onerror=()=>setErr('✗ Could not read file.');
+      reader.readAsText(file);
+      return;
+    }
+    if(name.endsWith('.xlsx') || name.endsWith('.xls')){
+      loadSheetJS(()=>{
+        const reader=new FileReader();
+        reader.onload=e=>{
+          try{
+            const wb=XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+            const ws=wb.Sheets[wb.SheetNames[0]];
+            const rows=XLSX.utils.sheet_to_json(ws, {defval:''});
+            processRows(rows);
+          }catch(err){ setErr('✗ Could not parse Excel file: ' + err.message); }
+        };
+        reader.onerror=()=>setErr('✗ Could not read file.');
+        reader.readAsArrayBuffer(file);
+      });
+      return;
+    }
+    setErr('✗ Please upload a .csv, .xlsx, or .xls file.');
+  };
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const zone=document.getElementById('onboardCsvDropZone');
+    if(!zone) return;
+    zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', ()=>zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e=>{ e.preventDefault(); zone.classList.remove('drag-over'); const f=e.dataTransfer.files && e.dataTransfer.files[0]; if(f) handleOnboardCsvFile(f); });
+  });
+
   /* ════════════════════════════════
      NOTIFICATION SYSTEM
   ════════════════════════════════ */
@@ -12276,7 +12415,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!el || !textEl) return;
     textEl.textContent = msg;
     if (iconEl) iconEl.textContent = icon;
-    el.className = 'banner-' + color;
+    el.className = ''; el.classList.add('banner-' + color);
     el.style.display = 'block';
     el.dataset.annId = id;
   }
