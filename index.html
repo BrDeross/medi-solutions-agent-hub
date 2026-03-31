@@ -9699,6 +9699,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   let _tripMeta   = {};  // {monthLabel, qualifyingGoal, updatedAt}
   let _tripSnapshot = '';
   let _tripSyncStarted = false;
+  let _tripSaveCooldown = false;
 
   function tripSnapshot(data) {
     try {
@@ -9751,6 +9752,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       }
       const nextSnapshot = tripSnapshot(next);
       const changed = nextSnapshot !== _tripSnapshot;
+      if (_tripSaveCooldown) return;
+      if (!changed && _tripSnapshot) return;
       _tripAgents = next.agents;
       _tripMeta = next.meta;
       _tripSnapshot = nextSnapshot;
@@ -9764,6 +9767,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         showSnuToast('✓ Trip tracker refreshed.');
       }
     }).catch(() => {
+      if (_tripSaveCooldown) return;
       renderTripTracker();
       renderTripAdminEditor();
     });
@@ -9947,6 +9951,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
     _tripMeta = { ..._tripMeta, qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
     const data = { agents: _tripAgents, meta: _tripMeta };
+    _tripSaveCooldown = true;
+    _tripSnapshot = tripSnapshot(data);
     const hdrs = {
       'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
       'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
@@ -9958,11 +9964,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       body: JSON.stringify({ hub: 'medi', data })
     }).then(r => {
       if (!r.ok) throw new Error('save failed');
-      _tripSnapshot = tripSnapshot(data);
       renderTripTracker();
       renderTripAdminEditor();
       showSnuToast(successMsg || '✓ Trip data saved!');
-    }).catch(() => showSnuToast('⚠ Save failed — check connection.'));
+      setTimeout(() => { _tripSaveCooldown = false; }, 15000);
+    }).catch(() => { _tripSaveCooldown = false; showSnuToast('⚠ Save failed — check connection.'); });
   }
 
   function applyTripAgentGoalEdits() {
