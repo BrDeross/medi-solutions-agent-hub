@@ -13316,9 +13316,10 @@ window.toggleTeamTask = function(id, checked) {
     const msg=(document.getElementById('notifAdminMsg')?.value?.trim()||'');
     const icon=(document.getElementById('notifAdminIcon')?.value?.trim()||'🔔');
     if(!title||!msg){toast('⚠ Title and message required.');return;}
+    const svcKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
     fetch(`${NF_URL}/rest/v1/notifications`,{
       method:'POST',
-      headers:{'apikey':NF_KEY,'Authorization':'Bearer '+NF_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      headers:{'apikey':svcKey,'Authorization':'Bearer '+svcKey,'Content-Type':'application/json','Prefer':'return=minimal'},
       body:JSON.stringify({hub:NF_HUB,title,message:msg,icon})
     })
     .then(r=>{
