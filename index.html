@@ -13316,15 +13316,20 @@ window.toggleTeamTask = function(id, checked) {
     const msg=(document.getElementById('notifAdminMsg')?.value?.trim()||'');
     const icon=(document.getElementById('notifAdminIcon')?.value?.trim()||'🔔');
     if(!title||!msg){toast('⚠ Title and message required.');return;}
-    fetch(`${NF_URL}/rest/v1/notifications`,{method:'POST',headers:hdrs(),body:JSON.stringify({hub:NF_HUB,title,message:msg,icon})})
-    .then(()=>{
+    fetch(`${NF_URL}/rest/v1/notifications`,{
+      method:'POST',
+      headers:{'apikey':NF_KEY,'Authorization':'Bearer '+NF_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({hub:NF_HUB,title,message:msg,icon})
+    })
+    .then(r=>{
+      if(!r.ok) throw new Error('Push failed: '+r.status);
       toast('✓ Notification pushed!');
       showNotifToast(title,msg,icon);
       document.getElementById('notifAdminTitle').value='';
       document.getElementById('notifAdminMsg').value='';
       checkNotifications({ silent:true });
     })
-    .catch(()=>toast('⚠ Push failed.'));
+    .catch(()=>toast('⚠ Push failed — check Supabase permissions.'));
   };
 
   /* ════════════════════════════════
