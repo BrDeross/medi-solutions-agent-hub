@@ -12500,9 +12500,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       const reader=new FileReader();
       reader.onload=e=>{
         try{
-          const lines=String(e.target.result||'').trim().split(/
-?
-/).filter(Boolean);
+          const lines=String(e.target.result||'').trim().split(/\r?\n/).filter(Boolean);
           if(lines.length<2){ setErr('✗ File appears empty.'); return; }
           const header=smartSplitCsv(lines[0]).map(h=>String(h).replace(/^"|"$/g,'').trim());
           const rows=lines.slice(1).map(line=>{
