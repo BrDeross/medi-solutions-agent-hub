@@ -270,6 +270,7 @@
       gap: 48px;
       align-items: center;
       position: relative;
+      z-index: 1;
     }
 
     .eyebrow {
@@ -4171,11 +4172,11 @@
               </a>
             </div>
           </div>
-          <div id="starStrip" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);">
+          <div id="starStrip" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);position:relative;z-index:2;">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:rgba(255,255,255,.4);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
               <span style="color:#fbbf24;">★</span> My pinned sections
             </div>
-            <div id="starStripItems" style="display:flex;flex-wrap:wrap;gap:7px;"></div>
+            <div id="starStripItems" style="display:flex;flex-wrap:wrap;gap:7px;position:relative;z-index:2;"></div>
           </div>
         </div>
       </div>
@@ -11929,20 +11930,24 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   document.addEventListener('click',e=>{if(_gsearchOpen&&!document.getElementById('gsearchWrap')?.contains(e.target))closeGsearch();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&_gsearchOpen)closeGsearch();});
 
-  /* ════════════════════════════════
-     HOOK INTO switchAdminTab
-  ════════════════════════════════ */
-  (function(){
-    const _orig=window.switchAdminTab;
-    window.switchAdminTab=function(tab,el){
-      if(_orig)_orig(tab,el);
-      if(tab==='directory'){refreshDirAdminList();if(!_dir.length)initDir();}
-      if(tab==='cheatsheet'){refreshCheatAdminList();if(!_cheat.length)initCheat();}
-      if(tab==='tasks'){refreshTaskAdminList();if(!_taskItems.length)initTasks();}
-      if(tab==='carriers'){refreshCarrierAdminList();if(!_carriers.length)initCarriers();}
-      if(tab==='onboarding'){refreshOnboardAdminList();if(!_onboard.length)initOnboard();}
+  /* ── HOOK INTO switchAdminTab ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Patch new tab buttons directly — avoids switchAdminTab wrapper chain conflicts
+    const tabMap = {
+      directory:  () => { refreshDirAdminList();     if (!_dir.length)       initDir(); },
+      cheatsheet: () => { refreshCheatAdminList();   if (!_cheat.length)     initCheat(); },
+      tasks:      () => { refreshTaskAdminList();    if (!_taskItems.length) initTasks(); },
+      carriers:   () => { refreshCarrierAdminList(); if (!_carriers.length)  initCarriers(); },
+      onboarding: () => { refreshOnboardAdminList(); if (!_onboard.length)   initOnboard(); },
     };
-  })();
+    Object.entries(tabMap).forEach(([tab, fn]) => {
+      const btn = document.querySelector(`.admin-tab[onclick*="'${tab}'"]`);
+      if (btn) {
+        const origClick = btn.onclick;
+        btn.onclick = function(e) { if (origClick) origClick.call(this, e); fn(); };
+      }
+    });
+  });
 
   document.addEventListener('DOMContentLoaded',()=>{ checkNotifications(); });
 })();
