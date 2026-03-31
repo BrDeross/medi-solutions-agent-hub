@@ -9962,7 +9962,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       renderTripTracker();
       renderTripAdminEditor();
       showSnuToast(successMsg || '✓ Trip data saved!');
-      loadTripData({ silent: true });
     }).catch(() => showSnuToast('⚠ Save failed — check connection.'));
   }
 
@@ -13004,8 +13003,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     syncChecklistButtonState(willOpen);
   };
 
-  window.openTask = function() { window.toggleChecklist(true); };
-  window.closeTask = function() { window.toggleChecklist(false); };
 window.toggleTeamTask = function(id, checked) {
     if(checked && !_tasks.includes(id)) _tasks.push(id);
     else if(!checked) _tasks=_tasks.filter(x=>x!==id);
@@ -13037,11 +13034,11 @@ window.toggleTeamTask = function(id, checked) {
   window.resetTasks=function(){_tasks=[];saveTaskChecks();renderTeamTasks();updateChecklistPill();};
 
   // Keep openTask/closeTask working for global search
-  window.openTask  = function() { const p=document.getElementById('checklistPanel'); if(p&&!p.classList.contains('open')){initTasks();p.classList.add('open');} };
-  window.closeTask = function() { const p=document.getElementById('checklistPanel'); if(p) p.classList.remove('open'); };
+  window.openTask  = function() { const p=document.getElementById('checklistPanel'); if(p&&!p.classList.contains('open')){initTasks();p.classList.add('open');syncChecklistButtonState(true);} };
+  window.closeTask = function() { const p=document.getElementById('checklistPanel'); if(p){p.classList.remove('open');p.style.display='none';syncChecklistButtonState(false);} };
 
 
-  (window.submitTaskEntry=function(){
+  window.submitTaskEntry=function(){
     const label=(document.getElementById('taskAdminLabel')?.value?.trim()||'');if(!label){toast('⚠ Label required.');return;}
     _taskItems.push({id:Date.now(),label});document.getElementById('taskAdminLabel').value='';
     refreshTaskAdminList(); renderTeamTasks(); updateChecklistPill();
