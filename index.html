@@ -5088,7 +5088,7 @@
         <div class="feature-modal-header">
           <div class="feature-modal-title">
             <div class="feature-modal-title-icon" style="background:rgba(59,130,246,.2);">👤</div>
-            <div><h3>Agent Login</h3><p>Save your name and email for this browser session</p></div>
+            <div><h3>Agent Login</h3><p>Use a non-persistent page-only login label</p></div>
           </div>
           <button class="feature-close" onclick="closeAgentLogin()">✕</button>
         </div>
@@ -8313,14 +8313,14 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 <script>
 (function(){
-  const AGENT_LOGIN_KEY = 'medi_agent_login';
+  let _agentLogin = null;
 
   function readAgentLogin() {
-    try { return JSON.parse(localStorage.getItem(AGENT_LOGIN_KEY) || 'null'); } catch(e) { return null; }
+    return _agentLogin;
   }
 
   function writeAgentLogin(data) {
-    try { localStorage.setItem(AGENT_LOGIN_KEY, JSON.stringify(data)); } catch(e) {}
+    _agentLogin = data || null;
   }
 
   function renderAgentLogin() {
@@ -8339,7 +8339,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     const statusEl = document.getElementById('agentLoginStatus');
     if (nameEl) nameEl.value = data.name || '';
     if (emailEl) emailEl.value = data.email || '';
-    if (statusEl) statusEl.textContent = '';
+    if (statusEl) statusEl.textContent = 'This label is not saved in browser storage.';
     if (overlay) overlay.style.display = 'flex';
   };
 
@@ -8358,12 +8358,12 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     }
     writeAgentLogin({ name, email, savedAt: new Date().toISOString() });
     renderAgentLogin();
-    if (statusEl) statusEl.textContent = 'Saved for this browser.';
+    if (statusEl) statusEl.textContent = 'Saved for this open page only.';
     setTimeout(window.closeAgentLogin, 450);
   };
 
   window.clearAgentLogin = function() {
-    try { localStorage.removeItem(AGENT_LOGIN_KEY); } catch(e) {}
+    writeAgentLogin(null);
     renderAgentLogin();
     const statusEl = document.getElementById('agentLoginStatus');
     if (statusEl) statusEl.textContent = 'Cleared.';
@@ -9542,29 +9542,79 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const TRIP_START     = new Date('2026-01-01');
   const TRIP_END       = new Date('2027-06-30');
   const DEFAULT_GOAL   = 50000;  // pts — change to match your actual qualifying bar
+  const TRIP_SYNC_MS   = 10000;
 
   let _tripAgents = [];  // [{name, production, goal?}]
   let _tripMeta   = {};  // {monthLabel, qualifyingGoal, updatedAt}
+  let _tripSnapshot = '';
+  let _tripSyncStarted = false;
 
-  // ── Load & Render ──────────────────────────────────────────────────────────
-  function loadTripData() {
-    // Load from Supabase only
+  function tripSnapshot(data) {
+    try {
+      return JSON.stringify({
+        agents: (Array.isArray(data?.agents) ? data.agents : []).map(a => ({
+          name: String(a.name || ''),
+          production: Number(a.production || 0),
+          goal: Number(a.goal || 0)
+        })).sort((a,b) => String(a.name).localeCompare(String(b.name))),
+        meta: {
+          monthLabel: String(data?.meta?.monthLabel || ''),
+          qualifyingGoal: Number(data?.meta?.qualifyingGoal || 0),
+          updatedAt: String(data?.meta?.updatedAt || '')
+        }
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function loadTripData(opts = {}) {
+    const silent = !!opts.silent;
     fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data', {
-      headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Cache-Control': 'no-cache' }
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
+        'Cache-Control': 'no-cache'
+      }
     }).then(r => r.json()).then(rows => {
+      let next = { agents: [], meta: {} };
       if (rows && rows.length && rows[0].data) {
         const raw = rows[0].data;
         const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        _tripAgents = Array.isArray(d.agents) ? d.agents : [];
-        _tripMeta   = d.meta || {};
+        next = {
+          agents: Array.isArray(d.agents) ? d.agents : [],
+          meta: d.meta || {}
+        };
       }
+      const nextSnapshot = tripSnapshot(next);
+      const changed = nextSnapshot !== _tripSnapshot;
+      _tripAgents = next.agents;
+      _tripMeta = next.meta;
+      _tripSnapshot = nextSnapshot;
       renderTripTracker();
       const goalInp = document.getElementById('tripGoalInput');
       if (goalInp) goalInp.value = _tripMeta.qualifyingGoal || '';
       const monthInp = document.getElementById('tripMonthLabel');
       if (monthInp) monthInp.value = _tripMeta.monthLabel || '';
       renderTripAdminEditor();
-    }).catch(() => { renderTripTracker(); renderTripAdminEditor(); });
+      if (!silent && changed && typeof showSnuToast === 'function') {
+        showSnuToast('✓ Trip tracker refreshed.');
+      }
+    }).catch(() => {
+      renderTripTracker();
+      renderTripAdminEditor();
+    });
+  }
+
+  function startTripLiveSync() {
+    if (_tripSyncStarted) return;
+    _tripSyncStarted = true;
+    loadTripData({ silent: true });
+    setInterval(() => loadTripData({ silent: true }), TRIP_SYNC_MS);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) loadTripData({ silent: true });
+    });
+    window.addEventListener('focus', () => loadTripData({ silent: true }));
   }
 
   function renderTripTracker() {
@@ -9591,7 +9641,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       return;
     }
 
-    // Sort by production desc
     const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
     const qualified = sorted.filter(a => {
       const prod = Number(a.production) || 0;
@@ -9603,7 +9652,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (qCount) qCount.textContent = qualified + ' qualified';
     if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
 
-    // Overall team progress bar — average % on track across all agents
     const avgProgress = sorted.length
       ? Math.round(sorted.reduce((sum, a) => {
           const prod = Number(a.production) || 0;
@@ -9691,9 +9739,11 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       body: JSON.stringify({ hub: 'medi', data })
     }).then(r => {
       if (!r.ok) throw new Error('save failed');
+      _tripSnapshot = tripSnapshot(data);
       renderTripTracker();
       renderTripAdminEditor();
       showSnuToast(successMsg || '✓ Trip data saved!');
+      loadTripData({ silent: true });
     }).catch(() => showSnuToast('⚠ Save failed — check connection.'));
   }
 
@@ -9712,7 +9762,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     persistTripData('✓ Agent goals saved for everyone.');
   }
 
-  // ── CSV Handling ───────────────────────────────────────────────────────────
   function handleTripCsvFile(file) {
     if (!file) return;
     const status = document.getElementById('tripCsvStatus');
@@ -9724,15 +9773,15 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       try {
         let rows = [];
         if (file.name.match(/\.xlsx?$/i)) {
-          // Excel — use SheetJS if available
           if (typeof XLSX === 'undefined') { setErr('Excel support requires XLSX library. Use CSV instead.'); return; }
           const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
           const ws = wb.Sheets[wb.SheetNames[0]];
           rows = XLSX.utils.sheet_to_json(ws, {defval:''});
         } else {
-          // CSV
           const text = e.target.result;
-          const lines = text.split(/\r?\n/).filter(l => l.trim());
+          const lines = text.split(/
+?
+/).filter(l => l.trim());
           const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
           rows = lines.slice(1).map(line => {
             const vals = smartSplitCsv(line);
@@ -9742,7 +9791,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
           });
         }
 
-        // Find Name and Production columns (case-insensitive)
         const agents = [];
         rows.forEach(r => {
           const nameKey = Object.keys(r).find(k => /name/i.test(k));
@@ -9760,7 +9808,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
         _tripAgents = agents;
         setOk(`✓ Loaded ${agents.length} agent${agents.length !== 1 ? 's' : ''} — review below, then Save & Publish.`);
 
-        // Show preview
         const preview = document.getElementById('tripAdminPreview');
         const previewRows = document.getElementById('tripPreviewRows');
         const previewCount = document.getElementById('tripPreviewCount');
@@ -9776,6 +9823,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
             </div>`;
           }).join('');
         }
+        renderTripTracker();
+        renderTripAdminEditor();
       } catch(err) { setErr('Parse error: ' + err.message); }
     };
     if (file.name.match(/\.xlsx?$/i)) reader.readAsArrayBuffer(file);
@@ -9806,17 +9855,22 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!confirm('Clear all trip tracker data? This cannot be undone.')) return;
     _tripAgents = [];
     _tripMeta = {};
+    _tripSnapshot = tripSnapshot({ agents: [], meta: {} });
     renderTripTracker();
     renderTripAdminEditor();
     fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi', {
-      method: 'DELETE', headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q' }
-    }).then(() => showSnuToast('↺ Trip data cleared.'))
-    .catch(() => showSnuToast('⚠ Clear failed.'));
+      method: 'DELETE', headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q'
+      }
+    }).then(() => {
+      showSnuToast('↺ Trip data cleared.');
+      loadTripData({ silent: true });
+    }).catch(() => showSnuToast('⚠ Clear failed.'));
   }
 
-  // Drag-and-drop on the trip drop zone
   document.addEventListener('DOMContentLoaded', function() {
-    loadTripData();
+    startTripLiveSync();
     const dz = document.getElementById('tripCsvDrop');
     if (dz) {
       dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
