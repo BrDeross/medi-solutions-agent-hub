@@ -6162,6 +6162,38 @@
         </div>
         </div><!-- /adminTabNotifications -->
 
+<!-- ── STANDALONE PUSH NOTIFICATION (no IIFE dependency) ── -->
+<script>
+window.pushNotification = function() {
+  var title = (document.getElementById('notifAdminTitle') || {}).value || '';
+  var msg = (document.getElementById('notifAdminMsg') || {}).value || '';
+  var icon = (document.getElementById('notifAdminIcon') || {}).value || '🔔';
+  title = title.trim(); msg = msg.trim(); icon = icon.trim() || '🔔';
+  if (!title || !msg) {
+    if (typeof showSnuToast === 'function') showSnuToast('⚠ Title and message required.');
+    else alert('Title and message required.');
+    return;
+  }
+  var url = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/notifications';
+  var key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  fetch(url, {
+    method: 'POST',
+    headers: { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ hub: 'medi', title: title, message: msg, icon: icon })
+  }).then(function(r) {
+    if (!r.ok) throw new Error(r.status);
+    if (typeof showSnuToast === 'function') showSnuToast('✓ Notification pushed!');
+    else alert('Notification pushed!');
+    if (typeof showNotifToast === 'function') showNotifToast(title, msg, icon);
+    document.getElementById('notifAdminTitle').value = '';
+    document.getElementById('notifAdminMsg').value = '';
+  }).catch(function() {
+    if (typeof showSnuToast === 'function') showSnuToast('⚠ Push failed.');
+    else alert('Push failed — check Supabase.');
+  });
+};
+</script>
+
 
       </div>
 
@@ -13311,27 +13343,7 @@ window.toggleTeamTask = function(id, checked) {
     setTimeout(()=>{el.style.transition='opacity .4s';el.style.opacity='0';setTimeout(()=>el.remove(),400);},8000);
   };
 
-  window.pushNotification=function(){
-    const title=(document.getElementById('notifAdminTitle')?.value?.trim()||'');
-    const msg=(document.getElementById('notifAdminMsg')?.value?.trim()||'');
-    const icon=(document.getElementById('notifAdminIcon')?.value?.trim()||'🔔');
-    if(!title||!msg){toast('⚠ Title and message required.');return;}
-    const svcKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-    fetch(`${NF_URL}/rest/v1/notifications`,{
-      method:'POST',
-      headers:{'apikey':svcKey,'Authorization':'Bearer '+svcKey,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({hub:NF_HUB,title,message:msg,icon})
-    })
-    .then(r=>{
-      if(!r.ok) throw new Error('Push failed: '+r.status);
-      toast('✓ Notification pushed!');
-      showNotifToast(title,msg,icon);
-      document.getElementById('notifAdminTitle').value='';
-      document.getElementById('notifAdminMsg').value='';
-      checkNotifications({ silent:true });
-    })
-    .catch(()=>toast('⚠ Push failed — check Supabase permissions.'));
-  };
+  /* pushNotification defined in standalone script below admin panel */
 
   /* ════════════════════════════════
      GLOBAL SEARCH
