@@ -1069,7 +1069,8 @@ th { font-size: 9.5px; }
 .brand-name { font-size: 14px; }
 }
 @media (max-width: 640px) {
-html, body, .page { max-width: 100%; overflow-x: clip; }
+html, body { max-width: 100%; overflow-x: clip; }
+.page { max-width: 100%; }
 .topbar-live { padding: 10px 14px; align-items: stretch; }
 .topbar-live-left, .topbar-live-right {
 width: 100%;
@@ -4816,6 +4817,10 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Territory / State</label><input id="dirAdminTerritory" type="text" placeholder="FL, NJ" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;"></div>
 <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Tag / Type</label><input id="dirAdminTag" type="text" placeholder="Captive / GA / Manager" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;"></div>
 </div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Category</label><select id="dirAdminRole" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;"><option value="Agent" style="background:#1c2d4a;">Agent</option><option value="Manager" style="background:#1c2d4a;">Manager</option><option value="Upper Management" style="background:#1c2d4a;">Upper Management</option></select></div>
+<div></div>
+</div>
 </div>
 <div style="display:flex;gap:8px;margin-bottom:16px;">
 <button onclick="submitDirEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">➕ Add Agent</button>
@@ -4823,7 +4828,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <label style="padding:7px 18px;border-radius:8px;border:1px solid rgba(45,212,191,.3);background:rgba(45,212,191,.08);color:var(--teal);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📂 Import CSV<input type="file" accept=".csv" style="display:none;" onchange="csvImportDir(this)"></label>
 <button onclick="csvExportDir()" style="padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">⬇ Export</button>
 </div>
-<div style="font-size:10px;color:var(--muted-2);margin-bottom:12px;">CSV columns: <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">name, title, phone, email, territory, tag</code></div>
+<div style="font-size:10px;color:var(--muted-2);margin-bottom:12px;">CSV columns: <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">name, title, phone, email, territory, tag, role</code> (role: Upper Management / Manager / Agent)</div>
 <div class="admin-section-title" style="margin-top:4px;">📋 Current Agents <span id="dirAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
 <div id="dirAdminList" style="margin-top:8px;"></div>
 </div>
@@ -11705,7 +11710,7 @@ window.csvImportDir = function(input) {
 readFileText(input, text => {
 const rows = parseCSV(text);
 if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
-const newRows = rows.filter(r => r.name).map(r => ({ id: Date.now() + Math.random(), name:r.name, title:r.title||'', phone:r.phone||'', email:r.email||'', territory:r.territory||'', tag:r.tag||'' }));
+const newRows = rows.filter(r => r.name).map(r => ({ id: Date.now() + Math.random(), name:r.name, title:r.title||'', phone:r.phone||'', email:r.email||'', territory:r.territory||'', tag:r.tag||'', role:r.role||'Agent' }));
 if (!newRows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No valid agent rows found.'); return; }
 if(typeof showSnuToast==='function') showSnuToast('⏳ Importing ' + newRows.length + ' agents…');
 if (typeof window._csvBridgeSaveDir === 'function') window._csvBridgeSaveDir(newRows);
@@ -11714,7 +11719,7 @@ if (typeof window._csvBridgeSaveDir === 'function') window._csvBridgeSaveDir(new
 window.csvExportDir = function() {
 const data = typeof window._csvBridgeGetDir === 'function' ? window._csvBridgeGetDir() : [];
 if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No agents to export.'); return; }
-downloadCSV('agent_directory.csv', toCSV(data, ['name','title','phone','email','territory','tag']));
+downloadCSV('agent_directory.csv', toCSV(data, ['name','title','phone','email','territory','tag','role']));
 };
 /* ── Cheat Sheet CSV ── */
 window.csvImportCheat = function(input) {
@@ -12101,11 +12106,23 @@ startDirLiveSync();
 function renderDirModal(list) {
 const el = document.getElementById('dirGrid'); if (!el) return;
 if (!list.length) { el.innerHTML = '<div class="dir-empty">No agents in directory yet.</div>'; return; }
-el.innerHTML = list.map(a => {
+const rolePriority = {'Upper Management':1,'Manager':2,'Agent':3};
+const roleIcon = {'Upper Management':'👔','Manager':'📋','Agent':'🧑‍💼'};
+const roleColor = {'Upper Management':'rgba(251,191,36,.25)','Manager':'rgba(99,179,237,.25)','Agent':'rgba(45,212,191,.15)'};
+const roleBorder = {'Upper Management':'rgba(251,191,36,.6)','Manager':'rgba(99,179,237,.5)','Agent':'rgba(45,212,191,.3)'};
+const sorted = [...list].sort((a,b) => (rolePriority[a.role]||3) - (rolePriority[b.role]||3) || (a.name||'').localeCompare(b.name||''));
+const groups = {};
+sorted.forEach(a => { const r = a.role || 'Agent'; if (!groups[r]) groups[r] = []; groups[r].push(a); });
+const order = ['Upper Management','Manager','Agent'];
+let html = '';
+order.forEach(role => {
+if (!groups[role] || !groups[role].length) return;
+html += `<div class="dir-section-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:${html?'18px':'0'} 0 4px;padding:8px 0;border-bottom:1px solid ${roleBorder[role]||'var(--border)'};"><span style="font-size:16px;">${roleIcon[role]||''}</span><span style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${roleBorder[role]||'var(--muted)'};">${pesc(role)}</span><span style="font-size:11px;color:var(--muted-2);font-weight:400;">(${groups[role].length})</span></div>`;
+html += groups[role].map(a => {
 const initials = (a.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-return `<div class="dir-card">
+return `<div class="dir-card" style="border-left:3px solid ${roleBorder[a.role]||roleBorder['Agent']};">
 <div class="dir-card-top">
-<div class="dir-avatar">${initials}</div>
+<div class="dir-avatar" style="background:${roleColor[a.role]||roleColor['Agent']};">${initials}</div>
 <div><div class="dir-name">${pesc(a.name)}</div><div class="dir-title">${pesc(a.title||'')}</div></div>
 </div>
 <div class="dir-meta">
@@ -12116,11 +12133,13 @@ ${a.territory ? `<span>📍 ${pesc(a.territory)}</span>` : ''}
 ${a.tag ? `<span class="dir-tag">${pesc(a.tag)}</span>` : ''}
 </div>`;
 }).join('');
+});
+el.innerHTML = html;
 }
 window.filterDir = function(q) {
 const lower = q.toLowerCase().trim();
 renderDirModal(!lower ? _dir : _dir.filter(a =>
-[a.name,a.title,a.territory,a.tag].some(f=>(f||'').toLowerCase().includes(lower))
+[a.name,a.title,a.territory,a.tag,a.role].some(f=>(f||'').toLowerCase().includes(lower))
 ));
 };
 window.openDir = function() { document.getElementById('dirOverlay').classList.add('open'); document.body.style.overflow='hidden'; initDir(); };
@@ -12129,7 +12148,7 @@ document.getElementById('dirOverlay').addEventListener('click', e=>{ if(e.target
 window.submitDirEntry = function() {
 const g = id => (document.getElementById(id)?.value?.trim()||'');
 const name = g('dirAdminName'); if (!name) { toast('⚠ Name required.'); return; }
-const entry = { id: _dirEditId||Date.now(), name, title:g('dirAdminTitle'), phone:g('dirAdminPhone'), email:g('dirAdminEmail'), territory:g('dirAdminTerritory'), tag:g('dirAdminTag') };
+const entry = { id: _dirEditId||Date.now(), name, title:g('dirAdminTitle'), phone:g('dirAdminPhone'), email:g('dirAdminEmail'), territory:g('dirAdminTerritory'), tag:g('dirAdminTag'), role:g('dirAdminRole')||'Agent' };
 if (_dirEditId) { const i=_dir.findIndex(x=>x.id===_dirEditId); if(i>=0)_dir[i]=entry; else _dir.push(entry); } else _dir.push(entry);
 cancelDirEdit(); refreshDirAdminList(); toast('⏳ Saving…');
 supaUpsert('agent_directory', _dir).then(()=>{ initDir(); toast('✓ Directory saved!'); }).catch(()=>toast('⚠ Save failed.'));
@@ -12137,7 +12156,7 @@ supaUpsert('agent_directory', _dir).then(()=>{ initDir(); toast('✓ Directory s
 window.editDirEntry = function(id) {
 const a=_dir.find(x=>x.id===id); if(!a) return; _dirEditId=id;
 const sv=(eid,v)=>{const e=document.getElementById(eid);if(e)e.value=v||'';};
-sv('dirAdminName',a.name); sv('dirAdminTitle',a.title); sv('dirAdminPhone',a.phone); sv('dirAdminEmail',a.email); sv('dirAdminTerritory',a.territory); sv('dirAdminTag',a.tag);
+sv('dirAdminName',a.name); sv('dirAdminTitle',a.title); sv('dirAdminPhone',a.phone); sv('dirAdminEmail',a.email); sv('dirAdminTerritory',a.territory); sv('dirAdminTag',a.tag); sv('dirAdminRole',a.role||'Agent');
 const cb=document.getElementById('dirCancelBtn'); if(cb) cb.style.display='';
 document.getElementById('dirAdminName')?.focus();
 };
@@ -12145,18 +12164,25 @@ window.deleteDirEntry = function(id) { _dir=_dir.filter(x=>x.id!==id); refreshDi
 window.cancelDirEdit = function() {
 _dirEditId=null;
 ['dirAdminName','dirAdminTitle','dirAdminPhone','dirAdminEmail','dirAdminTerritory','dirAdminTag'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+const rs=document.getElementById('dirAdminRole'); if(rs) rs.value='Agent';
 const cb=document.getElementById('dirCancelBtn'); if(cb) cb.style.display='none';
 };
 function refreshDirAdminList() {
 const el=document.getElementById('dirAdminList'), ct=document.getElementById('dirAdminCount'); if(!el) return;
 if(ct) ct.textContent=`(${_dir.length})`;
 if(!_dir.length){el.innerHTML='<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No agents yet.</div>';return;}
-el.innerHTML=_dir.map(a=>`<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;">
-<div style="flex:1;min-width:0;"><div class="admin-update-title">${pesc(a.name)}</div><div class="admin-update-meta"><span class="admin-update-type">${pesc(a.title||'')}</span><span style="color:var(--muted-2);">${pesc(a.territory||'')}</span></div></div>
+const rp={'Upper Management':1,'Manager':2,'Agent':3};
+const rc={'Upper Management':'rgba(251,191,36,.8)','Manager':'rgba(99,179,237,.8)','Agent':'rgba(45,212,191,.7)'};
+const sorted=[..._dir].sort((a,b)=>(rp[a.role]||3)-(rp[b.role]||3)||(a.name||'').localeCompare(b.name||''));
+el.innerHTML=sorted.map(a=>{
+const rBadge=`<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:${rc[a.role]||rc['Agent']};color:#0f1a2e;white-space:nowrap;">${pesc(a.role||'Agent')}</span>`;
+return `<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;">
+<div style="flex:1;min-width:0;"><div class="admin-update-title">${pesc(a.name)} ${rBadge}</div><div class="admin-update-meta"><span class="admin-update-type">${pesc(a.title||'')}</span><span style="color:var(--muted-2);">${pesc(a.territory||'')}</span></div></div>
 <div style="display:flex;gap:6px;flex-shrink:0;">
 <button onclick="editDirEntry(${a.id})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️</button>
 <button onclick="deleteDirEntry(${a.id})" class="admin-update-del">🗑</button>
-</div></div>`).join('');
+</div></div>`;
+}).join('');
 }
 /* ════════════════════════════════
 CHEAT SHEET
