@@ -10363,6 +10363,24 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
   const FRIDAY_STORAGE_KEY = 'friday_meetings_v1';
   let _fridayMeetings = [];
 
+  function parseMeetingDate(dateStr) {
+    if (!dateStr) return null;
+    try { const d = new Date(dateStr); return isNaN(d.getTime()) ? null : d; } catch(e) { return null; }
+  }
+
+  function cleanPastMeetings() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const before = _fridayMeetings.length;
+    _fridayMeetings = _fridayMeetings.filter(m => {
+      const d = parseMeetingDate(m.date);
+      if (!d) return true;
+      d.setHours(0,0,0,0);
+      return d >= today;
+    });
+    return _fridayMeetings.length !== before;
+  }
+
   function initFridayMeetings() {
     let localMeetings = [];
     try {
@@ -10370,6 +10388,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       if (!Array.isArray(localMeetings)) localMeetings = [];
     } catch(e) { localMeetings = []; }
     _fridayMeetings = localMeetings;
+    const localCleaned = cleanPastMeetings();
+    if (localCleaned) { try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {} }
     renderFridayMeetings(); renderFridayAdminList();
 
     fetch(`${FM_SUPA_URL}/rest/v1/friday_meetings?hub=eq.medi&select=data`, {
@@ -10385,12 +10405,17 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       }
       if (cloudData.length > 0 || localMeetings.length === 0) {
         _fridayMeetings = cloudData;
-        try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
       }
+      const cloudCleaned = cleanPastMeetings();
+      try { localStorage.setItem(FRIDAY_STORAGE_KEY, JSON.stringify(_fridayMeetings)); } catch(e) {}
       renderFridayMeetings(); renderFridayAdminList();
+      if (cloudCleaned) {
+        saveFridayMeetings();
+      }
     })
     .catch(() => {
       _fridayMeetings = localMeetings;
+      cleanPastMeetings();
       renderFridayMeetings(); renderFridayAdminList();
     });
   }
