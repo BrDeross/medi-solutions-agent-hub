@@ -207,12 +207,12 @@ nav a.pill:hover { background: #2563eb; }
 .page { position: relative; z-index: 1; }
 .wrap { max-width: 1320px; margin: 0 auto; padding: 0 32px; }
 /* ── HERO ── */
-.hero { padding: 52px 0 0; }
+.hero { padding: 36px 0 0; }
 .hero-inner {
 background: linear-gradient(140deg, #1e3d72 0%, #2a5298 50%, #1a3870 100%);
 border: 1px solid var(--border-2);
 border-radius: var(--r-xl);
-padding: 56px 60px;
+padding: 40px 48px 36px;
 position: relative;
 overflow: hidden;
 animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both;
@@ -275,7 +275,7 @@ animation: blink 2s infinite;
 font-family: 'Space Grotesk', sans-serif;
 font-size: 50px; font-weight: 700;
 line-height: 1.08; letter-spacing: -1.8px;
-color: #fff; margin-bottom: 18px;
+color: #fff; margin-bottom: 12px;
 }
 .hero h1 em {
 font-style: normal;
@@ -13025,25 +13025,46 @@ if (e.target === this) closeReferralModal();
   .cd-digits .cd-u { font-size: 9.5px; font-weight: 600; color: rgba(255,255,255,.4); letter-spacing: .3px; margin: 0 1px; }
   .cd-expired { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; color: #fb7185; }
   #countdownStrip .cd-empty { opacity: .4; text-align: center; width: 100%; font-size: 13px; color: var(--muted-2); padding: 12px 0; font-style: italic; }
-  .hero-bundle-btn {
-    display: inline-flex; align-items: center; gap: 8px; margin-top: 20px;
-    padding: 13px 24px; background: linear-gradient(135deg, rgba(59,130,246,.2), rgba(59,130,246,.08));
-    border: 1px solid rgba(59,130,246,.35); border-radius: 12px; color: var(--accent-2);
-    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700;
-    text-decoration: none; transition: background .2s, border-color .2s, transform .2s, box-shadow .2s; position: relative; z-index: 2;
-  }
-  .hero-bundle-btn:hover { background: linear-gradient(135deg, rgba(59,130,246,.3), rgba(59,130,246,.15)); border-color: rgba(59,130,246,.55); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(59,130,246,.3); color: #fff; }
-  .cd-admin-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-  .cd-admin-icon { font-size: 22px; flex-shrink: 0; }
-  .cd-admin-info { flex: 1; min-width: 0; }
-  .cd-admin-label { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; color: #fff; }
-  .cd-admin-target { font-size: 11px; color: var(--muted-2); font-family: 'JetBrains Mono', monospace; }
-  @media (max-width: 640px) {
-    #countdownStrip { flex-direction: column; }
-    #countdownStrip .cd-card { flex: 1 1 auto; }
-    .cd-digits { font-size: 16px; }
-    .hero-bundle-btn { font-size: 13px; padding: 11px 18px; }
-  }
+.hero-bundle-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 18px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+  border: none; border-radius: 14px;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px; font-weight: 800;
+  text-decoration: none;
+  letter-spacing: .2px;
+  position: relative; z-index: 2;
+  box-shadow:
+    0 4px 0 #1e40af,
+    0 8px 24px rgba(59,130,246,.45),
+    0 0 20px rgba(59,130,246,.3),
+    inset 0 1px 0 rgba(255,255,255,.25);
+  transition: transform .15s, box-shadow .15s;
+  animation: bundlePulse 2.5s ease-in-out infinite;
+}
+.hero-bundle-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 0 #1e40af,
+    0 14px 36px rgba(59,130,246,.55),
+    0 0 32px rgba(59,130,246,.4),
+    inset 0 1px 0 rgba(255,255,255,.3);
+  color: #fff;
+}
+.hero-bundle-btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 2px 0 #1e40af,
+    0 4px 12px rgba(59,130,246,.35),
+    inset 0 1px 0 rgba(255,255,255,.2);
+}
+@keyframes bundlePulse {
+  0%, 100% { box-shadow: 0 4px 0 #1e40af, 0 8px 24px rgba(59,130,246,.45), 0 0 20px rgba(59,130,246,.3), inset 0 1px 0 rgba(255,255,255,.25); }
+  50% { box-shadow: 0 4px 0 #1e40af, 0 8px 24px rgba(59,130,246,.45), 0 0 40px rgba(59,130,246,.55), 0 0 60px rgba(59,130,246,.2), inset 0 1px 0 rgba(255,255,255,.25); }
+}
 </style>
 <script>
 (function(){
