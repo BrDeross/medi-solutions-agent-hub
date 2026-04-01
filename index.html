@@ -10942,8 +10942,59 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     location.reload();
   };
 
+  let _tileOrderSnapshot = '';
+  let _tileOrderSyncStarted = false;
+  let _tileOrderSaveCooldown = false;
+
+  function tileOrderSnapshot() {
+    try { return JSON.stringify(_tileOrder); } catch(e) { return ''; }
+  }
+
+  function syncTileOrderFromCloud() {
+    if (_tileOrderSaveCooldown) return;
+    fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.tile_order&select=data`, {
+      headers: { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Cache-Control': 'no-cache' }
+    }).then(r => r.json()).then(rows => {
+      if (_tileOrderSaveCooldown) return;
+      if (rows && rows.length && rows[0].data) {
+        const raw = rows[0].data;
+        const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        const newSnap = JSON.stringify(d || {});
+        if (newSnap !== _tileOrderSnapshot) {
+          _tileOrder = d || {};
+          _tileOrderSnapshot = newSnap;
+          applyTileOrder();
+        }
+      }
+    }).catch(() => {});
+  }
+
+  function startTileOrderLiveSync() {
+    if (_tileOrderSyncStarted) return;
+    _tileOrderSyncStarted = true;
+    setInterval(syncTileOrderFromCloud, 10000);
+  }
+
+  // Wrap saveTileOrderToCloud with cooldown
+  const _origSaveTileOrder = saveTileOrderToCloud;
+  saveTileOrderToCloud = function() {
+    _tileOrderSaveCooldown = true;
+    _tileOrderSnapshot = tileOrderSnapshot();
+    const payload = JSON.stringify(_tileOrder);
+    const headers = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.tile_order`, {
+      method: 'DELETE', headers: { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY }
+    }).then(() => fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
+      method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key: 'tile_order', data: payload })
+    })).then(() => {
+      showSnuToast('✓ Tile order saved!');
+      setTimeout(() => { _tileOrderSaveCooldown = false; }, 15000);
+    }).catch(() => { _tileOrderSaveCooldown = false; });
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
     loadTileOrderFromCloud();
+    startTileOrderLiveSync();
   });
   </script>
 
