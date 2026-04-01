@@ -11272,7 +11272,183 @@ body { font-family: Arial, sans-serif; color: #1a1a2e; margin: 0; padding: 0; fo
 input[type=checkbox] { width: 12px; height: 12px; }
 table { page-break-inside: auto; }
 tr { page-break-inside: avoid; }
-</style>
+/* ═══════════════════════════════════════════════════
+   MOBILE FIXES — Medi Hub
+═══════════════════════════════════════════════════ */
+
+/* Prevent horizontal drift */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+}
+.page, .wrap, .hero-inner, .topbar, footer {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@media (max-width: 640px) {
+
+  /* Hero tighten */
+  .hero { padding: 16px 0 0; }
+  .hero-inner { padding: 22px 16px 20px !important; border-radius: 16px !important; }
+  .hero h1 { font-size: 22px !important; letter-spacing: -.5px; margin-bottom: 8px; }
+  .eyebrow { font-size: 9px; padding: 4px 10px; margin-bottom: 12px; }
+  .hero-layout { grid-template-columns: 1fr !important; gap: 16px !important; }
+
+  /* Countdown cards stack */
+  #countdownStrip {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  #countdownStrip .cd-card {
+    flex: 1 1 auto !important;
+    max-width: 100% !important;
+    padding: 12px 14px !important;
+  }
+  .cd-digits { font-size: 16px !important; }
+  .cd-icon { font-size: 22px !important; }
+
+  /* Bundle button */
+  .hero-bundle-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center;
+    font-size: 13px !important;
+    padding: 12px 18px !important;
+    margin-top: 12px !important;
+  }
+
+  /* Pinned sections wrap */
+  #starStrip { margin-top: 10px !important; padding-top: 10px !important; }
+  #starStripItems { gap: 6px !important; }
+
+  /* Cards grid — 1 column on small phones */
+  .card-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .card { padding: 16px 14px !important; }
+  .card h3 { font-size: 14px !important; }
+  .card p { font-size: 12px !important; }
+  .card-icon-wrap { width: 38px !important; height: 38px !important; font-size: 18px !important; }
+
+  /* Section headers */
+  .section { padding: 28px 0 0 !important; }
+  .section::before { margin-bottom: 28px !important; }
+  .section-head { flex-direction: column; align-items: flex-start !important; gap: 8px !important; }
+  .section-head h2 { font-size: 17px !important; }
+  .sh-icon { width: 32px !important; height: 32px !important; font-size: 15px !important; }
+
+  /* Topbar */
+  .topbar-inner { padding: 10px 12px !important; gap: 10px !important; }
+  .brand-name { font-size: 14px !important; }
+  .brand-sub { font-size: 10px !important; }
+  .logo { height: 32px !important; }
+  .logo-pill { padding: 4px 8px !important; }
+
+  /* Live stats bar */
+  .topbar-live {
+    padding: 8px 12px !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+  .live-pill { padding: 0 8px !important; height: auto !important; gap: 6px !important; }
+  .live-pill-value { font-size: 11px !important; }
+  .live-pill-label { font-size: 8px !important; }
+  .live-clock { font-size: 13px !important; padding: 0 8px !important; }
+  .admin-trigger { font-size: 10px !important; padding: 4px 8px !important; }
+
+  /* Feed grid */
+  .feed-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+
+  /* SNU grid */
+  .snu-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+
+  /* Ops block */
+  .ops-block { padding: 20px 14px !important; }
+  .ops-left h2 { font-size: 22px !important; }
+  .ops-layout { gap: 16px !important; }
+
+  /* Spotlight */
+  .spotlight-card { grid-template-columns: 1fr !important; }
+  .spotlight-photo-col { height: 200px !important; }
+  .spotlight-content-col { padding: 18px 16px !important; }
+  .spotlight-agent-name { font-size: 22px !important; }
+
+  /* AOM grid */
+  .aom-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .aom-photo-wrap { height: 120px !important; }
+
+  /* Tables scroll horizontally */
+  .lb-shell { overflow-x: auto; }
+  table { min-width: 500px; }
+
+  /* Redi chat — keep above bottom nav but not blocking */
+  .chat-launcher {
+    bottom: 80px !important;
+    right: 14px !important;
+    width: 56px !important;
+    height: 56px !important;
+  }
+  .chat-redi { width: 56px !important; height: 56px !important; }
+  .chat-modal {
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-height: 85vh !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  /* Admin modal full screen on mobile */
+  .admin-modal {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
+  }
+  .admin-modal.open { transform: none !important; }
+  .admin-body { padding: 16px 14px !important; }
+  .admin-week-row { grid-template-columns: 1fr !important; }
+  .admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-tab { font-size: 11px !important; padding: 10px 12px !important; }
+
+  /* Touch targets — minimum 44px */
+  button, a.card, .hstat, .feed-btn, .ops-btn, .admin-save-btn,
+  .snu-view-btn, .chat-launcher, .hamburger {
+    min-height: 44px;
+  }
+
+  /* Footer */
+  footer { padding: 16px 12px 0 !important; margin-top: 40px !important; }
+  .footer-disclaimer p { font-size: 10px !important; }
+
+  /* Checklist panel full width on mobile */
+  #checklistPanel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    right: 0 !important;
+    left: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  /* SNU print modal */
+  .snu-print-modal { width: 100% !important; border-radius: 0 !important; }
+  .mag-snu-title { font-size: 48px !important; }
+  .mag-cover { height: 280px !important; }
+}
+
+/* Medium tablets */
+@media (min-width: 641px) and (max-width: 900px) {
+  .card-grid { grid-template-columns: 1fr 1fr !important; }
+  .hero h1 { font-size: 32px !important; }
+  .hero-layout { grid-template-columns: 1fr !important; }
+  #countdownStrip { flex-wrap: wrap !important; }
+  .admin-modal { width: 95vw !important; }
+}</style>
 </head><body>${body.innerHTML}</body></html>`);
 w.document.close();
 w.focus();
