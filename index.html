@@ -2702,25 +2702,28 @@ padding:80px 40px;color:var(--muted-2);text-align:center;gap:12px;
 .spotlight-empty-text{font-size:14px;font-style:italic;}
 /* ── Admin spotlight tab styles ── */
 .admin-tabs {
-display:flex;gap:0;
+display:flex;gap:8px;
 border-bottom:1px solid var(--border);
 background:rgba(0,0,0,.2);
 flex-wrap:wrap;
+padding:10px 14px;
 }
 .admin-tabs::-webkit-scrollbar{display:none;}
 .admin-tab {
-padding:11px 14px;
+padding:8px 14px;
 font-size:12px;font-weight:700;
 color:var(--muted-2);
-cursor:pointer;border:none;background:none;
+cursor:pointer;
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.1);
+border-radius:8px;
 font-family:'Plus Jakarta Sans',sans-serif;
-border-bottom:2px solid transparent;
-transition:color .15s,border-color .15s;
+transition:color .15s,border-color .15s,background .15s;
 white-space:nowrap;
 flex-shrink:0;
 }
-.admin-tab.active{color:#fff;border-bottom-color:var(--accent);}
-.admin-tab:hover:not(.active){color:var(--muted);}
+.admin-tab.active{color:#fff;background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);}
+.admin-tab:hover:not(.active){color:var(--muted);background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);}
 .admin-tab-panel{display:none;}
 .admin-tab-panel.active{display:block;}
 /* Photo upload zone */
