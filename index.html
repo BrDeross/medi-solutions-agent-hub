@@ -13002,7 +13002,10 @@ if (e.target === this) closeReferralModal();
 </script>
 <!-- ── END REFERRAL MODAL ──────────────────────────────────────── -->
 
-<!-- GA4 ANALYTICS — Medi Hub -->
+</script>
+<!-- ── END REFERRAL MODAL ──────────────────────────────────────── -->
+
+<!-- GA4 + SUPABASE TRACKING — Medi Hub -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBEJ843NYN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -13010,7 +13013,58 @@ if (e.target === this) closeReferralModal();
   gtag('js', new Date());
   gtag('config', 'G-KBEJ843NYN');
 </script>
+<script>
+(function(){
+  'use strict';
+  var TRACK_HUB = 'medi';
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var _sid = sessionStorage.getItem('medi_sid');
+  if (!_sid) {
+    _sid = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+    sessionStorage.setItem('medi_sid', _sid);
+  }
+  function getAgent() {
+    try { var r = sessionStorage.getItem('medi_hub_session'); return r ? JSON.parse(r) : null; }
+    catch(e) { return null; }
+  }
+  function trackEvent(eventType, eventDetail) {
+    var agent = getAgent();
+    fetch(SUPA_URL + '/rest/v1/activity_log', {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        hub: TRACK_HUB, event_type: eventType, event_detail: eventDetail || null,
+        page_url: location.href, referrer: document.referrer || null, session_id: _sid,
+        user_agent: navigator.userAgent, screen_w: screen.width, screen_h: screen.height,
+        agent_email: agent ? agent.email : null, agent_name: agent ? agent.name : null
+      })
+    }).catch(function(e) { console.debug('[track]', e.message); });
+    if (typeof gtag === 'function') {
+      gtag('event', eventType, { event_category: TRACK_HUB, event_label: eventDetail || '' });
+    }
+  }
+  window.trackEvent = trackEvent;
+  window.addEventListener('load', function() {
+    setTimeout(function() { trackEvent('page_view', document.title); }, 1500);
+  });
+  document.addEventListener('click', function(e) {
+    var card = e.target.closest('.card');
+    if (card) { var h3 = card.querySelector('h3'); trackEvent('card_click', h3 ? h3.textContent.trim() : 'unknown'); return; }
+    var hstat = e.target.closest('.hstat');
+    if (hstat) { var lbl = hstat.querySelector('.hstat-lbl'); trackEvent('card_click', 'Hero: ' + (lbl ? lbl.textContent.trim() : '')); return; }
+    var launcher = e.target.closest('.chat-launcher');
+    if (launcher) { trackEvent('chat_open', 'Redi Launcher'); return; }
+    var navLink = e.target.closest('nav a, .mobile-nav a');
+    if (navLink && !navLink.classList.contains('pill')) { trackEvent('nav_click', navLink.textContent.trim()); return; }
+    var printBtn = e.target.closest('.snu-view-btn');
+    if (printBtn) { trackEvent('snu_view', 'SNU Magazine Opened'); return; }
+    var coach = e.target.closest('a[href*="sales-coach"]');
+    if (coach) { trackEvent('practice_tab', 'Sales Coach Launch'); return; }
+  });
+  console.log('[Medi Hub Tracking] Active · session:', _sid);
+})();
+</script>
 
 </body>
 </html>
-
