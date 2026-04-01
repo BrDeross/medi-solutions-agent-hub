@@ -13014,29 +13014,37 @@ if (e.target === this) closeReferralModal();
   gtag('js', new Date());
   gtag('config', 'G-KBEJ843NYN');
 </script>
-
 <script>
 (function(){
   'use strict';
   var TRACK_HUB = 'medi';
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+
   var _sid = sessionStorage.getItem('medi_sid');
   if (!_sid) {
     _sid = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
     sessionStorage.setItem('medi_sid', _sid);
   }
-  function getSb() { return window.sb || null; }
 
-  async function trackEvent(eventType, eventDetail) {
-    var client = getSb();
-    if (client) {
-      try {
-        await client.from('activity_log').insert({
+  function trackEvent(eventType, eventDetail) {
+    try {
+      fetch(SUPA_URL + '/rest/v1/activity_log', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
           hub: TRACK_HUB, event_type: eventType, event_detail: eventDetail || null,
           page_url: location.href, referrer: document.referrer || null, session_id: _sid,
           user_agent: navigator.userAgent, screen_w: screen.width, screen_h: screen.height
-        });
-      } catch (e) { console.debug('[track]', eventType, e.message); }
-    }
+        })
+      }).catch(function(e) { console.debug('[track]', eventType, e.message); });
+    } catch (e) { console.debug('[track]', eventType, e.message); }
+
     if (typeof gtag === 'function') {
       gtag('event', eventType, { event_category: TRACK_HUB, event_label: eventDetail || '' });
     }
@@ -13138,6 +13146,7 @@ if (e.target === this) closeReferralModal();
   console.log('[Medi Hub Tracking] Initialized · session:', _sid);
 })();
 </script>
+
 
 </body>
 </html>
