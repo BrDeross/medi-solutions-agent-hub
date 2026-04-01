@@ -214,7 +214,7 @@ border: 1px solid var(--border-2);
 border-radius: var(--r-xl);
 padding: 40px 48px 36px;
 position: relative;
-overflow: hidden;
+overflow: visible;
 animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both;
 }
 .hero-grid-bg {
@@ -3946,7 +3946,7 @@ cursor: pointer; white-space: nowrap;
 <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:8px;">Agent Hub Login</div>
 <div style="font-size:13px;color:var(--muted-2);margin-bottom:18px;">Enter your name and email before accessing the hub.</div>
 <div style="display:grid;gap:12px;">
-<input id="hubGateName" class="admin-input" type="text" placeholder="Full name">
+<input id="hubGateName" style="display:none;">
 <input id="hubGateEmail" class="admin-input" type="email" placeholder="Email address">
 </div>
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
@@ -7849,23 +7849,45 @@ if (btn) btn.textContent = '\ud83d\udc64 Agent Login';
 }
 }
 window.submitHubGateLogin = function() {
-const name = (document.getElementById('hubGateName')?.value || '').trim();
-const email = (document.getElementById('hubGateEmail')?.value || '').trim();
-const status = document.getElementById('hubGateStatus');
-if (!name || !email) {
-if (status) status.textContent = 'Name and email are required.';
-return;
-}
-const session = { name, email, signedInAt: new Date().toISOString() };
-writeHubSession(session);
-const nameEl = document.getElementById('agentLoginName');
-const emailEl = document.getElementById('agentLoginEmail');
-if (nameEl) nameEl.value = name;
-if (emailEl) emailEl.value = email;
-applyHubSessionUi();
-if (typeof trackHubEvent === 'function') {
-trackHubEvent('login', 'hub_gate', { signed_in_at: session.signedInAt });
-}
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var email = (document.getElementById('hubGateEmail')?.value || '').trim().toLowerCase();
+  var status = document.getElementById('hubGateStatus');
+  if (!email || !email.includes('@')) {
+    if (status) { status.textContent = 'Please enter your email address.'; status.style.color = '#fb7185'; }
+    return;
+  }
+  if (status) { status.textContent = 'Verifying...'; status.style.color = 'var(--muted)'; }
+  fetch(SUPA_URL + '/rest/v1/approved_agents?hub=eq.medi&email=eq.' + encodeURIComponent(email) + '&active=eq.true&select=email,name,role', {
+    headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Cache-Control': 'no-cache' }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (Array.isArray(rows) && rows.length > 0) {
+      var agent = rows[0];
+      var session = { name: agent.name, email: agent.email, role: agent.role || 'agent', signedInAt: new Date().toISOString() };
+      writeHubSession(session);
+      var nameEl = document.getElementById('agentLoginName');
+      var emailEl = document.getElementById('agentLoginEmail');
+      var hubGateName = document.getElementById('hubGateName');
+      if (nameEl) nameEl.value = agent.name;
+      if (emailEl) emailEl.value = agent.email;
+      if (hubGateName) hubGateName.value = agent.name;
+      applyHubSessionUi();
+      if (typeof trackHubEvent === 'function') {
+        trackHubEvent('login', 'hub_gate', { signed_in_at: session.signedInAt });
+      }
+      if (typeof trackEvent === 'function') {
+        trackEvent('agent_login', agent.name + ' (' + agent.email + ')');
+      }
+    } else {
+      if (status) { status.textContent = 'This email is not on the approved list. Contact your administrator.'; status.style.color = '#fb7185'; }
+    }
+  })
+  .catch(function() {
+    if (status) { status.textContent = 'Connection error. Please try again.'; status.style.color = '#fb7185'; }
+  });
+};
 };
 const prevOpenAgentLogin = window.openAgentLogin;
 window.openAgentLogin = function() {
@@ -13027,7 +13049,8 @@ if (e.target === this) closeReferralModal();
   #countdownStrip .cd-empty { opacity: .4; text-align: center; width: 100%; font-size: 13px; color: var(--muted-2); padding: 12px 0; font-style: italic; }
 .hero-bundle-btn {
   display: inline-flex; align-items: center; gap: 10px;
-  margin-top: 18px;
+  margin-top: 18px;width: fit-content;
+max-width: 300px;
   padding: 14px 28px;
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
   border: none; border-radius: 14px;
@@ -13072,9 +13095,15 @@ if (e.target === this) closeReferralModal();
 }
 @keyframes bundlePulse {/* Pinned sections — integrated into hero */
 #starStrip {
-  margin-top: 16px !important;
-  padding-top: 14px !important;
-  border-top: 1px solid rgba(255,255,255,.12) !important;
+  margin-top: 14px !important;
+  padding: 14px 0 0 !important;
+  border-top: 1px solid rgba(255,255,255,.1) !important;
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
 }
 #starStripItems .star-chip,
 #starStripItems a,
