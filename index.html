@@ -11705,22 +11705,14 @@ window.csvImportDir = function(input) {
 readFileText(input, text => {
 const rows = parseCSV(text);
 if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
-rows.forEach(r => {
-if (!r.name) return;
-window._dirData = window._dirData || [];
-// push to _dir via the existing global
-});
-// access _dir from closure via window ref trick
-const existing = typeof _dir !== 'undefined' ? _dir : [];
-rows.forEach(r => { if (r.name) existing.push({ id: Date.now() + Math.random(), name:r.name, title:r.title||'', phone:r.phone||'', email:r.email||'', territory:r.territory||'', tag:r.tag||'' }); });
-if (typeof refreshDirAdminList === 'function') refreshDirAdminList();
-if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + rows.length + ' agents…');
-if (typeof supaUpsertDir === 'function') supaUpsertDir();
-else document.dispatchEvent(new CustomEvent('csvDirImport', { detail: existing }));
+const newRows = rows.filter(r => r.name).map(r => ({ id: Date.now() + Math.random(), name:r.name, title:r.title||'', phone:r.phone||'', email:r.email||'', territory:r.territory||'', tag:r.tag||'' }));
+if (!newRows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No valid agent rows found.'); return; }
+if(typeof showSnuToast==='function') showSnuToast('⏳ Importing ' + newRows.length + ' agents…');
+if (typeof window._csvBridgeSaveDir === 'function') window._csvBridgeSaveDir(newRows);
 });
 };
 window.csvExportDir = function() {
-const data = typeof _dir !== 'undefined' ? _dir : [];
+const data = typeof window._csvBridgeGetDir === 'function' ? window._csvBridgeGetDir() : [];
 if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No agents to export.'); return; }
 downloadCSV('agent_directory.csv', toCSV(data, ['name','title','phone','email','territory','tag']));
 };
@@ -11729,19 +11721,19 @@ window.csvImportCheat = function(input) {
 readFileText(input, text => {
 const rows = parseCSV(text);
 if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
-const existing = typeof _cheat !== 'undefined' ? _cheat : [];
+const newRows = [];
 rows.forEach(r => {
 const q = r.question || r.q;
 const a = r.answer || r.a;
-if (q && a) existing.push({ id: Date.now() + Math.random(), cat: r.category || r.cat || 'General', q, a });
+if (q && a) newRows.push({ id: Date.now() + Math.random(), cat: r.category || r.cat || 'General', q, a });
 });
-if (typeof refreshCheatAdminList === 'function') refreshCheatAdminList();
-if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + rows.length + ' items…');
-document.dispatchEvent(new CustomEvent('csvCheatImport', { detail: existing }));
+if (!newRows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No valid items found.'); return; }
+if(typeof showSnuToast==='function') showSnuToast('⏳ Importing ' + newRows.length + ' items…');
+if (typeof window._csvBridgeSaveCheat === 'function') window._csvBridgeSaveCheat(newRows);
 });
 };
 window.csvExportCheat = function() {
-const data = typeof _cheat !== 'undefined' ? _cheat : [];
+const data = typeof window._csvBridgeGetCheat === 'function' ? window._csvBridgeGetCheat() : [];
 if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No items to export.'); return; }
 downloadCSV('cheat_sheet.csv', toCSV(data.map(r=>({category:r.cat,question:r.q,answer:r.a})), ['category','question','answer']));
 };
@@ -11750,18 +11742,14 @@ window.csvImportTasks = function(input) {
 readFileText(input, text => {
 const rows = parseCSV(text);
 if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
-const existing = typeof _taskItems !== 'undefined' ? _taskItems : [];
-rows.forEach(r => { if (r.label) existing.push({ id: Date.now() + Math.random() }); });
-// Need labels — rebuild properly
-const fresh = rows.filter(r=>r.label).map(r=>({ id: Date.now() + Math.random(), label: r.label }));
-if (typeof _taskItems !== 'undefined') { fresh.forEach(t => _taskItems.push(t)); }
-if (typeof refreshTaskAdminList === 'function') refreshTaskAdminList();
-if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + fresh.length + ' tasks…');
-document.dispatchEvent(new CustomEvent('csvTaskImport', { detail: fresh }));
+const newRows = rows.filter(r=>r.label).map(r=>({ id: Date.now() + Math.random(), label: r.label }));
+if (!newRows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No valid task rows found (need "label" column).'); return; }
+if(typeof showSnuToast==='function') showSnuToast('⏳ Importing ' + newRows.length + ' tasks…');
+if (typeof window._csvBridgeSaveTasks === 'function') window._csvBridgeSaveTasks(newRows);
 });
 };
 window.csvExportTasks = function() {
-const data = typeof _taskItems !== 'undefined' ? _taskItems : [];
+const data = typeof window._csvBridgeGetTasks === 'function' ? window._csvBridgeGetTasks() : [];
 if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No tasks to export.'); return; }
 downloadCSV('daily_tasks.csv', toCSV(data, ['label']));
 };
@@ -11770,15 +11758,14 @@ window.csvImportCarriers = function(input) {
 readFileText(input, text => {
 const rows = parseCSV(text);
 if (!rows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No rows found in CSV.'); return; }
-const existing = typeof _carriers !== 'undefined' ? _carriers : [];
-rows.forEach(r => { if (r.name) existing.push({ id: Date.now() + Math.random(), name:r.name, phone:r.phone||'', auth:r.auth||'', url:r.url||'', notes:r.notes||'' }); });
-if (typeof refreshCarrierAdminList === 'function') refreshCarrierAdminList();
-if (typeof showSnuToast === 'function') showSnuToast('⏳ Importing ' + rows.length + ' carriers…');
-document.dispatchEvent(new CustomEvent('csvCarrierImport', { detail: existing }));
+const newRows = rows.filter(r => r.name).map(r => ({ id: Date.now() + Math.random(), name:r.name, phone:r.phone||'', auth:r.auth||'', url:r.url||'', notes:r.notes||'' }));
+if (!newRows.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No valid carrier rows found.'); return; }
+if(typeof showSnuToast==='function') showSnuToast('⏳ Importing ' + newRows.length + ' carriers…');
+if (typeof window._csvBridgeSaveCarriers === 'function') window._csvBridgeSaveCarriers(newRows);
 });
 };
 window.csvExportCarriers = function() {
-const data = typeof _carriers !== 'undefined' ? _carriers : [];
+const data = typeof window._csvBridgeGetCarriers === 'function' ? window._csvBridgeGetCarriers() : [];
 if (!data.length) { if(typeof showSnuToast==='function') showSnuToast('⚠ No carriers to export.'); return; }
 downloadCSV('carrier_contacts.csv', toCSV(data, ['name','phone','auth','url','notes']));
 };
@@ -11956,11 +11943,6 @@ window.addEventListener('pageshow', () => {
 loadStarred();
 renderAllStarUi();
 });
-// Also listen for CSV import events to trigger saves
-document.addEventListener('csvDirImport', e => { if(typeof supaUpsert==='function' && typeof _dir!=='undefined') supaUpsert('agent_directory', _dir).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ '+e.detail.length+' agents imported!');}); });
-document.addEventListener('csvCheatImport', e => { if(typeof supaUpsert==='function' && typeof _cheat!=='undefined') supaUpsert('cheat_sheet', _cheat).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ Items imported!');}); });
-document.addEventListener('csvTaskImport', e => { if(typeof supaUpsert==='function' && typeof _taskItems!=='undefined') supaUpsert('task_list', _taskItems).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ Tasks imported!');}); });
-document.addEventListener('csvCarrierImport', e => { if(typeof supaUpsert==='function' && typeof _carriers!=='undefined') supaUpsert('carrier_contacts', _carriers).then(()=>{if(typeof showSnuToast==='function')showSnuToast('✓ Carriers imported!');}); });
 })();
 </script>
 <!-- ── END CSV + STARRED SECTIONS ENGINE ─────────────────────── -->
@@ -12716,6 +12698,31 @@ btn.onclick = function(e) { if (origClick) origClick.call(this, e); fn(); };
 }
 });
 });
+/* ── CSV Import Bridges (expose to window so CSV IIFE can reach these scoped vars) ── */
+window._csvBridgeSaveDir = function(newRows) {
+newRows.forEach(r => _dir.push(r));
+refreshDirAdminList();
+return supaUpsert('agent_directory', _dir).then(() => { toast('✓ ' + newRows.length + ' agents imported!'); });
+};
+window._csvBridgeSaveCheat = function(newRows) {
+newRows.forEach(r => _cheat.push(r));
+refreshCheatAdminList();
+return supaUpsert('cheat_sheet', _cheat).then(() => { toast('✓ ' + newRows.length + ' items imported!'); });
+};
+window._csvBridgeSaveTasks = function(newRows) {
+newRows.forEach(r => _taskItems.push(r));
+refreshTaskAdminList();
+return supaUpsert('task_list', _taskItems).then(() => { toast('✓ ' + newRows.length + ' tasks imported!'); });
+};
+window._csvBridgeSaveCarriers = function(newRows) {
+newRows.forEach(r => _carriers.push(r));
+refreshCarrierAdminList();
+return supaUpsert('carrier_contacts', _carriers).then(() => { toast('✓ ' + newRows.length + ' carriers imported!'); });
+};
+window._csvBridgeGetDir = function() { return _dir.slice(); };
+window._csvBridgeGetCheat = function() { return _cheat.slice(); };
+window._csvBridgeGetTasks = function() { return _taskItems.slice(); };
+window._csvBridgeGetCarriers = function() { return _carriers.slice(); };
 document.addEventListener('DOMContentLoaded',()=>{ initTasks(); startNotificationLiveSync(); });
 })();
 </script>
