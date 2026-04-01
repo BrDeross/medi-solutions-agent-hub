@@ -7858,36 +7858,42 @@ window.submitHubGateLogin = function() {
     return;
   }
   if (status) { status.textContent = 'Verifying...'; status.style.color = 'var(--muted)'; }
-  fetch(SUPA_URL + '/rest/v1/approved_agents?hub=eq.medi&email=eq.' + encodeURIComponent(email) + '&active=eq.true&select=email,name,role', {
+  fetch(SUPA_URL + '/rest/v1/agent_directory?hub=eq.medi&select=data', {
     headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Cache-Control': 'no-cache' }
   })
   .then(function(r) { return r.json(); })
   .then(function(rows) {
-    if (Array.isArray(rows) && rows.length > 0) {
-      var agent = rows[0];
-      var session = { name: agent.name, email: agent.email, role: agent.role || 'agent', signedInAt: new Date().toISOString() };
+    var agents = [];
+    if (rows && rows.length && rows[0].data) {
+      var raw = rows[0].data;
+      agents = Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
+    }
+    var match = agents.find(function(a) {
+      return a.email && a.email.trim().toLowerCase() === email;
+    });
+    if (match) {
+      var session = { name: match.name || 'Agent', email: match.email, role: match.tag || 'agent', signedInAt: new Date().toISOString() };
       writeHubSession(session);
       var nameEl = document.getElementById('agentLoginName');
       var emailEl = document.getElementById('agentLoginEmail');
       var hubGateName = document.getElementById('hubGateName');
-      if (nameEl) nameEl.value = agent.name;
-      if (emailEl) emailEl.value = agent.email;
-      if (hubGateName) hubGateName.value = agent.name;
+      if (nameEl) nameEl.value = match.name;
+      if (emailEl) emailEl.value = match.email;
+      if (hubGateName) hubGateName.value = match.name;
       applyHubSessionUi();
       if (typeof trackHubEvent === 'function') {
         trackHubEvent('login', 'hub_gate', { signed_in_at: session.signedInAt });
       }
       if (typeof trackEvent === 'function') {
-        trackEvent('agent_login', agent.name + ' (' + agent.email + ')');
+        trackEvent('agent_login', match.name + ' (' + match.email + ')');
       }
     } else {
-      if (status) { status.textContent = 'This email is not on the approved list. Contact your administrator.'; status.style.color = '#fb7185'; }
+      if (status) { status.textContent = 'This email is not in the agent directory. Contact your administrator.'; status.style.color = '#fb7185'; }
     }
   })
   .catch(function() {
     if (status) { status.textContent = 'Connection error. Please try again.'; status.style.color = '#fb7185'; }
   });
-};
 };
 const prevOpenAgentLogin = window.openAgentLogin;
 window.openAgentLogin = function() {
