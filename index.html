@@ -4081,7 +4081,7 @@ Agent Command Center
     <div class="hstat-lbl">Loading countdowns…</div>
   </div>
 </div>
-<a class="hero-bundle-btn" href="tools/bundle-options/">
+<a class="hero-bundle-btn" href="tools/bundle-options/" style="align-self:flex-start;">
   📦 Bundle Options Tool →
 </a>
 </div>
@@ -13054,14 +13054,53 @@ if (e.target === this) closeReferralModal();
     inset 0 1px 0 rgba(255,255,255,.3);
   color: #fff;
 }
-.hero-bundle-btn:active {
+.hero-bundle-btn:active {.pin-section-bar {
+  background: linear-gradient(180deg, rgba(30,58,110,.6) 0%, transparent 100%);
+  border-top: 1px solid rgba(255,255,255,.08);
+  margin-top: -1px;
+  padding: 16px 32px 20px;
+  position: relative; z-index: 1;
+}
+.pin-section-bar .wrap {
+  max-width: 1320px; margin: 0 auto;
+}
   transform: translateY(1px);
   box-shadow:
     0 2px 0 #1e40af,
     0 4px 12px rgba(59,130,246,.35),
     inset 0 1px 0 rgba(255,255,255,.2);
 }
-@keyframes bundlePulse {
+@keyframes bundlePulse {/* Pinned sections — integrated into hero */
+#starStrip {
+  margin-top: 16px !important;
+  padding-top: 14px !important;
+  border-top: 1px solid rgba(255,255,255,.12) !important;
+}
+#starStripItems .star-chip,
+#starStripItems a,
+#starStripItems button,
+#starStripItems [style] {
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--muted) !important;
+  cursor: pointer;
+  transition: all .2s !important;
+  text-decoration: none !important;
+}
+#starStripItems .star-chip:hover,
+#starStripItems a:hover,
+#starStripItems button:hover,
+#starStripItems [style]:hover {
+  background: rgba(59,130,246,.18) !important;
+  border-color: rgba(59,130,246,.35) !important;
+  color: var(--accent-2) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(59,130,246,.2);
+}
   0%, 100% { box-shadow: 0 4px 0 #1e40af, 0 8px 24px rgba(59,130,246,.45), 0 0 20px rgba(59,130,246,.3), inset 0 1px 0 rgba(255,255,255,.25); }
   50% { box-shadow: 0 4px 0 #1e40af, 0 8px 24px rgba(59,130,246,.45), 0 0 40px rgba(59,130,246,.55), 0 0 60px rgba(59,130,246,.2), inset 0 1px 0 rgba(255,255,255,.25); }
 }
