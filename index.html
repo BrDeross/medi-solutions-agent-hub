@@ -73,8 +73,8 @@ background: radial-gradient(circle, rgba(167,139,250,.28) 0%, transparent 70%);
 }
 /* ── TOPBAR ── */
 .topbar {
-position: sticky;
-top: 0; z-index: 500;
+position: fixed;
+top: 0; left: 0; right: 0; z-index: 500;
 background: rgba(28,56,106,.96);
 backdrop-filter: blur(24px) saturate(180%);
 border-bottom: 1px solid var(--border-2);
@@ -3628,6 +3628,7 @@ font-size: 14px; font-weight: 800; flex-shrink: 0;
 }
 .trip-rank.q { background: rgba(34,197,94,.15); color: #22c55e; border:1px solid rgba(34,197,94,.3); }
 .trip-rank.nq { background: rgba(148,163,184,.1); color: #94a3b8; border:1px solid rgba(148,163,184,.2); }
+.trip-rank.behind { background: rgba(239,68,68,.12); color: #ef4444; border:1px solid rgba(239,68,68,.3); }
 .trip-rank.top { background: rgba(251,191,36,.15); color: #fbbf24; border:1px solid rgba(251,191,36,.3); }
 .trip-agent-name {
 font-family: 'Space Grotesk', sans-serif;
@@ -3645,6 +3646,7 @@ transition: width .8s cubic-bezier(.22,1,.36,1);
 }
 .trip-mini-bar-fill.q { background: linear-gradient(90deg, #22c55e, #4ade80); }
 .trip-mini-bar-fill.nq { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.trip-mini-bar-fill.behind { background: linear-gradient(90deg, #ef4444, #f87171); }
 .trip-mini-pct { font-size: 10px; color: var(--muted-2); text-align: right; }
 .trip-pts {
 font-family: 'JetBrains Mono', monospace;
@@ -3653,8 +3655,11 @@ white-space: nowrap; text-align: right;
 }
 .trip-pts.q { color: #22c55e; }
 .trip-pts.nq { color: #7eb3f5; }
+.trip-pts.behind { color: #ef4444; }
 .trip-row.trip-row-q { background: rgba(34,197,94,.07); border-left: 3px solid rgba(34,197,94,.5); padding-left: 21px; }
+.trip-row.trip-row-behind { background: rgba(239,68,68,.05); border-left: 3px solid rgba(239,68,68,.4); padding-left: 21px; }
 .trip-agent-name.trip-name-q { color: #4ade80; font-weight: 800; }
+.trip-agent-name.trip-name-behind { color: #fca5a5; font-weight: 700; }
 .trip-empty {
 text-align: center; padding: 32px 0;
 color: var(--muted-2); font-style: italic; font-size: 13px;
@@ -3672,6 +3677,7 @@ font-size: 11px; color: var(--muted-2);
 width: 10px; height: 10px; border-radius: 50%;
 }
 .trip-legend-dot.q { background: #22c55e; }
+.trip-legend-dot.behind { background: #ef4444; }
 .trip-legend-dot.nq { background: #3b82f6; }
 /* ── ANNOUNCEMENT BANNER ── */
 #announcementBanner {
@@ -4060,6 +4066,16 @@ cursor: pointer; white-space: nowrap;
 </div>
 <!-- ── END ANNOUNCEMENT BANNER ── -->
 </header>
+<div id="topbarSpacer" style="width:100%;"></div>
+<script>
+(function(){
+function syncSpacer(){var tb=document.querySelector('.topbar'),sp=document.getElementById('topbarSpacer');if(tb&&sp)sp.style.height=tb.offsetHeight+'px';}
+syncSpacer();
+window.addEventListener('resize',syncSpacer);
+window.addEventListener('load',syncSpacer);
+document.addEventListener('DOMContentLoaded',syncSpacer);
+})();
+</script>
 <!-- HERO -->
 <section class="hero">
 <div class="wrap">
@@ -4818,7 +4834,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Tag / Type</label><input id="dirAdminTag" type="text" placeholder="Captive / GA / Manager" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Category</label><select id="dirAdminRole" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;"><option value="Agent" style="background:#1c2d4a;">Agent</option><option value="Manager" style="background:#1c2d4a;">Manager</option><option value="Upper Management" style="background:#1c2d4a;">Upper Management</option></select></div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Category</label><select id="dirAdminRole" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;"><option value="Agent" style="background:#1c2d4a;">Agent</option><option value="Manager" style="background:#1c2d4a;">Manager</option><option value="Admin" style="background:#1c2d4a;">Admin</option><option value="Upper Management" style="background:#1c2d4a;">Upper Management</option></select></div>
 <div></div>
 </div>
 </div>
@@ -9101,15 +9117,20 @@ const perAgentGoal = Number(a.goal);
 const agentGoal = perAgentGoal > 0 ? perAgentGoal : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : 0);
 const pct = agentGoal > 0 ? Math.min(100, Math.round(prod / agentGoal * 100)) : 0;
 const isQ = agentGoal > 0 && prod >= agentGoal;
-const cls = isQ ? 'q' : 'nq';
-const rankCls = i < 3 && isQ ? 'top' : (isQ ? 'q' : 'nq');
+const paceGoal = agentGoal > 0 ? agentGoal * monthIndex / 18 : 0;
+const isOnTrack = agentGoal > 0 && prod >= paceGoal;
+const cls = (isQ || isOnTrack) ? 'q' : 'behind';
+const rankCls = i < 3 && (isQ || isOnTrack) ? 'top' : ((isQ || isOnTrack) ? 'q' : 'behind');
+const rowCls = (isQ || isOnTrack) ? ' trip-row-q' : ' trip-row-behind';
+const nameCls = (isQ || isOnTrack) ? ' trip-name-q' : ' trip-name-behind';
 const remaining = isQ ? '' : (agentGoal > 0 ? `${(agentGoal - prod).toLocaleString()} pts to go` : 'Goal not set');
+const statusSub = isQ ? '<div class="trip-agent-sub">✅ Qualified!</div>' : (isOnTrack ? '<div class="trip-agent-sub" style="color:#4ade80;">📈 On track</div>' : (remaining ? `<div class="trip-agent-sub" style="color:#fca5a5;">⚠️ ${remaining}</div>` : `<div class="trip-agent-sub">${remaining}</div>`));
 return `
-<div class="trip-row${isQ ? ' trip-row-q' : ''}">
+<div class="trip-row${rowCls}">
 <div class="trip-rank ${rankCls}">${i < 3 ? rankEmoji(i) : i+1}</div>
 <div>
-<div class="trip-agent-name${isQ ? ' trip-name-q' : ''}">${pesc(a.name || '—')}</div>
-${remaining ? `<div class="trip-agent-sub">${remaining}</div>` : '<div class="trip-agent-sub">✅ Qualified!</div>'}
+<div class="trip-agent-name${nameCls}">${pesc(a.name || '—')}</div>
+${statusSub}
 </div>
 <div class="trip-progress-col">
 <div class="trip-mini-bar">
@@ -12106,14 +12127,14 @@ startDirLiveSync();
 function renderDirModal(list) {
 const el = document.getElementById('dirGrid'); if (!el) return;
 if (!list.length) { el.innerHTML = '<div class="dir-empty">No agents in directory yet.</div>'; return; }
-const rolePriority = {'Upper Management':1,'Manager':2,'Agent':3};
-const roleIcon = {'Upper Management':'👔','Manager':'📋','Agent':'🧑‍💼'};
-const roleColor = {'Upper Management':'rgba(251,191,36,.25)','Manager':'rgba(99,179,237,.25)','Agent':'rgba(45,212,191,.15)'};
-const roleBorder = {'Upper Management':'rgba(251,191,36,.6)','Manager':'rgba(99,179,237,.5)','Agent':'rgba(45,212,191,.3)'};
-const sorted = [...list].sort((a,b) => (rolePriority[a.role]||3) - (rolePriority[b.role]||3) || (a.name||'').localeCompare(b.name||''));
+const rolePriority = {'Upper Management':1,'Admin':2,'Manager':3,'Agent':4};
+const roleIcon = {'Upper Management':'👔','Admin':'🛡️','Manager':'📋','Agent':'🧑‍💼'};
+const roleColor = {'Upper Management':'rgba(251,191,36,.25)','Admin':'rgba(168,85,247,.25)','Manager':'rgba(99,179,237,.25)','Agent':'rgba(45,212,191,.15)'};
+const roleBorder = {'Upper Management':'rgba(251,191,36,.6)','Admin':'rgba(168,85,247,.5)','Manager':'rgba(99,179,237,.5)','Agent':'rgba(45,212,191,.3)'};
+const sorted = [...list].sort((a,b) => (rolePriority[a.role]||4) - (rolePriority[b.role]||4));
 const groups = {};
 sorted.forEach(a => { const r = a.role || 'Agent'; if (!groups[r]) groups[r] = []; groups[r].push(a); });
-const order = ['Upper Management','Manager','Agent'];
+const order = ['Upper Management','Admin','Manager','Agent'];
 let html = '';
 order.forEach(role => {
 if (!groups[role] || !groups[role].length) return;
@@ -12171,19 +12192,46 @@ function refreshDirAdminList() {
 const el=document.getElementById('dirAdminList'), ct=document.getElementById('dirAdminCount'); if(!el) return;
 if(ct) ct.textContent=`(${_dir.length})`;
 if(!_dir.length){el.innerHTML='<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No agents yet.</div>';return;}
-const rp={'Upper Management':1,'Manager':2,'Agent':3};
-const rc={'Upper Management':'rgba(251,191,36,.8)','Manager':'rgba(99,179,237,.8)','Agent':'rgba(45,212,191,.7)'};
-const sorted=[..._dir].sort((a,b)=>(rp[a.role]||3)-(rp[b.role]||3)||(a.name||'').localeCompare(b.name||''));
-el.innerHTML=sorted.map(a=>{
+const rp={'Upper Management':1,'Admin':2,'Manager':3,'Agent':4};
+const rc={'Upper Management':'rgba(251,191,36,.8)','Admin':'rgba(168,85,247,.8)','Manager':'rgba(99,179,237,.8)','Agent':'rgba(45,212,191,.7)'};
+const groups={};
+_dir.forEach((a,idx)=>{const r=a.role||'Agent';if(!groups[r])groups[r]=[];groups[r].push({...a,_idx:idx});});
+const order=['Upper Management','Admin','Manager','Agent'];
+const arrowBtn='padding:2px 6px;border-radius:4px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;line-height:1;';
+let html='';
+order.forEach(role=>{
+if(!groups[role]||!groups[role].length)return;
+html+=`<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:${rc[role]||'var(--muted)'};margin:${html?'12px':'0'} 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.06);">${role} (${groups[role].length})</div>`;
+groups[role].forEach((a,gi)=>{
 const rBadge=`<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:${rc[a.role]||rc['Agent']};color:#0f1a2e;white-space:nowrap;">${pesc(a.role||'Agent')}</span>`;
-return `<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;">
+const isFirst=gi===0, isLast=gi===groups[role].length-1;
+html+=`<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;">
+<div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0;">
+<button onclick="moveDirEntry(${a.id},-1)" style="${arrowBtn}${isFirst?'opacity:.25;pointer-events:none;':''}">▲</button>
+<button onclick="moveDirEntry(${a.id},1)" style="${arrowBtn}${isLast?'opacity:.25;pointer-events:none;':''}">▼</button>
+</div>
 <div style="flex:1;min-width:0;"><div class="admin-update-title">${pesc(a.name)} ${rBadge}</div><div class="admin-update-meta"><span class="admin-update-type">${pesc(a.title||'')}</span><span style="color:var(--muted-2);">${pesc(a.territory||'')}</span></div></div>
 <div style="display:flex;gap:6px;flex-shrink:0;">
 <button onclick="editDirEntry(${a.id})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️</button>
 <button onclick="deleteDirEntry(${a.id})" class="admin-update-del">🗑</button>
 </div></div>`;
-}).join('');
+});
+});
+el.innerHTML=html;
 }
+window.moveDirEntry = function(id, direction) {
+const role = (_dir.find(x=>x.id===id)||{}).role || 'Agent';
+const sameRole = _dir.map((a,i)=>({a,i})).filter(x=>(x.a.role||'Agent')===role);
+const pos = sameRole.findIndex(x=>x.a.id===id);
+if (pos < 0) return;
+const swapPos = pos + direction;
+if (swapPos < 0 || swapPos >= sameRole.length) return;
+const idxA = sameRole[pos].i, idxB = sameRole[swapPos].i;
+const tmp = _dir[idxA]; _dir[idxA] = _dir[idxB]; _dir[idxB] = tmp;
+refreshDirAdminList();
+toast('⏳ Saving order…');
+supaUpsert('agent_directory', _dir).then(()=>{ initDir(); toast('✓ Order saved!'); });
+};
 /* ════════════════════════════════
 CHEAT SHEET
 ════════════════════════════════ */
