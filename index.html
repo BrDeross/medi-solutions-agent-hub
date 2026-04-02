@@ -1010,12 +1010,20 @@ gap: 4px;
 width: 100%;
 padding: 12px 0 16px;
 border-top: 1px solid var(--border);
-max-height: 60vh;
-max-height: 60dvh;
+}
+.mobile-nav.open {
+display: flex;
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+z-index: 9999;
+background: rgba(20,40,80,.98);
+backdrop-filter: blur(24px);
+-webkit-backdrop-filter: blur(24px);
+padding: 80px 24px 40px;
 overflow-y: auto;
 -webkit-overflow-scrolling: touch;
+gap: 6px;
 }
-.mobile-nav.open { display: flex; }
 .mobile-nav a {
 color: var(--muted);
 text-decoration: none;
@@ -4071,6 +4079,7 @@ cursor: pointer; white-space: nowrap;
 </div>
 <div class="wrap">
 <nav class="mobile-nav" id="mobileNav">
+<button onclick="closeNav()" style="align-self:flex-end;background:none;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:18px;padding:8px 14px;cursor:pointer;margin-bottom:8px;">✕</button>
 <a href="#agent-tools" onclick="closeNav()">🛠 Tools</a>
 <a href="#quick-access" onclick="closeNav()">🔗 Portals</a>
 <a href="#libraries" onclick="closeNav()">📖 Libraries</a>
@@ -6259,11 +6268,12 @@ function toggleNav() {
 const nav = q('mobileNav'), btn = q('hamburger');
 nav.classList.toggle('open');
 btn.classList.toggle('open');
-nav.closest('.topbar')?.classList.toggle('nav-open', nav.classList.contains('open'));
+document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
 }
 function closeNav() {
 q('mobileNav').classList.remove('open');
 q('hamburger').classList.remove('open');
+document.body.style.overflow = '';
 q('mobileNav').closest('.topbar')?.classList.remove('nav-open');
 }
 loadData();
