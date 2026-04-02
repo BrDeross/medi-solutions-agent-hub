@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>My Medi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -36,15 +36,16 @@
 --r-xl: 32px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; overflow-x: clip; width: 100%; max-width: 100%; }
+html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; max-width: 100%; overscroll-behavior-x: none; }
 body {
 font-family: 'Plus Jakarta Sans', sans-serif;
 background: var(--ink);
 color: var(--text);
 min-height: 100vh;
-overflow-x: clip;
+overflow-x: hidden;
 width: 100%;
-max-width: 100vw;
+max-width: 100%;
+overscroll-behavior-x: none;
 }
 /* grain overlay */
 /* grain overlay removed */
@@ -1011,6 +1012,7 @@ padding: 12px 0 16px;
 border-top: 1px solid var(--border);
 }
 .mobile-nav.open { display: flex; }
+.topbar:has(.mobile-nav.open), .topbar.nav-open { overflow-y: auto; max-height: 100vh; max-height: 100dvh; -webkit-overflow-scrolling: touch; }
 .mobile-nav a {
 color: var(--muted);
 text-decoration: none;
@@ -1093,7 +1095,7 @@ th { font-size: 9.5px; }
 .brand-name { font-size: 14px; }
 }
 @media (max-width: 640px) {
-html, body { max-width: 100%; overflow-x: clip; }
+html, body { max-width: 100%; overflow-x: hidden; }
 .page { max-width: 100%; }
 .topbar-live { padding: 10px 14px; align-items: stretch; }
 .topbar-live-left, .topbar-live-right {
@@ -3867,7 +3869,7 @@ transition: background .15s, color .15s;
 @media (max-width: 768px) {
 .mobile-bottom-nav { display:block; }
 body { padding-bottom:56px; }
-html, body { overflow-x: clip; width: 100%; max-width: 100%; position: relative; }
+html, body { overflow-x: hidden; width: 100%; max-width: 100%; position: relative; }
 .page, .topbar, .wrap, .hero-inner, .ops-block, .trip-card, .card-grid, .feed-grid, .snu-grid, .video-grid, .dir-grid, .carrier-grid { max-width: 100%; }
 #checklistPanel {
 top: auto;
@@ -6254,10 +6256,12 @@ function toggleNav() {
 const nav = q('mobileNav'), btn = q('hamburger');
 nav.classList.toggle('open');
 btn.classList.toggle('open');
+nav.closest('.topbar')?.classList.toggle('nav-open', nav.classList.contains('open'));
 }
 function closeNav() {
 q('mobileNav').classList.remove('open');
 q('hamburger').classList.remove('open');
+q('mobileNav').closest('.topbar')?.classList.remove('nav-open');
 }
 loadData();
 </script>
@@ -11351,12 +11355,14 @@ MOBILE FIXES — Medi Hub
 ═══════════════════════════════════════════════════ */
 /* Prevent horizontal drift */
 html, body {
-overflow-x: clip !important;
-max-width: 100vw;
+overflow-x: hidden !important;
+max-width: 100%;
+overscroll-behavior-x: none;
 }
 .page, .wrap, .hero-inner, footer {
-max-width: 100vw;
-overflow-x: clip;
+max-width: 100%;
+overflow-x: hidden;
+box-sizing: border-box;
 }
 @media (max-width: 640px) {
 /* Hero tighten */
@@ -11458,8 +11464,8 @@ border-radius: 20px 20px 0 0 !important;
 }
 /* Admin modal full screen on mobile */
 .admin-modal {
-width: 100vw !important;
-max-width: 100vw !important;
+width: 100% !important;
+max-width: 100% !important;
 max-height: 100vh !important;
 border-radius: 0 !important;
 top: 0 !important;
@@ -11481,8 +11487,8 @@ footer { padding: 16px 12px 0 !important; margin-top: 40px !important; }
 .footer-disclaimer p { font-size: 10px !important; }
 /* Checklist panel full width on mobile */
 #checklistPanel {
-width: 100vw !important;
-max-width: 100vw !important;
+width: 100% !important;
+max-width: 100% !important;
 right: 0 !important;
 left: 0 !important;
 border-radius: 16px 16px 0 0 !important;
