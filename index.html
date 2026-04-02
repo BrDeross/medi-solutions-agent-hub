@@ -9878,20 +9878,23 @@ saveLayoutToCloud(_layoutOrder, vis);
 function applySectionOrder() {
 const order = _layoutOrder && _layoutOrder.length ? _layoutOrder : LAYOUT_SECTIONS.map(s => s.id);
 const vis = _layoutVis || {};
-// Get the direct-child footer of .page as our anchor
 const page = document.querySelector('.page');
 if (!page) return;
+// Find footer as an anchor — insert sections before it
 let footer = null;
 for (const child of page.children) {
 if (child.tagName === 'FOOTER') { footer = child; break; }
 }
-if (!footer) return;
-// Append each section in order, then footer last
+// Move each section in order (before footer if found, else append)
 order.forEach(id => {
 const el = document.getElementById(id);
-if (el) page.appendChild(el);
+if (!el) return;
+if (footer) {
+page.insertBefore(el, footer);
+} else {
+page.appendChild(el);
+}
 });
-page.appendChild(footer);
 // Apply visibility
 LAYOUT_SECTIONS.forEach(s => {
 const el = document.getElementById(s.id);
@@ -9973,7 +9976,6 @@ _layoutOrder = order;
 applySectionOrder();
 renderLayoutAdmin();
 saveLayoutToCloud(order, getSectionVis());
-showSnuToast('✓ Layout saved!');
 }
 function layoutDragEnd(e) {
 document.querySelectorAll('.layout-row').forEach(r => {
