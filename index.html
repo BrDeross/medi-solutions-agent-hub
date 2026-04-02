@@ -1012,7 +1012,6 @@ padding: 12px 0 16px;
 border-top: 1px solid var(--border);
 }
 .mobile-nav.open { display: flex; }
-.topbar:has(.mobile-nav.open), .topbar.nav-open { overflow-y: auto; max-height: 100vh; max-height: 100dvh; -webkit-overflow-scrolling: touch; }
 .mobile-nav a {
 color: var(--muted);
 text-decoration: none;
@@ -1100,7 +1099,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .topbar-live { padding: 10px 14px; align-items: stretch; }
 .topbar-live-left, .topbar-live-right {
 width: 100%;
-overflow: visible;
+overflow: hidden;
 flex-wrap: wrap;
 }
 .topbar-live-right { justify-content: space-between; }
@@ -11353,7 +11352,7 @@ tr { page-break-inside: avoid; }
 /* ═══════════════════════════════════════════════════
 MOBILE FIXES — Medi Hub
 ═══════════════════════════════════════════════════ */
-/* Prevent horizontal drift */
+/* Prevent horizontal drift — global */
 html, body {
 overflow-x: hidden !important;
 max-width: 100%;
@@ -11363,6 +11362,17 @@ overscroll-behavior-x: none;
 max-width: 100%;
 overflow-x: hidden;
 box-sizing: border-box;
+}
+.topbar {
+overflow-x: hidden !important;
+max-width: 100%;
+}
+/* Hamburger menu scroll */
+.topbar.nav-open {
+overflow-y: auto !important;
+max-height: 100vh;
+max-height: 100dvh;
+-webkit-overflow-scrolling: touch;
 }
 @media (max-width: 640px) {
 /* Hero tighten */
@@ -11411,7 +11421,7 @@ gap: 10px !important;
 .section-head h2 { font-size: 17px !important; }
 .sh-icon { width: 32px !important; height: 32px !important; font-size: 15px !important; }
 /* Topbar */
-.topbar-inner { padding: 10px 12px !important; gap: 10px !important; }
+.topbar-inner { padding: 10px 12px !important; gap: 10px !important; overflow: hidden; max-width: 100%; }
 .brand-name { font-size: 14px !important; }
 .brand-sub { font-size: 10px !important; }
 .logo { height: 32px !important; }
@@ -11421,7 +11431,14 @@ gap: 10px !important;
 padding: 8px 12px !important;
 gap: 6px !important;
 flex-wrap: wrap !important;
+overflow: hidden;
+max-width: 100%;
 }
+.topbar-live-left, .topbar-live-right {
+overflow: hidden !important;
+max-width: 100% !important;
+}
+.gsearch-wrap { max-width: 100%; min-width: 0; }
 .live-pill { padding: 0 8px !important; height: auto !important; gap: 6px !important; }
 .live-pill-value { font-size: 11px !important; }
 .live-pill-label { font-size: 8px !important; }
