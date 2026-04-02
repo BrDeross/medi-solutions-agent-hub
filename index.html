@@ -173,7 +173,9 @@ padding: 6px 12px;
 display: flex;
 align-items: center;
 box-shadow: 0 0 0 1px rgba(255,255,255,.15), 0 4px 20px rgba(0,0,0,.4), 0 0 24px rgba(59,130,246,.25);
-transition: box-shadow .3s;
+transition: box-shadow .3s, transform .3s;
+animation: rediFloat 3s ease-in-out infinite;
+perspective: 600px;
 }
 .logo-pill:hover {
 box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 6px 24px rgba(0,0,0,.5), 0 0 36px rgba(59,130,246,.45);
@@ -181,28 +183,23 @@ animation: rediDance .6s ease-in-out;
 }
 /* ── Redi mascot animations ── */
 @keyframes rediFloat {
-0%, 100% { transform: translateY(0) rotate(0deg); }
-25%      { transform: translateY(-2px) rotate(.5deg); }
-75%      { transform: translateY(1px) rotate(-.3deg); }
+0%, 100% { transform: translateY(0) scale(1); }
+50%      { transform: translateY(-3px) scale(1.03); }
 }
 @keyframes rediDance {
 0%   { transform: rotate(0deg) scale(1); }
-15%  { transform: rotate(-6deg) scale(1.06); }
-30%  { transform: rotate(5deg) scale(1.08); }
-45%  { transform: rotate(-4deg) scale(1.06); }
-60%  { transform: rotate(3deg) scale(1.04); }
+15%  { transform: rotate(-8deg) scale(1.10); }
+30%  { transform: rotate(6deg) scale(1.12); }
+45%  { transform: rotate(-5deg) scale(1.08); }
+60%  { transform: rotate(3deg) scale(1.05); }
 75%  { transform: rotate(-1deg) scale(1.02); }
 100% { transform: rotate(0deg) scale(1); }
 }
-.logo-pill {
-animation: rediFloat 4s ease-in-out infinite;
-perspective: 600px;
-}
 .logo-pill .logo {
-transition: transform .3s ease;
+transition: transform .3s ease, filter .3s ease;
 }
 .logo-pill:hover .logo {
-transform: rotateY(12deg) rotateX(-5deg) scale(1.05);
+transform: rotateY(12deg) rotateX(-5deg) scale(1.08);
 filter: drop-shadow(2px 4px 6px rgba(0,0,0,.35));
 }
 .logo { height: 68px; width: auto; display: block; }
