@@ -1010,6 +1010,10 @@ gap: 4px;
 width: 100%;
 padding: 12px 0 16px;
 border-top: 1px solid var(--border);
+max-height: 60vh;
+max-height: 60dvh;
+overflow-y: auto;
+-webkit-overflow-scrolling: touch;
 }
 .mobile-nav.open { display: flex; }
 .mobile-nav a {
@@ -11366,13 +11370,6 @@ box-sizing: border-box;
 .topbar {
 overflow-x: hidden !important;
 max-width: 100%;
-}
-/* Hamburger menu scroll */
-.topbar.nav-open {
-overflow-y: auto !important;
-max-height: 100vh;
-max-height: 100dvh;
--webkit-overflow-scrolling: touch;
 }
 @media (max-width: 640px) {
 /* Hero tighten */
