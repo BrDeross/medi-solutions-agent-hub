@@ -177,6 +177,33 @@ transition: box-shadow .3s;
 }
 .logo-pill:hover {
 box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 6px 24px rgba(0,0,0,.5), 0 0 36px rgba(59,130,246,.45);
+animation: rediDance .6s ease-in-out;
+}
+/* ── Redi mascot animations ── */
+@keyframes rediFloat {
+0%, 100% { transform: translateY(0) rotate(0deg); }
+25%      { transform: translateY(-2px) rotate(.5deg); }
+75%      { transform: translateY(1px) rotate(-.3deg); }
+}
+@keyframes rediDance {
+0%   { transform: rotate(0deg) scale(1); }
+15%  { transform: rotate(-6deg) scale(1.06); }
+30%  { transform: rotate(5deg) scale(1.08); }
+45%  { transform: rotate(-4deg) scale(1.06); }
+60%  { transform: rotate(3deg) scale(1.04); }
+75%  { transform: rotate(-1deg) scale(1.02); }
+100% { transform: rotate(0deg) scale(1); }
+}
+.logo-pill {
+animation: rediFloat 4s ease-in-out infinite;
+perspective: 600px;
+}
+.logo-pill .logo {
+transition: transform .3s ease;
+}
+.logo-pill:hover .logo {
+transform: rotateY(12deg) rotateX(-5deg) scale(1.05);
+filter: drop-shadow(2px 4px 6px rgba(0,0,0,.35));
 }
 .logo { height: 68px; width: auto; display: block; }
 .brand-name {
@@ -4186,7 +4213,7 @@ Agent Command Center
 <p>Medicare Special Enrollment Period rules and qualifying events from AARP.</p>
 <span class="card-tag">Compliance</span>
 </div>
-<a class="card" data-card-id="plan-count" data-color="blue" href="https://www.medicare.gov/plan-compare/" target="_blank" rel="noopener noreferrer">
+<a class="card" data-card-id="plan-count" data-color="blue" href="https://plansoffered.seniormarketsales.com/" target="_blank" rel="noopener noreferrer">
 <span class="card-arrow">↗</span>
 <div class="card-shimmer"></div>
 <div class="card-icon-wrap">📜</div>
@@ -4292,7 +4319,7 @@ Agent Command Center
 <p>Lead Advantage Pro for lead management and dialing.</p>
 <span class="card-tag">Leads</span>
 </a>
-<a class="card" data-card-id="my-sms" data-color="teal" href="https://my.seniormarketsales.com" target="_blank" rel="noopener noreferrer">
+<a class="card" data-card-id="my-sms" data-color="teal" href="https://my.seniormarketsales.com/my-dashboard" target="_blank" rel="noopener noreferrer">
 <span class="card-arrow">↗</span>
 <div class="card-shimmer"></div>
 <div class="card-icon-wrap">💬</div>
@@ -4383,7 +4410,7 @@ Agent Command Center
 <p>On-demand training videos, product walkthroughs, and coaching sessions.</p>
 <span class="card-tag">Training</span>
 </a>
-<a class="card" data-card-id="compliance-center" data-color="rose" href="https://my.seniormarketsales.com" target="_blank" rel="noopener">
+<a class="card" data-card-id="compliance-center" data-color="rose" href="https://my.seniormarketsales.com/compliance-medicare" target="_blank" rel="noopener">
 <span class="card-arrow">↗</span>
 <div class="card-shimmer"></div>
 <div class="card-icon-wrap">⚖️</div>
@@ -9817,15 +9844,26 @@ renderLayoutAdmin();
 }
 }).catch(() => {});
 }
-// ── Save layout to Supabase ────────────────────────────────────────────────
+// ── Save layout to Supabase (PATCH-then-POST upsert) ──────────────────────
 function saveLayoutToCloud(order, vis) {
 const payload = JSON.stringify({ order, vis });
-const headers = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+const baseHeaders = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json' };
+// PATCH first
 fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.layout`, {
-method: 'DELETE', headers: { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY }
-}).then(() => fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
-method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key: 'layout', data: payload })
-})).then(() => showSnuToast('✓ Layout saved!')).catch(() => {});
+method: 'PATCH',
+headers: Object.assign({}, baseHeaders, { 'Prefer': 'return=headers-only' }),
+body: JSON.stringify({ data: payload })
+}).then(r => {
+const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+if (count === 0) {
+// No existing row — POST a new one
+return fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
+method: 'POST',
+headers: Object.assign({}, baseHeaders, { 'Prefer': 'return=minimal' }),
+body: JSON.stringify({ hub: 'medi', key: 'layout', data: payload })
+});
+}
+}).then(() => showSnuToast('✓ Layout saved!')).catch(() => showSnuToast('⚠ Layout save failed.'));
 }
 function getSectionOrder() {
 return (_layoutOrder && _layoutOrder.length) ? [..._layoutOrder] : LAYOUT_SECTIONS.map(s => s.id);
@@ -10123,18 +10161,27 @@ if (_tileOrderSyncStarted) return;
 _tileOrderSyncStarted = true;
 setInterval(syncTileOrderFromCloud, 10000);
 }
-// Wrap saveTileOrderToCloud with cooldown
+// Wrap saveTileOrderToCloud with cooldown + PATCH-then-POST upsert
 const _origSaveTileOrder = saveTileOrderToCloud;
 saveTileOrderToCloud = function() {
 _tileOrderSaveCooldown = true;
 _tileOrderSnapshot = tileOrderSnapshot();
 const payload = JSON.stringify(_tileOrder);
-const headers = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+const baseHeaders = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json' };
 fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.tile_order`, {
-method: 'DELETE', headers: { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY }
-}).then(() => fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
-method: 'POST', headers, body: JSON.stringify({ hub: 'medi', key: 'tile_order', data: payload })
-})).then(() => {
+method: 'PATCH',
+headers: Object.assign({}, baseHeaders, { 'Prefer': 'return=headers-only' }),
+body: JSON.stringify({ data: payload })
+}).then(r => {
+const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+if (count === 0) {
+return fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
+method: 'POST',
+headers: Object.assign({}, baseHeaders, { 'Prefer': 'return=minimal' }),
+body: JSON.stringify({ hub: 'medi', key: 'tile_order', data: payload })
+});
+}
+}).then(() => {
 showSnuToast('✓ Tile order saved!');
 setTimeout(() => { _tileOrderSaveCooldown = false; }, 15000);
 }).catch(() => { _tileOrderSaveCooldown = false; });
@@ -12725,7 +12772,7 @@ const GSEARCH_INDEX = [
 {name:'Insurance Acronyms',section:'Libraries',icon:'📚',action:()=>window.location='tools/acronyms-library/'},
 {name:'Content Hook Library',section:'Libraries',icon:'🎣',action:()=>window.location='tools/hook-library/'},
 {name:'Sales One-Liners',section:'Libraries',icon:'⚡',action:()=>window.location='tools/sales-one-liners/'},
-{name:'Compliance Center',section:'Libraries',icon:'⚖️',action:()=>window.open('https://my.seniormarketsales.com','_blank')},
+{name:'Compliance Center',section:'Libraries',icon:'⚖️',action:()=>window.open('https://my.seniormarketsales.com/compliance-medicare','_blank')},
 // New features
 {name:'Agent Directory',section:'Directory',icon:'👥',action:()=>{ openDir(); closeGsearch(); }},
 {name:'Daily Checklist',section:'Tasks',icon:'✅',action:()=>{ openTask(); closeGsearch(); }},
