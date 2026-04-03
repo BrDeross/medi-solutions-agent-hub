@@ -9484,8 +9484,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLight
 </div>
 <button class="roleplay-close" onclick="closeRoleplay()">✕</button>
 </div>
-<div class="roleplay-messages" id="roleplayMessages"></div>
-<div class="roleplay-input-row">
+<div class="roleplay-messages" id="roleplayMessages" style="display:none;"></div>
+<div class="roleplay-input-row" style="display:none;">
 <textarea class="roleplay-input" id="roleplayInput" placeholder="Type your response…" rows="2"
 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRoleplayMessage();}"></textarea>
 <button class="roleplay-send-btn" id="roleplaySendBtn" onclick="sendRoleplayMessage()">Send ↑</button>
@@ -10779,19 +10779,35 @@ renderActiveArticle();
 }
 function saveArticleLocker(cb) {
 const payload = JSON.stringify({ articles: _artLocker, activeIdx: _artIdx });
+const hdrs = { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY, 'Content-Type': 'application/json' };
+// PATCH first (safe upsert — won't delete data if POST fails)
 fetch(`${ART_SUPA}/rest/v1/article_locker?hub=eq.${ART_HUB}`, {
-method: 'DELETE', headers: { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY }
-}).then(() => fetch(`${ART_SUPA}/rest/v1/article_locker`, {
+method: 'PATCH',
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=headers-only' }),
+body: JSON.stringify({ data: payload })
+}).then(r => {
+const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+if (count === 0) {
+return fetch(`${ART_SUPA}/rest/v1/article_locker`, {
 method: 'POST',
-headers: { 'apikey': ART_SKEY, 'Authorization': 'Bearer ' + ART_SKEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=minimal' }),
 body: JSON.stringify({ hub: ART_HUB, data: payload })
-})).then(() => { if (cb) cb(); }).catch(() => { if (cb) cb(); });
+});
+}
+}).then(() => { if (cb) cb(); }).catch(e => { console.error('[ART SAVE]', e); if (cb) cb(); });
 }
 // ── Auto-advance: called every time SNU leaderboard is saved ─
 function advanceArticleQueue() {
-if (!_artLocker.length) return;
+if (!_artLocker.length) {
+// Re-fetch in case locker wasn't loaded yet
+loadArticleLocker();
+return;
+}
 _artIdx = (_artIdx + 1) % _artLocker.length;
-saveArticleLocker(() => renderActiveArticle());
+saveArticleLocker(() => {
+renderActiveArticle();
+if (typeof showSnuToast === 'function') showSnuToast('📰 Spotlight rotated to: ' + (_artLocker[_artIdx]?.title || 'next article'));
+});
 }
 // ── Render the active article into the Industry Spotlight ─────
 function renderActiveArticle() {
@@ -10831,8 +10847,9 @@ if (tagEl) tagEl.textContent = a.category === 'health' ? 'Medicare / Health' : a
 const teaser = document.getElementById('industryTeaserCard');
 if (teaser) {
 teaser.onclick = a.url ? () => window.open(a.url, '_blank') : () => openSnuPrint();
+teaser.style.flexDirection = a.thumb ? 'column' : 'row';
 teaser.innerHTML = `
-${a.thumb ? `<img src="${pesc(a.thumb)}" alt="" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px 10px 0 0;display:block;margin-bottom:14px;" onerror="this.style.display='none'">` : '<div class="industry-teaser-icon">📰</div>'}
+${a.thumb ? `<img src="${pesc(a.thumb)}" alt="" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:block;flex-shrink:0;" onerror="this.style.display='none'; this.closest('.industry-teaser-card').style.flexDirection='row';">` : '<div class="industry-teaser-icon">📰</div>'}
 <div class="industry-teaser-content">
 <span class="industry-teaser-cat ${a.category||'industry'}" style="background:${cc.bg};border:1px solid ${cc.border};color:${cc.text};padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:8px;">${tagEl ? tagEl.textContent : a.category}</span>
 <div class="industry-teaser-headline">${pesc(a.title||'')}</div>
