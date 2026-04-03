@@ -8717,7 +8717,7 @@ if (_videosSaving) return;
 _videosSaving = true;
 // Re-fetch latest from cloud before saving to prevent race conditions
 fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
-headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
+headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Cache-Control': 'no-cache' }
 }).then(r => r.json()).then(rows => {
 let cloudVideos = [];
 if (rows && rows.length && rows[0].data) {
@@ -8743,7 +8743,7 @@ body: JSON.stringify({ hub: VID_HUB, data: payload })
 }).then(r => {
 _videosSaving = false;
 if (r.ok || r.status === 201) {
-renderVideoGrid(); renderVideoAdminList();
+renderVideoGrid(); refreshAdminVideosList();
 if (onSuccess) onSuccess();
 } else {
 r.text().then(t => console.error('[VID SAVE] ERROR', r.status, t));
