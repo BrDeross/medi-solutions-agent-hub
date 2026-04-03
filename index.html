@@ -9292,20 +9292,30 @@ renderTripAdminEditor();
 }
 function persistTripData(successMsg) {
 const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || _tripMeta.monthLabel || '';
-const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
+const goalInputVal = document.getElementById('tripGoalInput')?.value;
+const goal = (goalInputVal !== '' && goalInputVal !== null && goalInputVal !== undefined && Number(goalInputVal) > 0)
+? Number(goalInputVal)
+: (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : DEFAULT_GOAL);
 _tripMeta = { ..._tripMeta, qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
 const data = { agents: _tripAgents, meta: _tripMeta };
 _tripSaveCooldown = true;
 _tripSnapshot = tripSnapshot(data);
 const url = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker';
-const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
-const hdrs = { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+const svcKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+const hdrs = { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey, 'Content-Type': 'application/json' };
+// PATCH-then-POST upsert
 return fetch(url + '?hub=eq.medi', {
-method: 'PATCH', headers: hdrs,
+method: 'PATCH',
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=headers-only' }),
 body: JSON.stringify({ data })
-}).then(r => r.text()).then(t => {
-if (t === '[]' || t === '' || t === 'null') {
-return fetch(url, { method: 'POST', headers: hdrs, body: JSON.stringify({ hub: 'medi', data }) });
+}).then(r => {
+const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+if (count === 0) {
+return fetch(url, {
+method: 'POST',
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=minimal' }),
+body: JSON.stringify({ hub: 'medi', data })
+});
 }
 }).then(() => {
 renderTripTracker();
@@ -9399,7 +9409,7 @@ _tripMeta = {};
 _tripSnapshot = tripSnapshot({ agents: [], meta: {} });
 renderTripTracker();
 renderTripAdminEditor();
-const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi', {
 method: 'DELETE', headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
 }).then(() => {
