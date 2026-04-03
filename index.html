@@ -5384,13 +5384,13 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div id="adminTabVideos" class="admin-tab-panel">
 <div class="admin-body">
 <div class="admin-section-title">🎬 Add Training Video</div>
-<p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Paste a YouTube or Vimeo URL. The video will embed directly in the library.</p>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Paste a YouTube, Vimeo, Loom, or Google Drive URL. The video will embed directly in the library.</p>
 <div class="admin-field" style="margin-bottom:10px;">
 <label>Video Title</label>
 <input class="admin-input" id="vidTitle" placeholder="Medicare Advantage Overview 2025">
 </div>
 <div class="admin-field" style="margin-bottom:10px;">
-<label>Video URL (YouTube or Vimeo)</label>
+<label>Video URL (YouTube, Vimeo, Loom, or Drive)</label>
 <input class="admin-input" id="vidUrl" placeholder="https://www.youtube.com/watch?v=...">
 </div>
 <div class="admin-week-row" style="margin-bottom:10px;">
@@ -8682,10 +8682,21 @@ let _videosSaving = false;
 // ── Parse any YouTube/Vimeo URL into an embed URL ─────────────────────────
 function parseVideoEmbed(url) {
 url = url.trim();
+// YouTube: watch, embed, shorts, youtu.be
 let m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
 if (m) return 'https://www.youtube.com/embed/' + m[1] + '?rel=0&modestbranding=1';
+// Vimeo with unlisted hash: vimeo.com/123456789/abcdef
+m = url.match(/vimeo\.com\/(\d+)\/([a-f0-9]+)/);
+if (m) return 'https://player.vimeo.com/video/' + m[1] + '?h=' + m[2] + '&title=0&byline=0&portrait=0';
+// Vimeo standard: vimeo.com/123456789 or vimeo.com/video/123456789
 m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
 if (m) return 'https://player.vimeo.com/video/' + m[1] + '?title=0&byline=0&portrait=0';
+// Loom
+m = url.match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
+if (m) return 'https://www.loom.com/embed/' + m[1];
+// Google Drive
+m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+if (m) return 'https://drive.google.com/file/d/' + m[1] + '/preview';
 return null;
 }
 // ── Load from JSONBin ──────────────────────────────────────────────────────
@@ -8821,7 +8832,7 @@ const title = gv('vidTitle');
 const url = gv('vidUrl');
 if (!title) { showSnuToast('\u26a0 Please enter a title.'); return; }
 if (!url) { showSnuToast('\u26a0 Please enter a video URL.'); return; }
-if (!parseVideoEmbed(url)) { showSnuToast('\u26a0 URL must be a valid YouTube or Vimeo link.'); return; }
+if (!parseVideoEmbed(url)) { showSnuToast('\u26a0 URL must be a valid YouTube, Vimeo, Loom, or Google Drive link.'); return; }
 const video = {
 id: Date.now(),
 title,
