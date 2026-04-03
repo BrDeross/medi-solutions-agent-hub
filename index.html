@@ -8715,20 +8715,35 @@ refreshAdminVideosList();
 function saveVideos(onSuccess) {
 if (_videosSaving) return;
 _videosSaving = true;
+// Re-fetch latest from cloud before saving to prevent race conditions
+fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}&select=data`, {
+headers: { 'apikey': JB_SUPA_KEY, 'Authorization': 'Bearer ' + JB_SUPA_KEY, 'Cache-Control': 'no-cache' }
+}).then(r => r.json()).then(rows => {
+let cloudVideos = [];
+if (rows && rows.length && rows[0].data) {
+const raw = rows[0].data;
+cloudVideos = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
+}
+// Merge: keep all cloud videos, add any local-only ones (by URL dedup)
+const cloudUrls = new Set(cloudVideos.map(v => v.url));
+const localOnly = _videos.filter(v => !cloudUrls.has(v.url));
+// Also remove any that were deleted locally (not in _videos)
+const localUrls = new Set(_videos.map(v => v.url));
+const merged = cloudVideos.filter(v => localUrls.has(v.url)).concat(localOnly);
+_videos = merged;
 const payload = JSON.stringify(_videos);
-fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
+return fetch(`${JB_SUPA_URL}/rest/v1/videos?hub=eq.${VID_HUB}`, {
 method: 'DELETE',
 headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY }
-})
-.then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
+}).then(() => fetch(`${JB_SUPA_URL}/rest/v1/videos`, {
 method: 'POST',
 headers: { 'apikey': JB_SERVICE_KEY, 'Authorization': 'Bearer ' + JB_SERVICE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
 body: JSON.stringify({ hub: VID_HUB, data: payload })
-}))
-.then(r => {
+}));
+}).then(r => {
 _videosSaving = false;
 if (r.ok || r.status === 201) {
-console.log('[VID SAVE] OK');
+renderVideoGrid(); renderVideoAdminList();
 if (onSuccess) onSuccess();
 } else {
 r.text().then(t => console.error('[VID SAVE] ERROR', r.status, t));
