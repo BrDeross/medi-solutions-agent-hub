@@ -12105,7 +12105,7 @@ renderAllStarUi();
 <script>
 (function() {
 const NF_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-const NF_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const NF_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 const NF_HUB = 'medi';
 const hdrs = (extra={}) => ({ 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates', ...extra });
 const toast = msg => { if (typeof showSnuToast === 'function') showSnuToast(msg); };
@@ -12115,11 +12115,15 @@ function supaGet(table, params='') {
 return fetch(`${NF_URL}/rest/v1/${table}?hub=eq.${NF_HUB}&select=data${params}`, { headers: { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Cache-Control': 'no-cache' } }).then(r=>r.json());
 }
 function supaUpsert(table, data) {
-const h = { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
-return fetch(`${NF_URL}/rest/v1/${table}?hub=eq.${NF_HUB}`, { method:'PATCH', headers: h, body: JSON.stringify({ data }) })
-.then(r => r.text()).then(t => {
-if (t === '[]' || t === '' || t === 'null') {
-return fetch(`${NF_URL}/rest/v1/${table}`, { method:'POST', headers: h, body: JSON.stringify({ hub: NF_HUB, data }) });
+const h = { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Content-Type': 'application/json' };
+return fetch(`${NF_URL}/rest/v1/${table}?hub=eq.${NF_HUB}`, {
+method:'PATCH', headers: Object.assign({}, h, { 'Prefer': 'return=headers-only' }), body: JSON.stringify({ data })
+}).then(r => {
+const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+if (count === 0) {
+return fetch(`${NF_URL}/rest/v1/${table}`, {
+method:'POST', headers: Object.assign({}, h, { 'Prefer': 'return=minimal' }), body: JSON.stringify({ hub: NF_HUB, data })
+});
 }
 });
 }
@@ -12934,7 +12938,7 @@ document.addEventListener('DOMContentLoaded',()=>{ initTasks(); startNotificatio
 <script>
 (function() {
 const ANN_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-const ANN_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const ANN_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 const ANN_HUB = 'medi';
 const ANN_DISMISS_KEY = 'ann_dismissed_medi';
 function loadBanner() {
@@ -13061,7 +13065,7 @@ document.addEventListener('DOMContentLoaded', loadBanner);
 <script>
 (function() {
 const REORDER_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-const REORDER_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const REORDER_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 const REORDER_HUB = 'medi';
 const SECTIONS = ['agent-tools', 'quick-access', 'libraries'];
 let _savedOrders = {};
@@ -13509,7 +13513,7 @@ box-shadow: 0 4px 16px rgba(59,130,246,.2);
 (function(){
 'use strict';
 var CD_URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
-var CD_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+var CD_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 var CD_HUB='medi',_cdTimers=[],_cdInterval=null,_cdEditId=null;
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function pad(n){return n<10?'0'+n:String(n);}
@@ -13608,7 +13612,7 @@ gtag('config', 'G-KBEJ843NYN');
 'use strict';
 var TRACK_HUB = 'medi';
 var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 var _sid = sessionStorage.getItem('medi_sid');
 if (!_sid) {
 _sid = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
