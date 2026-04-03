@@ -4662,6 +4662,17 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div class="trip-legend-item"><div class="trip-legend-dot q"></div> Qualified</div>
 <div class="trip-legend-item"><div class="trip-legend-dot nq"></div> In Progress</div>
 </div>
+<div style="margin-top:16px;padding:14px 18px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.18);border-radius:12px;">
+<div style="font-size:12px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">⚠️ Double Points do not count towards the trip goal</div>
+<div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;">Goal Legend:</div>
+<div style="display:flex;flex-wrap:wrap;gap:6px 16px;">
+<span style="font-size:12px;color:#e2e8f0;">🟢 <strong>Rookies:</strong> $250,000</span>
+<span style="font-size:12px;color:#e2e8f0;">🔵 <strong>Under 5 Years:</strong> $300,000</span>
+<span style="font-size:12px;color:#e2e8f0;">🟣 <strong>5+ Years:</strong> $550,000</span>
+<span style="font-size:12px;color:#e2e8f0;">🏆 <strong>Lifetime Millionaires:</strong> $450,000</span>
+</div>
+<div style="font-size:11px;font-weight:700;color:var(--gold);margin-top:8px;">NO Double Points included</div>
+</div>
 </div>
 </div>
 </div>
@@ -6160,7 +6171,7 @@ if (record.snu_spotlight?.name) localStorage.setItem('snu_spotlight_v1', JSON.st
 if (record.snu_aom && Object.keys(record.snu_aom).length) localStorage.setItem('snu_aom_v1', JSON.stringify(record.snu_aom));
 // snu_trip now handled by Supabase trip_tracker table
 if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
-if (typeof renderAllAomCards === 'function') renderAllAomCards();
+if (typeof initAom === 'function') initAom();
 if (typeof renderSpotlightCard === 'function') renderSpotlightCard(record.snu_spotlight?.name ? record.snu_spotlight : undefined);
 if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cloud!');
 };
@@ -8345,7 +8356,7 @@ localStorage.setItem(AOM_KEY, JSON.stringify(slim));
 showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.');
 }
 if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
-renderAomCard(_aomEditingMonth);
+renderAllAomCards();
 refreshAomAdminPicker();
 showSnuToast('✓ ' + AOM_MONTHS[_aomEditingMonth] + ' saved!');
 }
@@ -8356,7 +8367,7 @@ delete _aomData[_aomEditingMonth];
 localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
 if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
 _aomPhotoBase64 = null;
-renderAomCard(_aomEditingMonth);
+renderAllAomCards();
 refreshAomAdminPicker();
 // Reset form
 ['aomAgentName','aomAgentStat','aomAgentNote'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
