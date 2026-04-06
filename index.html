@@ -1626,7 +1626,9 @@ background: linear-gradient(140deg, #254d8a 0%, #2a5598 100%);
 position: relative;
 }
 /* Page-wide aurora shimmer — smooth flowing color bands */
-to { transform: rotate(360deg); }
+@keyframes auroraSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 /* ══════════════════════════════════════════════
 SNU — SHOW N UP NEWSLETTER
