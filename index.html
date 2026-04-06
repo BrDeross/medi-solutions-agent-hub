@@ -12141,12 +12141,32 @@ method:'POST', headers: Object.assign({}, h, { 'Prefer': 'return=minimal' }), bo
 });
 }
 function supaAppend(table, data) {
-const h = { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
-return fetch(`${NF_URL}/rest/v1/${table}`, {
-method:'POST',
-headers: h,
-body: JSON.stringify({ hub: NF_HUB, data })
-});
+  const h = {
+    'apikey': NF_KEY,
+    'Authorization': 'Bearer ' + NF_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  };
+
+  const payload = { hub: NF_HUB, data };
+
+  if (table === 'activity_log' && data && typeof data === 'object') {
+    payload.event_type  = data.event_type || '';
+    payload.section     = data.section || '';
+    payload.path        = data.path || '';
+    payload.page_title  = data.page_title || '';
+    payload.user_name   = data.user_name || '';
+    payload.email       = data.email || '';
+    payload.occurred_at = data.occurred_at || new Date().toISOString();
+    payload.session_id  = data.session_id || '';
+    payload.meta        = data.meta && typeof data.meta === 'object' ? data.meta : {};
+  }
+
+  return fetch(`${NF_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify(payload)
+  });
 }
 /* ════════════════════════════════
 HUB TRACKING
