@@ -12148,18 +12148,21 @@ function supaAppend(table, data) {
     'Prefer': 'return=minimal'
   };
 
-  const payload = { hub: NF_HUB, data };
+  let payload = { hub: NF_HUB, data };
 
   if (table === 'activity_log' && data && typeof data === 'object') {
-    payload.event_type  = data.event_type || '';
-    payload.section     = data.section || '';
-    payload.path        = data.path || '';
-    payload.page_title  = data.page_title || '';
-    payload.user_name   = data.user_name || '';
-    payload.email       = data.email || '';
-    payload.occurred_at = data.occurred_at || new Date().toISOString();
-    payload.session_id  = data.session_id || '';
-    payload.meta        = data.meta && typeof data.meta === 'object' ? data.meta : {};
+    payload = {
+      hub: NF_HUB,
+      event_type: data.event_type || '',
+      section: data.section || '',
+      path: data.path || '',
+      page_title: data.page_title || '',
+      user_name: data.user_name || '',
+      email: data.email || '',
+      occurred_at: data.occurred_at || new Date().toISOString(),
+      session_id: data.session_id || '',
+      meta: data.meta && typeof data.meta === 'object' ? data.meta : {}
+    };
   }
 
   return fetch(`${NF_URL}/rest/v1/${table}`, {
