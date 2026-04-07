@@ -6086,7 +6086,7 @@ const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, sn
 // ── Generic bin helpers ────────────────────────────────────────
 async function jbReadBin(id) {
 try {
-const res = await fetch(`${JB_BASE}/b/${id}/latest`, { headers:{ 'X-Master-Key': JB_MASTER_KEY } });
+const res = await fetch(`${JB_BASE}/b/${id}/latest?t=${Date.now()}`, { headers:{ 'X-Master-Key': JB_MASTER_KEY, 'Cache-Control': 'no-cache' } });
 return (await res.json())?.record || null;
 } catch(e) { return null; }
 }
@@ -8335,7 +8335,7 @@ if (file && file.type.startsWith('image/')) handleAomPhoto(file);
 initAom();
 });
 // ── Save month ─────────────────────────────────────────────────────────────
-function saveAomMonth() {
+async function saveAomMonth() {
 if (_aomEditingMonth === null) return;
 const gv = id => document.getElementById(id)?.value?.trim() || '';
 const name = gv('aomAgentName');
@@ -8346,19 +8346,20 @@ note: gv('aomAgentNote'),
 photo: _aomPhotoBase64 || null
 };
 try {
-// Try to save with photo
 localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
 } catch(e) {
-// Quota exceeded — save without photos
 const slim = {};
 for (const k in _aomData) slim[k] = { ..._aomData[k], photo: null };
 localStorage.setItem(AOM_KEY, JSON.stringify(slim));
 showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.');
 }
-if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
 renderAllAomCards();
 refreshAomAdminPicker();
-showSnuToast('✓ ' + AOM_MONTHS[_aomEditingMonth] + ' saved!');
+showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ' to cloud...');
+if (typeof jbSave === 'function') {
+const ok = await jbSave('snu_aom', _aomData);
+if (!ok) showSnuToast('⚠ Cloud sync failed — saved locally only. Try Sync All.');
+}
 }
 // ── Clear month ─────────────────────────────────────────────────────────────
 function clearAomMonth() {
