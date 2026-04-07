@@ -6135,11 +6135,23 @@ img.src = base64;
 async function jbSavePhotos(spPhoto, aomData) {
 const id = await jbGetPhotoBinId();
 if (!id) return false;
-const aomPhotos = {};
+// Read existing photos first to avoid overwriting other months
+let existing = {};
+try { existing = (await jbReadBin(id)) || {}; } catch(e) {}
+const existingAom = existing.aom || {};
+// Merge: keep existing photos, overwrite only months that have new photos
+const aomPhotos = { ...existingAom };
 if (aomData) for (const k in aomData) {
-if (aomData[k]?.photo) aomPhotos[k] = await compressPhoto(aomData[k].photo);
+if (aomData[k]?.photo) {
+aomPhotos[k] = await compressPhoto(aomData[k].photo);
+} else if (aomData[k] && !aomData[k].name) {
+// Month was cleared — remove photo
+delete aomPhotos[k];
 }
-return jbWriteBin(id, { spotlight: spPhoto ? await compressPhoto(spPhoto) : null, aom: aomPhotos });
+}
+// For spotlight: use new if provided, otherwise keep existing
+const finalSpotlight = spPhoto ? await compressPhoto(spPhoto) : (existing.spotlight || null);
+return jbWriteBin(id, { spotlight: finalSpotlight, aom: aomPhotos });
 }
 // ── Load photos from photo bin ────────────────────────────────
 async function jbLoadPhotos() {
@@ -6165,13 +6177,30 @@ if (record.snu_aom[k]) record.snu_aom[k].photo = photos.aom[k];
 }
 }
 window._jbRecord = record;
+try {
 if (record.snu_data && Object.keys(record.snu_data).length) localStorage.setItem('snu_data_v1', JSON.stringify(record.snu_data));
 if (record.snu_article && Object.keys(record.snu_article).length) localStorage.setItem('snu_article_v1', JSON.stringify(record.snu_article));
-if (record.snu_spotlight?.name) localStorage.setItem('snu_spotlight_v1', JSON.stringify(record.snu_spotlight));
-if (record.snu_aom && Object.keys(record.snu_aom).length) localStorage.setItem('snu_aom_v1', JSON.stringify(record.snu_aom));
+if (record.snu_spotlight?.name) localStorage.setItem('snu_spotlight_v1', JSON.stringify({...record.snu_spotlight, photo: null}));
+// Strip photos from AOM before localStorage to avoid quota issues on mobile
+if (record.snu_aom && Object.keys(record.snu_aom).length) {
+const aomSlim = {};
+for (const k in record.snu_aom) aomSlim[k] = record.snu_aom[k] ? { ...record.snu_aom[k], photo: null } : null;
+localStorage.setItem('snu_aom_v1', JSON.stringify(aomSlim));
+}
+} catch(e) { console.warn('[JB] localStorage write failed', e); }
 // snu_trip now handled by Supabase trip_tracker table
 if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
-if (typeof initAom === 'function') initAom();
+// Use _jbRecord (has photos) to populate _aomData directly
+if (typeof initAom === 'function') {
+initAom();
+// Overlay photos from _jbRecord onto _aomData
+if (record.snu_aom && typeof _aomData !== 'undefined') {
+for (const k in record.snu_aom) {
+if (record.snu_aom[k]?.photo && _aomData[k]) _aomData[k].photo = record.snu_aom[k].photo;
+}
+renderAllAomCards();
+}
+}
 if (typeof renderSpotlightCard === 'function') renderSpotlightCard(record.snu_spotlight?.name ? record.snu_spotlight : undefined);
 if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cloud!');
 };
