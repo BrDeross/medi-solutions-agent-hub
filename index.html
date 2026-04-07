@@ -1626,9 +1626,7 @@ background: linear-gradient(140deg, #254d8a 0%, #2a5598 100%);
 position: relative;
 }
 /* Page-wide aurora shimmer — smooth flowing color bands */
-@keyframes auroraSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+to { transform: rotate(360deg); }
 }
 /* ══════════════════════════════════════════════
 SNU — SHOW N UP NEWSLETTER
@@ -4479,7 +4477,7 @@ Agent Command Center
 <span style="font-size:12px;font-weight:700;color:var(--gold);">Only use the Roleplay tool from a mobile phone.</span>
 </div>
 </div>
-<a href="https://chatgpt.com/g/g-69bbfe5f216c8191b29ee1b3b3f98d97-consumer-roleplay" target="_blank" rel="noopener"
+<a href="https://chatgpt.com/g/g-69bbfe5f216c8191b29ee1b3b3f98d97-consumer-roleplay-simulator" target="_blank" rel="noopener"
 style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--accent);border-radius:14px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 4px 20px rgba(59,130,246,.4);white-space:nowrap;flex-shrink:0;">
 🚀 Launch GPT Roleplay
 </a>
@@ -12141,35 +12139,12 @@ method:'POST', headers: Object.assign({}, h, { 'Prefer': 'return=minimal' }), bo
 });
 }
 function supaAppend(table, data) {
-  const h = {
-    'apikey': NF_KEY,
-    'Authorization': 'Bearer ' + NF_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=minimal'
-  };
-
-  let payload = { hub: NF_HUB, data };
-
-  if (table === 'activity_log' && data && typeof data === 'object') {
-    payload = {
-      hub: NF_HUB,
-      event_type: data.event_type || '',
-      section: data.section || '',
-      path: data.path || '',
-      page_title: data.page_title || '',
-      user_name: data.user_name || '',
-      email: data.email || '',
-      occurred_at: data.occurred_at || new Date().toISOString(),
-      session_id: data.session_id || '',
-      meta: data.meta && typeof data.meta === 'object' ? data.meta : {}
-    };
-  }
-
-  return fetch(`${NF_URL}/rest/v1/${table}`, {
-    method: 'POST',
-    headers: h,
-    body: JSON.stringify(payload)
-  });
+const h = { 'apikey': NF_KEY, 'Authorization': 'Bearer ' + NF_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+return fetch(`${NF_URL}/rest/v1/${table}`, {
+method:'POST',
+headers: h,
+body: JSON.stringify({ hub: NF_HUB, data })
+});
 }
 /* ════════════════════════════════
 HUB TRACKING
