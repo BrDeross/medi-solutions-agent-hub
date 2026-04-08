@@ -8284,8 +8284,9 @@ photo.innerHTML = d.photo
 <div class="aom-name-on-photo">
 <div class="aom-name-on-photo-text">${pesc(d.name)}</div>
 </div>`
-: `<div class="aom-photo-empty" style="font-size:36px;">👤<span>${pesc(d.name.split(' ')[0])}</span></div>`;
+: `<div style="font-size:48px;opacity:.6;display:flex;flex-direction:column;align-items:center;gap:8px;">👤<span style="font-size:13px;font-weight:700;color:#fff;opacity:1;font-style:normal;font-family:'Space Grotesk',sans-serif;">${pesc(d.name)}</span></div>`;
 info.innerHTML = `
+${!d.photo ? '' : ''}
 ${d.stat ? `<div class="aom-agent-stat">${pesc(d.stat)}</div>` : ''}
 ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
 `;
