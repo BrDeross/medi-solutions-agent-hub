@@ -6260,11 +6260,9 @@ await jbSavePhotos(sp?.photo||null, value);
 // Save text data to main bin (photos stripped)
 try {
 const latest = (await jbReadBin(JB_MAIN_BIN)) || {...JB_EMPTY};
-// Strip photos before setting on latest to keep payload small
+// Keep AOM photos in the shared main record so they push globally
 if (field === 'snu_aom') {
-const stripped = {};
-for (const k in value) stripped[k] = value[k] ? { ...value[k], photo: null } : null;
-latest.snu_aom = stripped;
+latest.snu_aom = JSON.parse(JSON.stringify(value || {}));
 } else if (field === 'snu_spotlight') {
 latest.snu_spotlight = value?.photo ? { ...value, photo: null } : value;
 } else {
@@ -6272,9 +6270,9 @@ latest[field] = value;
 }
 window._jbRecord = latest;
 // Keep photos in _jbRecord for print modal
-if (field === 'snu_aom') window._jbRecord.snu_aom = { ...value };
+if (field === 'snu_aom') window._jbRecord.snu_aom = JSON.parse(JSON.stringify(value || {}));
 if (field === 'snu_spotlight' && value?.photo) window._jbRecord.snu_spotlight = { ...value };
-const ok = await jbWriteBin(JB_MAIN_BIN, jbStripPhotos(latest));
+const ok = await jbWriteBin(JB_MAIN_BIN, field === 'snu_aom' ? latest : jbStripPhotos(latest));
 if (typeof showSnuToast === 'function') showSnuToast(ok ? '☁️ Synced to cloud!' : '⚠️ Cloud sync failed — saved locally only.');
 return ok;
 } catch(e) {
@@ -8431,35 +8429,28 @@ name, stat: gv('aomAgentStat'),
 note: gv('aomAgentNote'),
 photo: _aomPhotoBase64 || null
 };
-if (window._jbRecord && typeof window._jbRecord === 'object') {
-window._jbRecord.snu_aom = JSON.parse(JSON.stringify(_aomData));
-}
 try {
+localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
+} catch(e) {
 const slim = {};
-for (const k in _aomData) slim[k] = _aomData[k] ? { ..._aomData[k], photo: null } : null;
+for (const k in _aomData) slim[k] = { ..._aomData[k], photo: null };
 localStorage.setItem(AOM_KEY, JSON.stringify(slim));
-} catch(e) {}
+showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.');
+}
 renderAllAomCards();
 refreshAomAdminPicker();
 showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '...');
 console.log('[AOM SAVE] Month:', _aomEditingMonth, 'Data:', JSON.stringify(_aomData[_aomEditingMonth]));
 if (typeof jbSave === 'function') {
 const ok = await jbSave('snu_aom', _aomData);
-if (!ok) showSnuToast('⚠ Cloud sync failed.');
+if (!ok) showSnuToast('⚠ Cloud sync failed — saved locally only. Try Sync All.');
 }
 }
 // ── Clear month ─────────────────────────────────────────────────────────────
 function clearAomMonth() {
 if (_aomEditingMonth === null) return;
 delete _aomData[_aomEditingMonth];
-if (window._jbRecord && typeof window._jbRecord === 'object') {
-window._jbRecord.snu_aom = JSON.parse(JSON.stringify(_aomData));
-}
-try {
-const slim = {};
-for (const k in _aomData) slim[k] = _aomData[k] ? { ..._aomData[k], photo: null } : null;
-localStorage.setItem(AOM_KEY, JSON.stringify(slim));
-} catch(e) {}
+localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
 if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
 _aomPhotoBase64 = null;
 renderAllAomCards();
