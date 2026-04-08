@@ -6080,8 +6080,7 @@ Agents are solely responsible for verifying information and ensuring compliance 
 const JB_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
 const JB_BASE = 'https://api.jsonbin.io/v3';
 const JB_MAIN_BIN = '69b2cd77aa77b81da9dbc6e6';
-const JB_PHOTO_BIN_KEY = 'mymedi_jb_photo_bin_id';
-const JB_PHOTO_BIN_HARDCODED = '69b2da94c3097a1dd51cd2cf';
+// Photo bin constants removed — photos now stored in Supabase hub_photos table
 const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
 // ── Generic bin helpers ────────────────────────────────────────
 async function jbReadBin(id) {
@@ -6108,12 +6107,10 @@ body: JSON.stringify(data)
 return (await res.json())?.metadata?.id || null;
 } catch(e) { return null; }
 }
-// ── Photo bin ─────────────────────────────────────────────────
-async function jbGetPhotoBinId() {
-// Always use hardcoded bin — same for every device
-localStorage.setItem(JB_PHOTO_BIN_KEY, JB_PHOTO_BIN_HARDCODED);
-return JB_PHOTO_BIN_HARDCODED;
-}
+// ── Photo storage (Supabase hub_photos table) ────────────────
+const PHOTO_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+const PHOTO_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+const PHOTO_HUB = 'medi';
 // ── Compress image to max 400px wide, JPEG 0.75 ───────────────
 function compressPhoto(base64, maxW = 400) {
 return new Promise(resolve => {
@@ -6131,22 +6128,20 @@ img.onerror = () => resolve(base64);
 img.src = base64;
 });
 }
-// ── Save photos to photo bin ──────────────────────────────────
+// ── Save photos to Supabase ──────────────────────────────────
 async function jbSavePhotos(spPhoto, aomData) {
-const id = await jbGetPhotoBinId();
-if (!id) { console.error('[JB PHOTO] No photo bin ID'); return false; }
-let existing = {};
-try { existing = (await jbReadBin(id)) || {}; } catch(e) { console.error('[JB PHOTO] Read failed:', e); }
+try {
+// Read existing first to merge
+const existing = (await jbLoadPhotos()) || {};
 const existingAom = existing.aom || {};
 const aomPhotos = { ...existingAom };
 if (aomData) for (const k in aomData) {
 if (aomData[k]?.photo) {
-// Skip re-compressing if photo is identical to what's already in the bin
 if (existingAom[k] && existingAom[k] === aomData[k].photo) {
-console.log('[JB PHOTO] Month', k, 'unchanged, skipping');
+console.log('[PHOTO] Month', k, 'unchanged');
 } else {
 aomPhotos[k] = await compressPhoto(aomData[k].photo);
-console.log('[JB PHOTO] Month', k, 'compressed, size:', aomPhotos[k].length);
+console.log('[PHOTO] Month', k, 'compressed, size:', aomPhotos[k].length);
 }
 } else if (aomData[k] && !aomData[k].name) {
 delete aomPhotos[k];
@@ -6154,15 +6149,39 @@ delete aomPhotos[k];
 }
 const finalSpotlight = spPhoto ? await compressPhoto(spPhoto) : (existing.spotlight || null);
 const payload = { spotlight: finalSpotlight, aom: aomPhotos };
-console.log('[JB PHOTO] Saving — aom keys:', Object.keys(aomPhotos).join(','), 'payload size:', JSON.stringify(payload).length);
-const ok = await jbWriteBin(id, payload);
-console.log('[JB PHOTO] Write result:', ok);
-if (!ok && typeof showSnuToast === 'function') showSnuToast('⚠️ Photo cloud save failed — photo may not appear on other devices.');
-return ok;
+console.log('[PHOTO] Saving — aom keys:', Object.keys(aomPhotos).join(','), 'payload size:', JSON.stringify(payload).length);
+// PATCH then POST upsert
+const patchRes = await fetch(`${PHOTO_SUPA_URL}/rest/v1/hub_photos?hub=eq.${PHOTO_HUB}`, {
+method: 'PATCH', headers: { 'Content-Type':'application/json', 'apikey': PHOTO_SUPA_KEY, 'Authorization': 'Bearer ' + PHOTO_SUPA_KEY, 'Prefer': 'return=headers-only' },
+body: JSON.stringify({ data: payload })
+});
+const cr = patchRes.headers.get('content-range');
+if (cr && cr.endsWith('/0')) {
+const postRes = await fetch(`${PHOTO_SUPA_URL}/rest/v1/hub_photos`, {
+method: 'POST', headers: { 'Content-Type':'application/json', 'apikey': PHOTO_SUPA_KEY, 'Authorization': 'Bearer ' + PHOTO_SUPA_KEY },
+body: JSON.stringify({ hub: PHOTO_HUB, data: payload })
+});
+if (!postRes.ok) { console.error('[PHOTO] POST failed:', postRes.status); return false; }
+} else if (!patchRes.ok) {
+console.error('[PHOTO] PATCH failed:', patchRes.status); return false;
 }
-// ── Load photos from photo bin ────────────────────────────────
+console.log('[PHOTO] Save OK');
+return true;
+} catch(e) {
+console.error('[PHOTO] Save error:', e);
+if (typeof showSnuToast === 'function') showSnuToast('⚠️ Photo cloud save failed.');
+return false;
+}
+}
+// ── Load photos from Supabase ────────────────────────────────
 async function jbLoadPhotos() {
-return jbReadBin(JB_PHOTO_BIN_HARDCODED);
+try {
+const res = await fetch(`${PHOTO_SUPA_URL}/rest/v1/hub_photos?hub=eq.${PHOTO_HUB}&select=data`, {
+headers: { 'apikey': PHOTO_SUPA_KEY, 'Authorization': 'Bearer ' + PHOTO_SUPA_KEY }
+});
+const rows = await res.json();
+return rows?.[0]?.data || null;
+} catch(e) { console.error('[PHOTO] Load error:', e); return null; }
 }
 // ── Strip photos from record before saving to main bin ────────
 function jbStripPhotos(r) {
