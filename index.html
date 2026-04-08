@@ -5239,7 +5239,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div class="admin-week-row" style="margin-bottom:10px;">
 <div class="admin-field">
 <label>Agent Name</label>
-<input class="admin-input" id="aomAgentName" placeholder="Jane Smith">
+<input class="admin-input" id="aomAgentName" placeholder="Jane Smith" onchange="tryAutoPullAomPhotoFromLocker(true)" onblur="tryAutoPullAomPhotoFromLocker(true)">
 </div>
 <div class="admin-field">
 <label>Production / Stat</label>
@@ -5254,6 +5254,25 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <button class="admin-save-btn" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="saveAomMonth()">💾 Save Month</button>
 <button class="admin-save-btn" style="flex:0 0 auto;width:auto;padding:10px 16px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.35);color:#f87171;" onclick="clearAomMonth()">🗑 Clear</button>
 </div>
+</div>
+<hr class="admin-divider">
+<div class="admin-section-title">🖼️ Agent Photo Locker</div>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:12px;">Upload one agent photo once. Agent of the Month will automatically pull the saved photo whenever the agent name matches.</p>
+<div class="admin-field" style="margin-bottom:10px;">
+<label>Agent Name</label>
+<input class="admin-input" id="agentPhotoLibraryName" placeholder="Jane Smith">
+</div>
+<div class="aom-photo-upload" id="agentPhotoLibraryUploadZone" onclick="document.getElementById('agentPhotoLibraryInput').click()">
+<img class="aom-photo-mini-preview" id="agentPhotoLibraryPreview" src="" alt="">
+<div id="agentPhotoLibraryUploadHint">
+<div class="aom-photo-upload-text">📷 Drop or <span>click to upload</span> a library photo</div>
+</div>
+<input type="file" id="agentPhotoLibraryInput" accept="image/*" style="display:none" onchange="handleAgentPhotoLibraryUpload(this.files[0])">
+</div>
+<div style="display:flex;gap:10px;margin-bottom:12px;">
+<button class="admin-save-btn" style="flex:1;background:linear-gradient(135deg,#0ea5e9,#2563eb);" onclick="saveAgentPhotoLibraryEntry()">💾 Save to Photo Locker</button>
+</div>
+<div id="agentPhotoLibraryList" style="display:grid;gap:8px;"></div>
 </div>
 </div>
 </div><!-- /adminTabAom -->
@@ -6081,7 +6100,7 @@ const JB_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96o
 const JB_BASE = 'https://api.jsonbin.io/v3';
 const JB_MAIN_BIN = '69b2cd77aa77b81da9dbc6e6';
 // Photo bin constants removed — photos now stored in Supabase hub_photos table
-const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
+const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}}, snu_agent_photo_bins:{} };
 // ── Generic bin helpers ────────────────────────────────────────
 async function jbReadBin(id) {
 try {
@@ -6192,6 +6211,83 @@ if (Array.isArray(c.snu_updates)) c.snu_updates = c.snu_updates.map(u => ({...u,
 return c;
 }
 window._jbRecord = null;
+let _agentPhotoBins = {};
+let _agentPhotoCache = {};
+function normalizeAgentPhotoKey(name) {
+const clean = String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+return clean;
+}
+function humanizeAgentPhotoKey(key) {
+return String(key || '').split(' ').map(part => part ? part.charAt(0).toUpperCase() + part.slice(1) : '').join(' ');
+}
+function getAgentPhotoBinId(entry) {
+if (!entry) return null;
+if (typeof entry === 'string') return entry;
+if (entry && typeof entry === 'object') return entry.bin_id || entry.id || null;
+return null;
+}
+function getAgentPhotoDisplayName(key, entry) {
+if (entry && typeof entry === 'object' && entry.agent_name) return entry.agent_name;
+return humanizeAgentPhotoKey(key);
+}
+function getAgentPhotoFromLockerSync(name) {
+const key = normalizeAgentPhotoKey(name);
+return key ? (_agentPhotoCache[key] || null) : null;
+}
+async function jbLoadAgentPhotoByName(name) {
+const key = normalizeAgentPhotoKey(name);
+if (!key) return null;
+if (_agentPhotoCache[key]) return _agentPhotoCache[key];
+const entry = _agentPhotoBins[key];
+const binId = getAgentPhotoBinId(entry);
+if (!binId) return null;
+try {
+const rec = await jbReadBin(binId);
+const photo = rec?.photo || null;
+if (photo) _agentPhotoCache[key] = photo;
+return photo;
+} catch(e) {
+console.error('[AOM PHOTO LOCKER] Load failed:', e);
+return null;
+}
+}
+async function jbSaveAgentPhotoByName(name, base64) {
+const key = normalizeAgentPhotoKey(name);
+if (!key || !base64) return false;
+const compressed = await compressPhoto(base64, 260);
+let entry = _agentPhotoBins[key] || null;
+let binId = getAgentPhotoBinId(entry);
+let ok = false;
+const record = { agent_name: String(name || '').trim(), photo: compressed, updated_at: new Date().toISOString() };
+try {
+if (binId) {
+ok = await jbWriteBin(binId, record);
+} else {
+binId = await jbCreateBin('medi-agent-photo-' + key.replace(/[^a-z0-9]+/g, '-').slice(0, 40), record);
+ok = !!binId;
+}
+if (!ok || !binId) return false;
+_agentPhotoBins[key] = { bin_id: binId, agent_name: record.agent_name };
+_agentPhotoCache[key] = compressed;
+if (window._jbRecord) window._jbRecord.snu_agent_photo_bins = { ..._agentPhotoBins };
+try { localStorage.setItem('snu_agent_photo_bins_v1', JSON.stringify(_agentPhotoBins)); } catch(e) {}
+return await jbSave('snu_agent_photo_bins', { ..._agentPhotoBins });
+} catch(e) {
+console.error('[AOM PHOTO LOCKER] Save failed:', e);
+return false;
+}
+}
+async function hydrateAomPhotosFromLocker(record) {
+if (!record?.snu_aom) return;
+const tasks = Object.keys(record.snu_aom).map(async k => {
+const row = record.snu_aom[k];
+if (!row?.name) return;
+if (row.photo) return;
+const photo = await jbLoadAgentPhotoByName(row.photo_agent_name || row.name);
+if (photo) row.photo = photo;
+});
+await Promise.all(tasks);
+}
 // ── Init: load main + photos in parallel, merge, render ───────
 window.jbInit = async function() {
 const [record, photos] = await Promise.all([ jbReadBin(JB_MAIN_BIN), jbLoadPhotos() ]);
@@ -6203,6 +6299,9 @@ if (photos.aom && record.snu_aom) for (const k in photos.aom) {
 if (record.snu_aom[k]) record.snu_aom[k].photo = photos.aom[k];
 }
 }
+record.snu_agent_photo_bins = record.snu_agent_photo_bins || {};
+_agentPhotoBins = { ...record.snu_agent_photo_bins };
+await hydrateAomPhotosFromLocker(record);
 window._jbRecord = record;
 try {
 if (record.snu_data && Object.keys(record.snu_data).length) localStorage.setItem('snu_data_v1', JSON.stringify(record.snu_data));
@@ -6214,6 +6313,7 @@ const aomSlim = {};
 for (const k in record.snu_aom) aomSlim[k] = record.snu_aom[k] ? { ...record.snu_aom[k], photo: null } : null;
 localStorage.setItem('snu_aom_v1', JSON.stringify(aomSlim));
 }
+if (record.snu_agent_photo_bins) localStorage.setItem('snu_agent_photo_bins_v1', JSON.stringify(record.snu_agent_photo_bins));
 } catch(e) { console.warn('[JB] localStorage write failed', e); }
 // snu_trip now handled by Supabase trip_tracker table
 if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
@@ -6235,7 +6335,7 @@ if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cl
 };
 // ── Save a field ──────────────────────────────────────────────
 window.jbSave = async function(field, value) {
-const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
+const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1', snu_agent_photo_bins:'snu_agent_photo_bins_v1' };
 // Strip photos before localStorage to avoid quota issues
 if (field === 'snu_aom' && lsMap[field]) {
 try {
@@ -6253,16 +6353,17 @@ const aom = (() => { try { return JSON.parse(localStorage.getItem('snu_aom_v1')|
 await jbSavePhotos(value?.photo||null, aom);
 }
 if (field === 'snu_aom') {
-const sp = (() => { try { return JSON.parse(localStorage.getItem('snu_spotlight_v1')||'{}'); } catch(e){return{};} })();
-await jbSavePhotos(sp?.photo||null, value);
+// Agent of the Month photos now live in the Agent Photo Locker (per-agent bins)
 }
 } catch(e) { console.error('[JB] Photo save error:', e); }
 // Save text data to main bin (photos stripped)
 try {
 const latest = (await jbReadBin(JB_MAIN_BIN)) || {...JB_EMPTY};
-// Keep AOM photos in the shared main record so they push globally
+// Strip photos before setting on latest to keep payload small
 if (field === 'snu_aom') {
-latest.snu_aom = JSON.parse(JSON.stringify(value || {}));
+const stripped = {};
+for (const k in value) stripped[k] = value[k] ? { ...value[k], photo: null } : null;
+latest.snu_aom = stripped;
 } else if (field === 'snu_spotlight') {
 latest.snu_spotlight = value?.photo ? { ...value, photo: null } : value;
 } else {
@@ -6270,9 +6371,9 @@ latest[field] = value;
 }
 window._jbRecord = latest;
 // Keep photos in _jbRecord for print modal
-if (field === 'snu_aom') window._jbRecord.snu_aom = JSON.parse(JSON.stringify(value || {}));
+if (field === 'snu_aom') window._jbRecord.snu_aom = { ...value };
 if (field === 'snu_spotlight' && value?.photo) window._jbRecord.snu_spotlight = { ...value };
-const ok = await jbWriteBin(JB_MAIN_BIN, field === 'snu_aom' ? latest : jbStripPhotos(latest));
+const ok = await jbWriteBin(JB_MAIN_BIN, jbStripPhotos(latest));
 if (typeof showSnuToast === 'function') showSnuToast(ok ? '☁️ Synced to cloud!' : '⚠️ Cloud sync failed — saved locally only.');
 return ok;
 } catch(e) {
@@ -6286,10 +6387,10 @@ window.syncAllToCloud = async function() {
 const btn = document.querySelector('[onclick="syncAllToCloud()"]');
 if (btn) { btn.textContent = '⏳ Syncing…'; btn.disabled = true; }
 const g = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
-const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[] };
+const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[], snu_agent_photo_bins: g('snu_agent_photo_bins_v1')||((window._jbRecord && window._jbRecord.snu_agent_photo_bins) || {}) };
 const [ok] = await Promise.all([
 jbWriteBin(JB_MAIN_BIN, jbStripPhotos(record)),
-jbSavePhotos(record.snu_spotlight?.photo||null, record.snu_aom)
+jbSavePhotos(record.snu_spotlight?.photo||null, null)
 ]);
 window._jbRecord = record;
 if (btn) { btn.textContent = '🔄 Sync All Now'; btn.disabled = false; }
@@ -8292,14 +8393,50 @@ if (window._snuState) window._snuState.spotlight = data;
 <script id="aom-script">
 const AOM_KEY = 'snu_aom_v1';
 const AOM_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-let _aomData = {}; // { 0: {name,stat,note,photo}, 1: {...}, ... }
+let _aomData = {};
 let _aomEditingMonth = null;
 let _aomPhotoBase64 = null;
-// ── Load from storage and render all cards ───────────────────────────────
+let _aomPhotoDirty = false;
+let _agentLibraryPhotoBase64 = null;
+function deepCloneAomData(obj) {
+try { return JSON.parse(JSON.stringify(obj || {})); } catch(e) { return {}; }
+}
+function setAomPreview(photo) {
+const preview = document.getElementById('aomPhotoMiniPreview');
+const hint = document.getElementById('aomPhotoUploadHint');
+const zone = document.getElementById('aomPhotoUploadZone');
+if (photo) {
+if (preview) { preview.src = photo; preview.classList.add('visible'); }
+if (hint) hint.style.display = 'none';
+if (zone) zone.classList.add('has-photo');
+} else {
+if (preview) { preview.src = ''; preview.classList.remove('visible'); }
+if (hint) hint.style.display = '';
+if (zone) zone.classList.remove('has-photo');
+}
+}
+function setAgentLibraryPreview(photo) {
+const preview = document.getElementById('agentPhotoLibraryPreview');
+const hint = document.getElementById('agentPhotoLibraryUploadHint');
+const zone = document.getElementById('agentPhotoLibraryUploadZone');
+if (photo) {
+if (preview) { preview.src = photo; preview.classList.add('visible'); }
+if (hint) hint.style.display = 'none';
+if (zone) zone.classList.add('has-photo');
+} else {
+if (preview) { preview.src = ''; preview.classList.remove('visible'); }
+if (hint) hint.style.display = '';
+if (zone) zone.classList.remove('has-photo');
+}
+}
+function getResolvedAomPhoto(row) {
+if (!row) return null;
+return row.photo || getAgentPhotoFromLockerSync(row.photo_agent_name || row.name) || null;
+}
 function initAom() {
 try {
-if (window._jbRecord?.snu_aom && typeof window._jbRecord.snu_aom === 'object') {
-_aomData = JSON.parse(JSON.stringify(window._jbRecord.snu_aom || {}));
+if (window._jbRecord?.snu_aom && Object.keys(window._jbRecord.snu_aom).length) {
+_aomData = deepCloneAomData(window._jbRecord.snu_aom);
 } else {
 const raw = localStorage.getItem(AOM_KEY);
 _aomData = raw ? JSON.parse(raw) : {};
@@ -8307,8 +8444,8 @@ _aomData = raw ? JSON.parse(raw) : {};
 } catch(e) { _aomData = {}; }
 renderAllAomCards();
 refreshAomAdminPicker();
+renderAgentPhotoLockerList();
 }
-// ── Render a single dashboard card ───────────────────────────────────────
 function renderAomCard(monthIdx) {
 const card = document.getElementById('aomCard' + monthIdx);
 const photo = document.getElementById('aomPhotoWrap' + monthIdx);
@@ -8318,7 +8455,6 @@ if (!card) return;
 const now = new Date();
 const curMo = now.getMonth();
 const year = now.getFullYear();
-// Mark current month
 card.classList.toggle('current-month', monthIdx === curMo);
 card.classList.toggle('empty-month', !_aomData[monthIdx]);
 if (yearEl) yearEl.textContent = year;
@@ -8329,8 +8465,9 @@ info.innerHTML = '<div class="aom-empty-name">No agent selected</div>';
 return;
 }
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-photo.innerHTML = d.photo
-? `<img class="aom-photo" src="${d.photo}" alt="${pesc(d.name)}">
+const resolvedPhoto = getResolvedAomPhoto(d);
+photo.innerHTML = resolvedPhoto
+? `<img class="aom-photo" src="${resolvedPhoto}" alt="${pesc(d.name)}">
 <div class="aom-photo-gradient"></div>
 <div class="aom-badge">🏆 Agent of the Month</div>
 <div class="aom-name-on-photo">
@@ -8338,7 +8475,6 @@ photo.innerHTML = d.photo
 </div>`
 : `<div style="font-size:48px;opacity:.6;display:flex;flex-direction:column;align-items:center;gap:8px;">👤<span style="font-size:13px;font-weight:700;color:#fff;opacity:1;font-style:normal;font-family:'Space Grotesk',sans-serif;">${pesc(d.name)}</span></div>`;
 info.innerHTML = `
-${!d.photo ? '' : ''}
 ${d.stat ? `<div class="aom-agent-stat">${pesc(d.stat)}</div>` : ''}
 ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
 `;
@@ -8346,7 +8482,6 @@ ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
 function renderAllAomCards() {
 for (let i = 0; i < 12; i++) renderAomCard(i);
 }
-// ── Refresh admin picker labels ───────────────────────────────────────────
 function refreshAomAdminPicker() {
 for (let i = 0; i < 12; i++) {
 const el = document.getElementById('aomAdminCardAgent' + i);
@@ -8354,117 +8489,194 @@ if (el) el.textContent = _aomData[i]?.name || 'Not set';
 const card = document.getElementById('aomAdminCard' + i);
 if (card) card.style.borderColor = _aomData[i]?.name ? 'rgba(59,130,246,.4)' : '';
 }
+renderAgentPhotoLockerList();
 }
-// ── Select a month to edit ────────────────────────────────────────────────
-function selectAomMonth(idx) {
+function renderAgentPhotoLockerList() {
+const list = document.getElementById('agentPhotoLibraryList');
+if (!list) return;
+const entries = Object.entries(_agentPhotoBins || {}).sort((a, b) => getAgentPhotoDisplayName(a[0], a[1]).localeCompare(getAgentPhotoDisplayName(b[0], b[1])));
+if (!entries.length) {
+list.innerHTML = '<div style="font-size:12px;color:var(--muted-2);font-style:italic;padding:8px 2px;">No agent photos saved yet.</div>';
+return;
+}
+list.innerHTML = entries.map(([key, entry]) => {
+const label = getAgentPhotoDisplayName(key, entry);
+return `<button type="button" onclick="useAgentPhotoLockerEntry(${JSON.stringify(label)})" style="text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">${label}</button>`;
+}).join('');
+}
+async function useAgentPhotoLockerEntry(name) {
+const photo = await jbLoadAgentPhotoByName(name);
+const libName = document.getElementById('agentPhotoLibraryName');
+if (libName) libName.value = name || '';
+_agentLibraryPhotoBase64 = photo || null;
+setAgentLibraryPreview(photo || null);
+if (_aomEditingMonth !== null) {
+const aomName = document.getElementById('aomAgentName');
+if (aomName && !aomName.value.trim()) aomName.value = name || '';
+_aomPhotoDirty = false;
+_aomPhotoBase64 = photo || null;
+setAomPreview(photo || null);
+}
+}
+async function tryAutoPullAomPhotoFromLocker(forceClear = false) {
+if (_aomPhotoDirty) return;
+const name = document.getElementById('aomAgentName')?.value?.trim() || '';
+if (!name) {
+if (forceClear) { _aomPhotoBase64 = null; setAomPreview(null); }
+return;
+}
+const photo = getAgentPhotoFromLockerSync(name) || await jbLoadAgentPhotoByName(name);
+_aomPhotoBase64 = photo || null;
+setAomPreview(_aomPhotoBase64);
+}
+async function selectAomMonth(idx) {
 _aomEditingMonth = idx;
+_aomPhotoDirty = false;
 _aomPhotoBase64 = null;
-// Highlight selected
 document.querySelectorAll('.aom-admin-month-card').forEach(c => c.classList.remove('selected'));
 const sel = document.getElementById('aomAdminCard' + idx);
 if (sel) sel.classList.add('selected');
-// Show edit form
 const form = document.getElementById('aomEditForm');
 if (form) form.style.display = 'block';
 const title = document.getElementById('aomEditTitle');
 if (title) title.textContent = 'Editing: ' + AOM_MONTHS[idx];
-// Populate fields
 const d = _aomData[idx] || {};
 const sv = (id, val) => { const e = document.getElementById(id); if (e) e.value = val || ''; };
 sv('aomAgentName', d.name);
 sv('aomAgentStat', d.stat);
 sv('aomAgentNote', d.note);
-// Photo preview
-const preview = document.getElementById('aomPhotoMiniPreview');
-const hint = document.getElementById('aomPhotoUploadHint');
-const zone = document.getElementById('aomPhotoUploadZone');
-if (d.photo) {
-_aomPhotoBase64 = d.photo;
-if (preview) { preview.src = d.photo; preview.classList.add('visible'); }
-if (hint) hint.style.display = 'none';
-if (zone) zone.classList.add('has-photo');
-} else {
-if (preview) { preview.src = ''; preview.classList.remove('visible'); }
-if (hint) hint.style.display = '';
-if (zone) zone.classList.remove('has-photo');
+const lockerName = document.getElementById('agentPhotoLibraryName');
+if (lockerName && d.name) lockerName.value = d.name;
+const resolvedPhoto = getResolvedAomPhoto(d) || (d.name ? await jbLoadAgentPhotoByName(d.photo_agent_name || d.name) : null);
+_aomPhotoBase64 = resolvedPhoto || null;
+setAomPreview(_aomPhotoBase64);
+if (d.name) {
+const libPhoto = getAgentPhotoFromLockerSync(d.name) || await jbLoadAgentPhotoByName(d.name);
+if (libPhoto) {
+_agentLibraryPhotoBase64 = libPhoto;
+setAgentLibraryPreview(libPhoto);
+}
 }
 form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
-// ── Handle photo upload ────────────────────────────────────────────────────
 function handleAomPhoto(file) {
 if (!file) return;
 const reader = new FileReader();
 reader.onload = e => {
 _aomPhotoBase64 = e.target.result;
-const preview = document.getElementById('aomPhotoMiniPreview');
-const hint = document.getElementById('aomPhotoUploadHint');
-const zone = document.getElementById('aomPhotoUploadZone');
-if (preview) { preview.src = _aomPhotoBase64; preview.classList.add('visible'); }
-if (hint) hint.style.display = 'none';
-if (zone) zone.classList.add('has-photo');
+_aomPhotoDirty = true;
+setAomPreview(_aomPhotoBase64);
 };
 reader.readAsDataURL(file);
 }
-// Drag and drop on aom photo zone
-document.addEventListener('DOMContentLoaded', () => {
-const zone = document.getElementById('aomPhotoUploadZone');
-if (!zone) return;
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent-2)'; });
-zone.addEventListener('dragleave', () => zone.style.borderColor = '');
-zone.addEventListener('drop', e => {
-e.preventDefault(); zone.style.borderColor = '';
-const file = e.dataTransfer.files[0];
-if (file && file.type.startsWith('image/')) handleAomPhoto(file);
-});
-// initAom() is called by jbInit() — do NOT call it here or it overwrites cloud photos
-});
-// ── Save month ─────────────────────────────────────────────────────────────
+function handleAgentPhotoLibraryUpload(file) {
+if (!file) return;
+const reader = new FileReader();
+reader.onload = e => {
+_agentLibraryPhotoBase64 = e.target.result;
+setAgentLibraryPreview(_agentLibraryPhotoBase64);
+};
+reader.readAsDataURL(file);
+}
+async function saveAgentPhotoLibraryEntry() {
+const name = document.getElementById('agentPhotoLibraryName')?.value?.trim() || '';
+if (!name) { showSnuToast('⚠ Enter an agent name for the Photo Locker.'); return; }
+if (!_agentLibraryPhotoBase64) { showSnuToast('⚠ Upload a photo to save into the Photo Locker.'); return; }
+showSnuToast('⏳ Saving photo to Agent Photo Locker…');
+const ok = await jbSaveAgentPhotoByName(name, _agentLibraryPhotoBase64);
+if (!ok) { showSnuToast('⚠ Photo Locker save failed.'); return; }
+const fresh = getAgentPhotoFromLockerSync(name) || _agentLibraryPhotoBase64;
+_agentLibraryPhotoBase64 = fresh;
+setAgentLibraryPreview(fresh);
+renderAgentPhotoLockerList();
+if (_aomEditingMonth !== null) {
+const aomName = document.getElementById('aomAgentName');
+if (aomName && aomName.value.trim().toLowerCase() === name.trim().toLowerCase()) {
+_aomPhotoDirty = false;
+_aomPhotoBase64 = fresh;
+setAomPreview(fresh);
+}
+}
+showSnuToast('☁️ Agent Photo Locker updated for ' + name + '.');
+}
 async function saveAomMonth() {
 if (_aomEditingMonth === null) return;
 const gv = id => document.getElementById(id)?.value?.trim() || '';
 const name = gv('aomAgentName');
 if (!name) { showSnuToast('⚠ Please enter an agent name.'); return; }
+if (_aomPhotoDirty && _aomPhotoBase64) {
+showSnuToast('⏳ Saving photo to Agent Photo Locker…');
+const okPhoto = await jbSaveAgentPhotoByName(name, _aomPhotoBase64);
+if (!okPhoto) { showSnuToast('⚠ Agent photo failed to save. Month not updated.'); return; }
+_aomPhotoDirty = false;
+_aomPhotoBase64 = getAgentPhotoFromLockerSync(name) || _aomPhotoBase64;
+setAomPreview(_aomPhotoBase64);
+const lockerName = document.getElementById('agentPhotoLibraryName');
+if (lockerName) lockerName.value = name;
+_agentLibraryPhotoBase64 = _aomPhotoBase64;
+setAgentLibraryPreview(_agentLibraryPhotoBase64);
+}
 _aomData[_aomEditingMonth] = {
-name, stat: gv('aomAgentStat'),
+name,
+stat: gv('aomAgentStat'),
 note: gv('aomAgentNote'),
-photo: _aomPhotoBase64 || null
+photo: null,
+photo_agent_name: name
 };
 try {
-localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
-} catch(e) {
 const slim = {};
-for (const k in _aomData) slim[k] = { ..._aomData[k], photo: null };
+for (const k in _aomData) slim[k] = _aomData[k] ? { ..._aomData[k], photo: null } : null;
 localStorage.setItem(AOM_KEY, JSON.stringify(slim));
-showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.');
-}
+} catch(e) {}
 renderAllAomCards();
 refreshAomAdminPicker();
-showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '...');
-console.log('[AOM SAVE] Month:', _aomEditingMonth, 'Data:', JSON.stringify(_aomData[_aomEditingMonth]));
+showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '…');
 if (typeof jbSave === 'function') {
 const ok = await jbSave('snu_aom', _aomData);
 if (!ok) showSnuToast('⚠ Cloud sync failed — saved locally only. Try Sync All.');
 }
 }
-// ── Clear month ─────────────────────────────────────────────────────────────
 function clearAomMonth() {
 if (_aomEditingMonth === null) return;
 delete _aomData[_aomEditingMonth];
-localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
+try { localStorage.setItem(AOM_KEY, JSON.stringify(_aomData)); } catch(e) {}
 if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
 _aomPhotoBase64 = null;
+_aomPhotoDirty = false;
 renderAllAomCards();
 refreshAomAdminPicker();
-// Reset form
 ['aomAgentName','aomAgentStat','aomAgentNote'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
-const preview = document.getElementById('aomPhotoMiniPreview');
-const hint = document.getElementById('aomPhotoUploadHint');
-const zone = document.getElementById('aomPhotoUploadZone');
-if (preview) { preview.src=''; preview.classList.remove('visible'); }
-if (hint) hint.style.display = '';
-if (zone) zone.classList.remove('has-photo');
+setAomPreview(null);
 showSnuToast('🗑 ' + AOM_MONTHS[_aomEditingMonth] + ' cleared.');
 }
+document.addEventListener('DOMContentLoaded', () => {
+const aomZone = document.getElementById('aomPhotoUploadZone');
+if (aomZone) {
+aomZone.addEventListener('dragover', e => { e.preventDefault(); aomZone.style.borderColor = 'var(--accent-2)'; });
+aomZone.addEventListener('dragleave', () => aomZone.style.borderColor = '');
+aomZone.addEventListener('drop', e => {
+e.preventDefault(); aomZone.style.borderColor = '';
+const file = e.dataTransfer.files[0];
+if (file && file.type.startsWith('image/')) handleAomPhoto(file);
+});
+}
+const libZone = document.getElementById('agentPhotoLibraryUploadZone');
+if (libZone) {
+libZone.addEventListener('dragover', e => { e.preventDefault(); libZone.style.borderColor = 'var(--accent-2)'; });
+libZone.addEventListener('dragleave', () => libZone.style.borderColor = '');
+libZone.addEventListener('drop', e => {
+e.preventDefault(); libZone.style.borderColor = '';
+const file = e.dataTransfer.files[0];
+if (file && file.type.startsWith('image/')) handleAgentPhotoLibraryUpload(file);
+});
+}
+const aomName = document.getElementById('aomAgentName');
+if (aomName) {
+aomName.addEventListener('change', () => { _aomPhotoDirty = false; tryAutoPullAomPhotoFromLocker(true); });
+aomName.addEventListener('blur', () => { _aomPhotoDirty = false; tryAutoPullAomPhotoFromLocker(true); });
+}
+// initAom() is called by jbInit() — do NOT call it here or it overwrites cloud photos
+});
 </script>
 <script id="updates-script">
 // ── UPDATES (JSONBin backend) ──────────────────────────────────────────────
@@ -9595,21 +9807,8 @@ if (w) setTimeout(() => w.print(), 800);
 }
 }
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeRoleplay(); closeScoreModal(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); if (typeof closeScoreModal === 'function') closeScoreModal(); } });
 </script>
-</div>
-</div>
-</div>
-<button class="roleplay-close" onclick="closeRoleplay()">✕</button>
-</div>
-<div class="roleplay-messages" id="roleplayMessages" style="display:none;"></div>
-<div class="roleplay-input-row" style="display:none;">
-<textarea class="roleplay-input" id="roleplayInput" placeholder="Type your response…" rows="2"
-onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRoleplayMessage();}"></textarea>
-<button class="roleplay-send-btn" id="roleplaySendBtn" onclick="sendRoleplayMessage()">Send ↑</button>
-</div>
-</div>
-</div>
 <script id="new-features-script">
 // ── VIDEO SEARCH ──────────────────────────────────────────────────────────
 function filterVideos(query) {
