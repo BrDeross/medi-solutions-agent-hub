@@ -4471,15 +4471,21 @@ Agent Command Center
 <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
 <div>
 <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:6px;">🤖 AI Consumer Roleplay</div>
-<div style="font-size:13.5px;color:var(--muted);margin-bottom:10px;">Practice live client scenarios with an AI-powered Medicare consumer. Available via ChatGPT.</div>
-<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:6px 14px;">
-<span style="font-size:16px;">📱</span>
-<span style="font-size:12px;font-weight:700;color:var(--gold);">Only use the Roleplay tool from a mobile phone.</span>
+<div style="font-size:13.5px;color:var(--muted);margin-bottom:10px;">Practice live client scenarios with the current GPT sales simulator. Use this launcher for Medicare, life, annuity, and ancillary practice.</div>
+<div style="display:flex;flex-direction:column;gap:10px;">
+<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.28);border-radius:8px;padding:6px 14px;width:fit-content;">
+<span style="font-size:16px;">📨</span>
+<span style="font-size:12px;font-weight:700;color:var(--accent-2);">Completed scorecards are sent from the live GPT workflow.</span>
+</div>
+<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:6px 14px;width:fit-content;">
+<span style="font-size:16px;">✅</span>
+<span style="font-size:12px;font-weight:700;color:var(--gold);">Use the launch button below so every agent opens the same current GPT.</span>
+</div>
 </div>
 </div>
 <a href="https://chatgpt.com/g/g-69bbfe5f216c8191b29ee1b3b3f98d97-consumer-roleplay-simulator" target="_blank" rel="noopener"
 style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--accent);border-radius:14px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 4px 20px rgba(59,130,246,.4);white-space:nowrap;flex-shrink:0;">
-🚀 Launch GPT Roleplay
+🚀 Open Current Sales Simulator GPT
 </a>
 </div>
 </div>
@@ -9593,21 +9599,13 @@ if (w) setTimeout(() => w.print(), 800);
 }
 }
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeRoleplay(); closeScoreModal(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); } });
 </script>
-</div>
-</div>
-</div>
-<button class="roleplay-close" onclick="closeRoleplay()">✕</button>
-</div>
-<div class="roleplay-messages" id="roleplayMessages" style="display:none;"></div>
-<div class="roleplay-input-row" style="display:none;">
-<textarea class="roleplay-input" id="roleplayInput" placeholder="Type your response…" rows="2"
-onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRoleplayMessage();}"></textarea>
-<button class="roleplay-send-btn" id="roleplaySendBtn" onclick="sendRoleplayMessage()">Send ↑</button>
-</div>
-</div>
-</div>
+<script>
+function closeRoleplay() { return; }
+function closeScoreModal() { return; }
+function sendRoleplayMessage() { return; }
+</script>
 <script id="new-features-script">
 // ── VIDEO SEARCH ──────────────────────────────────────────────────────────
 function filterVideos(query) {
