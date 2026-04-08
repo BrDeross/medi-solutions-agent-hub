@@ -6209,29 +6209,52 @@ if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cl
 // ── Save a field ──────────────────────────────────────────────
 window.jbSave = async function(field, value) {
 const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
-if (lsMap[field]) { try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {} }
-// Save photos to photo bin
+// Strip photos before localStorage to avoid quota issues
+if (field === 'snu_aom' && lsMap[field]) {
+try {
+const slim = {};
+for (const k in value) slim[k] = value[k] ? { ...value[k], photo: null } : null;
+localStorage.setItem(lsMap[field], JSON.stringify(slim));
+} catch(e) {}
+} else if (lsMap[field]) {
+try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {}
+}
+// Save photos to photo bin (await to ensure completion)
+try {
 if (field === 'snu_spotlight') {
 const aom = (() => { try { return JSON.parse(localStorage.getItem('snu_aom_v1')||'{}'); } catch(e){return{};} })();
-jbSavePhotos(value?.photo||null, aom);
+await jbSavePhotos(value?.photo||null, aom);
 }
 if (field === 'snu_aom') {
 const sp = (() => { try { return JSON.parse(localStorage.getItem('snu_spotlight_v1')||'{}'); } catch(e){return{};} })();
-jbSavePhotos(sp?.photo||null, value);
+await jbSavePhotos(sp?.photo||null, value);
 }
+} catch(e) { console.error('[JB] Photo save error:', e); }
+// Save text data to main bin (photos stripped)
+try {
 const latest = (await jbReadBin(JB_MAIN_BIN)) || {...JB_EMPTY};
-latest[field] = value;
-// Keep photos in _jbRecord so print modal can access them
-if (field === 'snu_spotlight' && value?.photo) {
-latest.snu_spotlight = { ...value };
-}
+// Strip photos before setting on latest to keep payload small
 if (field === 'snu_aom') {
-latest.snu_aom = { ...value };
+const stripped = {};
+for (const k in value) stripped[k] = value[k] ? { ...value[k], photo: null } : null;
+latest.snu_aom = stripped;
+} else if (field === 'snu_spotlight') {
+latest.snu_spotlight = value?.photo ? { ...value, photo: null } : value;
+} else {
+latest[field] = value;
 }
 window._jbRecord = latest;
+// Keep photos in _jbRecord for print modal
+if (field === 'snu_aom') window._jbRecord.snu_aom = { ...value };
+if (field === 'snu_spotlight' && value?.photo) window._jbRecord.snu_spotlight = { ...value };
 const ok = await jbWriteBin(JB_MAIN_BIN, jbStripPhotos(latest));
 if (typeof showSnuToast === 'function') showSnuToast(ok ? '☁️ Synced to cloud!' : '⚠️ Cloud sync failed — saved locally only.');
 return ok;
+} catch(e) {
+console.error('[JB] Main bin save error:', e);
+if (typeof showSnuToast === 'function') showSnuToast('⚠️ Cloud sync failed — ' + e.message);
+return false;
+}
 };
 // ── Sync everything at once ───────────────────────────────────
 window.syncAllToCloud = async function() {
