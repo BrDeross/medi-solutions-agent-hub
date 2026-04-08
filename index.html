@@ -6134,24 +6134,31 @@ img.src = base64;
 // ── Save photos to photo bin ──────────────────────────────────
 async function jbSavePhotos(spPhoto, aomData) {
 const id = await jbGetPhotoBinId();
-if (!id) return false;
-// Read existing photos first to avoid overwriting other months
+if (!id) { console.error('[JB PHOTO] No photo bin ID'); return false; }
 let existing = {};
-try { existing = (await jbReadBin(id)) || {}; } catch(e) {}
+try { existing = (await jbReadBin(id)) || {}; } catch(e) { console.error('[JB PHOTO] Read failed:', e); }
 const existingAom = existing.aom || {};
-// Merge: keep existing photos, overwrite only months that have new photos
 const aomPhotos = { ...existingAom };
 if (aomData) for (const k in aomData) {
 if (aomData[k]?.photo) {
+// Skip re-compressing if photo is identical to what's already in the bin
+if (existingAom[k] && existingAom[k] === aomData[k].photo) {
+console.log('[JB PHOTO] Month', k, 'unchanged, skipping');
+} else {
 aomPhotos[k] = await compressPhoto(aomData[k].photo);
+console.log('[JB PHOTO] Month', k, 'compressed, size:', aomPhotos[k].length);
+}
 } else if (aomData[k] && !aomData[k].name) {
-// Month was cleared — remove photo
 delete aomPhotos[k];
 }
 }
-// For spotlight: use new if provided, otherwise keep existing
 const finalSpotlight = spPhoto ? await compressPhoto(spPhoto) : (existing.spotlight || null);
-return jbWriteBin(id, { spotlight: finalSpotlight, aom: aomPhotos });
+const payload = { spotlight: finalSpotlight, aom: aomPhotos };
+console.log('[JB PHOTO] Saving — aom keys:', Object.keys(aomPhotos).join(','), 'payload size:', JSON.stringify(payload).length);
+const ok = await jbWriteBin(id, payload);
+console.log('[JB PHOTO] Write result:', ok);
+if (!ok && typeof showSnuToast === 'function') showSnuToast('⚠️ Photo cloud save failed — photo may not appear on other devices.');
+return ok;
 }
 // ── Load photos from photo bin ────────────────────────────────
 async function jbLoadPhotos() {
@@ -6170,6 +6177,7 @@ window._jbRecord = null;
 window.jbInit = async function() {
 const [record, photos] = await Promise.all([ jbReadBin(JB_MAIN_BIN), jbLoadPhotos() ]);
 if (!record) { console.warn('[JB] No cloud data'); return; }
+console.log('[JB LOAD] Photo bin result:', photos ? 'aom keys: ' + Object.keys(photos.aom || {}).join(',') + ', spotlight: ' + (photos.spotlight ? 'yes' : 'no') : 'NULL');
 if (photos) {
 if (photos.spotlight && record.snu_spotlight) record.snu_spotlight.photo = photos.spotlight;
 if (photos.aom && record.snu_aom) for (const k in photos.aom) {
