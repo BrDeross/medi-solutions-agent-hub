@@ -8395,7 +8395,7 @@ e.preventDefault(); zone.style.borderColor = '';
 const file = e.dataTransfer.files[0];
 if (file && file.type.startsWith('image/')) handleAomPhoto(file);
 });
-initAom();
+// initAom() is called by jbInit() — do NOT call it here or it overwrites cloud photos
 });
 // ── Save month ─────────────────────────────────────────────────────────────
 async function saveAomMonth() {
