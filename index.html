@@ -6193,6 +6193,8 @@ if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
 // Use _jbRecord (has photos) to populate _aomData directly
 if (typeof initAom === 'function') {
 initAom();
+console.log('[JB LOAD] AOM from cloud:', record.snu_aom ? Object.keys(record.snu_aom).map(k => k + ':' + (record.snu_aom[k]?.name || 'no-name') + (record.snu_aom[k]?.photo ? '+photo' : '')).join(', ') : 'empty');
+console.log('[JB LOAD] _aomData after initAom:', typeof _aomData !== 'undefined' ? Object.keys(_aomData).map(k => k + ':' + (_aomData[k]?.name || 'no-name')).join(', ') : 'undefined');
 // Overlay photos from _jbRecord onto _aomData
 if (record.snu_aom && typeof _aomData !== 'undefined') {
 for (const k in record.snu_aom) {
@@ -8384,7 +8386,8 @@ showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.'
 }
 renderAllAomCards();
 refreshAomAdminPicker();
-showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ' to cloud...');
+showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '...');
+console.log('[AOM SAVE] Month:', _aomEditingMonth, 'Data:', JSON.stringify(_aomData[_aomEditingMonth]));
 if (typeof jbSave === 'function') {
 const ok = await jbSave('snu_aom', _aomData);
 if (!ok) showSnuToast('⚠ Cloud sync failed — saved locally only. Try Sync All.');
