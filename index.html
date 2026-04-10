@@ -4022,6 +4022,7 @@ cursor: pointer; white-space: nowrap;
 <a href="#libraries">Libraries</a>
 <a href="#updates">Updates</a>
 <a href="#leaderboard">Leaderboard</a>
+<a href="#ytd-board">📊 YTD</a>
 <a href="#video-library">Videos</a>
 <a href="#practice-client">🎯 Practice</a>
 <a href="#trip-tracker">🏝️ Trip</a>
@@ -4085,6 +4086,7 @@ cursor: pointer; white-space: nowrap;
 <a href="#libraries" onclick="closeNav()">📖 Libraries</a>
 <a href="#updates" onclick="closeNav()">📡 Updates</a>
 <a href="#leaderboard" onclick="closeNav()">🏆 Leaderboard</a>
+<a href="#ytd-board" onclick="closeNav()">📊 YTD</a>
 <a href="#video-library" onclick="closeNav()">🎬 Videos</a>
 <a href="#practice-client" onclick="closeNav()">🎯 Practice</a>
 <a href="#trip-tracker" onclick="closeNav()">🏝️ Trip</a>
@@ -4618,6 +4620,27 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 </section>
+<!-- YEAR-TO-DATE PRODUCTION -->
+<section class="section" id="ytd-board">
+<div class="wrap">
+<div class="section-head">
+<div class="sh-left">
+<div class="sh-icon" style="background:rgba(59,130,246,.16);color:var(--accent-2);">📊</div>
+<div>
+<h2>Year-to-Date Production</h2>
+<p>Monthly production by agent across the full year</p>
+</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+<span class="count-chip" id="ytdYearChip">YTD</span>
+<span class="count-chip" id="ytdAgentCount">0 agents</span>
+</div>
+</div>
+<div id="ytdBoardContent">
+<div class="trip-empty">No year-to-date data yet — upload a CSV in Admin to get started.</div>
+</div>
+</div>
+</section>
 <!-- INCENTIVE TRIP TRACKER -->
 <section class="section" id="trip-tracker">
 <div class="wrap">
@@ -4854,6 +4877,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <button class="admin-tab" onclick="switchAdminTab('updates',this)">📡 Updates Feed</button>
 <button class="admin-tab" onclick="switchAdminTab('videos',this)">🎬 Videos</button>
 <button class="admin-tab" onclick="switchAdminTab('trip',this)">🏝️ Trip</button>
+<button class="admin-tab" onclick="switchAdminTab('ytd',this)">📊 YTD</button>
 <button class="admin-tab" onclick="switchAdminTab('friday',this)">📅 Meetings</button>
 <button class="admin-tab" onclick="switchAdminTab('certs',this)">🎓 Certs</button>
 <button class="admin-tab" onclick="switchAdminTab('alliance',this)">🤝 Alliance</button>
@@ -5239,7 +5263,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div class="admin-week-row" style="margin-bottom:10px;">
 <div class="admin-field">
 <label>Agent Name</label>
-<input class="admin-input" id="aomAgentName" placeholder="Jane Smith" onchange="tryAutoPullAomPhotoFromLocker(true)" onblur="tryAutoPullAomPhotoFromLocker(true)">
+<input class="admin-input" id="aomAgentName" placeholder="Jane Smith">
 </div>
 <div class="admin-field">
 <label>Production / Stat</label>
@@ -5254,25 +5278,6 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <button class="admin-save-btn" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="saveAomMonth()">💾 Save Month</button>
 <button class="admin-save-btn" style="flex:0 0 auto;width:auto;padding:10px 16px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.35);color:#f87171;" onclick="clearAomMonth()">🗑 Clear</button>
 </div>
-</div>
-<hr class="admin-divider">
-<div class="admin-section-title">🖼️ Agent Photo Locker</div>
-<p style="font-size:12px;color:var(--muted-2);margin-bottom:12px;">Upload one agent photo once. Agent of the Month will automatically pull the saved photo whenever the agent name matches.</p>
-<div class="admin-field" style="margin-bottom:10px;">
-<label>Agent Name</label>
-<input class="admin-input" id="agentPhotoLibraryName" placeholder="Jane Smith">
-</div>
-<div class="aom-photo-upload" id="agentPhotoLibraryUploadZone" onclick="document.getElementById('agentPhotoLibraryInput').click()">
-<img class="aom-photo-mini-preview" id="agentPhotoLibraryPreview" src="" alt="">
-<div id="agentPhotoLibraryUploadHint">
-<div class="aom-photo-upload-text">📷 Drop or <span>click to upload</span> a library photo</div>
-</div>
-<input type="file" id="agentPhotoLibraryInput" accept="image/*" style="display:none" onchange="handleAgentPhotoLibraryUpload(this.files[0])">
-</div>
-<div style="display:flex;gap:10px;margin-bottom:12px;">
-<button class="admin-save-btn" style="flex:1;background:linear-gradient(135deg,#0ea5e9,#2563eb);" onclick="saveAgentPhotoLibraryEntry()">💾 Save to Photo Locker</button>
-</div>
-<div id="agentPhotoLibraryList" style="display:grid;gap:8px;"></div>
 </div>
 </div>
 </div><!-- /adminTabAom -->
@@ -5527,6 +5532,33 @@ Preview — <span id="tripPreviewCount">0</span> agents
 </div>
 </div>
 <!-- /adminTabVideos -->
+<div id="adminTabYtd" class="admin-tab-panel">
+<div class="admin-body">
+<div class="admin-section-title">📊 Year-to-Date Production</div>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
+Upload a CSV or Excel file with one row per agent and one column per month. Required: <code>Name</code> or <code>Agent</code>. Month columns can be <code>Jan</code> through <code>Dec</code> or full month names.
+</p>
+<div class="admin-field" style="margin-bottom:14px;max-width:220px;">
+<label>Reporting Year</label>
+<input class="admin-input" id="ytdYearInput" type="text" placeholder="2026">
+</div>
+<div class="csv-drop-zone" id="ytdCsvDrop" onclick="document.getElementById('ytdCsvInput').click()">
+<div class="csv-drop-icon">📂</div>
+<div class="csv-drop-text">Drop CSV/Excel here or <span>click to browse</span></div>
+<div class="csv-drop-hint">Columns: <code>Name</code>, <code>Jan</code>…<code>Dec</code> (or full month names)</div>
+<input type="file" id="ytdCsvInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleYtdCsvFile(this.files[0])">
+</div>
+<div class="csv-status" id="ytdCsvStatus"></div>
+<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+<button class="admin-save-btn" onclick="saveYtdData()">💾 Save &amp; Publish</button>
+<button class="admin-save-btn" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#ef4444;" onclick="clearYtdData()">🗑️ Clear YTD Data</button>
+</div>
+<div id="ytdAdminPreview" style="margin-top:20px;display:none;">
+<div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">Preview — <span id="ytdPreviewCount">0</span> agents loaded</div>
+<div id="ytdPreviewRows" style="max-height:260px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px 12px;"></div>
+</div>
+</div>
+</div>
 <div id="adminTabCerts" class="admin-tab-panel">
 <div class="admin-section-title">🎓 Carrier Certification Tracker</div>
 <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
@@ -6100,7 +6132,7 @@ const JB_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96o
 const JB_BASE = 'https://api.jsonbin.io/v3';
 const JB_MAIN_BIN = '69b2cd77aa77b81da9dbc6e6';
 // Photo bin constants removed — photos now stored in Supabase hub_photos table
-const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}}, snu_agent_photo_bins:{} };
+const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
 // ── Generic bin helpers ────────────────────────────────────────
 async function jbReadBin(id) {
 try {
@@ -6211,83 +6243,6 @@ if (Array.isArray(c.snu_updates)) c.snu_updates = c.snu_updates.map(u => ({...u,
 return c;
 }
 window._jbRecord = null;
-let _agentPhotoBins = {};
-let _agentPhotoCache = {};
-function normalizeAgentPhotoKey(name) {
-const clean = String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
-return clean;
-}
-function humanizeAgentPhotoKey(key) {
-return String(key || '').split(' ').map(part => part ? part.charAt(0).toUpperCase() + part.slice(1) : '').join(' ');
-}
-function getAgentPhotoBinId(entry) {
-if (!entry) return null;
-if (typeof entry === 'string') return entry;
-if (entry && typeof entry === 'object') return entry.bin_id || entry.id || null;
-return null;
-}
-function getAgentPhotoDisplayName(key, entry) {
-if (entry && typeof entry === 'object' && entry.agent_name) return entry.agent_name;
-return humanizeAgentPhotoKey(key);
-}
-function getAgentPhotoFromLockerSync(name) {
-const key = normalizeAgentPhotoKey(name);
-return key ? (_agentPhotoCache[key] || null) : null;
-}
-async function jbLoadAgentPhotoByName(name) {
-const key = normalizeAgentPhotoKey(name);
-if (!key) return null;
-if (_agentPhotoCache[key]) return _agentPhotoCache[key];
-const entry = _agentPhotoBins[key];
-const binId = getAgentPhotoBinId(entry);
-if (!binId) return null;
-try {
-const rec = await jbReadBin(binId);
-const photo = rec?.photo || null;
-if (photo) _agentPhotoCache[key] = photo;
-return photo;
-} catch(e) {
-console.error('[AOM PHOTO LOCKER] Load failed:', e);
-return null;
-}
-}
-async function jbSaveAgentPhotoByName(name, base64) {
-const key = normalizeAgentPhotoKey(name);
-if (!key || !base64) return false;
-const compressed = await compressPhoto(base64, 260);
-let entry = _agentPhotoBins[key] || null;
-let binId = getAgentPhotoBinId(entry);
-let ok = false;
-const record = { agent_name: String(name || '').trim(), photo: compressed, updated_at: new Date().toISOString() };
-try {
-if (binId) {
-ok = await jbWriteBin(binId, record);
-} else {
-binId = await jbCreateBin('medi-agent-photo-' + key.replace(/[^a-z0-9]+/g, '-').slice(0, 40), record);
-ok = !!binId;
-}
-if (!ok || !binId) return false;
-_agentPhotoBins[key] = { bin_id: binId, agent_name: record.agent_name };
-_agentPhotoCache[key] = compressed;
-if (window._jbRecord) window._jbRecord.snu_agent_photo_bins = { ..._agentPhotoBins };
-try { localStorage.setItem('snu_agent_photo_bins_v1', JSON.stringify(_agentPhotoBins)); } catch(e) {}
-return await jbSave('snu_agent_photo_bins', { ..._agentPhotoBins });
-} catch(e) {
-console.error('[AOM PHOTO LOCKER] Save failed:', e);
-return false;
-}
-}
-async function hydrateAomPhotosFromLocker(record) {
-if (!record?.snu_aom) return;
-const tasks = Object.keys(record.snu_aom).map(async k => {
-const row = record.snu_aom[k];
-if (!row?.name) return;
-if (row.photo) return;
-const photo = await jbLoadAgentPhotoByName(row.photo_agent_name || row.name);
-if (photo) row.photo = photo;
-});
-await Promise.all(tasks);
-}
 // ── Init: load main + photos in parallel, merge, render ───────
 window.jbInit = async function() {
 const [record, photos] = await Promise.all([ jbReadBin(JB_MAIN_BIN), jbLoadPhotos() ]);
@@ -6299,9 +6254,6 @@ if (photos.aom && record.snu_aom) for (const k in photos.aom) {
 if (record.snu_aom[k]) record.snu_aom[k].photo = photos.aom[k];
 }
 }
-record.snu_agent_photo_bins = record.snu_agent_photo_bins || {};
-_agentPhotoBins = { ...record.snu_agent_photo_bins };
-await hydrateAomPhotosFromLocker(record);
 window._jbRecord = record;
 try {
 if (record.snu_data && Object.keys(record.snu_data).length) localStorage.setItem('snu_data_v1', JSON.stringify(record.snu_data));
@@ -6313,7 +6265,6 @@ const aomSlim = {};
 for (const k in record.snu_aom) aomSlim[k] = record.snu_aom[k] ? { ...record.snu_aom[k], photo: null } : null;
 localStorage.setItem('snu_aom_v1', JSON.stringify(aomSlim));
 }
-if (record.snu_agent_photo_bins) localStorage.setItem('snu_agent_photo_bins_v1', JSON.stringify(record.snu_agent_photo_bins));
 } catch(e) { console.warn('[JB] localStorage write failed', e); }
 // snu_trip now handled by Supabase trip_tracker table
 if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
@@ -6335,7 +6286,7 @@ if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cl
 };
 // ── Save a field ──────────────────────────────────────────────
 window.jbSave = async function(field, value) {
-const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1', snu_agent_photo_bins:'snu_agent_photo_bins_v1' };
+const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
 // Strip photos before localStorage to avoid quota issues
 if (field === 'snu_aom' && lsMap[field]) {
 try {
@@ -6353,7 +6304,8 @@ const aom = (() => { try { return JSON.parse(localStorage.getItem('snu_aom_v1')|
 await jbSavePhotos(value?.photo||null, aom);
 }
 if (field === 'snu_aom') {
-// Agent of the Month photos now live in the Agent Photo Locker (per-agent bins)
+const sp = (() => { try { return JSON.parse(localStorage.getItem('snu_spotlight_v1')||'{}'); } catch(e){return{};} })();
+await jbSavePhotos(sp?.photo||null, value);
 }
 } catch(e) { console.error('[JB] Photo save error:', e); }
 // Save text data to main bin (photos stripped)
@@ -6387,10 +6339,10 @@ window.syncAllToCloud = async function() {
 const btn = document.querySelector('[onclick="syncAllToCloud()"]');
 if (btn) { btn.textContent = '⏳ Syncing…'; btn.disabled = true; }
 const g = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
-const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[], snu_agent_photo_bins: g('snu_agent_photo_bins_v1')||((window._jbRecord && window._jbRecord.snu_agent_photo_bins) || {}) };
+const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[] };
 const [ok] = await Promise.all([
 jbWriteBin(JB_MAIN_BIN, jbStripPhotos(record)),
-jbSavePhotos(record.snu_spotlight?.photo||null, null)
+jbSavePhotos(record.snu_spotlight?.photo||null, record.snu_aom)
 ]);
 window._jbRecord = record;
 if (btn) { btn.textContent = '🔄 Sync All Now'; btn.disabled = false; }
@@ -8393,59 +8345,19 @@ if (window._snuState) window._snuState.spotlight = data;
 <script id="aom-script">
 const AOM_KEY = 'snu_aom_v1';
 const AOM_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-let _aomData = {};
+let _aomData = {}; // { 0: {name,stat,note,photo}, 1: {...}, ... }
 let _aomEditingMonth = null;
 let _aomPhotoBase64 = null;
-let _aomPhotoDirty = false;
-let _agentLibraryPhotoBase64 = null;
-function deepCloneAomData(obj) {
-try { return JSON.parse(JSON.stringify(obj || {})); } catch(e) { return {}; }
-}
-function setAomPreview(photo) {
-const preview = document.getElementById('aomPhotoMiniPreview');
-const hint = document.getElementById('aomPhotoUploadHint');
-const zone = document.getElementById('aomPhotoUploadZone');
-if (photo) {
-if (preview) { preview.src = photo; preview.classList.add('visible'); }
-if (hint) hint.style.display = 'none';
-if (zone) zone.classList.add('has-photo');
-} else {
-if (preview) { preview.src = ''; preview.classList.remove('visible'); }
-if (hint) hint.style.display = '';
-if (zone) zone.classList.remove('has-photo');
-}
-}
-function setAgentLibraryPreview(photo) {
-const preview = document.getElementById('agentPhotoLibraryPreview');
-const hint = document.getElementById('agentPhotoLibraryUploadHint');
-const zone = document.getElementById('agentPhotoLibraryUploadZone');
-if (photo) {
-if (preview) { preview.src = photo; preview.classList.add('visible'); }
-if (hint) hint.style.display = 'none';
-if (zone) zone.classList.add('has-photo');
-} else {
-if (preview) { preview.src = ''; preview.classList.remove('visible'); }
-if (hint) hint.style.display = '';
-if (zone) zone.classList.remove('has-photo');
-}
-}
-function getResolvedAomPhoto(row) {
-if (!row) return null;
-return row.photo || getAgentPhotoFromLockerSync(row.photo_agent_name || row.name) || null;
-}
+// ── Load from storage and render all cards ───────────────────────────────
 function initAom() {
 try {
-if (window._jbRecord?.snu_aom && Object.keys(window._jbRecord.snu_aom).length) {
-_aomData = deepCloneAomData(window._jbRecord.snu_aom);
-} else {
 const raw = localStorage.getItem(AOM_KEY);
-_aomData = raw ? JSON.parse(raw) : {};
-}
+if (raw) _aomData = JSON.parse(raw);
 } catch(e) { _aomData = {}; }
 renderAllAomCards();
 refreshAomAdminPicker();
-renderAgentPhotoLockerList();
 }
+// ── Render a single dashboard card ───────────────────────────────────────
 function renderAomCard(monthIdx) {
 const card = document.getElementById('aomCard' + monthIdx);
 const photo = document.getElementById('aomPhotoWrap' + monthIdx);
@@ -8455,6 +8367,7 @@ if (!card) return;
 const now = new Date();
 const curMo = now.getMonth();
 const year = now.getFullYear();
+// Mark current month
 card.classList.toggle('current-month', monthIdx === curMo);
 card.classList.toggle('empty-month', !_aomData[monthIdx]);
 if (yearEl) yearEl.textContent = year;
@@ -8465,9 +8378,8 @@ info.innerHTML = '<div class="aom-empty-name">No agent selected</div>';
 return;
 }
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const resolvedPhoto = getResolvedAomPhoto(d);
-photo.innerHTML = resolvedPhoto
-? `<img class="aom-photo" src="${resolvedPhoto}" alt="${pesc(d.name)}">
+photo.innerHTML = d.photo
+? `<img class="aom-photo" src="${d.photo}" alt="${pesc(d.name)}">
 <div class="aom-photo-gradient"></div>
 <div class="aom-badge">🏆 Agent of the Month</div>
 <div class="aom-name-on-photo">
@@ -8475,6 +8387,7 @@ photo.innerHTML = resolvedPhoto
 </div>`
 : `<div style="font-size:48px;opacity:.6;display:flex;flex-direction:column;align-items:center;gap:8px;">👤<span style="font-size:13px;font-weight:700;color:#fff;opacity:1;font-style:normal;font-family:'Space Grotesk',sans-serif;">${pesc(d.name)}</span></div>`;
 info.innerHTML = `
+${!d.photo ? '' : ''}
 ${d.stat ? `<div class="aom-agent-stat">${pesc(d.stat)}</div>` : ''}
 ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
 `;
@@ -8482,6 +8395,7 @@ ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
 function renderAllAomCards() {
 for (let i = 0; i < 12; i++) renderAomCard(i);
 }
+// ── Refresh admin picker labels ───────────────────────────────────────────
 function refreshAomAdminPicker() {
 for (let i = 0; i < 12; i++) {
 const el = document.getElementById('aomAdminCardAgent' + i);
@@ -8489,194 +8403,117 @@ if (el) el.textContent = _aomData[i]?.name || 'Not set';
 const card = document.getElementById('aomAdminCard' + i);
 if (card) card.style.borderColor = _aomData[i]?.name ? 'rgba(59,130,246,.4)' : '';
 }
-renderAgentPhotoLockerList();
 }
-function renderAgentPhotoLockerList() {
-const list = document.getElementById('agentPhotoLibraryList');
-if (!list) return;
-const entries = Object.entries(_agentPhotoBins || {}).sort((a, b) => getAgentPhotoDisplayName(a[0], a[1]).localeCompare(getAgentPhotoDisplayName(b[0], b[1])));
-if (!entries.length) {
-list.innerHTML = '<div style="font-size:12px;color:var(--muted-2);font-style:italic;padding:8px 2px;">No agent photos saved yet.</div>';
-return;
-}
-list.innerHTML = entries.map(([key, entry]) => {
-const label = getAgentPhotoDisplayName(key, entry);
-return `<button type="button" onclick="useAgentPhotoLockerEntry(${JSON.stringify(label)})" style="text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">${label}</button>`;
-}).join('');
-}
-async function useAgentPhotoLockerEntry(name) {
-const photo = await jbLoadAgentPhotoByName(name);
-const libName = document.getElementById('agentPhotoLibraryName');
-if (libName) libName.value = name || '';
-_agentLibraryPhotoBase64 = photo || null;
-setAgentLibraryPreview(photo || null);
-if (_aomEditingMonth !== null) {
-const aomName = document.getElementById('aomAgentName');
-if (aomName && !aomName.value.trim()) aomName.value = name || '';
-_aomPhotoDirty = false;
-_aomPhotoBase64 = photo || null;
-setAomPreview(photo || null);
-}
-}
-async function tryAutoPullAomPhotoFromLocker(forceClear = false) {
-if (_aomPhotoDirty) return;
-const name = document.getElementById('aomAgentName')?.value?.trim() || '';
-if (!name) {
-if (forceClear) { _aomPhotoBase64 = null; setAomPreview(null); }
-return;
-}
-const photo = getAgentPhotoFromLockerSync(name) || await jbLoadAgentPhotoByName(name);
-_aomPhotoBase64 = photo || null;
-setAomPreview(_aomPhotoBase64);
-}
-async function selectAomMonth(idx) {
+// ── Select a month to edit ────────────────────────────────────────────────
+function selectAomMonth(idx) {
 _aomEditingMonth = idx;
-_aomPhotoDirty = false;
 _aomPhotoBase64 = null;
+// Highlight selected
 document.querySelectorAll('.aom-admin-month-card').forEach(c => c.classList.remove('selected'));
 const sel = document.getElementById('aomAdminCard' + idx);
 if (sel) sel.classList.add('selected');
+// Show edit form
 const form = document.getElementById('aomEditForm');
 if (form) form.style.display = 'block';
 const title = document.getElementById('aomEditTitle');
 if (title) title.textContent = 'Editing: ' + AOM_MONTHS[idx];
+// Populate fields
 const d = _aomData[idx] || {};
 const sv = (id, val) => { const e = document.getElementById(id); if (e) e.value = val || ''; };
 sv('aomAgentName', d.name);
 sv('aomAgentStat', d.stat);
 sv('aomAgentNote', d.note);
-const lockerName = document.getElementById('agentPhotoLibraryName');
-if (lockerName && d.name) lockerName.value = d.name;
-const resolvedPhoto = getResolvedAomPhoto(d) || (d.name ? await jbLoadAgentPhotoByName(d.photo_agent_name || d.name) : null);
-_aomPhotoBase64 = resolvedPhoto || null;
-setAomPreview(_aomPhotoBase64);
-if (d.name) {
-const libPhoto = getAgentPhotoFromLockerSync(d.name) || await jbLoadAgentPhotoByName(d.name);
-if (libPhoto) {
-_agentLibraryPhotoBase64 = libPhoto;
-setAgentLibraryPreview(libPhoto);
-}
+// Photo preview
+const preview = document.getElementById('aomPhotoMiniPreview');
+const hint = document.getElementById('aomPhotoUploadHint');
+const zone = document.getElementById('aomPhotoUploadZone');
+if (d.photo) {
+_aomPhotoBase64 = d.photo;
+if (preview) { preview.src = d.photo; preview.classList.add('visible'); }
+if (hint) hint.style.display = 'none';
+if (zone) zone.classList.add('has-photo');
+} else {
+if (preview) { preview.src = ''; preview.classList.remove('visible'); }
+if (hint) hint.style.display = '';
+if (zone) zone.classList.remove('has-photo');
 }
 form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+// ── Handle photo upload ────────────────────────────────────────────────────
 function handleAomPhoto(file) {
 if (!file) return;
 const reader = new FileReader();
 reader.onload = e => {
 _aomPhotoBase64 = e.target.result;
-_aomPhotoDirty = true;
-setAomPreview(_aomPhotoBase64);
+const preview = document.getElementById('aomPhotoMiniPreview');
+const hint = document.getElementById('aomPhotoUploadHint');
+const zone = document.getElementById('aomPhotoUploadZone');
+if (preview) { preview.src = _aomPhotoBase64; preview.classList.add('visible'); }
+if (hint) hint.style.display = 'none';
+if (zone) zone.classList.add('has-photo');
 };
 reader.readAsDataURL(file);
 }
-function handleAgentPhotoLibraryUpload(file) {
-if (!file) return;
-const reader = new FileReader();
-reader.onload = e => {
-_agentLibraryPhotoBase64 = e.target.result;
-setAgentLibraryPreview(_agentLibraryPhotoBase64);
-};
-reader.readAsDataURL(file);
-}
-async function saveAgentPhotoLibraryEntry() {
-const name = document.getElementById('agentPhotoLibraryName')?.value?.trim() || '';
-if (!name) { showSnuToast('⚠ Enter an agent name for the Photo Locker.'); return; }
-if (!_agentLibraryPhotoBase64) { showSnuToast('⚠ Upload a photo to save into the Photo Locker.'); return; }
-showSnuToast('⏳ Saving photo to Agent Photo Locker…');
-const ok = await jbSaveAgentPhotoByName(name, _agentLibraryPhotoBase64);
-if (!ok) { showSnuToast('⚠ Photo Locker save failed.'); return; }
-const fresh = getAgentPhotoFromLockerSync(name) || _agentLibraryPhotoBase64;
-_agentLibraryPhotoBase64 = fresh;
-setAgentLibraryPreview(fresh);
-renderAgentPhotoLockerList();
-if (_aomEditingMonth !== null) {
-const aomName = document.getElementById('aomAgentName');
-if (aomName && aomName.value.trim().toLowerCase() === name.trim().toLowerCase()) {
-_aomPhotoDirty = false;
-_aomPhotoBase64 = fresh;
-setAomPreview(fresh);
-}
-}
-showSnuToast('☁️ Agent Photo Locker updated for ' + name + '.');
-}
+// Drag and drop on aom photo zone
+document.addEventListener('DOMContentLoaded', () => {
+const zone = document.getElementById('aomPhotoUploadZone');
+if (!zone) return;
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent-2)'; });
+zone.addEventListener('dragleave', () => zone.style.borderColor = '');
+zone.addEventListener('drop', e => {
+e.preventDefault(); zone.style.borderColor = '';
+const file = e.dataTransfer.files[0];
+if (file && file.type.startsWith('image/')) handleAomPhoto(file);
+});
+// initAom() is called by jbInit() — do NOT call it here or it overwrites cloud photos
+});
+// ── Save month ─────────────────────────────────────────────────────────────
 async function saveAomMonth() {
 if (_aomEditingMonth === null) return;
 const gv = id => document.getElementById(id)?.value?.trim() || '';
 const name = gv('aomAgentName');
 if (!name) { showSnuToast('⚠ Please enter an agent name.'); return; }
-if (_aomPhotoDirty && _aomPhotoBase64) {
-showSnuToast('⏳ Saving photo to Agent Photo Locker…');
-const okPhoto = await jbSaveAgentPhotoByName(name, _aomPhotoBase64);
-if (!okPhoto) { showSnuToast('⚠ Agent photo failed to save. Month not updated.'); return; }
-_aomPhotoDirty = false;
-_aomPhotoBase64 = getAgentPhotoFromLockerSync(name) || _aomPhotoBase64;
-setAomPreview(_aomPhotoBase64);
-const lockerName = document.getElementById('agentPhotoLibraryName');
-if (lockerName) lockerName.value = name;
-_agentLibraryPhotoBase64 = _aomPhotoBase64;
-setAgentLibraryPreview(_agentLibraryPhotoBase64);
-}
 _aomData[_aomEditingMonth] = {
-name,
-stat: gv('aomAgentStat'),
+name, stat: gv('aomAgentStat'),
 note: gv('aomAgentNote'),
-photo: null,
-photo_agent_name: name
+photo: _aomPhotoBase64 || null
 };
 try {
+localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
+} catch(e) {
 const slim = {};
-for (const k in _aomData) slim[k] = _aomData[k] ? { ..._aomData[k], photo: null } : null;
+for (const k in _aomData) slim[k] = { ..._aomData[k], photo: null };
 localStorage.setItem(AOM_KEY, JSON.stringify(slim));
-} catch(e) {}
+showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.');
+}
 renderAllAomCards();
 refreshAomAdminPicker();
-showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '…');
+showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '...');
+console.log('[AOM SAVE] Month:', _aomEditingMonth, 'Data:', JSON.stringify(_aomData[_aomEditingMonth]));
 if (typeof jbSave === 'function') {
 const ok = await jbSave('snu_aom', _aomData);
 if (!ok) showSnuToast('⚠ Cloud sync failed — saved locally only. Try Sync All.');
 }
 }
+// ── Clear month ─────────────────────────────────────────────────────────────
 function clearAomMonth() {
 if (_aomEditingMonth === null) return;
 delete _aomData[_aomEditingMonth];
-try { localStorage.setItem(AOM_KEY, JSON.stringify(_aomData)); } catch(e) {}
+localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
 if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
 _aomPhotoBase64 = null;
-_aomPhotoDirty = false;
 renderAllAomCards();
 refreshAomAdminPicker();
+// Reset form
 ['aomAgentName','aomAgentStat','aomAgentNote'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
-setAomPreview(null);
+const preview = document.getElementById('aomPhotoMiniPreview');
+const hint = document.getElementById('aomPhotoUploadHint');
+const zone = document.getElementById('aomPhotoUploadZone');
+if (preview) { preview.src=''; preview.classList.remove('visible'); }
+if (hint) hint.style.display = '';
+if (zone) zone.classList.remove('has-photo');
 showSnuToast('🗑 ' + AOM_MONTHS[_aomEditingMonth] + ' cleared.');
 }
-document.addEventListener('DOMContentLoaded', () => {
-const aomZone = document.getElementById('aomPhotoUploadZone');
-if (aomZone) {
-aomZone.addEventListener('dragover', e => { e.preventDefault(); aomZone.style.borderColor = 'var(--accent-2)'; });
-aomZone.addEventListener('dragleave', () => aomZone.style.borderColor = '');
-aomZone.addEventListener('drop', e => {
-e.preventDefault(); aomZone.style.borderColor = '';
-const file = e.dataTransfer.files[0];
-if (file && file.type.startsWith('image/')) handleAomPhoto(file);
-});
-}
-const libZone = document.getElementById('agentPhotoLibraryUploadZone');
-if (libZone) {
-libZone.addEventListener('dragover', e => { e.preventDefault(); libZone.style.borderColor = 'var(--accent-2)'; });
-libZone.addEventListener('dragleave', () => libZone.style.borderColor = '');
-libZone.addEventListener('drop', e => {
-e.preventDefault(); libZone.style.borderColor = '';
-const file = e.dataTransfer.files[0];
-if (file && file.type.startsWith('image/')) handleAgentPhotoLibraryUpload(file);
-});
-}
-const aomName = document.getElementById('aomAgentName');
-if (aomName) {
-aomName.addEventListener('change', () => { _aomPhotoDirty = false; tryAutoPullAomPhotoFromLocker(true); });
-aomName.addEventListener('blur', () => { _aomPhotoDirty = false; tryAutoPullAomPhotoFromLocker(true); });
-}
-// initAom() is called by jbInit() — do NOT call it here or it overwrites cloud photos
-});
 </script>
 <script id="updates-script">
 // ── UPDATES (JSONBin backend) ──────────────────────────────────────────────
@@ -9807,8 +9644,21 @@ if (w) setTimeout(() => w.print(), 800);
 }
 }
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); if (typeof closeScoreModal === 'function') closeScoreModal(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeRoleplay(); closeScoreModal(); } });
 </script>
+</div>
+</div>
+</div>
+<button class="roleplay-close" onclick="closeRoleplay()">✕</button>
+</div>
+<div class="roleplay-messages" id="roleplayMessages" style="display:none;"></div>
+<div class="roleplay-input-row" style="display:none;">
+<textarea class="roleplay-input" id="roleplayInput" placeholder="Type your response…" rows="2"
+onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRoleplayMessage();}"></textarea>
+<button class="roleplay-send-btn" id="roleplaySendBtn" onclick="sendRoleplayMessage()">Send ↑</button>
+</div>
+</div>
+</div>
 <script id="new-features-script">
 // ── VIDEO SEARCH ──────────────────────────────────────────────────────────
 function filterVideos(query) {
@@ -10163,6 +10013,7 @@ const LAYOUT_SECTIONS = [
 { id: 'cert-tracker', label: '🎓 Cert Tracker' },
 { id: 'friday-meetings', label: '📅 Friday Meetings' },
 { id: 'leaderboard', label: '🏆 SNU / Leaderboard' },
+{ id: 'ytd-board', label: '📊 Year-to-Date' },
 { id: 'trip-tracker', label: '🏝️ Trip Tracker' },
 { id: 'industry-spotlight', label: '📰 Industry Spotlight' },
 { id: 'agent-spotlight', label: '⭐ Agent Spotlight' },
@@ -10539,6 +10390,291 @@ loadTileOrderFromCloud();
 startTileOrderLiveSync();
 });
 </script>
+<script id="ytd-tracker-script">
+// ── YEAR-TO-DATE PRODUCTION ──────────────────────────────────────────────
+const YTD_KEY = 'ytd_tracker_v1';
+const YTD_MONTHS = [
+  { key: 'Jan', aliases: ['jan', 'january'] },
+  { key: 'Feb', aliases: ['feb', 'february'] },
+  { key: 'Mar', aliases: ['mar', 'march'] },
+  { key: 'Apr', aliases: ['apr', 'april'] },
+  { key: 'May', aliases: ['may'] },
+  { key: 'Jun', aliases: ['jun', 'june'] },
+  { key: 'Jul', aliases: ['jul', 'july'] },
+  { key: 'Aug', aliases: ['aug', 'august'] },
+  { key: 'Sep', aliases: ['sep', 'sept', 'september'] },
+  { key: 'Oct', aliases: ['oct', 'october'] },
+  { key: 'Nov', aliases: ['nov', 'november'] },
+  { key: 'Dec', aliases: ['dec', 'december'] }
+];
+const YTD_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+const YTD_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+const YTD_HUB = 'medi';
+const YTD_TILE_KEY = 'ytd_tracker';
+let _ytdAgents = [];
+let _ytdMeta = {};
+function ytdEsc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function ytdNum(v) {
+  if (v == null) return 0;
+  const s = String(v).trim();
+  if (!s) return 0;
+  const cleaned = s.replace(/[$,%\s]/g, '').replace(/,/g, '').replace(/[()]/g, '');
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : 0;
+}
+function ytdSplitCsv(line) {
+  const out = [];
+  let cur = '', q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (q && line[i + 1] === '"') { cur += '"'; i++; }
+      else { q = !q; }
+    } else if (ch === ',' && !q) {
+      out.push(cur); cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
+function ytdNormalizePayload(raw) {
+  const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+  const agents = Array.isArray(d.agents) ? d.agents : [];
+  return {
+    agents: agents.map(a => {
+      const months = {};
+      YTD_MONTHS.forEach(m => { months[m.key] = ytdNum(a?.months?.[m.key] || a?.[m.key] || 0); });
+      const total = ytdNum(a?.total || Object.values(months).reduce((sum, n) => sum + (Number(n) || 0), 0));
+      return { name: String(a?.name || '').trim(), months, total };
+    }).filter(a => a.name),
+    meta: d.meta || {}
+  };
+}
+function ytdSetAdminFields() {
+  const yearEl = document.getElementById('ytdYearInput');
+  if (yearEl) yearEl.value = _ytdMeta.year || '';
+}
+function renderYtdBoard() {
+  const wrap = document.getElementById('ytdBoardContent');
+  const count = document.getElementById('ytdAgentCount');
+  const yearChip = document.getElementById('ytdYearChip');
+  if (!wrap) return;
+  if (count) count.textContent = _ytdAgents.length + ' agent' + (_ytdAgents.length !== 1 ? 's' : '');
+  if (yearChip) yearChip.textContent = _ytdMeta.year ? ('YTD ' + _ytdMeta.year) : 'YTD';
+  if (!_ytdAgents.length) {
+    wrap.innerHTML = '<div class="trip-empty">No year-to-date data yet — upload a CSV in Admin to get started.</div>';
+    return;
+  }
+  const totals = {};
+  YTD_MONTHS.forEach(m => totals[m.key] = 0);
+  let grandTotal = 0;
+  const rows = [..._ytdAgents].sort((a,b) => (Number(b.total) || 0) - (Number(a.total) || 0)).map(a => {
+    YTD_MONTHS.forEach(m => { totals[m.key] += ytdNum(a.months[m.key]); });
+    grandTotal += ytdNum(a.total);
+    const monthCells = YTD_MONTHS.map(m => `<td style="padding:8px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);font-family:'JetBrains Mono',monospace;font-size:12px;color:#e2e8f0;white-space:nowrap;">${ytdNum(a.months[m.key]).toLocaleString()}</td>`).join('');
+    return `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;font-weight:700;color:#fff;white-space:nowrap;">${ytdEsc(a.name)}</td>
+      ${monthCells}
+      <td style="padding:8px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:var(--accent-2);white-space:nowrap;">${ytdNum(a.total).toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+  const totalCells = YTD_MONTHS.map(m => `<td style="padding:9px 10px;text-align:right;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:#fff;white-space:nowrap;">${totals[m.key].toLocaleString()}</td>`).join('');
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;">
+      <div style="padding:10px 16px;font-size:12px;color:var(--muted-2);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);">${_ytdMeta.updatedAt ? 'Last updated: <strong style="color:var(--text);">' + new Date(_ytdMeta.updatedAt).toLocaleDateString() + '</strong>' : 'Upload a CSV in Admin to update this board.'}</div>
+      <table style="width:100%;border-collapse:collapse;min-width:1120px;">
+        <thead>
+          <tr>
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);position:sticky;left:0;z-index:1;">Agent</th>
+            ${YTD_MONTHS.map(m => `<th style="padding:10px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);white-space:nowrap;">${m.key}</th>`).join('')}
+            <th style="padding:10px 12px;text-align:right;font-size:10px;font-weight:700;color:var(--accent-2);border-bottom:1px solid var(--border);background:rgba(59,130,246,.08);white-space:nowrap;">Total</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr>
+            <td style="padding:9px 12px;border-top:1px solid var(--border);font-size:12px;font-weight:800;color:#fff;background:rgba(255,255,255,.03);">Team Total</td>
+            ${totalCells}
+            <td style="padding:9px 12px;text-align:right;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:900;color:var(--gold);background:rgba(251,191,36,.08);white-space:nowrap;">${grandTotal.toLocaleString()}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>`;
+}
+function renderYtdPreview() {
+  const preview = document.getElementById('ytdAdminPreview');
+  const rowsEl = document.getElementById('ytdPreviewRows');
+  const countEl = document.getElementById('ytdPreviewCount');
+  if (!preview || !rowsEl) return;
+  if (!_ytdAgents.length) {
+    preview.style.display = 'none';
+    rowsEl.innerHTML = '';
+    return;
+  }
+  preview.style.display = 'block';
+  if (countEl) countEl.textContent = String(_ytdAgents.length);
+  rowsEl.innerHTML = [..._ytdAgents].sort((a,b) => (Number(b.total)||0) - (Number(a.total)||0)).map(a => {
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;gap:12px;">
+      <span style="color:var(--text);font-weight:600;">${ytdEsc(a.name)}</span>
+      <span style="color:var(--accent-2);font-family:'JetBrains Mono',monospace;white-space:nowrap;">${ytdNum(a.total).toLocaleString()} total</span>
+    </div>`;
+  }).join('');
+}
+function loadYtdData() {
+  try {
+    const raw = localStorage.getItem(YTD_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      const norm = ytdNormalizePayload(d);
+      _ytdAgents = norm.agents;
+      _ytdMeta = norm.meta || {};
+      renderYtdBoard();
+      renderYtdPreview();
+      ytdSetAdminFields();
+    }
+  } catch (e) {}
+  loadYtdDataFromCloud();
+}
+function loadYtdDataFromCloud() {
+  fetch(`${YTD_SUPA_URL}/rest/v1/tile_content?hub=eq.${YTD_HUB}&key=eq.${YTD_TILE_KEY}&select=data`, {
+    headers: { 'apikey': YTD_SUPA_KEY, 'Authorization': 'Bearer ' + YTD_SUPA_KEY, 'Cache-Control': 'no-cache' }
+  }).then(r => r.json()).then(rows => {
+    if (rows && rows.length && rows[0].data) {
+      const norm = ytdNormalizePayload(rows[0].data);
+      _ytdAgents = norm.agents;
+      _ytdMeta = norm.meta || {};
+      try { localStorage.setItem(YTD_KEY, JSON.stringify({ agents: _ytdAgents, meta: _ytdMeta })); } catch(e) {}
+      renderYtdBoard();
+      renderYtdPreview();
+      ytdSetAdminFields();
+    }
+  }).catch(() => {});
+}
+function handleYtdCsvFile(file) {
+  if (!file) return;
+  const status = document.getElementById('ytdCsvStatus');
+  const setErr = m => { if (status) { status.textContent = m; status.className = 'csv-status err'; } };
+  const setOk = m => { if (status) { status.textContent = m; status.className = 'csv-status ok'; } };
+  const processRows = (rows, headers) => {
+    const nameKey = headers.find(h => /agent.?name|name/i.test(h)) || headers[0];
+    if (!nameKey) { setErr('✗ Could not find a Name column.'); return; }
+    const lowerHeaders = headers.map(h => String(h || '').trim().toLowerCase());
+    const monthKeyMap = {};
+    YTD_MONTHS.forEach(m => {
+      const idx = lowerHeaders.findIndex(h => m.aliases.includes(h));
+      if (idx >= 0) monthKeyMap[m.key] = headers[idx];
+    });
+    const explicitTotalKey = headers.find(h => /^(total|ytd|year.?to.?date)$/i.test(String(h).trim()));
+    const agents = rows.map(r => {
+      const name = String(r[nameKey] || '').trim();
+      if (!name) return null;
+      const months = {};
+      YTD_MONTHS.forEach(m => { months[m.key] = ytdNum(monthKeyMap[m.key] ? r[monthKeyMap[m.key]] : 0); });
+      const total = explicitTotalKey ? ytdNum(r[explicitTotalKey]) : Object.values(months).reduce((sum, n) => sum + (Number(n) || 0), 0);
+      return { name, months, total };
+    }).filter(Boolean);
+    if (!agents.length) { setErr('✗ No valid agent rows found.'); return; }
+    _ytdAgents = agents;
+    const yearVal = (document.getElementById('ytdYearInput')?.value || '').trim();
+    _ytdMeta = { ..._ytdMeta, year: yearVal || _ytdMeta.year || String(new Date().getFullYear()) };
+    setOk(`✓ Loaded ${agents.length} agent${agents.length !== 1 ? 's' : ''} — review below, then Save & Publish.`);
+    renderYtdBoard();
+    renderYtdPreview();
+    ytdSetAdminFields();
+  };
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      if (file.name.match(/\.xlsx?$/i)) {
+        if (typeof XLSX === 'undefined') { setErr('Loading Excel support…'); loadSheetJS(() => handleYtdCsvFile(file)); return; }
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        const headerRow = raw.findIndex(r => Array.isArray(r) && r.some(c => String(c || '').trim()));
+        const headers = (raw[headerRow] || []).map(h => String(h || '').trim());
+        const rows = raw.slice(headerRow + 1).filter(r => Array.isArray(r) && r.some(c => String(c || '').trim())).map(r => {
+          const obj = {};
+          headers.forEach((h, i) => obj[h] = r[i] !== undefined ? String(r[i]).trim() : '');
+          return obj;
+        });
+        processRows(rows, headers);
+      } else {
+        const lines = String(e.target.result || '').split(/\r?\n/).filter(l => l.trim());
+        const headers = ytdSplitCsv(lines[0]).map(h => String(h || '').replace(/^"|"$/g, '').trim());
+        const rows = lines.slice(1).map(line => {
+          const vals = ytdSplitCsv(line);
+          const obj = {};
+          headers.forEach((h, i) => obj[h] = String(vals[i] || '').replace(/^"|"$/g, '').trim());
+          return obj;
+        });
+        processRows(rows, headers);
+      }
+    } catch (err) {
+      setErr('Parse error: ' + err.message);
+    }
+  };
+  if (file.name.match(/\.xlsx?$/i)) reader.readAsArrayBuffer(file);
+  else reader.readAsText(file);
+}
+function saveYtdData() {
+  if (!_ytdAgents.length) { alert('No YTD data to save. Upload a file first.'); return; }
+  const yearVal = (document.getElementById('ytdYearInput')?.value || '').trim() || String(new Date().getFullYear());
+  _ytdMeta = { year: yearVal, updatedAt: new Date().toISOString() };
+  const payload = JSON.stringify({ agents: _ytdAgents, meta: _ytdMeta });
+  try { localStorage.setItem(YTD_KEY, JSON.stringify({ agents: _ytdAgents, meta: _ytdMeta })); } catch(e) {}
+  const headers = { 'apikey': YTD_SUPA_KEY, 'Authorization': 'Bearer ' + YTD_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+  fetch(`${YTD_SUPA_URL}/rest/v1/tile_content?hub=eq.${YTD_HUB}&key=eq.${YTD_TILE_KEY}`, {
+    method: 'DELETE', headers: { 'apikey': YTD_SUPA_KEY, 'Authorization': 'Bearer ' + YTD_SUPA_KEY }
+  }).then(() => fetch(`${YTD_SUPA_URL}/rest/v1/tile_content`, {
+    method: 'POST', headers, body: JSON.stringify({ hub: YTD_HUB, key: YTD_TILE_KEY, data: payload })
+  })).then(() => {
+    renderYtdBoard();
+    renderYtdPreview();
+    if (typeof showSnuToast === 'function') showSnuToast('✓ YTD data saved and published!');
+    else alert('✅ YTD data saved and published!');
+  }).catch(() => {
+    renderYtdBoard();
+    renderYtdPreview();
+    if (typeof showSnuToast === 'function') showSnuToast('⚠ Saved locally (cloud sync failed).');
+    else alert('Saved locally (cloud sync failed).');
+  });
+  const inp = document.getElementById('ytdCsvInput'); if (inp) inp.value = '';
+  const status = document.getElementById('ytdCsvStatus'); if (status) { status.textContent = ''; status.className = 'csv-status'; }
+}
+function clearYtdData() {
+  if (!confirm('Clear all year-to-date data? This cannot be undone.')) return;
+  _ytdAgents = [];
+  _ytdMeta = {};
+  try { localStorage.removeItem(YTD_KEY); } catch(e) {}
+  renderYtdBoard();
+  renderYtdPreview();
+  ytdSetAdminFields();
+  fetch(`${YTD_SUPA_URL}/rest/v1/tile_content?hub=eq.${YTD_HUB}&key=eq.${YTD_TILE_KEY}`, {
+    method: 'DELETE', headers: { 'apikey': YTD_SUPA_KEY, 'Authorization': 'Bearer ' + YTD_SUPA_KEY }
+  }).then(() => {
+    if (typeof showSnuToast === 'function') showSnuToast('🗑️ YTD data cleared.');
+  }).catch(() => {});
+  const status = document.getElementById('ytdCsvStatus'); if (status) { status.textContent = ''; status.className = 'csv-status'; }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  loadYtdData();
+  const zone = document.getElementById('ytdCsvDrop');
+  if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+    zone.addEventListener('dragleave', () => zone.style.borderColor = '');
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.style.borderColor = '';
+      const file = e.dataTransfer.files[0];
+      if (file) handleYtdCsvFile(file);
+    });
+  }
+});
+</script>
+
 <script id="cert-tracker-script">
 // ── CARRIER CERT TRACKER ───────────────────────────────────────────────────
 const CERT_KEY = 'cert_tracker_v1';
@@ -12237,6 +12373,7 @@ const STAR_SECTIONS = [
 { id:'cert-tracker', label:'🎓 Certs' },
 { id:'friday-meetings',label:'📅 Meetings' },
 { id:'leaderboard', label:'🏆 Leaderboard' },
+{ id:'ytd-board', label:'📊 YTD' },
 { id:'trip-tracker', label:'🏝 Trip' },
 { id:'agent-spotlight',label:'⭐ Spotlight' },
 ];
@@ -13163,6 +13300,7 @@ const GSEARCH_INDEX = [
 {name:'Video Library',section:'Training',icon:'🎬',action:()=>document.getElementById('video-library')?.scrollIntoView({behavior:'smooth'})},
 {name:'Updates Feed',section:'Updates',icon:'📡',action:()=>document.getElementById('updates')?.scrollIntoView({behavior:'smooth'})},
 {name:'Leaderboard',section:'Leaderboard',icon:'🏆',action:()=>document.getElementById('leaderboard')?.scrollIntoView({behavior:'smooth'})},
+{name:'Year-to-Date Production',section:'Performance',icon:'📊',action:()=>document.getElementById('ytd-board')?.scrollIntoView({behavior:'smooth'})},
 ];
 let _gsearchOpen=false;
 window.gsearchQuery=function(q){
