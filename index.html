@@ -6523,13 +6523,21 @@ if (photo) row.photo = photo;
 });
 await Promise.all(tasks);
 }
+
+async function hydrateSpotlightPhotoFromLocker(record) {
+if (!record?.snu_spotlight?.name) return;
+const row = record.snu_spotlight;
+if (row.photo) return;
+const photo = await jbLoadAgentPhotoByName(row.photo_agent_name || row.name);
+if (photo) row.photo = photo;
+}
 // ── Init: load main + photos in parallel, merge, render ───────
 window.jbInit = async function() {
 const [record, photos] = await Promise.all([ jbReadBin(JB_MAIN_BIN), jbLoadPhotos() ]);
 if (!record) { console.warn('[JB] No cloud data'); return; }
 console.log('[JB LOAD] Photo bin result:', photos ? 'aom keys: ' + Object.keys(photos.aom || {}).join(',') + ', spotlight: ' + (photos.spotlight ? 'yes' : 'no') : 'NULL');
 if (photos) {
-if (photos.spotlight && record.snu_spotlight) record.snu_spotlight.photo = photos.spotlight;
+if (photos.spotlight && record.snu_spotlight && !record.snu_spotlight.photo_agent_name) record.snu_spotlight.photo = photos.spotlight;
 if (photos.aom && record.snu_aom) for (const k in photos.aom) {
 if (record.snu_aom[k]) record.snu_aom[k].photo = photos.aom[k];
 }
@@ -6537,6 +6545,7 @@ if (record.snu_aom[k]) record.snu_aom[k].photo = photos.aom[k];
 record.snu_agent_photo_bins = record.snu_agent_photo_bins || {};
 _agentPhotoBins = { ...record.snu_agent_photo_bins };
 await hydrateAomPhotosFromLocker(record);
+await hydrateSpotlightPhotoFromLocker(record);
 window._jbRecord = record;
 try {
 if (record.snu_data && Object.keys(record.snu_data).length) localStorage.setItem('snu_data_v1', JSON.stringify(record.snu_data));
@@ -6584,8 +6593,7 @@ try { localStorage.setItem(lsMap[field], JSON.stringify(value)); } catch(e) {}
 // Save photos to photo bin (await to ensure completion)
 try {
 if (field === 'snu_spotlight') {
-const aom = (() => { try { return JSON.parse(localStorage.getItem('snu_aom_v1')||'{}'); } catch(e){return{};} })();
-await jbSavePhotos(value?.photo||null, aom);
+// Spotlight photos now live in the Agent Photo Locker (per-agent bins)
 }
 if (field === 'snu_aom') {
 // Agent of the Month photos now live in the Agent Photo Locker (per-agent bins)
@@ -8460,25 +8468,53 @@ if (name === 'ownership' && typeof initOwnership === 'function') initOwnership(t
 }
 // ── Photo upload handler ──────────────────────────────────────────────────
 let _spotlightPhotoBase64 = null;
+let _spotlightPhotoDirty = false;
+function setSpotlightPreview(photo) {
+const preview = document.getElementById('photoUploadPreview');
+const placeholder = document.getElementById('photoUploadPlaceholder');
+const zone = document.getElementById('photoUploadZone');
+if (photo) {
+if (preview) { preview.src = photo; preview.classList.add('visible'); }
+if (placeholder) placeholder.style.display = 'none';
+if (zone) zone.classList.add('has-photo');
+} else {
+if (preview) { preview.src = ''; preview.classList.remove('visible'); }
+if (placeholder) placeholder.style.display = '';
+if (zone) zone.classList.remove('has-photo');
+}
+}
+function getResolvedSpotlightPhoto(row) {
+if (!row) return null;
+return row.photo || getAgentPhotoFromLockerSync(row.photo_agent_name || row.name) || null;
+}
+async function tryAutoPullSpotlightPhotoFromLocker(forceClear = false) {
+if (_spotlightPhotoDirty) return;
+const name = document.getElementById('spotlightName')?.value?.trim() || '';
+if (!name) {
+if (forceClear) {
+_spotlightPhotoBase64 = null;
+setSpotlightPreview(null);
+}
+return;
+}
+const photo = getAgentPhotoFromLockerSync(name) || await jbLoadAgentPhotoByName(name);
+_spotlightPhotoBase64 = photo || null;
+setSpotlightPreview(_spotlightPhotoBase64);
+}
 function handleSpotlightPhoto(file) {
 if (!file) return;
 const reader = new FileReader();
 reader.onload = e => {
-_spotlightPhotoBase64 = e.target.result; // data:image/...;base64,...
-const preview = document.getElementById('photoUploadPreview');
-const placeholder = document.getElementById('photoUploadPlaceholder');
-const zone = document.getElementById('photoUploadZone');
-preview.src = _spotlightPhotoBase64;
-preview.classList.add('visible');
-if (placeholder) placeholder.style.display = 'none';
-zone.classList.add('has-photo');
+_spotlightPhotoBase64 = e.target.result;
+_spotlightPhotoDirty = true;
+setSpotlightPreview(_spotlightPhotoBase64);
 };
 reader.readAsDataURL(file);
 }
 // Drag-and-drop on photo zone
 document.addEventListener('DOMContentLoaded', () => {
 const zone = document.getElementById('photoUploadZone');
-if (!zone) return;
+if (zone) {
 zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
 zone.addEventListener('dragleave', () => zone.style.borderColor = '');
 zone.addEventListener('drop', e => {
@@ -8486,17 +8522,28 @@ e.preventDefault(); zone.style.borderColor = '';
 const file = e.dataTransfer.files[0];
 if (file && file.type.startsWith('image/')) handleSpotlightPhoto(file);
 });
+}
+const spotlightName = document.getElementById('spotlightName');
+if (spotlightName) {
+spotlightName.addEventListener('change', () => { _spotlightPhotoDirty = false; tryAutoPullSpotlightPhotoFromLocker(true); });
+spotlightName.addEventListener('blur', () => { _spotlightPhotoDirty = false; tryAutoPullSpotlightPhotoFromLocker(true); });
+}
 // Restore saved spotlight into admin fields on open
 loadSpotlightIntoAdmin();
 renderSpotlightCard();
 });
 // ── Load saved data back into admin form ──────────────────────────────────
-function loadSpotlightIntoAdmin() {
+async function loadSpotlightIntoAdmin() {
 try {
+let s = null;
+if (window._jbRecord?.snu_spotlight?.name) {
+s = JSON.parse(JSON.stringify(window._jbRecord.snu_spotlight));
+} else {
 const raw = localStorage.getItem(SPOTLIGHT_KEY);
-if (!raw) return;
-const s = JSON.parse(raw);
-const sv = (id, val) => { const e = document.getElementById(id); if (e && val) e.value = val; };
+s = raw ? JSON.parse(raw) : null;
+}
+if (!s) return;
+const sv = (id, val) => { const e = document.getElementById(id); if (e) e.value = val || ''; };
 sv('spotlightName', s.name);
 sv('spotlightTitle', s.title);
 sv('spotlightBio', s.bio);
@@ -8508,51 +8555,53 @@ sv('spotlightStat2Val', s.stats?.[1]?.val);
 sv('spotlightStat2Lbl', s.stats?.[1]?.lbl);
 sv('spotlightStat3Val', s.stats?.[2]?.val);
 sv('spotlightStat3Lbl', s.stats?.[2]?.lbl);
-if (s.photo) {
-_spotlightPhotoBase64 = s.photo;
-const preview = document.getElementById('photoUploadPreview');
-const placeholder = document.getElementById('photoUploadPlaceholder');
-const zone = document.getElementById('photoUploadZone');
-if (preview) { preview.src = s.photo; preview.classList.add('visible'); }
-if (placeholder) placeholder.style.display = 'none';
-if (zone) zone.classList.add('has-photo');
-}
+const resolvedPhoto = getResolvedSpotlightPhoto(s) || (s.name ? await jbLoadAgentPhotoByName(s.photo_agent_name || s.name) : null);
+_spotlightPhotoDirty = false;
+_spotlightPhotoBase64 = resolvedPhoto || null;
+setSpotlightPreview(_spotlightPhotoBase64);
 } catch(e) { console.warn('Spotlight load error', e); }
 }
 // ── Save spotlight ────────────────────────────────────────────────────────
-function saveSpotlight() {
+async function saveSpotlight() {
 const gv = id => document.getElementById(id)?.value?.trim() || '';
+const name = gv('spotlightName');
 const spotlight = {
-name: gv('spotlightName'),
+name,
 title: gv('spotlightTitle'),
 bio: gv('spotlightBio'),
 quote: gv('spotlightQuote'),
 award: gv('spotlightAward') || 'Agent of the Week',
-photo: _spotlightPhotoBase64 || null,
+photo: null,
+photo_agent_name: name,
 stats: [
 { val: gv('spotlightStat1Val'), lbl: gv('spotlightStat1Lbl') },
 { val: gv('spotlightStat2Val'), lbl: gv('spotlightStat2Lbl') },
-{ val: gv('spotlightStat3Val'), lbl: gv('spotlightStat3Lbl') },
+{ val: gv('spotlightStat3Val'), lbl: gv('spotlightStat3Lbl') }
 ].filter(s => s.val || s.lbl),
 savedAt: new Date().toISOString()
 };
 if (!spotlight.name) {
 showSnuToast('⚠ Please enter the agent name.'); return;
 }
-// Save — note: base64 photo may be large; split if needed
-try {
-localStorage.setItem(SPOTLIGHT_KEY, JSON.stringify(spotlight));
-} catch(e) {
-// If storage quota exceeded (large photo), save without photo
-spotlight.photo = null;
-localStorage.setItem(SPOTLIGHT_KEY, JSON.stringify(spotlight));
-showSnuToast('⚠ Photo too large for storage — saved without photo. Use a smaller image.');
-renderSpotlightCard(spotlight);
-closeAdmin();
-return;
+if (_spotlightPhotoDirty && _spotlightPhotoBase64) {
+showSnuToast('⏳ Saving photo to Agent Photo Locker…');
+const okPhoto = await jbSaveAgentPhotoByName(name, _spotlightPhotoBase64);
+if (!okPhoto) { showSnuToast('⚠ Spotlight photo failed to save. Spotlight not updated.'); return; }
+_spotlightPhotoDirty = false;
+_spotlightPhotoBase64 = getAgentPhotoFromLockerSync(name) || _spotlightPhotoBase64;
+setSpotlightPreview(_spotlightPhotoBase64);
+} else if (!_spotlightPhotoBase64) {
+const existingLockerPhoto = getAgentPhotoFromLockerSync(name) || await jbLoadAgentPhotoByName(name);
+if (existingLockerPhoto) {
+_spotlightPhotoBase64 = existingLockerPhoto;
+setSpotlightPreview(_spotlightPhotoBase64);
 }
-window._snuState.spotlight = spotlight;
-if (typeof jbSave === 'function') jbSave('snu_spotlight', spotlight);
+}
+try {
+localStorage.setItem(SPOTLIGHT_KEY, JSON.stringify({ ...spotlight, photo: null }));
+} catch(e) {}
+window._snuState.spotlight = { ...spotlight, photo: getResolvedSpotlightPhoto(spotlight) };
+if (typeof jbSave === 'function') await jbSave('snu_spotlight', spotlight);
 renderSpotlightCard(spotlight);
 closeAdmin();
 showSnuToast('⭐ Spotlight published!');
@@ -8561,9 +8610,13 @@ showSnuToast('⭐ Spotlight published!');
 function renderSpotlightCard(data) {
 if (!data) {
 try {
+if (window._jbRecord?.snu_spotlight?.name) {
+data = JSON.parse(JSON.stringify(window._jbRecord.snu_spotlight));
+} else {
 const raw = localStorage.getItem(SPOTLIGHT_KEY);
 if (!raw) return;
 data = JSON.parse(raw);
+}
 } catch(e) { return; }
 }
 if (!data || !data.name) return;
@@ -8580,8 +8633,20 @@ const quoteHtml = data.quote ? `
 <div class="spotlight-quote">${pesc(data.quote)}</div>` : '';
 const bioHtml = data.bio ? `
 <div class="spotlight-bio">${pesc(data.bio)}</div>` : '';
-const photoHtml = data.photo
-? `<img class="spotlight-photo" src="${data.photo}" alt="${pesc(data.name)}">
+const resolvedPhoto = getResolvedSpotlightPhoto(data);
+if (!resolvedPhoto && (data.photo_agent_name || data.name) && typeof jbLoadAgentPhotoByName === 'function') {
+jbLoadAgentPhotoByName(data.photo_agent_name || data.name).then(photo => {
+if (photo) {
+const next = { ...data, photo };
+if (window._jbRecord?.snu_spotlight && normalizeAgentPhotoKey(window._jbRecord.snu_spotlight.photo_agent_name || window._jbRecord.snu_spotlight.name) === normalizeAgentPhotoKey(data.photo_agent_name || data.name)) {
+window._jbRecord.snu_spotlight.photo = photo;
+}
+renderSpotlightCard(next);
+}
+}).catch(() => {});
+}
+const photoHtml = resolvedPhoto
+? `<img class="spotlight-photo" src="${resolvedPhoto}" alt="${pesc(data.name)}">
 <div class="spotlight-photo-gradient"></div>`
 : `<div class="spotlight-photo-placeholder">
 <div class="spotlight-photo-placeholder-icon">👤</div>
@@ -8619,8 +8684,7 @@ ${data.savedAt ? 'Published ' + new Date(data.savedAt).toLocaleDateString('en-US
 </div>
 </div>
 </div>`;
-// Also update global state
-if (window._snuState) window._snuState.spotlight = data;
+if (window._snuState) window._snuState.spotlight = { ...data, photo: resolvedPhoto || data.photo || null };
 }
 // ── Render on page load ───────────────────────────────────────────────────
 // (DOMContentLoaded above calls renderSpotlightCard())
