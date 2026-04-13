@@ -3984,6 +3984,59 @@ cursor: pointer; white-space: nowrap;
 }
 .cl-add-btn:hover { background: #2563eb; }
 .cl-empty { font-size: 12px; color: rgba(255,255,255,.3); font-style: italic; padding: 8px 2px; }
+
+/* ── ANCILLARY FINDER ── */
+.anc-filter-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:14px; }
+.anc-search-input, .anc-select, .anc-textarea {
+  width:100%; box-sizing:border-box; background:rgba(255,255,255,.06); border:1px solid var(--border);
+  border-radius:10px; padding:10px 12px; color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; outline:none;
+}
+.anc-select option { background:#1c2d4a; color:#fff; }
+.anc-compare-bar {
+  display:none; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; padding:10px 12px;
+  border:1px solid rgba(251,191,36,.25); background:rgba(251,191,36,.08); border-radius:10px;
+}
+.anc-compare-bar.active { display:flex; }
+.anc-result-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+.anc-card {
+  background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:10px;
+}
+.anc-card.compare-on { border-color:rgba(251,191,36,.45); box-shadow:0 0 0 1px rgba(251,191,36,.16); }
+.anc-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.anc-name { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; color:#fff; line-height:1.25; }
+.anc-product { font-size:12px; color:var(--accent-2); font-weight:700; margin-top:2px; }
+.anc-chip-row, .anc-resource-row { display:flex; flex-wrap:wrap; gap:6px; }
+.anc-chip { display:inline-flex; padding:4px 9px; border-radius:999px; font-size:10px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; background:rgba(255,255,255,.06); color:var(--muted); border:1px solid rgba(255,255,255,.08); }
+.anc-chip.active { background:rgba(45,212,191,.12); border-color:rgba(45,212,191,.22); color:#bff8ee; }
+.anc-meta { font-size:12px; color:var(--muted); line-height:1.6; }
+.anc-label { color:var(--muted-2); font-weight:700; text-transform:uppercase; font-size:10px; letter-spacing:.6px; margin-bottom:2px; }
+.anc-resource-btn, .anc-compare-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:8px; padding:7px 12px; font-size:11px; font-weight:700;
+  text-decoration:none; cursor:pointer; border:1px solid rgba(99,179,237,.3); background:rgba(99,179,237,.12); color:var(--accent-2); font-family:'Plus Jakarta Sans',sans-serif;
+}
+.anc-resource-btn:hover, .anc-compare-btn:hover { background:rgba(99,179,237,.18); }
+.anc-compare-btn.active { border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.12); color:var(--gold); }
+.anc-compare-table-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; }
+.anc-compare-table { width:100%; border-collapse:collapse; min-width:760px; }
+.anc-compare-table th, .anc-compare-table td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:top; }
+.anc-compare-table th { background:rgba(255,255,255,.03); font-size:11px; color:var(--muted); text-align:left; }
+.anc-compare-table td { font-size:12px; color:#fff; }
+.anc-upload-mini {
+  border:1px dashed rgba(255,255,255,.16); border-radius:10px; padding:10px 12px; background:rgba(255,255,255,.02); cursor:pointer;
+}
+.anc-upload-mini.has-file { border-style:solid; border-color:rgba(45,212,191,.3); background:rgba(45,212,191,.06); }
+.anc-upload-mini-title { font-size:11px; font-weight:700; color:#fff; margin-bottom:4px; }
+.anc-upload-mini-sub { font-size:11px; color:var(--muted-2); line-height:1.45; }
+.anc-admin-item { background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:8px; }
+.anc-admin-item:last-child { margin-bottom:0; }
+.anc-admin-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.anc-admin-title { font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:#fff; }
+.anc-admin-sub { font-size:11px; color:var(--muted-2); margin-top:2px; }
+@media (max-width: 680px) {
+  .anc-result-grid { grid-template-columns:1fr; }
+  .anc-filter-grid { grid-template-columns:1fr; }
+}
+
 </style>
 </head>
 <body class="hub-login-pending">
@@ -4165,7 +4218,7 @@ Agent Command Center
 <p>Coaching, marketing, and planning resources</p>
 </div>
 </div>
-<span class="count-chip">13 tools</span>
+<span class="count-chip">14 tools</span>
 <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
 </div>
 <!-- Tool Cards -->
@@ -4281,6 +4334,15 @@ Agent Command Center
 <h3>Carrier Contacts</h3>
 <p>Broker support lines, prior auth numbers, and portal links for every carrier.</p>
 <span class="card-tag">Contacts</span>
+</div>
+
+<div class="card" data-card-id="ancillary-finder" data-color="green" style="cursor:pointer;" onclick="openAncillaryFinder()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \\'){event.preventDefault();openAncillaryFinder();}">
+<span class="card-arrow">↗</span>
+<div class="card-shimmer"></div>
+<div class="card-icon-wrap">🩺</div>
+<h3>Ancillary Carrier Finder</h3>
+<p>Filter ancillary plans by category and state, then compare carriers side by side.</p>
+<span class="card-tag">Ancillary</span>
 </div>
 <div class="card" data-card-id="onboarding" data-color="rose" style="cursor:pointer;" onclick="openOnboard()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openOnboard()}">
 <span class="card-arrow">↗</span>
@@ -4760,6 +4822,66 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 </div>
+
+<!-- ── ANCILLARY FINDER MODAL ── -->
+<div class="feature-overlay" id="ancillaryOverlay">
+<div class="feature-modal" style="max-width:1120px;">
+<div class="feature-modal-header">
+<div class="feature-modal-title">
+<div class="feature-modal-title-icon" style="background:rgba(52,211,153,.2);">🩺</div>
+<div><h3>Ancillary Carrier Finder</h3><p>Filter plans, open resources, and compare carriers</p></div>
+</div>
+<button class="feature-modal-close" onclick="closeAncillaryFinder()">✕</button>
+</div>
+<div class="feature-modal-body">
+<div class="anc-filter-grid">
+<div>
+<div class="anc-label">Category</div>
+<select id="ancCategoryFilter" class="anc-select" onchange="renderAncillaryFinder()"><option value="">All categories</option></select>
+</div>
+<div>
+<div class="anc-label">State</div>
+<select id="ancStateFilter" class="anc-select" onchange="renderAncillaryFinder()"><option value="">All states</option></select>
+</div>
+<div>
+<div class="anc-label">Search</div>
+<input id="ancSearchFilter" class="anc-search-input" type="text" placeholder="Carrier, product, rider…" oninput="renderAncillaryFinder()">
+</div>
+<div style="display:flex;align-items:end;gap:8px;">
+<button class="anc-resource-btn" style="width:100%;" onclick="resetAncillaryFilters()">↺ Reset Filters</button>
+</div>
+</div>
+<div id="ancCompareBar" class="anc-compare-bar">
+<div style="font-size:12px;color:#fde68a;font-weight:700;">Compare selected: <span id="ancCompareCount">0</span> / 3</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<button class="anc-resource-btn" onclick="openAncillaryCompare()">⚖️ Compare Selected</button>
+<button class="anc-resource-btn" onclick="clearAncillaryCompare()">✕ Clear</button>
+</div>
+</div>
+<div class="anc-result-grid" id="ancillaryResults"><div class="dir-empty">Loading ancillary plans…</div></div>
+</div>
+</div>
+</div>
+<!-- ── ANCILLARY COMPARE MODAL ── -->
+<div class="feature-overlay" id="ancillaryCompareOverlay">
+<div class="feature-modal" style="max-width:1180px;">
+<div class="feature-modal-header">
+<div class="feature-modal-title">
+<div class="feature-modal-title-icon" style="background:rgba(251,191,36,.18);">⚖️</div>
+<div><h3>Ancillary Compare</h3><p>Side-by-side product comparison</p></div>
+</div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+<button class="anc-resource-btn" onclick="printAncillaryCompare()">🖨 Print</button>
+<button class="anc-resource-btn" onclick="emailAncillaryCompare()">✉️ Email</button>
+<button class="feature-modal-close" onclick="closeAncillaryCompare()">✕</button>
+</div>
+</div>
+<div class="feature-modal-body">
+<div id="ancillaryCompareContent"><div class="dir-empty">Select 2 or 3 plans to compare.</div></div>
+</div>
+</div>
+</div>
+
 <!-- ── ONBOARDING CHECKLIST MODAL ── -->
 <div class="feature-overlay" id="onboardOverlay">
 <div class="feature-modal" style="max-width:620px;">
@@ -4869,6 +4991,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <button class="admin-tab" onclick="switchAdminTab('directory',this)">👥 Directory</button>
 <button class="admin-tab" onclick="switchAdminTab('tasks',this)">✅ Tasks</button>
 <button class="admin-tab" onclick="switchAdminTab('carriers',this)">📞 Carriers</button>
+<button class="admin-tab" onclick="switchAdminTab('ancillary',this)">🩺 Ancillary</button>
 <button class="admin-tab" onclick="switchAdminTab('onboarding',this)">🚀 Onboarding</button>
 <button class="admin-tab" onclick="switchAdminTab('ownership',this)">📝 Ownership</button>
 <button class="admin-tab active" onclick="switchAdminTab('snu',this)">🏆 SNU Data</button>
@@ -4967,6 +5090,67 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div id="carrierAdminList" style="margin-top:8px;"></div>
 </div>
 </div><!-- /adminTabCarriers -->
+
+<!-- ── Tab: Ancillary Finder ── -->
+<div id="adminTabAncillary" class="admin-tab-panel">
+<div class="admin-body">
+<div class="admin-section-title">🩺 Ancillary Carrier Finder</div>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:14px;">Build a shared ancillary library for agents. Bulk import will replace the current library and publish globally. Manual entries save globally as soon as you add or update them.</p>
+<div class="csv-drop-zone" id="ancillaryCsvDrop" onclick="document.getElementById('ancillaryCsvInput').click()" style="margin-bottom:10px;">
+<div class="csv-drop-icon">📂</div>
+<div class="csv-drop-text">Drop CSV or Excel here, or <span>click to browse</span></div>
+<div class="csv-drop-hint">Columns: <code>Carrier Name</code>, <code>Category</code>, <code>Product Name</code>, <code>States</code>, <code>Riders</code>, <code>Brochure URL</code>, <code>State Chart URL</code>, <code>EApp URL</code>, <code>Portal URL</code>, <code>Support Phone</code>, <code>Notes</code>, <code>Active</code>, <code>Sort Order</code></div>
+<input type="file" id="ancillaryCsvInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleAncillaryCsvFile(this.files[0])">
+</div>
+<div class="csv-status" id="ancillaryCsvStatus"></div>
+<div style="display:grid;gap:10px;margin:18px 0 14px;">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Carrier Name *</label><input id="ancCarrierName" class="admin-input" type="text" placeholder="Aetna"></div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Category *</label><input id="ancCategory" class="admin-input" type="text" placeholder="Cancer"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Product Name *</label><input id="ancProductName" class="admin-input" type="text" placeholder="Cancer Protection Plus"></div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">States</label><input id="ancStates" class="admin-input" type="text" placeholder="NJ, PA, DE"></div>
+</div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Riders</label><input id="ancRiders" class="admin-input" type="text" placeholder="Return of Premium; Wellness Benefit"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Brochure URL</label><input id="ancBrochureUrl" class="admin-input" type="text" placeholder="https://…"></div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">State Chart URL</label><input id="ancStateChartUrl" class="admin-input" type="text" placeholder="https://…"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">EApp URL</label><input id="ancEappUrl" class="admin-input" type="text" placeholder="https://…"></div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Portal URL</label><input id="ancPortalUrl" class="admin-input" type="text" placeholder="https://…"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 120px 120px;gap:8px;align-items:end;">
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Support Phone</label><input id="ancSupportPhone" class="admin-input" type="text" placeholder="1-800-000-0000"></div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Sort Order</label><input id="ancSortOrder" class="admin-input" type="number" placeholder="1"></div>
+<div style="padding-bottom:10px;"><label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#fff;font-weight:700;"><input id="ancActive" type="checkbox" checked style="accent-color:var(--teal);">Active</label></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+<div class="anc-upload-mini" id="ancBrochureZone" onclick="document.getElementById('ancBrochureInput').click()">
+<div class="anc-upload-mini-title">📎 Brochure File (optional)</div>
+<div class="anc-upload-mini-sub" id="ancBrochureFileLabel">Click to upload PDF or image brochure</div>
+<input type="file" id="ancBrochureInput" accept=".pdf,image/*" style="display:none" onchange="handleAncillaryAsset(this.files[0],'brochure')">
+</div>
+<div class="anc-upload-mini" id="ancChartZone" onclick="document.getElementById('ancChartInput').click()">
+<div class="anc-upload-mini-title">🗺️ State Chart File (optional)</div>
+<div class="anc-upload-mini-sub" id="ancChartFileLabel">Click to upload PDF or image chart</div>
+<input type="file" id="ancChartInput" accept=".pdf,image/*" style="display:none" onchange="handleAncillaryAsset(this.files[0],'chart')">
+</div>
+</div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Notes</label><textarea id="ancNotes" class="anc-textarea" rows="3" placeholder="Underwriting notes, state quirks, waiting periods, exclusions…"></textarea></div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+<button onclick="submitAncillaryEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">💾 Save Entry</button>
+<button onclick="cancelAncillaryEdit()" id="ancCancelBtn" style="display:none;padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer;">Cancel</button>
+<button onclick="clearAncillaryData()" style="padding:7px 18px;border-radius:8px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.12);color:#f87171;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🗑 Clear Library</button>
+</div>
+<div style="font-size:10px;color:var(--muted-2);margin-bottom:12px;">Tip: use hosted URLs for large PDFs. Uploaded brochure/chart files are best for smaller PDFs or images.</div>
+<div class="admin-section-title" style="margin-top:4px;">📋 Current Ancillary Library <span id="ancAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
+<div id="ancAdminList" style="margin-top:8px;"></div>
+</div>
+</div><!-- /adminTabAncillary -->
+
 <!-- ── Tab: Onboarding ── -->
 <div id="adminTabOnboarding" class="admin-tab-panel">
 <div class="admin-body">
@@ -5263,7 +5447,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div class="admin-week-row" style="margin-bottom:10px;">
 <div class="admin-field">
 <label>Agent Name</label>
-<input class="admin-input" id="aomAgentName" placeholder="Jane Smith">
+<input class="admin-input" id="aomAgentName" placeholder="Jane Smith" onchange="tryAutoPullAomPhotoFromLocker(true)" onblur="tryAutoPullAomPhotoFromLocker(true)">
 </div>
 <div class="admin-field">
 <label>Production / Stat</label>
@@ -5278,6 +5462,25 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <button class="admin-save-btn" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="saveAomMonth()">💾 Save Month</button>
 <button class="admin-save-btn" style="flex:0 0 auto;width:auto;padding:10px 16px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.35);color:#f87171;" onclick="clearAomMonth()">🗑 Clear</button>
 </div>
+</div>
+<hr class="admin-divider">
+<div class="admin-section-title">🖼️ Agent Photo Locker</div>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:12px;">Upload one agent photo once. Agent of the Month will automatically pull the saved photo whenever the agent name matches.</p>
+<div class="admin-field" style="margin-bottom:10px;">
+<label>Agent Name</label>
+<input class="admin-input" id="agentPhotoLibraryName" placeholder="Jane Smith">
+</div>
+<div class="aom-photo-upload" id="agentPhotoLibraryUploadZone" onclick="document.getElementById('agentPhotoLibraryInput').click()">
+<img class="aom-photo-mini-preview" id="agentPhotoLibraryPreview" src="" alt="">
+<div id="agentPhotoLibraryUploadHint">
+<div class="aom-photo-upload-text">📷 Drop or <span>click to upload</span> a library photo</div>
+</div>
+<input type="file" id="agentPhotoLibraryInput" accept="image/*" style="display:none" onchange="handleAgentPhotoLibraryUpload(this.files[0])">
+</div>
+<div style="display:flex;gap:10px;margin-bottom:12px;">
+<button class="admin-save-btn" style="flex:1;background:linear-gradient(135deg,#0ea5e9,#2563eb);" onclick="saveAgentPhotoLibraryEntry()">💾 Save to Photo Locker</button>
+</div>
+<div id="agentPhotoLibraryList" style="display:grid;gap:8px;"></div>
 </div>
 </div>
 </div><!-- /adminTabAom -->
@@ -6132,7 +6335,7 @@ const JB_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96o
 const JB_BASE = 'https://api.jsonbin.io/v3';
 const JB_MAIN_BIN = '69b2cd77aa77b81da9dbc6e6';
 // Photo bin constants removed — photos now stored in Supabase hub_photos table
-const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}} };
+const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}}, snu_agent_photo_bins:{} };
 // ── Generic bin helpers ────────────────────────────────────────
 async function jbReadBin(id) {
 try {
@@ -6243,6 +6446,83 @@ if (Array.isArray(c.snu_updates)) c.snu_updates = c.snu_updates.map(u => ({...u,
 return c;
 }
 window._jbRecord = null;
+let _agentPhotoBins = {};
+let _agentPhotoCache = {};
+function normalizeAgentPhotoKey(name) {
+const clean = String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+return clean;
+}
+function humanizeAgentPhotoKey(key) {
+return String(key || '').split(' ').map(part => part ? part.charAt(0).toUpperCase() + part.slice(1) : '').join(' ');
+}
+function getAgentPhotoBinId(entry) {
+if (!entry) return null;
+if (typeof entry === 'string') return entry;
+if (entry && typeof entry === 'object') return entry.bin_id || entry.id || null;
+return null;
+}
+function getAgentPhotoDisplayName(key, entry) {
+if (entry && typeof entry === 'object' && entry.agent_name) return entry.agent_name;
+return humanizeAgentPhotoKey(key);
+}
+function getAgentPhotoFromLockerSync(name) {
+const key = normalizeAgentPhotoKey(name);
+return key ? (_agentPhotoCache[key] || null) : null;
+}
+async function jbLoadAgentPhotoByName(name) {
+const key = normalizeAgentPhotoKey(name);
+if (!key) return null;
+if (_agentPhotoCache[key]) return _agentPhotoCache[key];
+const entry = _agentPhotoBins[key];
+const binId = getAgentPhotoBinId(entry);
+if (!binId) return null;
+try {
+const rec = await jbReadBin(binId);
+const photo = rec?.photo || null;
+if (photo) _agentPhotoCache[key] = photo;
+return photo;
+} catch(e) {
+console.error('[AOM PHOTO LOCKER] Load failed:', e);
+return null;
+}
+}
+async function jbSaveAgentPhotoByName(name, base64) {
+const key = normalizeAgentPhotoKey(name);
+if (!key || !base64) return false;
+const compressed = await compressPhoto(base64, 260);
+let entry = _agentPhotoBins[key] || null;
+let binId = getAgentPhotoBinId(entry);
+let ok = false;
+const record = { agent_name: String(name || '').trim(), photo: compressed, updated_at: new Date().toISOString() };
+try {
+if (binId) {
+ok = await jbWriteBin(binId, record);
+} else {
+binId = await jbCreateBin('medi-agent-photo-' + key.replace(/[^a-z0-9]+/g, '-').slice(0, 40), record);
+ok = !!binId;
+}
+if (!ok || !binId) return false;
+_agentPhotoBins[key] = { bin_id: binId, agent_name: record.agent_name };
+_agentPhotoCache[key] = compressed;
+if (window._jbRecord) window._jbRecord.snu_agent_photo_bins = { ..._agentPhotoBins };
+try { localStorage.setItem('snu_agent_photo_bins_v1', JSON.stringify(_agentPhotoBins)); } catch(e) {}
+return await jbSave('snu_agent_photo_bins', { ..._agentPhotoBins });
+} catch(e) {
+console.error('[AOM PHOTO LOCKER] Save failed:', e);
+return false;
+}
+}
+async function hydrateAomPhotosFromLocker(record) {
+if (!record?.snu_aom) return;
+const tasks = Object.keys(record.snu_aom).map(async k => {
+const row = record.snu_aom[k];
+if (!row?.name) return;
+if (row.photo) return;
+const photo = await jbLoadAgentPhotoByName(row.photo_agent_name || row.name);
+if (photo) row.photo = photo;
+});
+await Promise.all(tasks);
+}
 // ── Init: load main + photos in parallel, merge, render ───────
 window.jbInit = async function() {
 const [record, photos] = await Promise.all([ jbReadBin(JB_MAIN_BIN), jbLoadPhotos() ]);
@@ -6254,6 +6534,9 @@ if (photos.aom && record.snu_aom) for (const k in photos.aom) {
 if (record.snu_aom[k]) record.snu_aom[k].photo = photos.aom[k];
 }
 }
+record.snu_agent_photo_bins = record.snu_agent_photo_bins || {};
+_agentPhotoBins = { ...record.snu_agent_photo_bins };
+await hydrateAomPhotosFromLocker(record);
 window._jbRecord = record;
 try {
 if (record.snu_data && Object.keys(record.snu_data).length) localStorage.setItem('snu_data_v1', JSON.stringify(record.snu_data));
@@ -6265,6 +6548,7 @@ const aomSlim = {};
 for (const k in record.snu_aom) aomSlim[k] = record.snu_aom[k] ? { ...record.snu_aom[k], photo: null } : null;
 localStorage.setItem('snu_aom_v1', JSON.stringify(aomSlim));
 }
+if (record.snu_agent_photo_bins) localStorage.setItem('snu_agent_photo_bins_v1', JSON.stringify(record.snu_agent_photo_bins));
 } catch(e) { console.warn('[JB] localStorage write failed', e); }
 // snu_trip now handled by Supabase trip_tracker table
 if (typeof renderSnuFromStorage === 'function') renderSnuFromStorage();
@@ -6286,7 +6570,7 @@ if (typeof showSnuToast === 'function') showSnuToast('☁️ Data loaded from cl
 };
 // ── Save a field ──────────────────────────────────────────────
 window.jbSave = async function(field, value) {
-const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1' };
+const lsMap = { snu_data:'snu_data_v1', snu_article:'snu_article_v1', snu_spotlight:'snu_spotlight_v1', snu_aom:'snu_aom_v1', snu_updates:'snu_updates_v1', snu_trip:'snu_trip_v1', snu_agent_photo_bins:'snu_agent_photo_bins_v1' };
 // Strip photos before localStorage to avoid quota issues
 if (field === 'snu_aom' && lsMap[field]) {
 try {
@@ -6304,8 +6588,7 @@ const aom = (() => { try { return JSON.parse(localStorage.getItem('snu_aom_v1')|
 await jbSavePhotos(value?.photo||null, aom);
 }
 if (field === 'snu_aom') {
-const sp = (() => { try { return JSON.parse(localStorage.getItem('snu_spotlight_v1')||'{}'); } catch(e){return{};} })();
-await jbSavePhotos(sp?.photo||null, value);
+// Agent of the Month photos now live in the Agent Photo Locker (per-agent bins)
 }
 } catch(e) { console.error('[JB] Photo save error:', e); }
 // Save text data to main bin (photos stripped)
@@ -6339,10 +6622,10 @@ window.syncAllToCloud = async function() {
 const btn = document.querySelector('[onclick="syncAllToCloud()"]');
 if (btn) { btn.textContent = '⏳ Syncing…'; btn.disabled = true; }
 const g = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
-const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[] };
+const record = { snu_data: g('snu_data_v1')||{}, snu_article: g('snu_article_v1')||{}, snu_spotlight: g('snu_spotlight_v1')||{}, snu_aom: g('snu_aom_v1')||{}, snu_updates: g('snu_updates_v1')||[], snu_agent_photo_bins: g('snu_agent_photo_bins_v1')||((window._jbRecord && window._jbRecord.snu_agent_photo_bins) || {}) };
 const [ok] = await Promise.all([
 jbWriteBin(JB_MAIN_BIN, jbStripPhotos(record)),
-jbSavePhotos(record.snu_spotlight?.photo||null, record.snu_aom)
+jbSavePhotos(record.snu_spotlight?.photo||null, null)
 ]);
 window._jbRecord = record;
 if (btn) { btn.textContent = '🔄 Sync All Now'; btn.disabled = false; }
@@ -8345,19 +8628,59 @@ if (window._snuState) window._snuState.spotlight = data;
 <script id="aom-script">
 const AOM_KEY = 'snu_aom_v1';
 const AOM_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-let _aomData = {}; // { 0: {name,stat,note,photo}, 1: {...}, ... }
+let _aomData = {};
 let _aomEditingMonth = null;
 let _aomPhotoBase64 = null;
-// ── Load from storage and render all cards ───────────────────────────────
+let _aomPhotoDirty = false;
+let _agentLibraryPhotoBase64 = null;
+function deepCloneAomData(obj) {
+try { return JSON.parse(JSON.stringify(obj || {})); } catch(e) { return {}; }
+}
+function setAomPreview(photo) {
+const preview = document.getElementById('aomPhotoMiniPreview');
+const hint = document.getElementById('aomPhotoUploadHint');
+const zone = document.getElementById('aomPhotoUploadZone');
+if (photo) {
+if (preview) { preview.src = photo; preview.classList.add('visible'); }
+if (hint) hint.style.display = 'none';
+if (zone) zone.classList.add('has-photo');
+} else {
+if (preview) { preview.src = ''; preview.classList.remove('visible'); }
+if (hint) hint.style.display = '';
+if (zone) zone.classList.remove('has-photo');
+}
+}
+function setAgentLibraryPreview(photo) {
+const preview = document.getElementById('agentPhotoLibraryPreview');
+const hint = document.getElementById('agentPhotoLibraryUploadHint');
+const zone = document.getElementById('agentPhotoLibraryUploadZone');
+if (photo) {
+if (preview) { preview.src = photo; preview.classList.add('visible'); }
+if (hint) hint.style.display = 'none';
+if (zone) zone.classList.add('has-photo');
+} else {
+if (preview) { preview.src = ''; preview.classList.remove('visible'); }
+if (hint) hint.style.display = '';
+if (zone) zone.classList.remove('has-photo');
+}
+}
+function getResolvedAomPhoto(row) {
+if (!row) return null;
+return row.photo || getAgentPhotoFromLockerSync(row.photo_agent_name || row.name) || null;
+}
 function initAom() {
 try {
+if (window._jbRecord?.snu_aom && Object.keys(window._jbRecord.snu_aom).length) {
+_aomData = deepCloneAomData(window._jbRecord.snu_aom);
+} else {
 const raw = localStorage.getItem(AOM_KEY);
-if (raw) _aomData = JSON.parse(raw);
+_aomData = raw ? JSON.parse(raw) : {};
+}
 } catch(e) { _aomData = {}; }
 renderAllAomCards();
 refreshAomAdminPicker();
+renderAgentPhotoLockerList();
 }
-// ── Render a single dashboard card ───────────────────────────────────────
 function renderAomCard(monthIdx) {
 const card = document.getElementById('aomCard' + monthIdx);
 const photo = document.getElementById('aomPhotoWrap' + monthIdx);
@@ -8367,7 +8690,6 @@ if (!card) return;
 const now = new Date();
 const curMo = now.getMonth();
 const year = now.getFullYear();
-// Mark current month
 card.classList.toggle('current-month', monthIdx === curMo);
 card.classList.toggle('empty-month', !_aomData[monthIdx]);
 if (yearEl) yearEl.textContent = year;
@@ -8378,8 +8700,9 @@ info.innerHTML = '<div class="aom-empty-name">No agent selected</div>';
 return;
 }
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-photo.innerHTML = d.photo
-? `<img class="aom-photo" src="${d.photo}" alt="${pesc(d.name)}">
+const resolvedPhoto = getResolvedAomPhoto(d);
+photo.innerHTML = resolvedPhoto
+? `<img class="aom-photo" src="${resolvedPhoto}" alt="${pesc(d.name)}">
 <div class="aom-photo-gradient"></div>
 <div class="aom-badge">🏆 Agent of the Month</div>
 <div class="aom-name-on-photo">
@@ -8387,7 +8710,6 @@ photo.innerHTML = d.photo
 </div>`
 : `<div style="font-size:48px;opacity:.6;display:flex;flex-direction:column;align-items:center;gap:8px;">👤<span style="font-size:13px;font-weight:700;color:#fff;opacity:1;font-style:normal;font-family:'Space Grotesk',sans-serif;">${pesc(d.name)}</span></div>`;
 info.innerHTML = `
-${!d.photo ? '' : ''}
 ${d.stat ? `<div class="aom-agent-stat">${pesc(d.stat)}</div>` : ''}
 ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
 `;
@@ -8395,7 +8717,6 @@ ${d.note ? `<div class="aom-agent-note">${pesc(d.note)}</div>` : ''}
 function renderAllAomCards() {
 for (let i = 0; i < 12; i++) renderAomCard(i);
 }
-// ── Refresh admin picker labels ───────────────────────────────────────────
 function refreshAomAdminPicker() {
 for (let i = 0; i < 12; i++) {
 const el = document.getElementById('aomAdminCardAgent' + i);
@@ -8403,117 +8724,194 @@ if (el) el.textContent = _aomData[i]?.name || 'Not set';
 const card = document.getElementById('aomAdminCard' + i);
 if (card) card.style.borderColor = _aomData[i]?.name ? 'rgba(59,130,246,.4)' : '';
 }
+renderAgentPhotoLockerList();
 }
-// ── Select a month to edit ────────────────────────────────────────────────
-function selectAomMonth(idx) {
+function renderAgentPhotoLockerList() {
+const list = document.getElementById('agentPhotoLibraryList');
+if (!list) return;
+const entries = Object.entries(_agentPhotoBins || {}).sort((a, b) => getAgentPhotoDisplayName(a[0], a[1]).localeCompare(getAgentPhotoDisplayName(b[0], b[1])));
+if (!entries.length) {
+list.innerHTML = '<div style="font-size:12px;color:var(--muted-2);font-style:italic;padding:8px 2px;">No agent photos saved yet.</div>';
+return;
+}
+list.innerHTML = entries.map(([key, entry]) => {
+const label = getAgentPhotoDisplayName(key, entry);
+return `<button type="button" onclick="useAgentPhotoLockerEntry(${JSON.stringify(label)})" style="text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">${label}</button>`;
+}).join('');
+}
+async function useAgentPhotoLockerEntry(name) {
+const photo = await jbLoadAgentPhotoByName(name);
+const libName = document.getElementById('agentPhotoLibraryName');
+if (libName) libName.value = name || '';
+_agentLibraryPhotoBase64 = photo || null;
+setAgentLibraryPreview(photo || null);
+if (_aomEditingMonth !== null) {
+const aomName = document.getElementById('aomAgentName');
+if (aomName && !aomName.value.trim()) aomName.value = name || '';
+_aomPhotoDirty = false;
+_aomPhotoBase64 = photo || null;
+setAomPreview(photo || null);
+}
+}
+async function tryAutoPullAomPhotoFromLocker(forceClear = false) {
+if (_aomPhotoDirty) return;
+const name = document.getElementById('aomAgentName')?.value?.trim() || '';
+if (!name) {
+if (forceClear) { _aomPhotoBase64 = null; setAomPreview(null); }
+return;
+}
+const photo = getAgentPhotoFromLockerSync(name) || await jbLoadAgentPhotoByName(name);
+_aomPhotoBase64 = photo || null;
+setAomPreview(_aomPhotoBase64);
+}
+async function selectAomMonth(idx) {
 _aomEditingMonth = idx;
+_aomPhotoDirty = false;
 _aomPhotoBase64 = null;
-// Highlight selected
 document.querySelectorAll('.aom-admin-month-card').forEach(c => c.classList.remove('selected'));
 const sel = document.getElementById('aomAdminCard' + idx);
 if (sel) sel.classList.add('selected');
-// Show edit form
 const form = document.getElementById('aomEditForm');
 if (form) form.style.display = 'block';
 const title = document.getElementById('aomEditTitle');
 if (title) title.textContent = 'Editing: ' + AOM_MONTHS[idx];
-// Populate fields
 const d = _aomData[idx] || {};
 const sv = (id, val) => { const e = document.getElementById(id); if (e) e.value = val || ''; };
 sv('aomAgentName', d.name);
 sv('aomAgentStat', d.stat);
 sv('aomAgentNote', d.note);
-// Photo preview
-const preview = document.getElementById('aomPhotoMiniPreview');
-const hint = document.getElementById('aomPhotoUploadHint');
-const zone = document.getElementById('aomPhotoUploadZone');
-if (d.photo) {
-_aomPhotoBase64 = d.photo;
-if (preview) { preview.src = d.photo; preview.classList.add('visible'); }
-if (hint) hint.style.display = 'none';
-if (zone) zone.classList.add('has-photo');
-} else {
-if (preview) { preview.src = ''; preview.classList.remove('visible'); }
-if (hint) hint.style.display = '';
-if (zone) zone.classList.remove('has-photo');
+const lockerName = document.getElementById('agentPhotoLibraryName');
+if (lockerName && d.name) lockerName.value = d.name;
+const resolvedPhoto = getResolvedAomPhoto(d) || (d.name ? await jbLoadAgentPhotoByName(d.photo_agent_name || d.name) : null);
+_aomPhotoBase64 = resolvedPhoto || null;
+setAomPreview(_aomPhotoBase64);
+if (d.name) {
+const libPhoto = getAgentPhotoFromLockerSync(d.name) || await jbLoadAgentPhotoByName(d.name);
+if (libPhoto) {
+_agentLibraryPhotoBase64 = libPhoto;
+setAgentLibraryPreview(libPhoto);
+}
 }
 form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
-// ── Handle photo upload ────────────────────────────────────────────────────
 function handleAomPhoto(file) {
 if (!file) return;
 const reader = new FileReader();
 reader.onload = e => {
 _aomPhotoBase64 = e.target.result;
-const preview = document.getElementById('aomPhotoMiniPreview');
-const hint = document.getElementById('aomPhotoUploadHint');
-const zone = document.getElementById('aomPhotoUploadZone');
-if (preview) { preview.src = _aomPhotoBase64; preview.classList.add('visible'); }
-if (hint) hint.style.display = 'none';
-if (zone) zone.classList.add('has-photo');
+_aomPhotoDirty = true;
+setAomPreview(_aomPhotoBase64);
 };
 reader.readAsDataURL(file);
 }
-// Drag and drop on aom photo zone
-document.addEventListener('DOMContentLoaded', () => {
-const zone = document.getElementById('aomPhotoUploadZone');
-if (!zone) return;
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent-2)'; });
-zone.addEventListener('dragleave', () => zone.style.borderColor = '');
-zone.addEventListener('drop', e => {
-e.preventDefault(); zone.style.borderColor = '';
-const file = e.dataTransfer.files[0];
-if (file && file.type.startsWith('image/')) handleAomPhoto(file);
-});
-// initAom() is called by jbInit() — do NOT call it here or it overwrites cloud photos
-});
-// ── Save month ─────────────────────────────────────────────────────────────
+function handleAgentPhotoLibraryUpload(file) {
+if (!file) return;
+const reader = new FileReader();
+reader.onload = e => {
+_agentLibraryPhotoBase64 = e.target.result;
+setAgentLibraryPreview(_agentLibraryPhotoBase64);
+};
+reader.readAsDataURL(file);
+}
+async function saveAgentPhotoLibraryEntry() {
+const name = document.getElementById('agentPhotoLibraryName')?.value?.trim() || '';
+if (!name) { showSnuToast('⚠ Enter an agent name for the Photo Locker.'); return; }
+if (!_agentLibraryPhotoBase64) { showSnuToast('⚠ Upload a photo to save into the Photo Locker.'); return; }
+showSnuToast('⏳ Saving photo to Agent Photo Locker…');
+const ok = await jbSaveAgentPhotoByName(name, _agentLibraryPhotoBase64);
+if (!ok) { showSnuToast('⚠ Photo Locker save failed.'); return; }
+const fresh = getAgentPhotoFromLockerSync(name) || _agentLibraryPhotoBase64;
+_agentLibraryPhotoBase64 = fresh;
+setAgentLibraryPreview(fresh);
+renderAgentPhotoLockerList();
+if (_aomEditingMonth !== null) {
+const aomName = document.getElementById('aomAgentName');
+if (aomName && aomName.value.trim().toLowerCase() === name.trim().toLowerCase()) {
+_aomPhotoDirty = false;
+_aomPhotoBase64 = fresh;
+setAomPreview(fresh);
+}
+}
+showSnuToast('☁️ Agent Photo Locker updated for ' + name + '.');
+}
 async function saveAomMonth() {
 if (_aomEditingMonth === null) return;
 const gv = id => document.getElementById(id)?.value?.trim() || '';
 const name = gv('aomAgentName');
 if (!name) { showSnuToast('⚠ Please enter an agent name.'); return; }
+if (_aomPhotoDirty && _aomPhotoBase64) {
+showSnuToast('⏳ Saving photo to Agent Photo Locker…');
+const okPhoto = await jbSaveAgentPhotoByName(name, _aomPhotoBase64);
+if (!okPhoto) { showSnuToast('⚠ Agent photo failed to save. Month not updated.'); return; }
+_aomPhotoDirty = false;
+_aomPhotoBase64 = getAgentPhotoFromLockerSync(name) || _aomPhotoBase64;
+setAomPreview(_aomPhotoBase64);
+const lockerName = document.getElementById('agentPhotoLibraryName');
+if (lockerName) lockerName.value = name;
+_agentLibraryPhotoBase64 = _aomPhotoBase64;
+setAgentLibraryPreview(_agentLibraryPhotoBase64);
+}
 _aomData[_aomEditingMonth] = {
-name, stat: gv('aomAgentStat'),
+name,
+stat: gv('aomAgentStat'),
 note: gv('aomAgentNote'),
-photo: _aomPhotoBase64 || null
+photo: null,
+photo_agent_name: name
 };
 try {
-localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
-} catch(e) {
 const slim = {};
-for (const k in _aomData) slim[k] = { ..._aomData[k], photo: null };
+for (const k in _aomData) slim[k] = _aomData[k] ? { ..._aomData[k], photo: null } : null;
 localStorage.setItem(AOM_KEY, JSON.stringify(slim));
-showSnuToast('⚠ Photo too large — saved without photo. Use a smaller image.');
-}
+} catch(e) {}
 renderAllAomCards();
 refreshAomAdminPicker();
-showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '...');
-console.log('[AOM SAVE] Month:', _aomEditingMonth, 'Data:', JSON.stringify(_aomData[_aomEditingMonth]));
+showSnuToast('⏳ Syncing ' + AOM_MONTHS[_aomEditingMonth] + ': ' + name + '…');
 if (typeof jbSave === 'function') {
 const ok = await jbSave('snu_aom', _aomData);
 if (!ok) showSnuToast('⚠ Cloud sync failed — saved locally only. Try Sync All.');
 }
 }
-// ── Clear month ─────────────────────────────────────────────────────────────
 function clearAomMonth() {
 if (_aomEditingMonth === null) return;
 delete _aomData[_aomEditingMonth];
-localStorage.setItem(AOM_KEY, JSON.stringify(_aomData));
+try { localStorage.setItem(AOM_KEY, JSON.stringify(_aomData)); } catch(e) {}
 if (typeof jbSave === 'function') jbSave('snu_aom', _aomData);
 _aomPhotoBase64 = null;
+_aomPhotoDirty = false;
 renderAllAomCards();
 refreshAomAdminPicker();
-// Reset form
 ['aomAgentName','aomAgentStat','aomAgentNote'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
-const preview = document.getElementById('aomPhotoMiniPreview');
-const hint = document.getElementById('aomPhotoUploadHint');
-const zone = document.getElementById('aomPhotoUploadZone');
-if (preview) { preview.src=''; preview.classList.remove('visible'); }
-if (hint) hint.style.display = '';
-if (zone) zone.classList.remove('has-photo');
+setAomPreview(null);
 showSnuToast('🗑 ' + AOM_MONTHS[_aomEditingMonth] + ' cleared.');
 }
+document.addEventListener('DOMContentLoaded', () => {
+const aomZone = document.getElementById('aomPhotoUploadZone');
+if (aomZone) {
+aomZone.addEventListener('dragover', e => { e.preventDefault(); aomZone.style.borderColor = 'var(--accent-2)'; });
+aomZone.addEventListener('dragleave', () => aomZone.style.borderColor = '');
+aomZone.addEventListener('drop', e => {
+e.preventDefault(); aomZone.style.borderColor = '';
+const file = e.dataTransfer.files[0];
+if (file && file.type.startsWith('image/')) handleAomPhoto(file);
+});
+}
+const libZone = document.getElementById('agentPhotoLibraryUploadZone');
+if (libZone) {
+libZone.addEventListener('dragover', e => { e.preventDefault(); libZone.style.borderColor = 'var(--accent-2)'; });
+libZone.addEventListener('dragleave', () => libZone.style.borderColor = '');
+libZone.addEventListener('drop', e => {
+e.preventDefault(); libZone.style.borderColor = '';
+const file = e.dataTransfer.files[0];
+if (file && file.type.startsWith('image/')) handleAgentPhotoLibraryUpload(file);
+});
+}
+const aomName = document.getElementById('aomAgentName');
+if (aomName) {
+aomName.addEventListener('change', () => { _aomPhotoDirty = false; tryAutoPullAomPhotoFromLocker(true); });
+aomName.addEventListener('blur', () => { _aomPhotoDirty = false; tryAutoPullAomPhotoFromLocker(true); });
+}
+// initAom() is called by jbInit() — do NOT call it here or it overwrites cloud photos
+});
 </script>
 <script id="updates-script">
 // ── UPDATES (JSONBin backend) ──────────────────────────────────────────────
@@ -10671,6 +11069,481 @@ document.addEventListener('DOMContentLoaded', () => {
       const file = e.dataTransfer.files[0];
       if (file) handleYtdCsvFile(file);
     });
+  }
+});
+</script>
+
+
+<script id="ancillary-finder-script">
+// ── ANCILLARY CARRIER FINDER ─────────────────────────────────────────────
+const ANC_LOCAL_KEY = 'ancillary_finder_v1';
+const ANC_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+const ANC_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+const ANC_HUB = 'medi';
+const ANC_TILE_KEY = 'ancillary_finder';
+let _ancillary = [];
+let _ancillaryCompare = [];
+let _ancillaryEditId = null;
+let _ancillarySyncStarted = false;
+let _ancillaryPendingAssets = { brochure: null, chart: null };
+function ancEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function ancSlug(){ return 'anc_' + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
+function ancSplitMulti(val){
+  return String(val||'').split(/[;,\n]+/).map(v=>String(v||'').trim()).filter(Boolean);
+}
+function ancSplitStates(val){
+  return ancSplitMulti(val).map(v=>v.toUpperCase()).filter(Boolean);
+}
+function ancBool(v){
+  const s = String(v == null ? '' : v).trim().toLowerCase();
+  if (!s) return true;
+  return !['false','0','no','n','inactive'].includes(s);
+}
+function ancNum(v){ const n = Number(String(v||'').replace(/,/g,'')); return Number.isFinite(n) ? n : 0; }
+function ancNormalizeRecord(r){
+  const id = String(r.id || ancSlug());
+  return {
+    id,
+    carrier_name: String(r.carrier_name || r.name || '').trim(),
+    category: String(r.category || '').trim(),
+    product_name: String(r.product_name || '').trim(),
+    states: Array.isArray(r.states) ? r.states.map(v=>String(v).trim().toUpperCase()).filter(Boolean) : ancSplitStates(r.states),
+    riders: Array.isArray(r.riders) ? r.riders.map(v=>String(v).trim()).filter(Boolean) : ancSplitMulti(r.riders),
+    brochure_url: String(r.brochure_url || '').trim(),
+    brochure_file64: String(r.brochure_file64 || '').trim(),
+    brochure_file_type: String(r.brochure_file_type || '').trim(),
+    brochure_file_name: String(r.brochure_file_name || '').trim(),
+    state_chart_url: String(r.state_chart_url || '').trim(),
+    state_chart_file64: String(r.state_chart_file64 || '').trim(),
+    state_chart_file_type: String(r.state_chart_file_type || '').trim(),
+    state_chart_file_name: String(r.state_chart_file_name || '').trim(),
+    eapp_url: String(r.eapp_url || '').trim(),
+    portal_url: String(r.portal_url || '').trim(),
+    support_phone: String(r.support_phone || '').trim(),
+    notes: String(r.notes || '').trim(),
+    active: r.active === undefined ? true : ancBool(r.active),
+    sort_order: ancNum(r.sort_order || 0)
+  };
+}
+function ancNormalizePayload(raw){
+  const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+  const rows = Array.isArray(d.records) ? d.records : (Array.isArray(d) ? d : []);
+  return rows.map(ancNormalizeRecord).filter(r => r.carrier_name && r.category && r.product_name);
+}
+function ancSaveLocal(){ try { localStorage.setItem(ANC_LOCAL_KEY, JSON.stringify({ records:_ancillary })); } catch(e){} }
+function ancFetchCloud(){
+  return fetch(`${ANC_SUPA_URL}/rest/v1/tile_content?hub=eq.${ANC_HUB}&key=eq.${ANC_TILE_KEY}&select=data`, {
+    headers:{ 'apikey': ANC_SUPA_KEY, 'Authorization':'Bearer '+ANC_SUPA_KEY, 'Cache-Control':'no-cache' }
+  }).then(r=>r.json());
+}
+function ancLoadData(){
+  try {
+    const raw = localStorage.getItem(ANC_LOCAL_KEY);
+    if (raw) _ancillary = ancNormalizePayload(JSON.parse(raw));
+  } catch(e) {}
+  renderAncillaryAdminList();
+  renderAncillaryFinder();
+  ancFetchCloud().then(rows=>{
+    if (rows && rows.length && rows[0].data) {
+      _ancillary = ancNormalizePayload(rows[0].data);
+      ancSaveLocal();
+      renderAncillaryAdminList();
+      renderAncillaryFinder();
+    }
+  }).catch(()=>{});
+}
+function ancStartSync(){
+  if (_ancillarySyncStarted) return;
+  _ancillarySyncStarted = true;
+  setInterval(()=>{ ancFetchCloud().then(rows=>{
+    if (rows && rows.length && rows[0].data) {
+      _ancillary = ancNormalizePayload(rows[0].data);
+      ancSaveLocal();
+      renderAncillaryAdminList();
+      renderAncillaryFinder();
+    }
+  }).catch(()=>{}); }, 12000);
+}
+function ancSaveCloud(successMsg, failMsg){
+  ancSaveLocal();
+  const payload = JSON.stringify({ records:_ancillary });
+  const headers = { 'apikey': ANC_SUPA_KEY, 'Authorization':'Bearer '+ANC_SUPA_KEY, 'Content-Type':'application/json', 'Prefer':'return=minimal' };
+  return fetch(`${ANC_SUPA_URL}/rest/v1/tile_content?hub=eq.${ANC_HUB}&key=eq.${ANC_TILE_KEY}`, {
+    method:'DELETE', headers:{ 'apikey': ANC_SUPA_KEY, 'Authorization':'Bearer '+ANC_SUPA_KEY }
+  }).then(()=>fetch(`${ANC_SUPA_URL}/rest/v1/tile_content`, {
+    method:'POST', headers, body: JSON.stringify({ hub: ANC_HUB, key: ANC_TILE_KEY, data: payload })
+  })).then(()=>{
+    if (typeof showSnuToast === 'function') showSnuToast(successMsg || '✓ Ancillary Finder published!');
+  }).catch(()=>{
+    if (typeof showSnuToast === 'function') showSnuToast(failMsg || '⚠ Saved locally (cloud sync failed).');
+  });
+}
+function ancGetActive(){ return _ancillary.filter(r => r.active !== false); }
+function ancGetCategories(){ return [...new Set(ancGetActive().map(r=>r.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
+function ancGetStates(){ return [...new Set(ancGetActive().flatMap(r=>Array.isArray(r.states)?r.states:[]).filter(Boolean))].sort(); }
+function renderAncillaryFilterOptions(){
+  const cat = document.getElementById('ancCategoryFilter');
+  const st = document.getElementById('ancStateFilter');
+  const curCat = cat ? cat.value : '';
+  const curSt = st ? st.value : '';
+  if (cat) cat.innerHTML = '<option value="">All categories</option>' + ancGetCategories().map(v=>`<option value="${ancEsc(v)}">${ancEsc(v)}</option>`).join('');
+  if (st) st.innerHTML = '<option value="">All states</option>' + ancGetStates().map(v=>`<option value="${ancEsc(v)}">${ancEsc(v)}</option>`).join('');
+  if (cat) cat.value = curCat;
+  if (st) st.value = curSt;
+}
+function ancFiltered(){
+  const category = (document.getElementById('ancCategoryFilter')?.value || '').trim().toLowerCase();
+  const state = (document.getElementById('ancStateFilter')?.value || '').trim().toUpperCase();
+  const q = (document.getElementById('ancSearchFilter')?.value || '').trim().toLowerCase();
+  return ancGetActive().filter(r => {
+    if (category && String(r.category||'').toLowerCase() !== category) return false;
+    if (state && !(Array.isArray(r.states) && r.states.includes(state))) return false;
+    if (q) {
+      const hay = [r.carrier_name, r.product_name, r.category, r.notes, (r.riders||[]).join(' '), (r.states||[]).join(' ')].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => (Number(a.sort_order)||0) - (Number(b.sort_order)||0) || a.carrier_name.localeCompare(b.carrier_name));
+}
+function ancDocBtn(rec, kind, label){
+  const urlKey = kind === 'brochure' ? 'brochure_url' : 'state_chart_url';
+  const fileKey = kind === 'brochure' ? 'brochure_file64' : 'state_chart_file64';
+  if (!rec[urlKey] && !rec[fileKey]) return '';
+  return `<button class="anc-resource-btn" onclick="openAncillaryDoc('${ancEsc(rec.id)}','${kind}')">${label}</button>`;
+}
+window.openAncillaryDoc = function(id, kind){
+  const rec = _ancillary.find(r => String(r.id) === String(id));
+  if (!rec) return;
+  const urlKey = kind === 'brochure' ? 'brochure_url' : 'state_chart_url';
+  const fileKey = kind === 'brochure' ? 'brochure_file64' : 'state_chart_file64';
+  const typeKey = kind === 'brochure' ? 'brochure_file_type' : 'state_chart_file_type';
+  const nameKey = kind === 'brochure' ? 'brochure_file_name' : 'state_chart_file_name';
+  if (rec[fileKey]) {
+    if (typeof openLightbox === 'function') openLightbox(rec[fileKey], rec[typeKey] || 'application/pdf', rec[nameKey] || kind);
+    else window.open(rec[fileKey], '_blank');
+    return;
+  }
+  if (rec[urlKey]) window.open(rec[urlKey], '_blank', 'noopener');
+};
+window.toggleAncillaryCompare = function(id){
+  id = String(id);
+  if (_ancillaryCompare.includes(id)) _ancillaryCompare = _ancillaryCompare.filter(x => x !== id);
+  else {
+    if (_ancillaryCompare.length >= 3) {
+      if (typeof showSnuToast === 'function') showSnuToast('⚠ Compare up to 3 plans at a time.');
+      return;
+    }
+    _ancillaryCompare.push(id);
+  }
+  renderAncillaryCompareBar();
+  renderAncillaryFinder();
+};
+function renderAncillaryCompareBar(){
+  const bar = document.getElementById('ancCompareBar');
+  const ct = document.getElementById('ancCompareCount');
+  if (ct) ct.textContent = String(_ancillaryCompare.length);
+  if (bar) bar.classList.toggle('active', _ancillaryCompare.length > 0);
+}
+window.clearAncillaryCompare = function(){ _ancillaryCompare = []; renderAncillaryCompareBar(); renderAncillaryFinder(); };
+function ancRenderResourceRow(rec){
+  return [
+    ancDocBtn(rec, 'brochure', '📄 Brochure'),
+    ancDocBtn(rec, 'chart', '🗺️ State Chart'),
+    rec.eapp_url ? `<a class="anc-resource-btn" href="${ancEsc(rec.eapp_url)}" target="_blank" rel="noopener">🖊️ EApp</a>` : '',
+    rec.portal_url ? `<a class="anc-resource-btn" href="${ancEsc(rec.portal_url)}" target="_blank" rel="noopener">🔗 Portal</a>` : ''
+  ].filter(Boolean).join('');
+}
+window.renderAncillaryFinder = function(){
+  renderAncillaryFilterOptions();
+  renderAncillaryCompareBar();
+  const el = document.getElementById('ancillaryResults'); if (!el) return;
+  const list = ancFiltered();
+  if (!list.length) { el.innerHTML = '<div class="dir-empty">No ancillary products match those filters.</div>'; return; }
+  el.innerHTML = list.map(rec => {
+    const selected = _ancillaryCompare.includes(String(rec.id));
+    const states = (rec.states||[]).join(', ');
+    const riders = (rec.riders||[]).length ? rec.riders.map(r=>`<span class="anc-chip active">${ancEsc(r)}</span>`).join('') : '<span class="anc-chip">No riders listed</span>';
+    return `<div class="anc-card${selected?' compare-on':''}">
+      <div class="anc-head">
+        <div>
+          <div class="anc-name">${ancEsc(rec.carrier_name)}</div>
+          <div class="anc-product">${ancEsc(rec.product_name)}</div>
+        </div>
+        <button class="anc-compare-btn${selected?' active':''}" onclick="toggleAncillaryCompare('${ancEsc(rec.id)}')">${selected ? '✓ Comparing' : '＋ Compare'}</button>
+      </div>
+      <div class="anc-chip-row">
+        <span class="anc-chip active">${ancEsc(rec.category)}</span>
+        ${states ? `<span class="anc-chip">${ancEsc(states)}</span>` : ''}
+        ${rec.eapp_url ? '<span class="anc-chip">eApp</span>' : ''}
+      </div>
+      <div>
+        <div class="anc-label">Riders</div>
+        <div class="anc-chip-row">${riders}</div>
+      </div>
+      ${rec.notes ? `<div><div class="anc-label">Notes</div><div class="anc-meta">${ancEsc(rec.notes)}</div></div>` : ''}
+      <div>
+        <div class="anc-label">Resources</div>
+        <div class="anc-resource-row">${ancRenderResourceRow(rec) || '<span class="anc-chip">No resources yet</span>'}</div>
+      </div>
+      <div class="anc-meta">${rec.support_phone ? `<strong style="color:#fff;">Support:</strong> ${ancEsc(rec.support_phone)}` : '<span style="color:var(--muted-2);">No support phone listed</span>'}</div>
+    </div>`;
+  }).join('');
+};
+window.resetAncillaryFilters = function(){
+  const ids = ['ancCategoryFilter','ancStateFilter','ancSearchFilter']; ids.forEach(id=>{ const el=document.getElementById(id); if (el) el.value=''; }); renderAncillaryFinder();
+};
+window.openAncillaryFinder = function(){
+  document.getElementById('ancillaryOverlay').classList.add('open'); document.body.style.overflow='hidden'; ancLoadData(); ancStartSync();
+};
+window.closeAncillaryFinder = function(){ document.getElementById('ancillaryOverlay').classList.remove('open'); document.body.style.overflow=''; };
+document.addEventListener('DOMContentLoaded', ()=>{
+  const ov = document.getElementById('ancillaryOverlay'); if (ov) ov.addEventListener('click', e=>{ if (e.target === e.currentTarget) closeAncillaryFinder(); });
+  const cv = document.getElementById('ancillaryCompareOverlay'); if (cv) cv.addEventListener('click', e=>{ if (e.target === e.currentTarget) closeAncillaryCompare(); });
+});
+window.openAncillaryCompare = function(){
+  const chosen = _ancillary.filter(r => _ancillaryCompare.includes(String(r.id)));
+  const el = document.getElementById('ancillaryCompareContent'); if (!el) return;
+  if (chosen.length < 2) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Select at least 2 plans to compare.'); return; }
+  const rows = [
+    ['Carrier', r => ancEsc(r.carrier_name)],
+    ['Product', r => ancEsc(r.product_name)],
+    ['Category', r => ancEsc(r.category)],
+    ['States', r => ancEsc((r.states||[]).join(', ') || '—')],
+    ['Riders', r => ancEsc((r.riders||[]).join(', ') || '—')],
+    ['EApp', r => r.eapp_url ? `<a class="anc-resource-btn" href="${ancEsc(r.eapp_url)}" target="_blank" rel="noopener">Open ↗</a>` : '—'],
+    ['Brochure', r => (r.brochure_url || r.brochure_file64) ? `<button class="anc-resource-btn" onclick="openAncillaryDoc('${ancEsc(r.id)}','brochure')">Open</button>` : '—'],
+    ['State Chart', r => (r.state_chart_url || r.state_chart_file64) ? `<button class="anc-resource-btn" onclick="openAncillaryDoc('${ancEsc(r.id)}','chart')">Open</button>` : '—'],
+    ['Portal', r => r.portal_url ? `<a class="anc-resource-btn" href="${ancEsc(r.portal_url)}" target="_blank" rel="noopener">Open ↗</a>` : '—'],
+    ['Support', r => ancEsc(r.support_phone || '—')],
+    ['Notes', r => ancEsc(r.notes || '—')]
+  ];
+  el.innerHTML = `<div class="anc-compare-table-wrap"><table class="anc-compare-table"><thead><tr><th style="width:170px;">Compare</th>${chosen.map(r=>`<th><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#fff;">${ancEsc(r.carrier_name)}</div><div style="font-size:11px;color:var(--accent-2);margin-top:2px;">${ancEsc(r.product_name)}</div></th>`).join('')}</tr></thead><tbody>${rows.map(([label, fn])=>`<tr><th>${label}</th>${chosen.map(r=>`<td>${fn(r)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('ancillaryCompareOverlay').classList.add('open'); document.body.style.overflow='hidden';
+};
+window.closeAncillaryCompare = function(){ document.getElementById('ancillaryCompareOverlay').classList.remove('open'); document.body.style.overflow=''; };
+window.printAncillaryCompare = function(){
+  const content = document.getElementById('ancillaryCompareContent'); if (!content) return;
+  const w = window.open('', '_blank', 'width=1180,height=820');
+  if (!w) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Allow pop-ups to print the compare view.'); return; }
+  w.document.write('<html><head><title>Ancillary Compare</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d1d5db;padding:10px;vertical-align:top;text-align:left}th{background:#f3f4f6}button{display:none}</style></head><body><h2>Ancillary Compare</h2>' + content.innerHTML + '</body></html>');
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(), 400);
+};
+window.emailAncillaryCompare = function(){
+  const chosen = _ancillary.filter(r => _ancillaryCompare.includes(String(r.id)));
+  if (chosen.length < 2) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Select at least 2 plans to compare.'); return; }
+  const lines = [];
+  lines.push('Ancillary Compare');
+  lines.push('');
+  chosen.forEach((r, idx) => {
+    lines.push((idx+1) + '. ' + (r.carrier_name || 'Carrier') + ' - ' + (r.product_name || 'Product'));
+    lines.push('Category: ' + (r.category || ''));
+    lines.push('States: ' + ((r.states||[]).join(', ') || '—'));
+    lines.push('Riders: ' + ((r.riders||[]).join(', ') || '—'));
+    lines.push('EApp: ' + (r.eapp_url || '—'));
+    lines.push('Brochure: ' + (r.brochure_url || (r.brochure_file_name || 'Embedded file')));
+    lines.push('State Chart: ' + (r.state_chart_url || (r.state_chart_file_name || 'Embedded file')));
+    lines.push('Portal: ' + (r.portal_url || '—'));
+    lines.push('Support: ' + (r.support_phone || '—'));
+    lines.push('Notes: ' + (r.notes || '—'));
+    lines.push('');
+  });
+  const subject = encodeURIComponent('Ancillary Compare');
+  const body = encodeURIComponent(lines.join('\n'));
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+};
+function ancUpdateAssetLabels(){
+  const b = _ancillaryPendingAssets.brochure; const c = _ancillaryPendingAssets.chart;
+  const bLabel = document.getElementById('ancBrochureFileLabel'); const cLabel = document.getElementById('ancChartFileLabel');
+  const bz = document.getElementById('ancBrochureZone'); const cz = document.getElementById('ancChartZone');
+  if (bLabel) bLabel.textContent = b ? b.name : 'Click to upload PDF or image brochure';
+  if (cLabel) cLabel.textContent = c ? c.name : 'Click to upload PDF or image chart';
+  if (bz) bz.classList.toggle('has-file', !!b); if (cz) cz.classList.toggle('has-file', !!c);
+}
+window.handleAncillaryAsset = function(file, kind){
+  if (!file) return;
+  if (file.size > 1800000) { if (typeof showSnuToast === 'function') showSnuToast('⚠ File too large — use a hosted URL for large PDFs.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => { _ancillaryPendingAssets[kind] = { dataUrl: e.target.result, type: file.type || '', name: file.name || '' }; ancUpdateAssetLabels(); };
+  reader.readAsDataURL(file);
+};
+function ancSetForm(rec){
+  const set = (id, val) => { const el = document.getElementById(id); if (!el) return; if (el.type === 'checkbox') el.checked = !!val; else el.value = val || ''; };
+  set('ancCarrierName', rec?.carrier_name || ''); set('ancCategory', rec?.category || ''); set('ancProductName', rec?.product_name || '');
+  set('ancStates', (rec?.states || []).join(', ')); set('ancRiders', (rec?.riders || []).join('; '));
+  set('ancBrochureUrl', rec?.brochure_url || ''); set('ancStateChartUrl', rec?.state_chart_url || ''); set('ancEappUrl', rec?.eapp_url || '');
+  set('ancPortalUrl', rec?.portal_url || ''); set('ancSupportPhone', rec?.support_phone || ''); set('ancSortOrder', rec?.sort_order || '');
+  set('ancNotes', rec?.notes || ''); set('ancActive', rec ? rec.active !== false : true);
+  _ancillaryPendingAssets = {
+    brochure: rec?.brochure_file64 ? { dataUrl: rec.brochure_file64, type: rec.brochure_file_type || '', name: rec.brochure_file_name || 'Saved file' } : null,
+    chart: rec?.state_chart_file64 ? { dataUrl: rec.state_chart_file64, type: rec.state_chart_file_type || '', name: rec.state_chart_file_name || 'Saved file' } : null
+  };
+  ancUpdateAssetLabels();
+}
+window.cancelAncillaryEdit = function(){
+  _ancillaryEditId = null; ancSetForm(null); const btn = document.getElementById('ancCancelBtn'); if (btn) btn.style.display='none';
+  const fi1=document.getElementById('ancBrochureInput'); if(fi1) fi1.value=''; const fi2=document.getElementById('ancChartInput'); if(fi2) fi2.value='';
+};
+window.submitAncillaryEntry = function(){
+  const g = id => (document.getElementById(id)?.value || '').trim();
+  const carrier_name = g('ancCarrierName'); const category = g('ancCategory'); const product_name = g('ancProductName');
+  if (!carrier_name || !category || !product_name) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Carrier, category, and product are required.'); return; }
+  const prev = _ancillaryEditId ? (_ancillary.find(r => String(r.id) === String(_ancillaryEditId)) || {}) : {};
+  const rec = ancNormalizeRecord({
+    id: _ancillaryEditId || ancSlug(),
+    carrier_name, category, product_name,
+    states: ancSplitStates(g('ancStates')),
+    riders: ancSplitMulti(g('ancRiders')),
+    brochure_url: g('ancBrochureUrl'),
+    brochure_file64: _ancillaryPendingAssets.brochure?.dataUrl || prev.brochure_file64 || '',
+    brochure_file_type: _ancillaryPendingAssets.brochure?.type || prev.brochure_file_type || '',
+    brochure_file_name: _ancillaryPendingAssets.brochure?.name || prev.brochure_file_name || '',
+    state_chart_url: g('ancStateChartUrl'),
+    state_chart_file64: _ancillaryPendingAssets.chart?.dataUrl || prev.state_chart_file64 || '',
+    state_chart_file_type: _ancillaryPendingAssets.chart?.type || prev.state_chart_file_type || '',
+    state_chart_file_name: _ancillaryPendingAssets.chart?.name || prev.state_chart_file_name || '',
+    eapp_url: g('ancEappUrl'),
+    portal_url: g('ancPortalUrl'),
+    support_phone: g('ancSupportPhone'),
+    notes: g('ancNotes'),
+    active: !!document.getElementById('ancActive')?.checked,
+    sort_order: ancNum(g('ancSortOrder'))
+  });
+  const idx = _ancillary.findIndex(r => String(r.id) === String(rec.id));
+  if (idx >= 0) _ancillary[idx] = rec; else _ancillary.push(rec);
+  renderAncillaryAdminList(); renderAncillaryFinder();
+  ancSaveCloud('✓ Ancillary entry saved globally!');
+  cancelAncillaryEdit();
+};
+window.editAncillaryEntry = function(id){
+  const rec = _ancillary.find(r => String(r.id) === String(id)); if (!rec) return;
+  _ancillaryEditId = rec.id; ancSetForm(rec); const btn=document.getElementById('ancCancelBtn'); if(btn) btn.style.display='';
+  document.getElementById('ancCarrierName')?.focus();
+};
+window.deleteAncillaryEntry = function(id){
+  _ancillary = _ancillary.filter(r => String(r.id) !== String(id)); _ancillaryCompare = _ancillaryCompare.filter(x => String(x) !== String(id));
+  renderAncillaryAdminList(); renderAncillaryFinder(); renderAncillaryCompareBar();
+  ancSaveCloud('🗑 Ancillary entry removed.');
+};
+function renderAncillaryAdminList(){
+  const el = document.getElementById('ancAdminList'); const ct = document.getElementById('ancAdminCount'); if (!el) return;
+  if (ct) ct.textContent = `(${_ancillary.length})`;
+  if (!_ancillary.length) { el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No ancillary plans yet.</div>'; return; }
+  const rows = [..._ancillary].sort((a,b)=>(Number(a.sort_order)||0)-(Number(b.sort_order)||0)||a.carrier_name.localeCompare(b.carrier_name));
+  el.innerHTML = rows.map(r => `
+    <div class="anc-admin-item">
+      <div class="anc-admin-top">
+        <div style="flex:1;min-width:0;">
+          <div class="anc-admin-title">${ancEsc(r.carrier_name)} <span style="color:var(--accent-2);font-weight:600;">· ${ancEsc(r.product_name)}</span></div>
+          <div class="anc-admin-sub">${ancEsc(r.category)}${(r.states||[]).length ? ' · ' + ancEsc(r.states.join(', ')) : ''}${r.active === false ? ' · Inactive' : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button onclick="editAncillaryEntry('${ancEsc(r.id)}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️</button>
+          <button onclick="deleteAncillaryEntry('${ancEsc(r.id)}')" class="admin-update-del">🗑</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">${(r.riders||[]).slice(0,6).map(v=>`<span class="anc-chip active">${ancEsc(v)}</span>`).join('') || '<span class="anc-chip">No riders listed</span>'}</div>
+      <div style="font-size:11px;color:var(--muted-2);margin-top:8px;line-height:1.5;">${ancEsc(r.notes || '')}</div>
+    </div>
+  `).join('');
+}
+function ancMapHeaders(headers){
+  const lower = headers.map(h => String(h||'').trim().toLowerCase());
+  const find = (...names) => {
+    const idx = lower.findIndex(h => names.includes(h));
+    return idx >= 0 ? headers[idx] : '';
+  };
+  return {
+    carrier_name: find('carrier name','carrier','name'),
+    category: find('category','plan category','type'),
+    product_name: find('product name','product','plan name'),
+    states: find('states','state availability','state'),
+    riders: find('riders','rider','benefits'),
+    brochure_url: find('brochure url','brochure','brochure link'),
+    state_chart_url: find('state chart url','state chart','availability chart','state availability chart'),
+    eapp_url: find('eapp url','eapp','e-app','e-app url'),
+    portal_url: find('portal url','portal'),
+    support_phone: find('support phone','support','phone','broker support'),
+    notes: find('notes','note'),
+    active: find('active','status'),
+    sort_order: find('sort order','sort','order')
+  };
+}
+function ancRowsFromImported(rows, headers){
+  const map = ancMapHeaders(headers);
+  const out = rows.map(r => ancNormalizeRecord({
+    id: ancSlug(),
+    carrier_name: r[map.carrier_name],
+    category: r[map.category],
+    product_name: r[map.product_name],
+    states: r[map.states],
+    riders: r[map.riders],
+    brochure_url: r[map.brochure_url],
+    state_chart_url: r[map.state_chart_url],
+    eapp_url: r[map.eapp_url],
+    portal_url: r[map.portal_url],
+    support_phone: r[map.support_phone],
+    notes: r[map.notes],
+    active: map.active ? r[map.active] : true,
+    sort_order: map.sort_order ? r[map.sort_order] : 0
+  })).filter(r => r.carrier_name && r.category && r.product_name);
+  return out;
+}
+window.handleAncillaryCsvFile = function(file){
+  if (!file) return;
+  const status = document.getElementById('ancillaryCsvStatus');
+  const setMsg = (msg, ok) => { if (status) { status.textContent = msg; status.className = 'csv-status ' + (ok ? 'ok' : 'err'); } };
+  const processRows = (rows, headers) => {
+    const items = ancRowsFromImported(rows, headers);
+    if (!items.length) { setMsg('✗ No valid ancillary rows found.', false); return; }
+    _ancillary = items;
+    renderAncillaryAdminList(); renderAncillaryFinder();
+    ancSaveCloud('✓ Ancillary library imported and published!');
+    setMsg(`✓ Imported ${items.length} ancillary plan${items.length !== 1 ? 's' : ''}.`, true);
+  };
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      if (file.name.match(/\.xlsx?$/i)) {
+        if (typeof XLSX === 'undefined') { setMsg('Loading Excel support…', false); loadSheetJS(() => handleAncillaryCsvFile(file)); return; }
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        const headerRow = raw.findIndex(r => Array.isArray(r) && r.some(c => String(c || '').trim()));
+        const headers = (raw[headerRow] || []).map(h => String(h || '').trim());
+        const rows = raw.slice(headerRow + 1).filter(r => Array.isArray(r) && r.some(c => String(c || '').trim())).map(r => {
+          const obj = {}; headers.forEach((h,i)=>obj[h] = r[i] !== undefined ? String(r[i]).trim() : ''); return obj;
+        });
+        processRows(rows, headers);
+      } else {
+        const lines = String(e.target.result || '').split(/\r?\n/).filter(l => l.trim());
+        const headers = smartSplitCsv(lines[0]).map(h => String(h || '').replace(/^"|"$/g,'').trim());
+        const rows = lines.slice(1).map(line => {
+          const vals = smartSplitCsv(line); const obj = {}; headers.forEach((h,i)=>obj[h] = String(vals[i] || '').replace(/^"|"$/g,'').trim()); return obj;
+        });
+        processRows(rows, headers);
+      }
+    } catch (err) { setMsg('✗ Parse error: ' + err.message, false); }
+  };
+  if (file.name.match(/\.xlsx?$/i)) reader.readAsArrayBuffer(file); else reader.readAsText(file);
+};
+window.clearAncillaryData = function(){
+  if (!confirm('Clear the entire ancillary library?')) return;
+  _ancillary = []; _ancillaryCompare = []; ancSaveLocal(); renderAncillaryAdminList(); renderAncillaryFinder(); renderAncillaryCompareBar();
+  fetch(`${ANC_SUPA_URL}/rest/v1/tile_content?hub=eq.${ANC_HUB}&key=eq.${ANC_TILE_KEY}`, { method:'DELETE', headers:{ 'apikey': ANC_SUPA_KEY, 'Authorization':'Bearer '+ANC_SUPA_KEY } }).then(()=>{
+    if (typeof showSnuToast === 'function') showSnuToast('🗑 Ancillary library cleared.');
+  }).catch(()=>{});
+  cancelAncillaryEdit();
+  const status = document.getElementById('ancillaryCsvStatus'); if (status) { status.textContent=''; status.className='csv-status'; }
+};
+document.addEventListener('DOMContentLoaded', ()=>{
+  ancLoadData(); ancStartSync();
+  const drop = document.getElementById('ancillaryCsvDrop');
+  if (drop) {
+    drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('drag-over'); });
+    drop.addEventListener('dragleave', ()=>drop.classList.remove('drag-over'));
+    drop.addEventListener('drop', e=>{ e.preventDefault(); drop.classList.remove('drag-over'); const file=e.dataTransfer.files[0]; if(file) handleAncillaryCsvFile(file); });
   }
 });
 </script>
@@ -13280,6 +14153,7 @@ const GSEARCH_INDEX = [
 {name:'Submit a Referral',section:'Agent Tools',icon:'📋',action:()=>{ openReferralModal?.(); closeGsearch(); }},
 {name:'Alliance Program',section:'Agent Tools',icon:'🤝',action:()=>{ openAllianceProgramModal?.(); closeGsearch(); }},
 {name:'Group Health Census',section:'Agent Tools',icon:'📋',action:()=>{ openCensusFormModal?.(); closeGsearch(); }},
+{name:'Ancillary Carrier Finder',section:'Agent Tools',icon:'🩺',action:()=>{ openAncillaryFinder?.(); closeGsearch(); }},
 // Portals
 {name:'AgencyBloc',section:'Portals',icon:'🗂️',action:()=>window.open('https://app.agencybloc.com/','_blank')},
 {name:'CSG Portal',section:'Portals',icon:'🧰',action:()=>window.open('https://www.insurancetoolsportal.com/','_blank')},
