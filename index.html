@@ -5099,7 +5099,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div class="csv-drop-zone" id="ancillaryCsvDrop" onclick="document.getElementById('ancillaryCsvInput').click()" style="margin-bottom:10px;">
 <div class="csv-drop-icon">📂</div>
 <div class="csv-drop-text">Drop CSV or Excel here, or <span>click to browse</span></div>
-<div class="csv-drop-hint">Columns: <code>Carrier Name</code>, <code>Category</code>, <code>Product Name</code>, <code>States</code>, <code>Riders</code>, <code>Brochure URL</code>, <code>State Chart URL</code>, <code>EApp URL</code>, <code>Portal URL</code>, <code>Support Phone</code>, <code>Notes</code>, <code>Active</code>, <code>Sort Order</code></div>
+<div class="csv-drop-hint">Columns: <code>Carrier Name</code>, <code>Category</code>, <code>Product Name</code>, <code>States</code>, <code>Riders</code>, <code>Brochure URL</code>, <code>State Chart URL</code>, <code>Quote / Enroll URL</code> (or <code>EApp URL</code>), <code>Portal URL</code>, <code>Support Phone</code>, <code>Notes</code>, <code>Active</code>, <code>Sort Order</code></div>
 <input type="file" id="ancillaryCsvInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleAncillaryCsvFile(this.files[0])">
 </div>
 <div class="csv-status" id="ancillaryCsvStatus"></div>
@@ -5118,7 +5118,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">State Chart URL</label><input id="ancStateChartUrl" class="admin-input" type="text" placeholder="https://…"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">EApp URL</label><input id="ancEappUrl" class="admin-input" type="text" placeholder="https://…"></div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Quote / Enroll URL</label><input id="ancEappUrl" class="admin-input" type="text" placeholder="https://…"></div>
 <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Portal URL</label><input id="ancPortalUrl" class="admin-input" type="text" placeholder="https://…"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 120px 120px;gap:8px;align-items:end;">
@@ -11336,7 +11336,7 @@ function ancRenderResourceRow(rec){
   return [
     ancDocBtn(rec, 'brochure', '📄 Brochure'),
     ancDocBtn(rec, 'chart', '🗺️ State Chart'),
-    rec.eapp_url ? `<a class="anc-resource-btn" href="${ancEsc(rec.eapp_url)}" target="_blank" rel="noopener">🖊️ EApp</a>` : '',
+    rec.eapp_url ? `<a class="anc-resource-btn" href="${ancEsc(rec.eapp_url)}" target="_blank" rel="noopener">🖊️ Quote / Enroll</a>` : '',
     rec.portal_url ? `<a class="anc-resource-btn" href="${ancEsc(rec.portal_url)}" target="_blank" rel="noopener">🔗 Portal</a>` : ''
   ].filter(Boolean).join('');
 }
@@ -11363,7 +11363,7 @@ window.renderAncillaryFinder = function(){
         <span class="anc-chip active">${ancEsc(rec.category)}</span>
         ${subtype}
         ${states ? `<span class="anc-chip">${ancEsc(states)}</span>` : ''}
-        ${rec.eapp_url ? '<span class="anc-chip">eApp</span>' : ''}
+        ${rec.eapp_url ? '<span class="anc-chip">Quote / Enroll</span>' : ''}
       </div>
       <div>
         <div class="anc-label">Riders</div>
@@ -11407,7 +11407,7 @@ window.openAncillaryCompare = function(){
     ['Plan Type', r => ancEsc(r.raw_category || r.category || '—')],
     ['States', r => ancEsc((r.states||[]).join(', ') || '—')],
     ['Riders', r => ancEsc((r.riders||[]).join(', ') || '—')],
-    ['EApp', r => r.eapp_url ? `<a class="anc-resource-btn" href="${ancEsc(r.eapp_url)}" target="_blank" rel="noopener">Open ↗</a>` : '—'],
+    ['Quote / Enroll', r => r.eapp_url ? `<a class="anc-resource-btn" href="${ancEsc(r.eapp_url)}" target="_blank" rel="noopener">Open ↗</a>` : '—'],
     ['Brochure', r => (r.brochure_url || r.brochure_file64) ? `<button class="anc-resource-btn" onclick="openAncillaryDoc('${ancEsc(r.id)}','brochure')">Open</button>` : '—'],
     ['State Chart', r => (r.state_chart_url || r.state_chart_file64) ? `<button class="anc-resource-btn" onclick="openAncillaryDoc('${ancEsc(r.id)}','chart')">Open</button>` : '—'],
     ['Portal', r => r.portal_url ? `<a class="anc-resource-btn" href="${ancEsc(r.portal_url)}" target="_blank" rel="noopener">Open ↗</a>` : '—'],
@@ -11438,7 +11438,7 @@ window.emailAncillaryCompare = function(){
     lines.push('Category: ' + (r.category || ''));
     lines.push('States: ' + ((r.states||[]).join(', ') || '—'));
     lines.push('Riders: ' + ((r.riders||[]).join(', ') || '—'));
-    lines.push('EApp: ' + (r.eapp_url || '—'));
+    lines.push('Quote / Enroll: ' + (r.eapp_url || '—'));
     lines.push('Brochure: ' + (r.brochure_url || (r.brochure_file_name || 'Embedded file')));
     lines.push('State Chart: ' + (r.state_chart_url || (r.state_chart_file_name || 'Embedded file')));
     lines.push('Portal: ' + (r.portal_url || '—'));
@@ -11559,7 +11559,7 @@ function ancMapHeaders(headers){
     riders: find('riders','rider','benefits'),
     brochure_url: find('brochure url','brochure','brochure link'),
     state_chart_url: find('state chart url','state chart','availability chart','state availability chart'),
-    eapp_url: find('eapp url','eapp','e-app','e-app url'),
+    eapp_url: find('quote / enroll url','quote and enroll url','quote & enroll url','quote/enroll url','quote enroll url','quote url','enroll url','eapp url','eapp','e-app','e-app url'),
     portal_url: find('portal url','portal'),
     support_phone: find('support phone','support','phone','broker support'),
     notes: find('notes','note'),
