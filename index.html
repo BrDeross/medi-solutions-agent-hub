@@ -5095,7 +5095,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div id="adminTabAncillary" class="admin-tab-panel">
 <div class="admin-body">
 <div class="admin-section-title">🩺 Ancillary Carrier Finder</div>
-<p style="font-size:12px;color:var(--muted-2);margin-bottom:14px;">Build a shared ancillary library for agents. Bulk import will replace the current library and publish globally. Manual entries save globally as soon as you add or update them.</p>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:14px;">Build a shared ancillary library for agents. Bulk import now merges new rows into the current library and publishes globally. Manual entries save globally as soon as you add or update them.</p>
 <div class="csv-drop-zone" id="ancillaryCsvDrop" onclick="document.getElementById('ancillaryCsvInput').click()" style="margin-bottom:10px;">
 <div class="csv-drop-icon">📂</div>
 <div class="csv-drop-text">Drop CSV or Excel here, or <span>click to browse</span></div>
@@ -11164,12 +11164,26 @@ function ancBool(v){
   return !['false','0','no','n','inactive'].includes(s);
 }
 function ancNum(v){ const n = Number(String(v||'').replace(/,/g,'')); return Number.isFinite(n) ? n : 0; }
+function ancNormalizeCategory(val){
+  const raw = String(val || '').trim();
+  const s = raw.toLowerCase();
+  if (!raw) return '';
+  if (/hospital\s*(indemnity|confinement)|fchi|chi/.test(s)) return 'Hospital Indemnity';
+  if (/short[ -]?term\s*care|\bstc\b/.test(s)) return 'Short-Term Care';
+  if (/dental|vision|hearing|\bdvh\b/.test(s)) return 'Dental / Vision / Hearing';
+  if (/\baccident\b/.test(s)) return 'Accident';
+  if (/whole life|\blife\b/.test(s) && !/quality of life/.test(s)) return 'Life';
+  if (/critical illness|cancer|heart|stroke|specified disease/.test(s)) return 'Cancer / Heart Attack & Stroke';
+  return raw;
+}
 function ancNormalizeRecord(r){
   const id = String(r.id || ancSlug());
+  const rawCategory = String(r.raw_category || r.sub_category || r.original_category || r.category || '').trim();
   return {
     id,
     carrier_name: String(r.carrier_name || r.name || '').trim(),
-    category: String(r.category || '').trim(),
+    category: ancNormalizeCategory(rawCategory),
+    raw_category: rawCategory,
     product_name: String(r.product_name || '').trim(),
     states: Array.isArray(r.states) ? r.states.map(v=>String(v).trim().toUpperCase()).filter(Boolean) : ancSplitStates(r.states),
     riders: Array.isArray(r.riders) ? r.riders.map(v=>String(v).trim()).filter(Boolean) : ancSplitMulti(r.riders),
@@ -11188,6 +11202,15 @@ function ancNormalizeRecord(r){
     active: r.active === undefined ? true : ancBool(r.active),
     sort_order: ancNum(r.sort_order || 0)
   };
+}
+function ancNaturalKey(r){
+  const states = Array.isArray(r.states) ? [...r.states].map(v=>String(v).trim().toUpperCase()).filter(Boolean).sort().join('|') : '';
+  return [
+    String(r.carrier_name || '').trim().toLowerCase(),
+    String(r.product_name || '').trim().toLowerCase(),
+    String(r.raw_category || r.category || '').trim().toLowerCase(),
+    states
+  ].join('::');
 }
 function ancNormalizePayload(raw){
   const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
@@ -11327,6 +11350,7 @@ window.renderAncillaryFinder = function(){
     const selected = _ancillaryCompare.includes(String(rec.id));
     const states = (rec.states||[]).join(', ');
     const riders = (rec.riders||[]).length ? rec.riders.map(r=>`<span class="anc-chip active">${ancEsc(r)}</span>`).join('') : '<span class="anc-chip">No riders listed</span>';
+    const subtype = rec.raw_category && rec.raw_category !== rec.category ? `<span class="anc-chip">${ancEsc(rec.raw_category)}</span>` : '';
     return `<div class="anc-card${selected?' compare-on':''}">
       <div class="anc-head">
         <div>
@@ -11337,6 +11361,7 @@ window.renderAncillaryFinder = function(){
       </div>
       <div class="anc-chip-row">
         <span class="anc-chip active">${ancEsc(rec.category)}</span>
+        ${subtype}
         ${states ? `<span class="anc-chip">${ancEsc(states)}</span>` : ''}
         ${rec.eapp_url ? '<span class="anc-chip">eApp</span>' : ''}
       </div>
@@ -11357,7 +11382,14 @@ window.resetAncillaryFilters = function(){
   const ids = ['ancCategoryFilter','ancStateFilter','ancSearchFilter']; ids.forEach(id=>{ const el=document.getElementById(id); if (el) el.value=''; }); renderAncillaryFinder();
 };
 window.openAncillaryFinder = function(){
-  document.getElementById('ancillaryOverlay').classList.add('open'); document.body.style.overflow='hidden'; ancLoadData(); ancStartSync();
+  document.getElementById('ancillaryOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  ancLoadData();
+  ancStartSync();
+  const cat = document.getElementById('ancCategoryFilter'); if (cat) cat.value = '';
+  const st = document.getElementById('ancStateFilter'); if (st) st.value = '';
+  const q = document.getElementById('ancSearchFilter'); if (q) q.value = '';
+  renderAncillaryFinder();
 };
 window.closeAncillaryFinder = function(){ document.getElementById('ancillaryOverlay').classList.remove('open'); document.body.style.overflow=''; };
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -11372,6 +11404,7 @@ window.openAncillaryCompare = function(){
     ['Carrier', r => ancEsc(r.carrier_name)],
     ['Product', r => ancEsc(r.product_name)],
     ['Category', r => ancEsc(r.category)],
+    ['Plan Type', r => ancEsc(r.raw_category || r.category || '—')],
     ['States', r => ancEsc((r.states||[]).join(', ') || '—')],
     ['Riders', r => ancEsc((r.riders||[]).join(', ') || '—')],
     ['EApp', r => r.eapp_url ? `<a class="anc-resource-btn" href="${ancEsc(r.eapp_url)}" target="_blank" rel="noopener">Open ↗</a>` : '—'],
@@ -11561,10 +11594,17 @@ window.handleAncillaryCsvFile = function(file){
   const processRows = (rows, headers) => {
     const items = ancRowsFromImported(rows, headers);
     if (!items.length) { setMsg('✗ No valid ancillary rows found.', false); return; }
-    _ancillary = items;
+    const merged = [..._ancillary];
+    items.forEach(rec => {
+      const key = ancNaturalKey(rec);
+      const idx = merged.findIndex(x => ancNaturalKey(x) === key);
+      if (idx >= 0) merged[idx] = { ...merged[idx], ...rec, id: merged[idx].id || rec.id };
+      else merged.push(rec);
+    });
+    _ancillary = merged;
     renderAncillaryAdminList(); renderAncillaryFinder();
     ancSaveCloud('✓ Ancillary library imported and published!');
-    setMsg(`✓ Imported ${items.length} ancillary plan${items.length !== 1 ? 's' : ''}.`, true);
+    setMsg(`✓ Imported ${items.length} ancillary plan${items.length !== 1 ? 's' : ''} and merged them into the current library.`, true);
   };
   const reader = new FileReader();
   reader.onload = function(e){
