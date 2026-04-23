@@ -8607,7 +8607,15 @@ closeAdmin();
 showSnuToast('⭐ Spotlight published!');
 }
 // ── Render spotlight card on dashboard ───────────────────────────────────
+// RACE-CONDITION GUARD: Every render (and every explicit save/admin action)
+// bumps _spotlightRenderVersion. Async photo fetches capture the version at
+// dispatch time; when they resolve, they only re-render if the version is
+// still current. This prevents a stale in-flight photo fetch (started against
+// an OLD spotlight before the admin saved a NEW one) from clobbering the
+// freshly-saved spotlight ~3 seconds later.
+window._spotlightRenderVersion = window._spotlightRenderVersion || 0;
 function renderSpotlightCard(data) {
+const myVersion = ++window._spotlightRenderVersion;
 if (!data) {
 try {
 if (window._jbRecord?.snu_spotlight?.name) {
@@ -8636,6 +8644,9 @@ const bioHtml = data.bio ? `
 const resolvedPhoto = getResolvedSpotlightPhoto(data);
 if (!resolvedPhoto && (data.photo_agent_name || data.name) && typeof jbLoadAgentPhotoByName === 'function') {
 jbLoadAgentPhotoByName(data.photo_agent_name || data.name).then(photo => {
+// Abort if a newer render happened while we were fetching — prevents
+// stale photo fetches from overwriting freshly-saved spotlights.
+if (myVersion !== window._spotlightRenderVersion) return;
 if (photo) {
 const next = { ...data, photo };
 if (window._jbRecord?.snu_spotlight && normalizeAgentPhotoKey(window._jbRecord.snu_spotlight.photo_agent_name || window._jbRecord.snu_spotlight.name) === normalizeAgentPhotoKey(data.photo_agent_name || data.name)) {
