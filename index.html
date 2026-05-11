@@ -5941,7 +5941,7 @@ Build a library of articles. Each time you save the SNU leaderboard, the spotlig
 <div id="adminTabForms" class="admin-tab-panel">
 <div class="admin-body">
 <div class="admin-section-title">📁 Forms Locker</div>
-<p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add forms agents can access during calls. Drag rows to reorder. Click ✏️ to edit an existing form.</p>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Add forms agents can access during calls. Drag/drop PDF or JPG files to upload, drag rows to reorder, and click ✏️ to edit an existing form.</p>
 <!-- Add / Edit form -->
 <div style="background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:12px;padding:16px;margin-bottom:16px;">
 <div class="admin-section-title" id="formsFormTitle" style="margin-bottom:10px;font-size:11px;">➕ New Form</div>
@@ -5960,9 +5960,21 @@ Build a library of articles. Each time you save the SNU leaderboard, the spotlig
 <label>Description (optional)</label>
 <input class="admin-input" id="formsDesc" placeholder="Brief description of this form…">
 </div>
-<div class="admin-field" style="margin-bottom:14px;">
+<div class="admin-field" style="margin-bottom:10px;">
 <label>Link URL</label>
 <input class="admin-input" id="formsUrl" placeholder="https://…">
+</div>
+<div style="border:1px solid rgba(251,191,36,.28);background:rgba(251,191,36,.08);border-radius:12px;padding:12px 14px;margin:12px 0 10px;">
+<div style="font-size:12px;font-weight:900;color:var(--gold);letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px;">⬆ Upload PDF/JPG From Computer</div>
+<div style="font-size:11px;color:var(--muted);line-height:1.5;">Drop files in the box below, or click the box to browse. Uploaded files are saved to Forms Locker and become clickable for agents.</div>
+</div>
+<div id="formsDropZone" onclick="document.getElementById('formsFileInput')?.click()" ondragover="formsFileDragOver(event)" ondragleave="formsFileDragLeave(event)" ondrop="formsFileDrop(event)" style="border:3px dashed rgba(251,191,36,.65);border-radius:16px;padding:28px 18px;text-align:center;background:rgba(251,191,36,.10);cursor:pointer;margin-bottom:14px;transition:background .15s,border-color .15s,box-shadow .15s;box-shadow:0 0 0 1px rgba(251,191,36,.10) inset;">
+<input id="formsFileInput" type="file" accept="application/pdf,image/jpeg,image/jpg" multiple style="display:none;" onchange="formsFileInputChanged(event)">
+<div style="font-size:34px;margin-bottom:8px;">📎</div>
+<div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:5px;">DROP PDF OR JPG FILES HERE</div>
+<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;">or click this upload box to choose files from your computer</div>
+<button type="button" onclick="event.stopPropagation();document.getElementById('formsFileInput')?.click();" style="background:var(--gold);color:#102245;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;">Choose PDF/JPG Files</button>
+<div id="formsUploadStatus" style="font-size:12px;color:var(--muted-2);margin-top:10px;min-height:18px;font-weight:700;"></div>
 </div>
 <div style="display:flex;gap:10px;">
 <button class="admin-save-btn" id="formsSubmitBtn" style="width:auto;padding:10px 24px;" onclick="submitFormEntry()">➕ Add Form</button>
@@ -13303,6 +13315,7 @@ const FORMS_HUB = 'medi';
 let _forms = [];
 let _formsSaving = false;
 let _formsEditId = null;
+const FORMS_STORAGE_BUCKET = 'forms-locker';
 // ── Load — always fetch from Supabase, no localStorage ────────────────────
 function initFormsLocker() {
 fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}&select=data`, {
@@ -13338,6 +13351,124 @@ body: JSON.stringify({ hub: FORMS_HUB, data: payload })
 }).then(() => { _formsSaving = false; if (onSuccess) onSuccess(); })
 .catch(() => { _formsSaving = false; if (typeof showSnuToast === 'function') showSnuToast('⚠ Save failed — check connection.'); });
 }
+// ── Admin: drag/drop file upload ───────────────────────────────────────────
+function formsSetUploadStatus(message, isError) {
+const el = document.getElementById('formsUploadStatus');
+if (!el) return;
+el.textContent = message || '';
+el.style.color = isError ? 'var(--rose)' : 'var(--muted-2)';
+}
+function formsFileDragOver(e) {
+e.preventDefault();
+const dz = document.getElementById('formsDropZone');
+if (dz) { dz.style.borderColor = 'var(--accent-2)'; dz.style.background = 'rgba(59,130,246,.10)'; }
+}
+function formsFileDragLeave(e) {
+e.preventDefault();
+const dz = document.getElementById('formsDropZone');
+if (dz) { dz.style.borderColor = 'rgba(255,255,255,.22)'; dz.style.background = 'rgba(255,255,255,.035)'; }
+}
+function formsFileDrop(e) {
+e.preventDefault();
+formsFileDragLeave(e);
+const files = Array.from(e.dataTransfer?.files || []);
+uploadFormsFiles(files);
+}
+function formsFileInputChanged(e) {
+const files = Array.from(e.target?.files || []);
+uploadFormsFiles(files);
+e.target.value = '';
+}
+function formsSafeFileName(name) {
+const parts = String(name || 'form').split('.');
+const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
+const base = parts.join('.').toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '') || 'form';
+return ext ? `${base}.${ext}` : base;
+}
+function formsDisplayNameFromFile(name) {
+return String(name || 'Uploaded Form')
+  .replace(/\.[^.]+$/, '')
+  .replace(/[_-]+/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .replace(/\b\w/g, c => c.toUpperCase());
+}
+function formsIsAllowedFile(file) {
+const type = String(file?.type || '').toLowerCase();
+const name = String(file?.name || '').toLowerCase();
+return type === 'application/pdf' || type === 'image/jpeg' || name.endsWith('.pdf') || name.endsWith('.jpg') || name.endsWith('.jpeg');
+}
+async function ensureFormsStorageBucket() {
+try {
+  const check = await fetch(`${FORMS_SUPA_URL}/storage/v1/bucket/${FORMS_STORAGE_BUCKET}`, {
+    headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY }
+  });
+  if (check.ok) return true;
+  const create = await fetch(`${FORMS_SUPA_URL}/storage/v1/bucket`, {
+    method: 'POST',
+    headers: { 'apikey': FORMS_SUPA_KEY, 'Authorization': 'Bearer ' + FORMS_SUPA_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: FORMS_STORAGE_BUCKET, name: FORMS_STORAGE_BUCKET, public: true })
+  });
+  return create.ok || create.status === 409;
+} catch (err) {
+  return false;
+}
+}
+async function uploadFormsFiles(files) {
+if (!files.length) return;
+const allowed = files.filter(formsIsAllowedFile);
+if (!allowed.length) { formsSetUploadStatus('Only PDF and JPG files are supported.', true); return; }
+if (allowed.length !== files.length && typeof showSnuToast === 'function') showSnuToast('⚠ Some files were skipped. Only PDF/JPG allowed.');
+formsSetUploadStatus(`Uploading ${allowed.length} file${allowed.length === 1 ? '' : 's'}…`, false);
+const bucketReady = await ensureFormsStorageBucket();
+if (!bucketReady) { formsSetUploadStatus('Upload failed: storage bucket could not be prepared.', true); return; }
+const currentName = document.getElementById('formsName')?.value?.trim() || '';
+const currentCategory = document.getElementById('formsCategory')?.value?.trim() || '';
+const currentDesc = document.getElementById('formsDesc')?.value?.trim() || '';
+const newEntries = [];
+for (const file of allowed) {
+  try {
+    const safe = formsSafeFileName(file.name);
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
+    const upload = await fetch(`${FORMS_SUPA_URL}/storage/v1/object/${FORMS_STORAGE_BUCKET}/${encodeURIComponent(path)}`, {
+      method: 'POST',
+      headers: {
+        'apikey': FORMS_SUPA_KEY,
+        'Authorization': 'Bearer ' + FORMS_SUPA_KEY,
+        'Content-Type': file.type || (safe.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'),
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+    if (!upload.ok) throw new Error(await upload.text());
+    const publicUrl = `${FORMS_SUPA_URL}/storage/v1/object/public/${FORMS_STORAGE_BUCKET}/${encodeURIComponent(path)}`;
+    newEntries.push({
+      id: Date.now() + Math.floor(Math.random() * 100000),
+      name: allowed.length === 1 && currentName ? currentName : formsDisplayNameFromFile(file.name),
+      category: currentCategory,
+      desc: currentDesc,
+      url: publicUrl
+    });
+  } catch (err) {
+    console.error('Forms Locker upload failed:', err);
+    if (typeof showSnuToast === 'function') showSnuToast(`⚠ Upload failed: ${file.name}`);
+  }
+}
+if (!newEntries.length) { formsSetUploadStatus('Upload failed. No forms were added.', true); return; }
+_forms.push(...newEntries);
+refreshFormsAdminList();
+renderFormsList(_forms);
+formsSetUploadStatus(`Uploaded and added ${newEntries.length} form${newEntries.length === 1 ? '' : 's'}.`, false);
+if (typeof showSnuToast === 'function') showSnuToast('⏳ Saving uploaded form(s)…');
+saveForms(() => { if (typeof showSnuToast === 'function') showSnuToast('✓ Uploaded form(s) saved!'); });
+if (newEntries.length === 1) {
+  const urlEl = document.getElementById('formsUrl');
+  if (urlEl) urlEl.value = newEntries[0].url;
+}
+}
+
 // ── Admin: add or update ───────────────────────────────────────────────────
 function submitFormEntry() {
 const gv = id => document.getElementById(id)?.value?.trim() || '';
