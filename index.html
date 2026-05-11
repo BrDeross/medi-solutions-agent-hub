@@ -4218,7 +4218,7 @@ Agent Command Center
 <p>Coaching, marketing, and planning resources</p>
 </div>
 </div>
-<span class="count-chip">15 tools</span>
+<span class="count-chip">14 tools</span>
 <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
 </div>
 <!-- Tool Cards -->
@@ -13029,7 +13029,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="overflow-y:auto;padding:24px 28px;color:#1a1a2e;font-family:Arial,sans-serif;">
 <form id="vacationHubForm" onsubmit="event.preventDefault();submitVacationForm();">
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;">
 <label style="font-size:12px;font-weight:700;color:#1a2340;">Agent Name<br><input id="vacAgentName" required style="width:100%;margin-top:5px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>
 <label style="font-size:12px;font-weight:700;color:#1a2340;">Date of Departure<br><input id="vacDepartureDate" type="date" required style="width:100%;margin-top:5px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>
 <label style="font-size:12px;font-weight:700;color:#1a2340;">Date of Availability<br><input id="vacAvailabilityDate" type="date" required style="width:100%;margin-top:5px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>
@@ -13042,7 +13042,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="background:#fff;border:1px solid #d4dce8;border-radius:12px;padding:14px 16px;margin-bottom:14px;">
 <div style="font-size:13px;font-weight:900;color:#1a2340;margin-bottom:10px;">Mail Handling</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:13px;color:#334155;">
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;font-size:13px;color:#334155;">
 <div>Retain mail in office until return?<br><label><input type="radio" name="vacRetainMail" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacRetainMail" value="No"> No</label></div>
 <div>Send mail to home?<br><label><input type="radio" name="vacSendMailHome" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacSendMailHome" value="No"> No</label></div>
 <div>Scan & email mail to office?<br><label><input type="radio" name="vacScanEmailMail" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacScanEmailMail" value="No"> No</label></div>
@@ -13052,7 +13052,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="background:#fff;border:1px solid #d4dce8;border-radius:12px;padding:14px 16px;margin-bottom:14px;">
 <div style="font-size:13px;font-weight:900;color:#1a2340;margin-bottom:10px;">Policy Handling</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:13px;color:#334155;">
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;font-size:13px;color:#334155;">
 <div>Mail policy?<br><label><input type="radio" name="vacMailPolicy" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacMailPolicy" value="No"> No</label></div>
 <div>Requirement needed?<br><label><input type="radio" name="vacPolicyRequirement" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacPolicyRequirement" value="No"> No</label></div>
 <div>Email when policy is mailed to client?<br><label><input type="radio" name="vacEmailWhenPolicyMailed" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacEmailWhenPolicyMailed" value="No"> No</label></div>
@@ -13062,7 +13062,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="background:#fff;border:1px solid #d4dce8;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
 <div style="font-size:13px;font-weight:900;color:#1a2340;margin-bottom:10px;">Referral Handling</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:13px;color:#334155;">
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;font-size:13px;color:#334155;">
 <div>Specific agent handles referrals?<br><label><input type="radio" name="vacReferralSpecificAgent" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacReferralSpecificAgent" value="No"> No</label></div>
 <div>Deliver referral info by email for record?<br><label><input type="radio" name="vacReferralEmailRecord" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacReferralEmailRecord" value="No"> No</label></div>
 </div>
@@ -13078,16 +13078,10 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <script id="vacation-form-script">
 const VACATION_FORM_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9awElj6nEPrML_qDNPK2KfvynO4rFeIwxkzi7-6ZKlzPfUXe2qQjdkO61YXlCFXLo/exec';
-function getVacationHubSession() {
-  try { return JSON.parse(sessionStorage.getItem('medi_hub_session') || 'null'); } catch(e) { return null; }
-}
 function openVacationFormModal() {
   const overlay = document.getElementById('vacationFormOverlay');
   if (overlay) overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-  const session = getVacationHubSession();
-  const agentName = document.getElementById('vacAgentName');
-  if (agentName && !agentName.value && session && session.name) agentName.value = session.name;
 }
 function closeVacationFormModal() {
   const overlay = document.getElementById('vacationFormOverlay');
@@ -13102,6 +13096,143 @@ function resetVacationForm() {
   const form = document.getElementById('vacationHubForm');
   if (form) form.reset();
 }
+function escapeVacationHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildVacationSummary(data) {
+  return `Vacation / Days of Absence Form
+
+Agent Name: ${data.agentName || ''}
+Date of Departure: ${data.departureDate || ''}
+Date of Availability: ${data.availabilityDate || ''}
+Voicemail set to vacation dates: ${data.voicemailVacation || ''}
+
+MAIL
+Retain in office until return: ${data.retainMail || ''}
+Send mail to home: ${data.sendMailHome || ''}
+Scan & Email as they come into the office: ${data.scanEmailMail || ''}
+Specific agent who will handle mail: ${data.mailSpecificAgent || ''}
+Mail Agent Name: ${data.mailAgentName || ''}
+
+POLICY
+Mail Policy: ${data.mailPolicy || ''}
+Requirement: ${data.policyRequirement || ''}
+Policy Agent Name: ${data.policyAgentName || ''}
+Email when policy is mailed to client: ${data.emailWhenPolicyMailed || ''}
+Client message method: ${data.clientMessageMethod || ''}
+
+REFERRAL
+Specific agent handles referrals: ${data.referralSpecificAgent || ''}
+Referral Agent Name: ${data.referralAgentName || ''}
+Deliver referral information in email for record: ${data.referralEmailRecord || ''}
+
+Submitted: ${new Date().toLocaleString()}`.trim();
+}
+
+function showVacationConfirmation(data) {
+  const summary = buildVacationSummary(data);
+  const existing = document.getElementById('vacationConfirmOverlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'vacationConfirmOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9140;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.onclick = function(event) {
+    if (event.target === overlay) closeVacationConfirmation();
+  };
+
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:720px;max-height:90vh;background:#f8fafc;border:1px solid rgba(15,23,42,.14);border-radius:18px;box-shadow:0 28px 80px rgba(0,0,0,.55);overflow:hidden;display:flex;flex-direction:column;color:#1e293b;">
+      <div style="padding:18px 22px;background:#102245;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(52,211,153,.16);color:#34d399;display:flex;align-items:center;justify-content:center;font-size:18px;">✅</div>
+          <div>
+            <div style="font-size:16px;font-weight:900;letter-spacing:.2px;">Vacation Form Submitted</div>
+            <div style="font-size:12px;color:#b8d4ee;margin-top:2px;">A completed copy is shown below for the agent's records.</div>
+          </div>
+        </div>
+        <button type="button" onclick="closeVacationConfirmation()" style="width:34px;height:34px;border-radius:8px;border:none;background:rgba(255,255,255,.12);color:#fff;font-size:18px;cursor:pointer;">×</button>
+      </div>
+      <div style="padding:18px 22px;overflow-y:auto;">
+        <div style="background:#ecfdf5;border:1px solid #bbf7d0;border-radius:12px;padding:13px 15px;margin-bottom:14px;color:#166534;font-size:13px;line-height:1.55;font-weight:700;">
+          Your vacation / absence form has been sent. If you do not receive internal confirmation, contact Brian or Nicole.
+        </div>
+        <textarea id="vacationCompletedSummary" readonly style="width:100%;min-height:330px;background:#fff;border:1px solid #cbd5e1;border-radius:12px;color:#0f172a;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;resize:vertical;">${escapeVacationHtml(summary)}</textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:flex-end;">
+          <button type="button" onclick="copyVacationSummary()" style="padding:10px 16px;background:#1a2340;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;">Copy Summary</button>
+          <button type="button" onclick="printVacationSummary()" style="padding:10px 16px;background:#e2e8f0;border:1px solid #cbd5e1;border-radius:8px;color:#334155;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Print Copy</button>
+          <button type="button" onclick="closeVacationConfirmation()" style="padding:10px 16px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;color:#334155;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVacationConfirmation() {
+  const overlay = document.getElementById('vacationConfirmOverlay');
+  if (overlay) overlay.remove();
+  document.body.style.overflow = '';
+}
+
+function copyVacationSummary() {
+  const box = document.getElementById('vacationCompletedSummary');
+  if (!box) return;
+  const value = box.value;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(value).then(function() {
+      alert('Completed vacation form summary copied.');
+    }).catch(function() {
+      box.select();
+      document.execCommand('copy');
+      alert('Completed vacation form summary copied.');
+    });
+  } else {
+    box.select();
+    document.execCommand('copy');
+    alert('Completed vacation form summary copied.');
+  }
+}
+
+function printVacationSummary() {
+  const box = document.getElementById('vacationCompletedSummary');
+  if (!box) return;
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    alert('Popup blocked. Please allow popups to print the vacation form copy.');
+    return;
+  }
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Vacation Form Copy</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 30px; color: #111827; }
+          h1 { color: #1e3a6e; font-size: 22px; margin-bottom: 6px; }
+          .note { color: #475569; font-size: 12px; margin-bottom: 18px; }
+          pre { white-space: pre-wrap; font-size: 13px; line-height: 1.55; border: 1px solid #d1d5db; border-radius: 10px; padding: 16px; }
+        </style>
+      </head>
+      <body>
+        <h1>Vacation / Days of Absence Form</h1>
+        <div class="note">Completed copy for agent records.</div>
+        <pre>${escapeVacationHtml(box.value)}</pre>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+}
+
 async function submitVacationForm() {
   const btn = document.getElementById('vacationSubmitBtn');
   const agentName = document.getElementById('vacAgentName')?.value?.trim() || '';
@@ -13138,9 +13269,9 @@ async function submitVacationForm() {
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(data)
     });
-    alert('Vacation form submitted. Please verify the office received it.');
     resetVacationForm();
     closeVacationFormModal();
+    showVacationConfirmation(data);
   } catch (error) {
     alert('Vacation form submission failed. Please try again or contact Brian.');
   } finally {
@@ -13172,21 +13303,6 @@ const FORMS_HUB = 'medi';
 let _forms = [];
 let _formsSaving = false;
 let _formsEditId = null;
-
-function normalizeFormsUrl(url) {
-const raw = String(url || '').trim();
-if (!raw) return '';
-if (/^(https?:|mailto:|tel:|data:|blob:)/i.test(raw)) return encodeURI(raw);
-return encodeURI('https://' + raw.replace(/^\/+/, ''));
-}
-function escFormsAttr(s) {
-return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function openFormLink(url) {
-const safeUrl = normalizeFormsUrl(url);
-if (!safeUrl) return;
-window.open(safeUrl, '_blank', 'noopener,noreferrer');
-}
 // ── Load — always fetch from Supabase, no localStorage ────────────────────
 function initFormsLocker() {
 fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}&select=data`, {
@@ -13227,7 +13343,7 @@ function submitFormEntry() {
 const gv = id => document.getElementById(id)?.value?.trim() || '';
 const name = gv('formsName');
 if (!name) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Form name is required.'); return; }
-const entry = { id: _formsEditId || Date.now(), name, category: gv('formsCategory'), desc: gv('formsDesc'), url: normalizeFormsUrl(gv('formsUrl')) };
+const entry = { id: _formsEditId || Date.now(), name, category: gv('formsCategory'), desc: gv('formsDesc'), url: gv('formsUrl') };
 if (_formsEditId) {
 const idx = _forms.findIndex(f => f.id === _formsEditId);
 if (idx >= 0) _forms[idx] = entry; else _forms.push(entry);
@@ -13347,6 +13463,40 @@ renderFormsList(_forms.filter(f =>
 (f.category||'').toLowerCase().includes(lower) ||
 (f.desc||'').toLowerCase().includes(lower)
 ));
+}
+function normalizeFormsUrl(url) {
+let raw = String(url || '').trim();
+if (!raw) return '';
+raw = raw.replace(/^['"]|['"]$/g, '').trim();
+if (!raw) return '';
+
+// Repair entries that were accidentally saved as fake absolute URLs,
+// e.g. "forms/my-form.pdf" became "https://forms/my-form.pdf".
+try {
+  const parsed = new URL(raw);
+  const fakeLocalHosts = ['forms', 'form', 'files', 'file', 'docs', 'documents', 'pdfs', 'uploads'];
+  if ((parsed.protocol === 'http:' || parsed.protocol === 'https:') && fakeLocalHosts.includes(parsed.hostname.toLowerCase())) {
+    raw = parsed.hostname + parsed.pathname + parsed.search + parsed.hash;
+  }
+} catch(e) {}
+
+if (/^(https?:|mailto:|tel:|data:|blob:)/i.test(raw)) return raw;
+if (/^www\./i.test(raw)) return 'https://' + raw;
+
+// If it looks like a real domain without http(s), add https://.
+if (/^[a-z0-9.-]+\.[a-z]{2,}(?:[/:?#]|$)/i.test(raw)) return 'https://' + raw;
+
+// Otherwise treat it as a GitHub Pages relative file path, preserving old Forms Locker links.
+try { return new URL(raw.replace(/^\/+/, '').replace(/ /g, '%20'), window.location.href).href; }
+catch(e) { return raw; }
+}
+function escFormsAttr(s) {
+return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function openFormLink(url) {
+const safeUrl = normalizeFormsUrl(url);
+if (!safeUrl) return;
+window.open(safeUrl, '_blank', 'noopener,noreferrer');
 }
 function renderFormsList(list) {
 const el = document.getElementById('formsModalList');
