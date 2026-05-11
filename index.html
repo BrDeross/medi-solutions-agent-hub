@@ -4218,7 +4218,7 @@ Agent Command Center
 <p>Coaching, marketing, and planning resources</p>
 </div>
 </div>
-<span class="count-chip">14 tools</span>
+<span class="count-chip">15 tools</span>
 <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
 </div>
 <!-- Tool Cards -->
@@ -13029,7 +13029,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="overflow-y:auto;padding:24px 28px;color:#1a1a2e;font-family:Arial,sans-serif;">
 <form id="vacationHubForm" onsubmit="event.preventDefault();submitVacationForm();">
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;">
 <label style="font-size:12px;font-weight:700;color:#1a2340;">Agent Name<br><input id="vacAgentName" required style="width:100%;margin-top:5px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>
 <label style="font-size:12px;font-weight:700;color:#1a2340;">Date of Departure<br><input id="vacDepartureDate" type="date" required style="width:100%;margin-top:5px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>
 <label style="font-size:12px;font-weight:700;color:#1a2340;">Date of Availability<br><input id="vacAvailabilityDate" type="date" required style="width:100%;margin-top:5px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>
@@ -13042,7 +13042,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="background:#fff;border:1px solid #d4dce8;border-radius:12px;padding:14px 16px;margin-bottom:14px;">
 <div style="font-size:13px;font-weight:900;color:#1a2340;margin-bottom:10px;">Mail Handling</div>
-<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;font-size:13px;color:#334155;">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:13px;color:#334155;">
 <div>Retain mail in office until return?<br><label><input type="radio" name="vacRetainMail" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacRetainMail" value="No"> No</label></div>
 <div>Send mail to home?<br><label><input type="radio" name="vacSendMailHome" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacSendMailHome" value="No"> No</label></div>
 <div>Scan & email mail to office?<br><label><input type="radio" name="vacScanEmailMail" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacScanEmailMail" value="No"> No</label></div>
@@ -13052,7 +13052,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="background:#fff;border:1px solid #d4dce8;border-radius:12px;padding:14px 16px;margin-bottom:14px;">
 <div style="font-size:13px;font-weight:900;color:#1a2340;margin-bottom:10px;">Policy Handling</div>
-<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;font-size:13px;color:#334155;">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:13px;color:#334155;">
 <div>Mail policy?<br><label><input type="radio" name="vacMailPolicy" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacMailPolicy" value="No"> No</label></div>
 <div>Requirement needed?<br><label><input type="radio" name="vacPolicyRequirement" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacPolicyRequirement" value="No"> No</label></div>
 <div>Email when policy is mailed to client?<br><label><input type="radio" name="vacEmailWhenPolicyMailed" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacEmailWhenPolicyMailed" value="No"> No</label></div>
@@ -13062,7 +13062,7 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <div style="background:#fff;border:1px solid #d4dce8;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
 <div style="font-size:13px;font-weight:900;color:#1a2340;margin-bottom:10px;">Referral Handling</div>
-<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;font-size:13px;color:#334155;">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:13px;color:#334155;">
 <div>Specific agent handles referrals?<br><label><input type="radio" name="vacReferralSpecificAgent" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacReferralSpecificAgent" value="No"> No</label></div>
 <div>Deliver referral info by email for record?<br><label><input type="radio" name="vacReferralEmailRecord" value="Yes"> Yes</label> <label style="margin-left:12px;"><input type="radio" name="vacReferralEmailRecord" value="No"> No</label></div>
 </div>
@@ -13078,10 +13078,16 @@ setTimeout(() => { w.print(); }, 400);
 </div>
 <script id="vacation-form-script">
 const VACATION_FORM_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9awElj6nEPrML_qDNPK2KfvynO4rFeIwxkzi7-6ZKlzPfUXe2qQjdkO61YXlCFXLo/exec';
+function getVacationHubSession() {
+  try { return JSON.parse(sessionStorage.getItem('medi_hub_session') || 'null'); } catch(e) { return null; }
+}
 function openVacationFormModal() {
   const overlay = document.getElementById('vacationFormOverlay');
   if (overlay) overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  const session = getVacationHubSession();
+  const agentName = document.getElementById('vacAgentName');
+  if (agentName && !agentName.value && session && session.name) agentName.value = session.name;
 }
 function closeVacationFormModal() {
   const overlay = document.getElementById('vacationFormOverlay');
@@ -13166,6 +13172,21 @@ const FORMS_HUB = 'medi';
 let _forms = [];
 let _formsSaving = false;
 let _formsEditId = null;
+
+function normalizeFormsUrl(url) {
+const raw = String(url || '').trim();
+if (!raw) return '';
+if (/^(https?:|mailto:|tel:|data:|blob:)/i.test(raw)) return encodeURI(raw);
+return encodeURI('https://' + raw.replace(/^\/+/, ''));
+}
+function escFormsAttr(s) {
+return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function openFormLink(url) {
+const safeUrl = normalizeFormsUrl(url);
+if (!safeUrl) return;
+window.open(safeUrl, '_blank', 'noopener,noreferrer');
+}
 // ── Load — always fetch from Supabase, no localStorage ────────────────────
 function initFormsLocker() {
 fetch(`${FORMS_SUPA_URL}/rest/v1/forms_locker?hub=eq.${FORMS_HUB}&select=data`, {
@@ -13206,7 +13227,7 @@ function submitFormEntry() {
 const gv = id => document.getElementById(id)?.value?.trim() || '';
 const name = gv('formsName');
 if (!name) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Form name is required.'); return; }
-const entry = { id: _formsEditId || Date.now(), name, category: gv('formsCategory'), desc: gv('formsDesc'), url: gv('formsUrl') };
+const entry = { id: _formsEditId || Date.now(), name, category: gv('formsCategory'), desc: gv('formsDesc'), url: normalizeFormsUrl(gv('formsUrl')) };
 if (_formsEditId) {
 const idx = _forms.findIndex(f => f.id === _formsEditId);
 if (idx >= 0) _forms[idx] = entry; else _forms.push(entry);
@@ -13326,20 +13347,6 @@ renderFormsList(_forms.filter(f =>
 (f.category||'').toLowerCase().includes(lower) ||
 (f.desc||'').toLowerCase().includes(lower)
 ));
-}
-function normalizeFormsUrl(url) {
-const raw = String(url || '').trim();
-if (!raw) return '';
-if (/^(https?:|mailto:|tel:|data:|blob:)/i.test(raw)) return raw;
-return 'https://' + raw.replace(/^\/+/, '');
-}
-function escFormsAttr(s) {
-return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function openFormLink(url) {
-const safeUrl = normalizeFormsUrl(url);
-if (!safeUrl) return;
-window.open(safeUrl, '_blank', 'noopener,noreferrer');
 }
 function renderFormsList(list) {
 const el = document.getElementById('formsModalList');
