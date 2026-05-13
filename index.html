@@ -10535,22 +10535,57 @@ renderLayoutAdmin();
 }).catch(() => {});
 }
 // ── Save layout to Supabase (PATCH-then-POST upsert) ──────────────────────
-function saveLayoutToCloud(order, vis) {
+async function saveLayoutToCloud(order, vis) {
 const payload = JSON.stringify({ order, vis });
-const headers = {
+const baseHeaders = {
 'apikey': LAYOUT_SKEY,
 'Authorization': 'Bearer ' + LAYOUT_SKEY,
-'Content-Type': 'application/json',
-'Prefer': 'resolution=merge-duplicates,return=representation'
+'Content-Type': 'application/json'
 };
-fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?on_conflict=hub,key`, {
+
+try {
+const patchRes = await fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.layout`, {
+method: 'PATCH',
+headers: Object.assign({}, baseHeaders, {
+'Prefer': 'return=representation'
+}),
+body: JSON.stringify({ data: payload })
+});
+
+if (!patchRes.ok) {
+throw new Error(`PATCH failed: ${patchRes.status}`);
+}
+
+let patchRows = [];
+try {
+patchRows = await patchRes.json();
+} catch (e) {
+patchRows = [];
+}
+
+if (!Array.isArray(patchRows) || patchRows.length === 0) {
+const postRes = await fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
 method: 'POST',
-headers,
-body: JSON.stringify([{ hub: 'medi', key: 'layout', data: payload }])
-}).then(r => {
-if (!r.ok) throw new Error('Layout save failed');
-return r.json();
-}).then(() => showSnuToast('✓ Layout saved!')).catch(() => showSnuToast('⚠ Layout save failed.'));
+headers: Object.assign({}, baseHeaders, {
+'Prefer': 'return=representation'
+}),
+body: JSON.stringify({
+hub: 'medi',
+key: 'layout',
+data: payload
+})
+});
+
+if (!postRes.ok) {
+throw new Error(`POST failed: ${postRes.status}`);
+}
+}
+
+showSnuToast('✓ Layout saved!');
+} catch (err) {
+console.error('[LAYOUT SAVE ERROR]', err);
+showSnuToast('⚠ Layout save failed.');
+}
 }
 function getSectionOrder() {
 return (_layoutOrder && _layoutOrder.length) ? [..._layoutOrder] : LAYOUT_SECTIONS.map(s => s.id);
