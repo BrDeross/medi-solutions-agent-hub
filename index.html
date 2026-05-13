@@ -10537,22 +10537,19 @@ renderLayoutAdmin();
 // ── Save layout to Supabase (PATCH-then-POST upsert) ──────────────────────
 function saveLayoutToCloud(order, vis) {
 const payload = JSON.stringify({ order, vis });
-const baseHeaders = { 'apikey': LAYOUT_SKEY, 'Authorization': 'Bearer ' + LAYOUT_SKEY, 'Content-Type': 'application/json' };
-// PATCH first
-fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?hub=eq.medi&key=eq.layout`, {
-method: 'PATCH',
-headers: Object.assign({}, baseHeaders, { 'Prefer': 'return=headers-only' }),
-body: JSON.stringify({ data: payload })
-}).then(r => {
-const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
-if (count === 0) {
-// No existing row — POST a new one
-return fetch(`${LAYOUT_SUPA}/rest/v1/tile_content`, {
+const headers = {
+'apikey': LAYOUT_SKEY,
+'Authorization': 'Bearer ' + LAYOUT_SKEY,
+'Content-Type': 'application/json',
+'Prefer': 'resolution=merge-duplicates,return=representation'
+};
+fetch(`${LAYOUT_SUPA}/rest/v1/tile_content?on_conflict=hub,key`, {
 method: 'POST',
-headers: Object.assign({}, baseHeaders, { 'Prefer': 'return=minimal' }),
-body: JSON.stringify({ hub: 'medi', key: 'layout', data: payload })
-});
-}
+headers,
+body: JSON.stringify([{ hub: 'medi', key: 'layout', data: payload }])
+}).then(r => {
+if (!r.ok) throw new Error('Layout save failed');
+return r.json();
 }).then(() => showSnuToast('✓ Layout saved!')).catch(() => showSnuToast('⚠ Layout save failed.'));
 }
 function getSectionOrder() {
