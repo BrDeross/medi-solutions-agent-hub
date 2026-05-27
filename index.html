@@ -6352,11 +6352,12 @@ Agents are solely responsible for verifying information and ensuring compliance 
 // Photo bin : compressed photos (auto-created on first sync)
 // ═══════════════════════════════════════════════════════════════
 // GLOBAL RELIABILITY PATCH - 2026-05-26
+// EMERGENCY DATA RESTORE VERSION: JSONBin reads/writes are re-enabled to restore legacy data while login fallback remains in place.
 // JSONBin is not safe as a required browser-side dependency for global users.
 // The previous client-side JSONBin requests used X-Master-Key, which triggers CORS preflight
 // and can lock users out when JSONBin/Cloudflare returns CORS/520 errors.
 const HUB_CLOUD_CONFIG = {
-  DISABLE_JSONBIN_IN_BROWSER: true,
+  DISABLE_JSONBIN_IN_BROWSER: false,
   CLOUD_TIMEOUT_MS: 4500,
   OWNERSHIP_SYNC_MS: 60000,
   FALLBACK_LOGIN_ON_CLOUD_ERROR: true,
