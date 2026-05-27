@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><!-- My Medi Hub v2026-03-12 14:27 -->
+<html lang="en"><!-- My Medi Hub v2026-03-12 14:27 | Global reliability patch 2026-05-26 -->
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
@@ -6351,6 +6351,19 @@ Agents are solely responsible for verifying information and ensuring compliance 
 // Main bin : text data (no photos)
 // Photo bin : compressed photos (auto-created on first sync)
 // ═══════════════════════════════════════════════════════════════
+// GLOBAL RELIABILITY PATCH - 2026-05-26
+// JSONBin is not safe as a required browser-side dependency for global users.
+// The previous client-side JSONBin requests used X-Master-Key, which triggers CORS preflight
+// and can lock users out when JSONBin/Cloudflare returns CORS/520 errors.
+const HUB_CLOUD_CONFIG = {
+  DISABLE_JSONBIN_IN_BROWSER: true,
+  CLOUD_TIMEOUT_MS: 4500,
+  OWNERSHIP_SYNC_MS: 60000,
+  FALLBACK_LOGIN_ON_CLOUD_ERROR: true,
+  // Use this list only for emergency strict allow-list behavior. Empty means: if cloud is down,
+  // any syntactically valid email can enter so the Hub remains available to the field team.
+  LOCAL_ALLOWED_EMAILS: ['brdeross@fjins.net']
+};
 const JB_MASTER_KEY = '$2a$10$dCpyXKmwk3yUN0kAuZJ7Huw0/Ht4CwwOBh2ydi1ATORn8Vo96oXVC';
 const JB_BASE = 'https://api.jsonbin.io/v3';
 const JB_MAIN_BIN = '69b2cd77aa77b81da9dbc6e6';
@@ -6358,28 +6371,56 @@ const JB_MAIN_BIN = '69b2cd77aa77b81da9dbc6e6';
 const JB_EMPTY = { snu_data:{}, snu_article:{}, snu_spotlight:{}, snu_aom:{}, snu_updates:[], snu_trip:{agents:[],meta:{}}, snu_agent_photo_bins:{} };
 // ── Generic bin helpers ────────────────────────────────────────
 async function jbReadBin(id) {
+if (window.HUB_CLOUD_CONFIG?.DISABLE_JSONBIN_IN_BROWSER || HUB_CLOUD_CONFIG?.DISABLE_JSONBIN_IN_BROWSER) {
+console.warn('[JSONBin] Disabled in browser. Using local/Supabase fallback instead.');
+return null;
+}
+const ctrl = new AbortController();
+const timeout = setTimeout(() => ctrl.abort(), HUB_CLOUD_CONFIG.CLOUD_TIMEOUT_MS || 4500);
 try {
-const res = await fetch(`${JB_BASE}/b/${id}/latest?t=${Date.now()}`, { headers:{ 'X-Master-Key': JB_MASTER_KEY, 'Cache-Control': 'no-cache' } });
+const res = await fetch(`${JB_BASE}/b/${id}/latest?t=${Date.now()}`, {
+headers:{ 'X-Master-Key': JB_MASTER_KEY, 'Cache-Control': 'no-cache' },
+signal: ctrl.signal
+});
+if (!res.ok) throw new Error('JSONBin read failed: ' + res.status);
 return (await res.json())?.record || null;
-} catch(e) { return null; }
+} catch(e) {
+console.warn('[JSONBin] Read unavailable:', e?.message || e);
+return null;
+} finally { clearTimeout(timeout); }
 }
 async function jbWriteBin(id, record) {
+if (window.HUB_CLOUD_CONFIG?.DISABLE_JSONBIN_IN_BROWSER || HUB_CLOUD_CONFIG?.DISABLE_JSONBIN_IN_BROWSER) {
+console.warn('[JSONBin] Browser write disabled. Save skipped.');
+return false;
+}
+const ctrl = new AbortController();
+const timeout = setTimeout(() => ctrl.abort(), HUB_CLOUD_CONFIG.CLOUD_TIMEOUT_MS || 4500);
 try {
 const res = await fetch(`${JB_BASE}/b/${id}`, {
 method:'PUT', headers:{ 'Content-Type':'application/json', 'X-Master-Key': JB_MASTER_KEY },
-body: JSON.stringify(record)
+body: JSON.stringify(record), signal: ctrl.signal
 });
 return res.ok;
-} catch(e) { return false; }
+} catch(e) { console.warn('[JSONBin] Write unavailable:', e?.message || e); return false; }
+finally { clearTimeout(timeout); }
 }
 async function jbCreateBin(name, data) {
+if (window.HUB_CLOUD_CONFIG?.DISABLE_JSONBIN_IN_BROWSER || HUB_CLOUD_CONFIG?.DISABLE_JSONBIN_IN_BROWSER) {
+console.warn('[JSONBin] Browser create disabled.');
+return null;
+}
+const ctrl = new AbortController();
+const timeout = setTimeout(() => ctrl.abort(), HUB_CLOUD_CONFIG.CLOUD_TIMEOUT_MS || 4500);
 try {
 const res = await fetch(`${JB_BASE}/b`, {
 method:'POST', headers:{ 'Content-Type':'application/json', 'X-Master-Key': JB_MASTER_KEY, 'X-Bin-Name': name, 'X-Private':'true' },
-body: JSON.stringify(data)
+body: JSON.stringify(data), signal: ctrl.signal
 });
+if (!res.ok) throw new Error('JSONBin create failed: ' + res.status);
 return (await res.json())?.metadata?.id || null;
-} catch(e) { return null; }
+} catch(e) { console.warn('[JSONBin] Create unavailable:', e?.message || e); return null; }
+finally { clearTimeout(timeout); }
 }
 // ── Photo storage (Supabase hub_photos table) ────────────────
 const PHOTO_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
@@ -7564,14 +7605,14 @@ sections: Array.isArray(x.sections) ? [...x.sections].sort() : []
 })).sort((a,b) => String(a.id).localeCompare(String(b.id))));
 }
 async function readOwnershipShared() {
-if (typeof jbReadBin === 'function' && typeof JB_MAIN_BIN !== 'undefined') {
+// Prefer Supabase/static fallback. JSONBin is intentionally skipped in browser because it causes CORS/520 lockouts.
+if (!(HUB_CLOUD_CONFIG && HUB_CLOUD_CONFIG.DISABLE_JSONBIN_IN_BROWSER) && typeof jbReadBin === 'function' && typeof JB_MAIN_BIN !== 'undefined') {
 const rec = await jbReadBin(JB_MAIN_BIN);
 const data = rec && rec.section_ownership;
 if (Array.isArray(data)) return data;
 if (typeof data === 'string') {
 try { return JSON.parse(data) || []; } catch(e) { return []; }
 }
-return [];
 }
 const rows = await supaGet('section_ownership');
 if (rows && rows.length && rows[0].data) {
@@ -7581,12 +7622,7 @@ return Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : [
 return [];
 }
 async function writeOwnershipShared(items) {
-if (typeof jbReadBin === 'function' && typeof jbWriteBin === 'function' && typeof JB_MAIN_BIN !== 'undefined') {
-const rec = await jbReadBin(JB_MAIN_BIN) || {};
-rec.section_ownership = items;
-await jbWriteBin(JB_MAIN_BIN, rec);
-return;
-}
+// Write to Supabase only. JSONBin browser writes are disabled to avoid CORS failures.
 await supaUpsert('section_ownership', items);
 }
 function syncOwnershipFromCloud(silent) {
@@ -7606,7 +7642,7 @@ if (!silent) renderOwnershipAdminList();
 function startOwnershipLiveSync() {
 if (_ownershipSyncStarted) return;
 _ownershipSyncStarted = true;
-setInterval(() => { syncOwnershipFromCloud(true); }, 5000);
+setInterval(() => { syncOwnershipFromCloud(true); }, HUB_CLOUD_CONFIG.OWNERSHIP_SYNC_MS || 60000);
 }
 function initOwnership(forceReload) {
 const box = document.getElementById('ownershipOptions');
@@ -8371,16 +8407,52 @@ var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
 var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
 var email = (document.getElementById('hubGateEmail')?.value || '').trim().toLowerCase();
 var status = document.getElementById('hubGateStatus');
+function niceNameFromEmail(e) {
+  return String(e || '').split('@')[0].replace(/[._-]+/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }) || 'Agent';
+}
+function finishLogin(session) {
+  writeHubSession(session);
+  var nameEl = document.getElementById('agentLoginName');
+  var emailEl = document.getElementById('agentLoginEmail');
+  var hubGateName = document.getElementById('hubGateName');
+  if (nameEl) nameEl.value = session.name;
+  if (emailEl) emailEl.value = session.email;
+  if (hubGateName) hubGateName.value = session.name;
+  applyHubSessionUi();
+  if (typeof trackHubEvent === 'function') trackHubEvent('login', 'hub_gate', { signed_in_at: session.signedInAt, offline_fallback: !!session.offlineFallback });
+  if (typeof trackEvent === 'function') trackEvent('agent_login', session.name + ' (' + session.email + ')');
+}
+function fallbackLogin(reason) {
+  var local = (HUB_CLOUD_CONFIG.LOCAL_ALLOWED_EMAILS || []).map(function(x){ return String(x).toLowerCase().trim(); });
+  var strictListHasOnlyAdmin = local.length === 1 && local[0] === 'brdeross@fjins.net';
+  var allowedByLocalList = local.indexOf(email) >= 0;
+  // Operational rule: if Supabase is down/slow, let valid field users in rather than locking out 30+ people.
+  // To make this strict later, add every approved user to LOCAL_ALLOWED_EMAILS and change strictListHasOnlyAdmin handling.
+  var allowDuringOutage = HUB_CLOUD_CONFIG.FALLBACK_LOGIN_ON_CLOUD_ERROR && (allowedByLocalList || strictListHasOnlyAdmin || !local.length);
+  if (!allowDuringOutage) {
+    if (status) { status.textContent = 'Cloud directory unavailable and this email is not in the local emergency list.'; status.style.color = '#fb7185'; }
+    return;
+  }
+  if (status) { status.textContent = 'Directory is temporarily unavailable. Using offline access fallback.'; status.style.color = 'var(--gold)'; }
+  finishLogin({ name: niceNameFromEmail(email), email: email, role: 'agent', signedInAt: new Date().toISOString(), offlineFallback: true, fallbackReason: reason || 'cloud_unavailable' });
+}
 if (!email || !email.includes('@')) {
 if (status) { status.textContent = 'Please enter your email address.'; status.style.color = '#fb7185'; }
 return;
 }
 if (status) { status.textContent = 'Verifying...'; status.style.color = 'var(--muted)'; }
+var ctrl = new AbortController();
+var timer = setTimeout(function(){ try { ctrl.abort(); } catch(e) {} }, HUB_CLOUD_CONFIG.CLOUD_TIMEOUT_MS || 4500);
 fetch(SUPA_URL + '/rest/v1/agent_directory?hub=eq.medi&select=data', {
-headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Cache-Control': 'no-cache' }
+headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Cache-Control': 'no-cache' },
+signal: ctrl.signal
 })
-.then(function(r) { return r.json(); })
+.then(function(r) {
+  if (!r.ok) throw new Error('Directory request failed: ' + r.status);
+  return r.json();
+})
 .then(function(rows) {
+clearTimeout(timer);
 var agents = [];
 if (rows && rows.length && rows[0].data) {
 var raw = rows[0].data;
@@ -8390,27 +8462,19 @@ var match = agents.find(function(a) {
 return a.email && a.email.trim().toLowerCase() === email;
 });
 if (match) {
-var session = { name: match.name || 'Agent', email: match.email, role: match.tag || 'agent', signedInAt: new Date().toISOString() };
-writeHubSession(session);
-var nameEl = document.getElementById('agentLoginName');
-var emailEl = document.getElementById('agentLoginEmail');
-var hubGateName = document.getElementById('hubGateName');
-if (nameEl) nameEl.value = match.name;
-if (emailEl) emailEl.value = match.email;
-if (hubGateName) hubGateName.value = match.name;
-applyHubSessionUi();
-if (typeof trackHubEvent === 'function') {
-trackHubEvent('login', 'hub_gate', { signed_in_at: session.signedInAt });
-}
-if (typeof trackEvent === 'function') {
-trackEvent('agent_login', match.name + ' (' + match.email + ')');
-}
+var session = { name: match.name || 'Agent', email: match.email, role: match.tag || match.role || 'agent', signedInAt: new Date().toISOString(), offlineFallback: false };
+finishLogin(session);
+} else if (!agents.length) {
+// Treat an empty cloud directory as unavailable, not as a hard denial.
+fallbackLogin('empty_directory');
 } else {
 if (status) { status.textContent = 'This email is not in the agent directory. Contact your administrator.'; status.style.color = '#fb7185'; }
 }
 })
-.catch(function() {
-if (status) { status.textContent = 'Connection error. Please try again.'; status.style.color = '#fb7185'; }
+.catch(function(err) {
+clearTimeout(timer);
+console.warn('[Hub Login] Directory check unavailable:', err?.message || err);
+fallbackLogin(err?.name === 'AbortError' ? 'directory_timeout' : 'directory_unavailable');
 });
 };
 const prevOpenAgentLogin = window.openAgentLogin;
