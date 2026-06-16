@@ -9753,7 +9753,7 @@ const TRIP_KEY = 'snu_trip_v1';
 const TRIP_START = new Date('2026-01-01');
 const TRIP_END = new Date('2027-06-30');
 const DEFAULT_GOAL = 50000; // pts — change to match your actual qualifying bar
-const TRIP_SYNC_MS = 10000;
+const TRIP_SYNC_MS = 60000;
 let _tripAgents = []; // [{name, production, goal?}]
 let _tripMeta = {}; // {monthLabel, qualifyingGoal, updatedAt}
 let _tripSnapshot = '';
@@ -9812,6 +9812,15 @@ const nextSnapshot = tripSnapshot(next);
 const changed = nextSnapshot !== _tripSnapshot;
 if (_tripSaveCooldown) return;
 if (!changed && _tripSnapshot) return;
+
+// SAFETY FIX: do not let failed/empty cloud reads wipe an uploaded CSV preview
+if ((!next.agents || !next.agents.length) && _tripAgents && _tripAgents.length) {
+console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current CSV/admin data.');
+renderTripTracker();
+renderTripAdminEditor();
+return;
+}
+
 _tripAgents = next.agents;
 _tripMeta = next.meta;
 _tripSnapshot = nextSnapshot;
