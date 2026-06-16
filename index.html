@@ -4723,8 +4723,8 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-<span class="count-chip" id="tripMonthChip">Month 1/18</span>
-<span class="count-chip" id="tripQualifiedCount">0 qualifying</span>
+<span class="count-chip" id="tripMonthChip">1/18</span>
+<span class="count-chip" id="tripQualifiedCount">0 qualified</span>
 </div>
 </div>
 <div class="trip-card">
@@ -9753,7 +9753,7 @@ const TRIP_KEY = 'snu_trip_v1';
 const TRIP_START = new Date('2026-01-01');
 const TRIP_END = new Date('2027-06-30');
 const DEFAULT_GOAL = 50000; // pts — change to match your actual qualifying bar
-const TRIP_SYNC_MS = 60000;
+const TRIP_SYNC_MS = 10000;
 let _tripAgents = []; // [{name, production, goal?}]
 let _tripMeta = {}; // {monthLabel, qualifyingGoal, updatedAt}
 let _tripSnapshot = '';
@@ -9812,15 +9812,6 @@ const nextSnapshot = tripSnapshot(next);
 const changed = nextSnapshot !== _tripSnapshot;
 if (_tripSaveCooldown) return;
 if (!changed && _tripSnapshot) return;
-
-// SAFETY FIX: do not let failed/empty cloud reads wipe an uploaded CSV preview
-if ((!next.agents || !next.agents.length) && _tripAgents && _tripAgents.length) {
-console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current CSV/admin data.');
-renderTripTracker();
-renderTripAdminEditor();
-return;
-}
-
 _tripAgents = next.agents;
 _tripMeta = next.meta;
 _tripSnapshot = nextSnapshot;
@@ -9863,10 +9854,10 @@ const today = new Date();
 let monthIndex = ((today.getFullYear() - tripStart.getFullYear()) * 12) + (today.getMonth() - tripStart.getMonth()) + 1;
 if (!Number.isFinite(monthIndex)) monthIndex = 1;
 monthIndex = Math.max(1, Math.min(18, monthIndex));
-if (monthChip) monthChip.textContent = 'Month ' + monthIndex + '/18';
+if (monthChip) monthChip.textContent = monthIndex + '/18';
 if (!_tripAgents.length) {
 list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
-if (qCount) qCount.textContent = '0 qualifying';
+if (qCount) qCount.textContent = '0 qualified';
 return;
 }
 const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
@@ -9876,7 +9867,7 @@ const agentGoal = Number(a.goal);
 const effectiveGoal = agentGoal > 0 ? agentGoal : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : 0);
 return effectiveGoal > 0 && prod >= effectiveGoal;
 }).length;
-if (qCount) qCount.textContent = qualified + ' qualifying';
+if (qCount) qCount.textContent = qualified + ' qualified';
 if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
 const avgProgress = sorted.length
 ? Math.round(sorted.reduce((sum, a) => {
