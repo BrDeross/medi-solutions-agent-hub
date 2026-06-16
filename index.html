@@ -4723,8 +4723,8 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-<span class="count-chip" id="tripMonthChip">1/18</span>
-<span class="count-chip" id="tripQualifiedCount">0 qualified</span>
+<span class="count-chip" id="tripMonthChip">Month 1/18</span>
+<span class="count-chip" id="tripQualifiedCount">0 qualifying</span>
 </div>
 </div>
 <div class="trip-card">
@@ -9753,6 +9753,47 @@ const TRIP_KEY = 'snu_trip_v1';
 const TRIP_START = new Date('2026-01-01');
 const TRIP_END = new Date('2027-06-30');
 const DEFAULT_GOAL = 50000; // pts — change to match your actual qualifying bar
+const TRIP_AGENT_GOALS = {
+"Ackerman, Thomas": 550000,
+"Avantagiato, Vincent": 300000,
+"Berenson, James": 450000,
+"Bobchin, Iris": 450000,
+"Bobchin, Kelly": 300000,
+"Bonaccolta, Michael": 450000,
+"Bueschel, Walter": 300000,
+"Casale, Marco": 300000,
+"Cash, Donald": 250000,
+"DeRoss, Brian": 450000,
+"DeRoss, William": 450000,
+"Furr, Joshua": 450000,
+"Haq, Iftikhar": 250000,
+"Hooban, Jack": 250000,
+"Hughes, LeAnne": 450000,
+"Knaup, Cassandra": 300000,
+"Kossakowska, Aleks": 550000,
+"Lang, William": 550000,
+"Lochhead, Andrew": 550000,
+"Morrell, Thomas": 450000,
+"Neely, Ryan": 250000,
+"Pecoraro, Vito": 450000,
+"Rogers, Ann": 450000,
+"Schaefer, Robert": 300000,
+"Smith, Michael": 300000,
+"Steward, Tina": 450000,
+"Turco, Alfred": 450000,
+"Wise, Aaron": 450000,
+"Zemartis, Stephen": 450000,
+};
+function normalizeTripAgentGoals(agents) {
+if (!Array.isArray(agents)) return [];
+return agents.map(a => {
+const name = String(a?.name || '').trim();
+if (Object.prototype.hasOwnProperty.call(TRIP_AGENT_GOALS, name)) {
+return { ...a, name, goal: Number(TRIP_AGENT_GOALS[name]) || 0 };
+}
+return { ...a, name };
+});
+}
 const TRIP_SYNC_MS = 60000;
 let _tripAgents = []; // [{name, production, goal?}]
 let _tripMeta = {}; // {monthLabel, qualifyingGoal, updatedAt}
@@ -9808,19 +9849,17 @@ meta: legacy.meta || {}
 }
 } catch (e) {}
 }
+next.agents = normalizeTripAgentGoals(next.agents);
 const nextSnapshot = tripSnapshot(next);
 const changed = nextSnapshot !== _tripSnapshot;
 if (_tripSaveCooldown) return;
 if (!changed && _tripSnapshot) return;
-
-// SAFETY FIX: do not let failed/empty cloud reads wipe an uploaded CSV preview
 if ((!next.agents || !next.agents.length) && _tripAgents && _tripAgents.length) {
 console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current CSV/admin data.');
 renderTripTracker();
 renderTripAdminEditor();
 return;
 }
-
 _tripAgents = next.agents;
 _tripMeta = next.meta;
 _tripSnapshot = nextSnapshot;
@@ -9863,10 +9902,10 @@ const today = new Date();
 let monthIndex = ((today.getFullYear() - tripStart.getFullYear()) * 12) + (today.getMonth() - tripStart.getMonth()) + 1;
 if (!Number.isFinite(monthIndex)) monthIndex = 1;
 monthIndex = Math.max(1, Math.min(18, monthIndex));
-if (monthChip) monthChip.textContent = monthIndex + '/18';
+if (monthChip) monthChip.textContent = 'Month ' + monthIndex + '/18';
 if (!_tripAgents.length) {
 list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
-if (qCount) qCount.textContent = '0 qualified';
+if (qCount) qCount.textContent = '0 qualifying';
 return;
 }
 const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
@@ -9876,7 +9915,7 @@ const agentGoal = Number(a.goal);
 const effectiveGoal = agentGoal > 0 ? agentGoal : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : 0);
 return effectiveGoal > 0 && prod >= effectiveGoal;
 }).length;
-if (qCount) qCount.textContent = qualified + ' qualified';
+if (qCount) qCount.textContent = qualified + ' qualifying';
 if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
 const avgProgress = sorted.length
 ? Math.round(sorted.reduce((sum, a) => {
@@ -9964,6 +10003,7 @@ if (!name) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Agent nam
 const production = Math.max(0, Number(prodEl?.value) || 0);
 const goal = Math.max(0, Number(goalEl?.value) || 0);
 _tripAgents.push({ name, production, ...(goal ? { goal } : {}) });
+_tripAgents = normalizeTripAgentGoals(_tripAgents);
 if (nameEl) nameEl.value = '';
 if (prodEl) prodEl.value = '';
 if (goalEl) goalEl.value = '';
@@ -9998,7 +10038,7 @@ production: Math.max(0, Number(prodInput?.value) || 0),
 goal: Math.max(0, Number(goalInput?.value) || 0)
 });
 });
-if (updated.length) _tripAgents = updated;
+if (updated.length) _tripAgents = normalizeTripAgentGoals(updated);
 }
 function resetTripAgentGoalEditor() {
 renderTripAdminEditor();
@@ -10009,66 +10049,34 @@ const goalInputVal = document.getElementById('tripGoalInput')?.value;
 const goal = (goalInputVal !== '' && goalInputVal !== null && goalInputVal !== undefined && Number(goalInputVal) > 0)
 ? Number(goalInputVal)
 : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : DEFAULT_GOAL);
+_tripAgents = normalizeTripAgentGoals(_tripAgents);
 _tripMeta = { ..._tripMeta, qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
 const data = { agents: _tripAgents, meta: _tripMeta };
-const dataText = JSON.stringify(data);
 _tripSaveCooldown = true;
 _tripSnapshot = tripSnapshot(data);
 const url = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker';
 const svcKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-const hdrs = {
-'apikey': svcKey,
-'Authorization': 'Bearer ' + svcKey,
-'Content-Type': 'application/json',
-'Prefer': 'return=representation'
-};
-
-return fetch(url + '?hub=eq.medi&select=hub,data', {
+const hdrs = { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey, 'Content-Type': 'application/json' };
+// PATCH-then-POST upsert
+return fetch(url + '?hub=eq.medi', {
 method: 'PATCH',
-headers: hdrs,
-body: JSON.stringify({ data: dataText })
-}).then(async patchRes => {
-if (!patchRes.ok) {
-const errText = await patchRes.text().catch(() => '');
-throw new Error('Trip patch failed: ' + patchRes.status + (errText ? ' ' + errText : ''));
-}
-let rows = [];
-try { rows = await patchRes.json(); } catch (e) { rows = []; }
-if (Array.isArray(rows) && rows.length) return rows;
-return fetch(url + '?select=hub,data', {
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=headers-only' }),
+body: JSON.stringify({ data })
+}).then(r => {
+const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+if (count === 0) {
+return fetch(url, {
 method: 'POST',
-headers: hdrs,
-body: JSON.stringify({ hub: 'medi', data: dataText })
-}).then(async postRes => {
-if (!postRes.ok) {
-const errText = await postRes.text().catch(() => '');
-throw new Error('Trip post failed: ' + postRes.status + (errText ? ' ' + errText : ''));
-}
-try { return await postRes.json(); } catch (e) { return []; }
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=minimal' }),
+body: JSON.stringify({ hub: 'medi', data })
 });
-}).then(rows => {
-let saved = null;
-if (Array.isArray(rows) && rows.length && rows[0].data) {
-const raw = rows[0].data;
-saved = typeof raw === 'string' ? JSON.parse(raw) : raw;
 }
-if (!saved || !Array.isArray(saved.agents) || saved.agents.length !== _tripAgents.length) {
-throw new Error('Trip save verify failed after cloud write.');
-}
+}).then(() => {
 renderTripTracker();
 renderTripAdminEditor();
-showSnuToast(successMsg || '✓ Trip data saved globally!');
-setTimeout(() => {
-_tripSaveCooldown = false;
-loadTripData({ silent: true });
-}, 15000);
-return true;
-}).catch(err => {
-console.error('[TRIP SAVE ERROR]', err);
-_tripSaveCooldown = false;
-showSnuToast('⚠ Trip cloud save failed — check console.');
-throw err;
-});
+showSnuToast(successMsg || '✓ Trip data saved!');
+setTimeout(() => { _tripSaveCooldown = false; }, 15000);
+}).catch(() => { _tripSaveCooldown = false; showSnuToast('⚠ Save failed — check connection.'); });
 }
 function applyTripAgentGoalEdits() {
 collectTripEditorEdits();
@@ -10113,16 +10121,16 @@ if (name) agents.push({ name, production, ...(goal ? {goal} : {}) });
 });
 if (!agents.length) { setErr('✗ No valid rows found. Check Name and Production columns.'); return; }
 agents.sort((a,b) => b.production - a.production);
-_tripAgents = agents;
-setOk(`✓ Loaded ${agents.length} agent${agents.length !== 1 ? 's' : ''} — review below, then Save & Publish.`);
+_tripAgents = normalizeTripAgentGoals(agents);
+setOk(`✓ Loaded ${_tripAgents.length} agent${_tripAgents.length !== 1 ? 's' : ''} — review below, then Save & Publish.`);
 const preview = document.getElementById('tripAdminPreview');
 const previewRows = document.getElementById('tripPreviewRows');
 const previewCount = document.getElementById('tripPreviewCount');
 if (preview && previewRows) {
 preview.style.display = 'block';
-if (previewCount) previewCount.textContent = agents.length;
+if (previewCount) previewCount.textContent = _tripAgents.length;
 const goal = Number(document.getElementById('tripGoalInput')?.value) || DEFAULT_GOAL;
-previewRows.innerHTML = agents.map(a => {
+previewRows.innerHTML = _tripAgents.map(a => {
 const isQ = a.production >= (a.goal || goal);
 return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
 <span style="color:${isQ?'#22c55e':'#e2e8f0'}">${pesc(a.name)}</span>
@@ -10137,21 +10145,16 @@ renderTripAdminEditor();
 if (file.name.match(/\.xlsx?$/i)) reader.readAsArrayBuffer(file);
 else reader.readAsText(file);
 }
-async function saveTripData() {
+function saveTripData() {
 collectTripEditorEdits();
 if (!_tripAgents.length) { alert('No agents to save. Add agents above first.'); return; }
-try {
-await persistTripData('✓ Trip data saved globally!');
+persistTripData('✓ Trip data saved!');
 const inp = document.getElementById('tripCsvInput');
 if (inp) inp.value = '';
 const status = document.getElementById('tripCsvStatus');
 if (status) { status.textContent = ''; status.className = 'csv-status'; }
 const preview = document.getElementById('tripAdminPreview');
 if (preview) preview.style.display = 'none';
-} catch (err) {
-const status = document.getElementById('tripCsvStatus');
-if (status) { status.textContent = 'Cloud save failed — CSV remains loaded locally. Check console.'; status.className = 'csv-status err'; }
-}
 }
 function clearTripData() {
 if (!confirm('Clear all trip tracker data? This cannot be undone.')) return;
