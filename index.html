@@ -4723,8 +4723,8 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-<span class="count-chip" id="tripMonthChip">1/18</span>
-<span class="count-chip" id="tripQualifiedCount">0 qualified</span>
+<span class="count-chip" id="tripMonthChip">Month 1/18</span>
+<span class="count-chip" id="tripQualifiedCount">0 qualifying</span>
 </div>
 </div>
 <div class="trip-card">
@@ -9753,7 +9753,7 @@ const TRIP_KEY = 'snu_trip_v1';
 const TRIP_START = new Date('2026-01-01');
 const TRIP_END = new Date('2027-06-30');
 const DEFAULT_GOAL = 50000; // pts — change to match your actual qualifying bar
-const TRIP_SYNC_MS = 10000;
+const TRIP_SYNC_MS = 60000;
 let _tripAgents = []; // [{name, production, goal?}]
 let _tripMeta = {}; // {monthLabel, qualifyingGoal, updatedAt}
 let _tripSnapshot = '';
@@ -9812,6 +9812,15 @@ const nextSnapshot = tripSnapshot(next);
 const changed = nextSnapshot !== _tripSnapshot;
 if (_tripSaveCooldown) return;
 if (!changed && _tripSnapshot) return;
+
+// SAFETY FIX: do not let failed/empty cloud reads wipe an uploaded CSV preview
+if ((!next.agents || !next.agents.length) && _tripAgents && _tripAgents.length) {
+console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current CSV/admin data.');
+renderTripTracker();
+renderTripAdminEditor();
+return;
+}
+
 _tripAgents = next.agents;
 _tripMeta = next.meta;
 _tripSnapshot = nextSnapshot;
@@ -9854,10 +9863,10 @@ const today = new Date();
 let monthIndex = ((today.getFullYear() - tripStart.getFullYear()) * 12) + (today.getMonth() - tripStart.getMonth()) + 1;
 if (!Number.isFinite(monthIndex)) monthIndex = 1;
 monthIndex = Math.max(1, Math.min(18, monthIndex));
-if (monthChip) monthChip.textContent = monthIndex + '/18';
+if (monthChip) monthChip.textContent = 'Month ' + monthIndex + '/18';
 if (!_tripAgents.length) {
 list.innerHTML = '<div class="trip-empty">No trip data yet — upload a CSV in Admin to get started.</div>';
-if (qCount) qCount.textContent = '0 qualified';
+if (qCount) qCount.textContent = '0 qualifying';
 return;
 }
 const sorted = [..._tripAgents].sort((a,b) => (b.production||0) - (a.production||0));
@@ -9867,7 +9876,7 @@ const agentGoal = Number(a.goal);
 const effectiveGoal = agentGoal > 0 ? agentGoal : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : 0);
 return effectiveGoal > 0 && prod >= effectiveGoal;
 }).length;
-if (qCount) qCount.textContent = qualified + ' qualified';
+if (qCount) qCount.textContent = qualified + ' qualifying';
 if (updLabel && _tripMeta.monthLabel) updLabel.textContent = 'Updated: ' + _tripMeta.monthLabel;
 const avgProgress = sorted.length
 ? Math.round(sorted.reduce((sum, a) => {
@@ -10006,27 +10015,46 @@ _tripSaveCooldown = true;
 _tripSnapshot = tripSnapshot(data);
 const url = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker';
 const svcKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-const hdrs = { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey, 'Content-Type': 'application/json' };
-// PATCH-then-POST upsert
+const hdrs = {
+'apikey': svcKey,
+'Authorization': 'Bearer ' + svcKey,
+'Content-Type': 'application/json'
+};
+
+// Reliable overwrite: remove the old hub row, insert the fresh TRIP payload, then verify it can be read back.
 return fetch(url + '?hub=eq.medi', {
-method: 'PATCH',
-headers: Object.assign({}, hdrs, { 'Prefer': 'return=headers-only' }),
-body: JSON.stringify({ data })
-}).then(r => {
-const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
-if (count === 0) {
+method: 'DELETE',
+headers: { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey }
+})
+.then(r => {
+if (!r.ok) throw new Error('Trip delete failed: ' + r.status);
 return fetch(url, {
 method: 'POST',
-headers: Object.assign({}, hdrs, { 'Prefer': 'return=minimal' }),
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=representation' }),
 body: JSON.stringify({ hub: 'medi', data })
 });
-}
-}).then(() => {
+})
+.then(r => {
+if (!r.ok) throw new Error('Trip insert failed: ' + r.status);
+return r.json();
+})
+.then(rows => {
+const saved = Array.isArray(rows) ? rows[0] : rows;
+const savedData = saved && saved.data;
+const savedAgents = savedData && Array.isArray(savedData.agents) ? savedData.agents : [];
+if (savedAgents.length !== _tripAgents.length) throw new Error('Trip verify failed: saved agent count mismatch');
 renderTripTracker();
 renderTripAdminEditor();
-showSnuToast(successMsg || '✓ Trip data saved!');
-setTimeout(() => { _tripSaveCooldown = false; }, 15000);
-}).catch(() => { _tripSaveCooldown = false; showSnuToast('⚠ Save failed — check connection.'); });
+showSnuToast(successMsg || '✓ Trip data saved globally!');
+setTimeout(() => { _tripSaveCooldown = false; loadTripData({ silent: true }); }, 15000);
+return true;
+})
+.catch(err => {
+console.error('[TRIP SAVE ERROR]', err);
+_tripSaveCooldown = false;
+showSnuToast('⚠ Trip cloud save failed — check console.');
+throw err;
+});
 }
 function applyTripAgentGoalEdits() {
 collectTripEditorEdits();
@@ -10095,16 +10123,22 @@ renderTripAdminEditor();
 if (file.name.match(/\.xlsx?$/i)) reader.readAsArrayBuffer(file);
 else reader.readAsText(file);
 }
-function saveTripData() {
+async function saveTripData() {
 collectTripEditorEdits();
 if (!_tripAgents.length) { alert('No agents to save. Add agents above first.'); return; }
-persistTripData('✓ Trip data saved!');
+try {
+await persistTripData('✓ Trip data saved globally!');
 const inp = document.getElementById('tripCsvInput');
 if (inp) inp.value = '';
 const status = document.getElementById('tripCsvStatus');
 if (status) { status.textContent = ''; status.className = 'csv-status'; }
 const preview = document.getElementById('tripAdminPreview');
 if (preview) preview.style.display = 'none';
+} catch (err) {
+console.error('[TRIP SAVE BUTTON ERROR]', err);
+const status = document.getElementById('tripCsvStatus');
+if (status) { status.textContent = 'Save failed — data is still shown locally. Check console.'; status.className = 'csv-status err'; }
+}
 }
 function clearTripData() {
 if (!confirm('Clear all trip tracker data? This cannot be undone.')) return;
