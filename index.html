@@ -9779,7 +9779,7 @@ return '';
 }
 function loadTripData(opts = {}) {
 const silent = !!opts.silent;
-const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data', {
 headers: {
 'apikey': key,
@@ -10016,26 +10016,31 @@ _tripSnapshot = tripSnapshot(data);
 const url = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker';
 const svcKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
 const hdrs = { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey, 'Content-Type': 'application/json' };
-// PATCH-then-POST upsert
+
 return fetch(url + '?hub=eq.medi', {
-method: 'PATCH',
-headers: Object.assign({}, hdrs, { 'Prefer': 'return=headers-only' }),
-body: JSON.stringify({ data })
-}).then(r => {
-const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
-if (count === 0) {
+method: 'DELETE',
+headers: { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey }
+}).then(delRes => {
+if (!delRes.ok) throw new Error('Trip delete-before-save failed: ' + delRes.status);
 return fetch(url, {
 method: 'POST',
 headers: Object.assign({}, hdrs, { 'Prefer': 'return=minimal' }),
 body: JSON.stringify({ hub: 'medi', data })
 });
-}
-}).then(() => {
+}).then(saveRes => {
+if (!saveRes.ok) throw new Error('Trip save failed: ' + saveRes.status);
 renderTripTracker();
 renderTripAdminEditor();
-showSnuToast(successMsg || '✓ Trip data saved!');
-setTimeout(() => { _tripSaveCooldown = false; }, 15000);
-}).catch(() => { _tripSaveCooldown = false; showSnuToast('⚠ Save failed — check connection.'); });
+showSnuToast(successMsg || '✓ Trip data saved globally!');
+setTimeout(() => {
+_tripSaveCooldown = false;
+loadTripData({ silent: true });
+}, 15000);
+}).catch(err => {
+console.error('[TRIP SAVE ERROR]', err);
+_tripSaveCooldown = false;
+showSnuToast('⚠ Trip cloud save failed — check console.');
+});
 }
 function applyTripAgentGoalEdits() {
 collectTripEditorEdits();
