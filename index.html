@@ -9836,7 +9836,7 @@ async function loadTripData(opts = {}) {
 const silent = !!opts.silent;
 const force = !!opts.force;
 const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-const readUrl = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data&t=' + Date.now();
+const readUrl = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data';
 try {
 const r = await fetch(readUrl, {
 cache: 'no-store',
