@@ -9777,11 +9777,30 @@ updatedAt: String(data?.meta?.updatedAt || '')
 return '';
 }
 }
+function normalizeTripPayload(raw) {
+try {
+if (!raw) return { agents: [], meta: {} };
+let d = raw;
+if (typeof d === 'string') {
+d = d.trim();
+if (!d) return { agents: [], meta: {} };
+d = JSON.parse(d);
+}
+if (typeof d === 'string') d = JSON.parse(d);
+return {
+agents: Array.isArray(d?.agents) ? d.agents : [],
+meta: (d && typeof d.meta === 'object' && d.meta) ? d.meta : {}
+};
+} catch (e) {
+console.warn('[TRIP] Could not parse cloud payload.', e);
+return { agents: [], meta: {} };
+}
+}
 function getTripLocalBackup() {
 try {
 const raw = localStorage.getItem(TRIP_KEY);
 if (!raw) return null;
-const data = JSON.parse(raw);
+const data = normalizeTripPayload(raw);
 if (data && Array.isArray(data.agents) && data.agents.length) return data;
 } catch (e) {}
 return null;
@@ -9793,66 +9812,49 @@ localStorage.setItem(TRIP_KEY, JSON.stringify(data));
 }
 } catch (e) {}
 }
+function clearTripLocalBackup() {
+try { localStorage.removeItem(TRIP_KEY); } catch (e) {}
+}
 function loadTripData(opts = {}) {
 const silent = !!opts.silent;
 const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
-fetch('https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data', {
+const readUrl = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data&t=' + Date.now();
+return fetch(readUrl, {
 headers: {
 'apikey': key,
 'Authorization': 'Bearer ' + key,
 'Cache-Control': 'no-cache'
 }
-}).then(r => r.json()).then(async rows => {
+}).then(r => {
+if (!r.ok) throw new Error('Trip cloud read failed: ' + r.status);
+return r.json();
+}).then(rows => {
 let next = { agents: [], meta: {} };
-if (rows && rows.length && rows[0].data) {
-const raw = rows[0].data;
-const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
-next = {
-agents: Array.isArray(d.agents) ? d.agents : [],
-meta: d.meta || {}
-};
-}
-if ((!next.agents || !next.agents.length) && typeof jbReadBin === 'function' && typeof JB_MAIN_BIN !== 'undefined') {
-try {
-const rec = await jbReadBin(JB_MAIN_BIN);
-const legacy = rec && rec.snu_trip;
-if (legacy && typeof legacy === 'object') {
-next = {
-agents: Array.isArray(legacy.agents) ? legacy.agents : [],
-meta: legacy.meta || {}
-};
-}
-} catch (e) {}
-}
+if (rows && rows.length) next = normalizeTripPayload(rows[0].data);
+
+// Critical consistency rule: do not use stale per-device localStorage as the normal data source.
+// That is what caused your three different views: your browser had one backup, your coworker had another, and mobile had none.
 if ((!next.agents || !next.agents.length)) {
-const backup = getTripLocalBackup();
-if (backup && Array.isArray(backup.agents) && backup.agents.length) {
-console.warn('[TRIP] Cloud returned empty/unavailable data; restoring local backup.');
-next = { agents: backup.agents, meta: backup.meta || {} };
-} else if (_tripAgents && _tripAgents.length) {
-console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current CSV/admin data.');
+if (_tripAgents && _tripAgents.length) {
+console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current in-session CSV/admin data only.');
 renderTripTracker();
 renderTripAdminEditor();
 return;
 }
+clearTripLocalBackup();
+console.warn('[TRIP] No cloud TRIP data found. Showing empty tracker instead of stale device backup.');
+next = { agents: [], meta: {} };
 }
+
 const nextSnapshot = tripSnapshot(next);
 const changed = nextSnapshot !== _tripSnapshot;
 if (_tripSaveCooldown) return;
 if (!changed && _tripSnapshot) return;
 
-// SAFETY FIX: do not let failed/empty cloud reads wipe an uploaded CSV preview
-if ((!next.agents || !next.agents.length) && _tripAgents && _tripAgents.length) {
-console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current CSV/admin data.');
-renderTripTracker();
-renderTripAdminEditor();
-return;
-}
-
 _tripAgents = next.agents;
 _tripMeta = next.meta;
 _tripSnapshot = nextSnapshot;
-setTripLocalBackup(next);
+if (_tripAgents.length) setTripLocalBackup(next); else clearTripLocalBackup();
 renderTripTracker();
 const goalInp = document.getElementById('tripGoalInput');
 if (goalInp) goalInp.value = _tripMeta.qualifyingGoal || '';
@@ -9860,12 +9862,18 @@ const monthInp = document.getElementById('tripMonthLabel');
 if (monthInp) monthInp.value = _tripMeta.monthLabel || '';
 renderTripAdminEditor();
 if (!silent && changed && typeof showSnuToast === 'function') {
-showSnuToast('✓ Trip tracker refreshed.');
+showSnuToast('✓ Trip tracker refreshed from cloud.');
 }
-}).catch(() => {
-if (_tripSaveCooldown) return;
+}).catch(err => {
+console.warn('[TRIP] Cloud read unavailable; not using stale local backup.', err);
+if (_tripAgents && _tripAgents.length) {
 renderTripTracker();
 renderTripAdminEditor();
+} else {
+clearTripLocalBackup();
+renderTripTracker();
+renderTripAdminEditor();
+}
 });
 }
 function startTripLiveSync() {
@@ -10037,7 +10045,7 @@ setTripLocalBackup({ agents: _tripAgents, meta: _tripMeta });
 function resetTripAgentGoalEditor() {
 renderTripAdminEditor();
 }
-function persistTripData(successMsg) {
+async function persistTripData(successMsg) {
 const monthLabel = document.getElementById('tripMonthLabel')?.value?.trim() || _tripMeta.monthLabel || '';
 const goalInputVal = document.getElementById('tripGoalInput')?.value;
 const goal = (goalInputVal !== '' && goalInputVal !== null && goalInputVal !== undefined && Number(goalInputVal) > 0)
@@ -10045,6 +10053,7 @@ const goal = (goalInputVal !== '' && goalInputVal !== null && goalInputVal !== u
 : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : DEFAULT_GOAL);
 _tripMeta = { ..._tripMeta, qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
 const data = { agents: _tripAgents, meta: _tripMeta };
+const dataText = JSON.stringify(data);
 setTripLocalBackup(data);
 _tripSaveCooldown = true;
 _tripSnapshot = tripSnapshot(data);
@@ -10053,49 +10062,58 @@ const svcKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const hdrs = {
 'apikey': svcKey,
 'Authorization': 'Bearer ' + svcKey,
-'Content-Type': 'application/json'
+'Content-Type': 'application/json',
+'Cache-Control': 'no-cache'
 };
-
-// Reliable overwrite: remove the old hub row, insert the fresh TRIP payload, then verify it can be read back.
-return fetch(url + '?hub=eq.medi', {
-method: 'DELETE',
-headers: { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey }
-})
-.then(r => {
-if (!r.ok) throw new Error('Trip delete failed: ' + r.status);
-return fetch(url, {
+try {
+console.log('[TRIP SAVE] saving to Supabase', { agents: _tripAgents.length, updatedAt: _tripMeta.updatedAt });
+let r = await fetch(url + '?hub=eq.medi&select=hub,data', {
+method: 'PATCH',
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=representation' }),
+body: JSON.stringify({ data: dataText })
+});
+let bodyText = await r.text();
+if (!r.ok) throw new Error('Trip update failed: ' + r.status + ' ' + bodyText);
+let rows = [];
+try { rows = bodyText ? JSON.parse(bodyText) : []; } catch (e) { rows = []; }
+if (!Array.isArray(rows) || !rows.length) {
+r = await fetch(url + '?select=hub,data', {
 method: 'POST',
 headers: Object.assign({}, hdrs, { 'Prefer': 'return=representation' }),
-body: JSON.stringify({ hub: 'medi', data })
+body: JSON.stringify({ hub: 'medi', data: dataText })
 });
-})
-.then(r => {
-if (!r.ok) throw new Error('Trip insert failed: ' + r.status);
-return r.json();
-})
-.then(rows => {
-const saved = Array.isArray(rows) ? rows[0] : rows;
-const rawSavedData = saved && saved.data;
-let savedData = rawSavedData;
-if (typeof rawSavedData === 'string') {
-try { savedData = JSON.parse(rawSavedData); } catch (e) { savedData = null; }
+bodyText = await r.text();
+if (!r.ok) throw new Error('Trip insert failed: ' + r.status + ' ' + bodyText);
+try { rows = bodyText ? JSON.parse(bodyText) : []; } catch (e) { rows = []; }
 }
-const savedAgents = savedData && Array.isArray(savedData.agents) ? savedData.agents : [];
-if (savedAgents.length !== _tripAgents.length) {
-console.warn('[TRIP SAVE] Supabase saved, but immediate read-back shape did not match. Keeping local data and allowing next cloud refresh.', { expected: _tripAgents.length, got: savedAgents.length, savedData });
+
+const verify = await fetch(url + '?hub=eq.medi&select=data&t=' + Date.now(), {
+headers: { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey, 'Cache-Control': 'no-cache' }
+});
+const verifyText = await verify.text();
+if (!verify.ok) throw new Error('Trip verify read failed: ' + verify.status + ' ' + verifyText);
+let verifyRows = [];
+try { verifyRows = verifyText ? JSON.parse(verifyText) : []; } catch (e) { verifyRows = []; }
+const savedData = verifyRows && verifyRows.length ? normalizeTripPayload(verifyRows[0].data) : { agents: [], meta: {} };
+if (!savedData.agents.length) throw new Error('Trip verify failed: Supabase row is empty after save.');
+if (savedData.agents.length !== _tripAgents.length) {
+console.warn('[TRIP SAVE] Supabase saved, but read-back agent count differs.', { expected: _tripAgents.length, got: savedData.agents.length });
 }
+_tripAgents = savedData.agents.length ? savedData.agents : _tripAgents;
+_tripMeta = savedData.meta || _tripMeta;
+_tripSnapshot = tripSnapshot({ agents: _tripAgents, meta: _tripMeta });
+setTripLocalBackup({ agents: _tripAgents, meta: _tripMeta });
 renderTripTracker();
 renderTripAdminEditor();
 showSnuToast(successMsg || '✓ Trip data saved globally!');
-setTimeout(() => { _tripSaveCooldown = false; loadTripData({ silent: true }); }, 15000);
+setTimeout(() => { _tripSaveCooldown = false; loadTripData({ silent: true }); }, 3000);
 return true;
-})
-.catch(err => {
+} catch (err) {
 console.error('[TRIP SAVE ERROR]', err);
 _tripSaveCooldown = false;
 showSnuToast('⚠ Trip cloud save failed — check console.');
 throw err;
-});
+}
 }
 function applyTripAgentGoalEdits() {
 collectTripEditorEdits();
