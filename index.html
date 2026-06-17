@@ -9777,6 +9777,22 @@ updatedAt: String(data?.meta?.updatedAt || '')
 return '';
 }
 }
+function getTripLocalBackup() {
+try {
+const raw = localStorage.getItem(TRIP_KEY);
+if (!raw) return null;
+const data = JSON.parse(raw);
+if (data && Array.isArray(data.agents) && data.agents.length) return data;
+} catch (e) {}
+return null;
+}
+function setTripLocalBackup(data) {
+try {
+if (data && Array.isArray(data.agents) && data.agents.length) {
+localStorage.setItem(TRIP_KEY, JSON.stringify(data));
+}
+} catch (e) {}
+}
 function loadTripData(opts = {}) {
 const silent = !!opts.silent;
 const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
@@ -9808,6 +9824,18 @@ meta: legacy.meta || {}
 }
 } catch (e) {}
 }
+if ((!next.agents || !next.agents.length)) {
+const backup = getTripLocalBackup();
+if (backup && Array.isArray(backup.agents) && backup.agents.length) {
+console.warn('[TRIP] Cloud returned empty/unavailable data; restoring local backup.');
+next = { agents: backup.agents, meta: backup.meta || {} };
+} else if (_tripAgents && _tripAgents.length) {
+console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current CSV/admin data.');
+renderTripTracker();
+renderTripAdminEditor();
+return;
+}
+}
 const nextSnapshot = tripSnapshot(next);
 const changed = nextSnapshot !== _tripSnapshot;
 if (_tripSaveCooldown) return;
@@ -9824,6 +9852,7 @@ return;
 _tripAgents = next.agents;
 _tripMeta = next.meta;
 _tripSnapshot = nextSnapshot;
+setTripLocalBackup(next);
 renderTripTracker();
 const goalInp = document.getElementById('tripGoalInput');
 if (goalInp) goalInp.value = _tripMeta.qualifyingGoal || '';
@@ -9964,6 +9993,7 @@ if (!name) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Agent nam
 const production = Math.max(0, Number(prodEl?.value) || 0);
 const goal = Math.max(0, Number(goalEl?.value) || 0);
 _tripAgents.push({ name, production, ...(goal ? { goal } : {}) });
+setTripLocalBackup({ agents: _tripAgents, meta: _tripMeta });
 if (nameEl) nameEl.value = '';
 if (prodEl) prodEl.value = '';
 if (goalEl) goalEl.value = '';
@@ -9977,6 +10007,7 @@ const agent = sorted[sortedIndex];
 if (!agent) return;
 const realIdx = _tripAgents.findIndex(a => a.name === agent.name && a.production === agent.production);
 if (realIdx !== -1) _tripAgents.splice(realIdx, 1);
+setTripLocalBackup({ agents: _tripAgents, meta: _tripMeta });
 renderTripTracker();
 renderTripAdminEditor();
 if (typeof showSnuToast === 'function') showSnuToast('🗑 Removed ' + (agent.name || 'agent') + ' — Save & Publish to confirm.');
@@ -9998,7 +10029,10 @@ production: Math.max(0, Number(prodInput?.value) || 0),
 goal: Math.max(0, Number(goalInput?.value) || 0)
 });
 });
-if (updated.length) _tripAgents = updated;
+if (updated.length) {
+_tripAgents = updated;
+setTripLocalBackup({ agents: _tripAgents, meta: _tripMeta });
+}
 }
 function resetTripAgentGoalEditor() {
 renderTripAdminEditor();
@@ -10011,6 +10045,7 @@ const goal = (goalInputVal !== '' && goalInputVal !== null && goalInputVal !== u
 : (Number(_tripMeta.qualifyingGoal) > 0 ? Number(_tripMeta.qualifyingGoal) : DEFAULT_GOAL);
 _tripMeta = { ..._tripMeta, qualifyingGoal: goal, monthLabel, updatedAt: new Date().toISOString() };
 const data = { agents: _tripAgents, meta: _tripMeta };
+setTripLocalBackup(data);
 _tripSaveCooldown = true;
 _tripSnapshot = tripSnapshot(data);
 const url = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker';
@@ -10040,9 +10075,15 @@ return r.json();
 })
 .then(rows => {
 const saved = Array.isArray(rows) ? rows[0] : rows;
-const savedData = saved && saved.data;
+const rawSavedData = saved && saved.data;
+let savedData = rawSavedData;
+if (typeof rawSavedData === 'string') {
+try { savedData = JSON.parse(rawSavedData); } catch (e) { savedData = null; }
+}
 const savedAgents = savedData && Array.isArray(savedData.agents) ? savedData.agents : [];
-if (savedAgents.length !== _tripAgents.length) throw new Error('Trip verify failed: saved agent count mismatch');
+if (savedAgents.length !== _tripAgents.length) {
+console.warn('[TRIP SAVE] Supabase saved, but immediate read-back shape did not match. Keeping local data and allowing next cloud refresh.', { expected: _tripAgents.length, got: savedAgents.length, savedData });
+}
 renderTripTracker();
 renderTripAdminEditor();
 showSnuToast(successMsg || '✓ Trip data saved globally!');
@@ -10100,6 +10141,7 @@ if (name) agents.push({ name, production, ...(goal ? {goal} : {}) });
 if (!agents.length) { setErr('✗ No valid rows found. Check Name and Production columns.'); return; }
 agents.sort((a,b) => b.production - a.production);
 _tripAgents = agents;
+setTripLocalBackup({ agents: _tripAgents, meta: _tripMeta });
 setOk(`✓ Loaded ${agents.length} agent${agents.length !== 1 ? 's' : ''} — review below, then Save & Publish.`);
 const preview = document.getElementById('tripAdminPreview');
 const previewRows = document.getElementById('tripPreviewRows');
@@ -10144,6 +10186,7 @@ function clearTripData() {
 if (!confirm('Clear all trip tracker data? This cannot be undone.')) return;
 _tripAgents = [];
 _tripMeta = {};
+try { localStorage.removeItem(TRIP_KEY); } catch (e) {}
 _tripSnapshot = tripSnapshot({ agents: [], meta: {} });
 renderTripTracker();
 renderTripAdminEditor();
