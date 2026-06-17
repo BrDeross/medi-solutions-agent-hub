@@ -4218,7 +4218,7 @@ Agent Command Center
 <p>Coaching, marketing, and planning resources</p>
 </div>
 </div>
-<span class="count-chip">14 tools</span>
+<span class="count-chip">19 tools</span>
 <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
 </div>
 <!-- Tool Cards -->
@@ -4360,6 +4360,22 @@ Agent Command Center
 <p>Step-by-step setup guide for new agents — track your progress as you go.</p>
 <span class="card-tag">Onboarding</span>
 </div>
+<a class="card" data-card-id="medicare-price-lookup" data-color="blue" href="https://www.medicare.gov/procedure-price-lookup/" target="_blank" rel="noopener noreferrer">
+<span class="card-arrow">↗</span>
+<div class="card-shimmer"></div>
+<div class="card-icon-wrap">💵</div>
+<h3>Medicare Procedure Price Lookup</h3>
+<p>Compare what Medicare typically pays for procedures across hospital outpatient and ambulatory surgical settings.</p>
+<span class="card-tag">Pricing</span>
+</a>
+<a class="card" data-card-id="carescout-cost" data-color="teal" href="https://www.carescout.com/cost-of-care" target="_blank" rel="noopener noreferrer">
+<span class="card-arrow">↗</span>
+<div class="card-shimmer"></div>
+<div class="card-icon-wrap">🏥</div>
+<h3>CareScout Cost of Care</h3>
+<p>Look up average long-term care costs by location — home care, assisted living, and nursing homes.</p>
+<span class="card-tag">Long-Term Care</span>
+</a>
 </div>
 </div>
 </section>
@@ -10109,7 +10125,7 @@ let rows = [];
 try { rows = bodyText ? JSON.parse(bodyText) : []; } catch (e) { rows = []; }
 console.log('[TRIP SAVE] Supabase upsert returned', { rows: Array.isArray(rows) ? rows.length : 0 });
 
-const verify = await fetch(url + '?hub=eq.medi&select=data&t=' + Date.now(), {
+const verify = await fetch(url + '?hub=eq.medi&select=data', {
 headers: { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey, 'Cache-Control': 'no-cache' }
 });
 const verifyText = await verify.text();
@@ -14919,6 +14935,8 @@ const GSEARCH_INDEX = [
 {name:'Alliance Program',section:'Agent Tools',icon:'🤝',action:()=>{ openAllianceProgramModal?.(); closeGsearch(); }},
 {name:'Group Health Census',section:'Agent Tools',icon:'📋',action:()=>{ openCensusFormModal?.(); closeGsearch(); }},
 {name:'Ancillary Carrier Finder',section:'Agent Tools',icon:'🩺',action:()=>{ openAncillaryFinder?.(); closeGsearch(); }},
+{name:'Medicare Procedure Price Lookup',section:'Agent Tools',icon:'💵',action:()=>window.open('https://www.medicare.gov/procedure-price-lookup/','_blank')},
+{name:'CareScout Cost of Care',section:'Agent Tools',icon:'🏥',action:()=>window.open('https://www.carescout.com/cost-of-care','_blank')},
 // Portals
 {name:'AgencyBloc',section:'Portals',icon:'🗂️',action:()=>window.open('https://app.agencybloc.com/','_blank')},
 {name:'CSG Portal',section:'Portals',icon:'🧰',action:()=>window.open('https://www.insurancetoolsportal.com/','_blank')},
