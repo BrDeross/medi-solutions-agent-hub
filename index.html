@@ -11943,8 +11943,8 @@ return;
 }
 const year = _certMeta.year || '';
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-// Determine which carriers actually appear in data
-const activeCols = CERT_CARRIERS.filter(c => _certAgents.some(a => a.certs && a.certs[c] !== undefined));
+// Always show all 15 carrier columns, regardless of whether data matched
+const activeCols = CERT_CARRIERS;
 const headerCells = activeCols.map(c =>
 `<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">${pesc(c)}</th>`
 ).join('');
@@ -12040,16 +12040,23 @@ const name = (r[nameKey]||'').trim();
 if (!name) return;
 const year = yearKey ? String(r[yearKey]).trim() : '';
 const certs = {};
+const norm = s => String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 CERT_CARRIERS.forEach(c => {
-// Try exact match then case-insensitive
-const key = headers.find(h => h === c) || headers.find(h => h.toLowerCase() === c.toLowerCase());
+// Try exact match, then case-insensitive, then normalized (ignore spaces/slashes/punctuation)
+const cNorm = norm(c);
+const key = headers.find(h => h === c) || headers.find(h => h.toLowerCase() === c.toLowerCase()) || headers.find(h => norm(h) === cNorm);
 if (key) certs[c] = String(r[key]||'').trim();
 });
 agents.push({ name, year, certs });
 });
 if (!agents.length) { setErr('✗ No agent rows found. Check column headers.'); return; }
 _certAgents = agents;
+const unmatched = CERT_CARRIERS.filter(c => !agents.some(a => a.certs && a.certs[c] !== undefined));
+if (unmatched.length) {
+setOk(`✓ Loaded ${agents.length} agent${agents.length!==1?'s':''} — but ${unmatched.length} carrier column${unmatched.length!==1?'s':''} didn't match: ${unmatched.join(', ')}. Check those headers. Review below, then Save & Publish.`);
+} else {
 setOk(`✓ Loaded ${agents.length} agent${agents.length!==1?'s':''} — review below, then Save & Publish.`);
+}
 const preview = document.getElementById('certAdminPreview');
 const previewRows = document.getElementById('certPreviewRows');
 const previewCount = document.getElementById('certPreviewCount');
