@@ -4218,7 +4218,7 @@ Agent Command Center
 <p>Coaching, marketing, and planning resources</p>
 </div>
 </div>
-<span class="count-chip">19 tools</span>
+<span class="count-chip">14 tools</span>
 <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
 </div>
 <!-- Tool Cards -->
@@ -4360,22 +4360,6 @@ Agent Command Center
 <p>Step-by-step setup guide for new agents — track your progress as you go.</p>
 <span class="card-tag">Onboarding</span>
 </div>
-<a class="card" data-card-id="medicare-price-lookup" data-color="blue" href="https://www.medicare.gov/procedure-price-lookup/" target="_blank" rel="noopener noreferrer">
-<span class="card-arrow">↗</span>
-<div class="card-shimmer"></div>
-<div class="card-icon-wrap">💵</div>
-<h3>Medicare Procedure Price Lookup</h3>
-<p>Compare what Medicare typically pays for procedures across hospital outpatient and ambulatory surgical settings.</p>
-<span class="card-tag">Pricing</span>
-</a>
-<a class="card" data-card-id="carescout-cost" data-color="teal" href="https://www.carescout.com/cost-of-care" target="_blank" rel="noopener noreferrer">
-<span class="card-arrow">↗</span>
-<div class="card-shimmer"></div>
-<div class="card-icon-wrap">🏥</div>
-<h3>CareScout Cost of Care</h3>
-<p>Look up average long-term care costs by location — home care, assisted living, and nursing homes.</p>
-<span class="card-tag">Long-Term Care</span>
-</a>
 </div>
 </div>
 </section>
@@ -9848,59 +9832,45 @@ localStorage.setItem(TRIP_KEY, JSON.stringify(data));
 function clearTripLocalBackup() {
 try { localStorage.removeItem(TRIP_KEY); } catch (e) {}
 }
-async function loadTripData(opts = {}) {
+function loadTripData(opts = {}) {
 const silent = !!opts.silent;
-const force = !!opts.force;
 const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-const readUrl = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data';
-try {
-const r = await fetch(readUrl, {
-cache: 'no-store',
+const readUrl = 'https://bjlzwmoogypfefjxvgyt.supabase.co/rest/v1/trip_tracker?hub=eq.medi&select=data&t=' + Date.now();
+return fetch(readUrl, {
 headers: {
 'apikey': key,
 'Authorization': 'Bearer ' + key,
-'Cache-Control': 'no-cache',
-'Pragma': 'no-cache'
+'Cache-Control': 'no-cache'
 }
-});
-const bodyText = await r.text();
-if (!r.ok) throw new Error('Trip cloud read failed: ' + r.status + ' ' + bodyText);
-let rows = [];
-try { rows = bodyText ? JSON.parse(bodyText) : []; } catch (e) { rows = []; }
+}).then(r => {
+if (!r.ok) throw new Error('Trip cloud read failed: ' + r.status);
+return r.json();
+}).then(rows => {
 let next = chooseTripCloudPayload(rows);
-const cloudCount = Array.isArray(next.agents) ? next.agents.length : 0;
-console.log('[TRIP LOAD] Supabase read', { rows: Array.isArray(rows) ? rows.length : 0, agents: cloudCount, forced: force });
 
-if (!cloudCount) {
-clearTripLocalBackup();
-if (_tripAgents && _tripAgents.length && !force) {
-console.warn('[TRIP LOAD] Supabase returned no agents; keeping only the current in-session CSV/admin data.');
+// Critical consistency rule: do not use stale per-device localStorage as the normal data source.
+// That is what caused your three different views: your browser had one backup, your coworker had another, and mobile had none.
+if ((!next.agents || !next.agents.length)) {
+if (_tripAgents && _tripAgents.length) {
+console.warn('[TRIP] Cloud returned empty/unavailable data; keeping current in-session CSV/admin data only.');
 renderTripTracker();
 renderTripAdminEditor();
 return;
 }
-console.warn('[TRIP LOAD] Supabase returned no agents; rendering empty tracker.');
-_tripAgents = [];
-_tripMeta = {};
-_tripSnapshot = tripSnapshot({ agents: [], meta: {} });
-renderTripTracker();
-renderTripAdminEditor();
-return;
+clearTripLocalBackup();
+console.warn('[TRIP] No cloud TRIP data found. Showing empty tracker instead of stale device backup.');
+next = { agents: [], meta: {} };
 }
 
 const nextSnapshot = tripSnapshot(next);
 const changed = nextSnapshot !== _tripSnapshot;
-if (_tripSaveCooldown && !force) {
-console.log('[TRIP LOAD] Save cooldown active; local saved data remains visible.');
-return;
-}
-if (!changed && _tripSnapshot && !force) return;
+if (_tripSaveCooldown) return;
+if (!changed && _tripSnapshot) return;
 
-// Supabase is the source of truth. When it has agents, it always wins over device-local backup.
 _tripAgents = next.agents;
-_tripMeta = next.meta || {};
+_tripMeta = next.meta;
 _tripSnapshot = nextSnapshot;
-setTripLocalBackup(next);
+if (_tripAgents.length) setTripLocalBackup(next); else clearTripLocalBackup();
 renderTripTracker();
 const goalInp = document.getElementById('tripGoalInput');
 if (goalInp) goalInp.value = _tripMeta.qualifyingGoal || '';
@@ -9908,21 +9878,20 @@ const monthInp = document.getElementById('tripMonthLabel');
 if (monthInp) monthInp.value = _tripMeta.monthLabel || '';
 renderTripAdminEditor();
 if (!silent && changed && typeof showSnuToast === 'function') {
-showSnuToast('✓ Trip tracker loaded from Supabase.');
+showSnuToast('✓ Trip tracker refreshed from cloud.');
 }
-} catch (err) {
-console.warn('[TRIP LOAD ERROR] Supabase unavailable; not using stale device backup.', err);
+}).catch(err => {
+console.warn('[TRIP] Cloud read unavailable; not using stale local backup.', err);
+if (_tripAgents && _tripAgents.length) {
+renderTripTracker();
+renderTripAdminEditor();
+} else {
 clearTripLocalBackup();
-if (!(_tripAgents && _tripAgents.length)) {
-_tripAgents = [];
-_tripMeta = {};
-_tripSnapshot = tripSnapshot({ agents: [], meta: {} });
-}
 renderTripTracker();
 renderTripAdminEditor();
 }
+});
 }
-window.tripForceCloudReload = function() { return loadTripData({ silent: false, force: true }); };
 function startTripLiveSync() {
 if (_tripSyncStarted) return;
 _tripSyncStarted = true;
@@ -10113,19 +10082,28 @@ const hdrs = {
 'Cache-Control': 'no-cache'
 };
 try {
-console.log('[TRIP SAVE] upserting to Supabase', { agents: _tripAgents.length, updatedAt: _tripMeta.updatedAt });
-let r = await fetch(url + '?on_conflict=hub&select=hub,data', {
-method: 'POST',
-headers: Object.assign({}, hdrs, { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
-body: JSON.stringify({ hub: 'medi', data: dataText })
+console.log('[TRIP SAVE] saving to Supabase', { agents: _tripAgents.length, updatedAt: _tripMeta.updatedAt });
+let r = await fetch(url + '?hub=eq.medi&select=hub,data', {
+method: 'PATCH',
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=representation' }),
+body: JSON.stringify({ data: dataText })
 });
 let bodyText = await r.text();
-if (!r.ok) throw new Error('Trip upsert failed: ' + r.status + ' ' + bodyText);
+if (!r.ok) throw new Error('Trip update failed: ' + r.status + ' ' + bodyText);
 let rows = [];
 try { rows = bodyText ? JSON.parse(bodyText) : []; } catch (e) { rows = []; }
-console.log('[TRIP SAVE] Supabase upsert returned', { rows: Array.isArray(rows) ? rows.length : 0 });
+if (!Array.isArray(rows) || !rows.length) {
+r = await fetch(url + '?select=hub,data', {
+method: 'POST',
+headers: Object.assign({}, hdrs, { 'Prefer': 'return=representation' }),
+body: JSON.stringify({ hub: 'medi', data: dataText })
+});
+bodyText = await r.text();
+if (!r.ok) throw new Error('Trip insert failed: ' + r.status + ' ' + bodyText);
+try { rows = bodyText ? JSON.parse(bodyText) : []; } catch (e) { rows = []; }
+}
 
-const verify = await fetch(url + '?hub=eq.medi&select=data', {
+const verify = await fetch(url + '?hub=eq.medi&select=data&t=' + Date.now(), {
 headers: { 'apikey': svcKey, 'Authorization': 'Bearer ' + svcKey, 'Cache-Control': 'no-cache' }
 });
 const verifyText = await verify.text();
@@ -10144,7 +10122,7 @@ setTripLocalBackup({ agents: _tripAgents, meta: _tripMeta });
 renderTripTracker();
 renderTripAdminEditor();
 showSnuToast(successMsg || '✓ Trip data saved globally!');
-setTimeout(() => { _tripSaveCooldown = false; loadTripData({ silent: true, force: true }); }, 3000);
+setTimeout(() => { _tripSaveCooldown = false; loadTripData({ silent: true }); }, 3000);
 return true;
 } catch (err) {
 console.error('[TRIP SAVE ERROR]', err);
@@ -11919,14 +11897,53 @@ const CERT_KEY = 'cert_tracker_v1';
 const CERT_CARRIERS = ['RTS','AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
 let _certAgents = []; // [{name, year, certs:{RTS:'Y', AHIP:'', ...}}]
 let _certMeta = {};
+function isCertSummaryRow(agent) {
+const n = String(agent?.name || '').trim().toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ');
+return n === 'total certified' || n.startsWith('total certified ');
+}
+function normalizeCertAgents(agents) {
+return (Array.isArray(agents) ? agents : []).filter(a => a && a.name && !isCertSummaryRow(a));
+}
+function renderCertAdminPreview(show) {
+const preview = document.getElementById('certAdminPreview');
+const previewRows = document.getElementById('certPreviewRows');
+const previewCount = document.getElementById('certPreviewCount');
+if (!preview || !previewRows) return;
+if (!show && !_certAgents.length) { preview.style.display = 'none'; return; }
+preview.style.display = 'block';
+if (previewCount) previewCount.textContent = _certAgents.length;
+const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+if (!_certAgents.length) {
+previewRows.innerHTML = '<div style="padding:8px 0;font-size:12px;color:var(--muted);">No certification rows loaded.</div>';
+return;
+}
+previewRows.innerHTML = _certAgents.map((a, idx) => {
+const count = CERT_CARRIERS.filter(c => isCertified(a.certs?.[c])).length;
+return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
+<span style="color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pesc(a.name)}</span>
+<span style="color:var(--accent-2);font-family:'JetBrains Mono',monospace;white-space:nowrap;">${count}/${CERT_CARRIERS.length} certs</span>
+<button type="button" onclick="removeCertAgent(${idx})" style="border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.12);color:#ff6b6b;border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Remove</button>
+</div>`;
+}).join('');
+}
+function removeCertAgent(index) {
+if (index < 0 || index >= _certAgents.length) return;
+const name = _certAgents[index]?.name || 'this row';
+if (!confirm('Remove ' + name + ' from Hub Certs? Click Save & Publish after removing rows.')) return;
+_certAgents.splice(index, 1);
+try { localStorage.setItem(CERT_KEY, JSON.stringify({agents:_certAgents, meta:_certMeta})); } catch(e) {}
+renderCertTracker();
+renderCertAdminPreview(true);
+}
 function loadCertData() {
 try {
 const raw = localStorage.getItem(CERT_KEY);
 if (raw) {
 const d = JSON.parse(raw);
-_certAgents = Array.isArray(d.agents) ? d.agents : [];
+_certAgents = normalizeCertAgents(d.agents);
 _certMeta = d.meta || {};
 renderCertTracker();
+renderCertAdminPreview(false);
 }
 } catch(e) {}
 // Always fetch from Supabase for latest data
@@ -11943,8 +11960,8 @@ return;
 }
 const year = _certMeta.year || '';
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-// Always show all 15 carrier columns, regardless of whether data matched
-const activeCols = CERT_CARRIERS;
+// Determine which carriers actually appear in data
+const activeCols = CERT_CARRIERS.filter(c => _certAgents.some(a => a.certs && a.certs[c] !== undefined));
 const headerCells = activeCols.map(c =>
 `<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">${pesc(c)}</th>`
 ).join('');
@@ -12040,38 +12057,18 @@ const name = (r[nameKey]||'').trim();
 if (!name) return;
 const year = yearKey ? String(r[yearKey]).trim() : '';
 const certs = {};
-const norm = s => String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 CERT_CARRIERS.forEach(c => {
-// Try exact match, then case-insensitive, then normalized (ignore spaces/slashes/punctuation)
-const cNorm = norm(c);
-const key = headers.find(h => h === c) || headers.find(h => h.toLowerCase() === c.toLowerCase()) || headers.find(h => norm(h) === cNorm);
+// Try exact match then case-insensitive
+const key = headers.find(h => h === c) || headers.find(h => h.toLowerCase() === c.toLowerCase());
 if (key) certs[c] = String(r[key]||'').trim();
 });
 agents.push({ name, year, certs });
 });
 if (!agents.length) { setErr('✗ No agent rows found. Check column headers.'); return; }
-_certAgents = agents;
-const unmatched = CERT_CARRIERS.filter(c => !agents.some(a => a.certs && a.certs[c] !== undefined));
-if (unmatched.length) {
-setOk(`✓ Loaded ${agents.length} agent${agents.length!==1?'s':''} — but ${unmatched.length} carrier column${unmatched.length!==1?'s':''} didn't match: ${unmatched.join(', ')}. Check those headers. Review below, then Save & Publish.`);
-} else {
-setOk(`✓ Loaded ${agents.length} agent${agents.length!==1?'s':''} — review below, then Save & Publish.`);
-}
-const preview = document.getElementById('certAdminPreview');
-const previewRows = document.getElementById('certPreviewRows');
-const previewCount = document.getElementById('certPreviewCount');
-if (preview && previewRows) {
-preview.style.display = 'block';
-if (previewCount) previewCount.textContent = agents.length;
-const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-previewRows.innerHTML = agents.map(a => {
-const count = CERT_CARRIERS.filter(c => isCertified(a.certs?.[c])).length;
-return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
-<span style="color:var(--text);">${pesc(a.name)}</span>
-<span style="color:var(--accent-2);font-family:'JetBrains Mono',monospace;">${count}/${CERT_CARRIERS.length} certs</span>
-</div>`;
-}).join('');
-}
+_certAgents = normalizeCertAgents(agents);
+setOk(`✓ Loaded ${_certAgents.length} agent${_certAgents.length!==1?'s':''} — review below, remove any unwanted rows, then Save & Publish.`);
+renderCertTracker();
+renderCertAdminPreview(true);
 } catch(err) { setErr('Parse error: ' + err.message); }
 };
 if (file.name.match(/\.xlsx?$/i)) reader.readAsArrayBuffer(file);
@@ -12093,14 +12090,16 @@ headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 
 if (rows && rows.length && rows[0].data) {
 const raw = rows[0].data;
 const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
-_certAgents = Array.isArray(d.agents) ? d.agents : [];
+_certAgents = normalizeCertAgents(d.agents);
 _certMeta = d.meta || {};
 try { localStorage.setItem(CERT_KEY, JSON.stringify({agents: _certAgents, meta: _certMeta})); } catch(e) {}
 renderCertTracker();
+renderCertAdminPreview(false);
 }
 }).catch(() => {});
 }
 function saveCertData() {
+_certAgents = normalizeCertAgents(_certAgents);
 if (!_certAgents.length) { alert('No data to save. Upload a file first.'); return; }
 const year = _certAgents[0]?.year || new Date().getFullYear();
 _certMeta = { year, updatedAt: new Date().toISOString() };
@@ -12113,7 +12112,7 @@ method: 'DELETE', headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer '
 method: 'POST',
 headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
 body: JSON.stringify({ hub: CERT_HUB, data: payload })
-})).then(() => { renderCertTracker(); alert('✅ Certification data saved and synced!'); })
+})).then(() => { renderCertTracker(); renderCertAdminPreview(true); alert('✅ Certification data saved and synced!'); })
 .catch(() => { renderCertTracker(); alert('✅ Saved locally (cloud sync failed).'); });
 const inp = document.getElementById('certCsvInput'); if (inp) inp.value = '';
 const status = document.getElementById('certCsvStatus'); if (status) { status.textContent=''; status.className='csv-status'; }
@@ -14942,8 +14941,6 @@ const GSEARCH_INDEX = [
 {name:'Alliance Program',section:'Agent Tools',icon:'🤝',action:()=>{ openAllianceProgramModal?.(); closeGsearch(); }},
 {name:'Group Health Census',section:'Agent Tools',icon:'📋',action:()=>{ openCensusFormModal?.(); closeGsearch(); }},
 {name:'Ancillary Carrier Finder',section:'Agent Tools',icon:'🩺',action:()=>{ openAncillaryFinder?.(); closeGsearch(); }},
-{name:'Medicare Procedure Price Lookup',section:'Agent Tools',icon:'💵',action:()=>window.open('https://www.medicare.gov/procedure-price-lookup/','_blank')},
-{name:'CareScout Cost of Care',section:'Agent Tools',icon:'🏥',action:()=>window.open('https://www.carescout.com/cost-of-care','_blank')},
 // Portals
 {name:'AgencyBloc',section:'Portals',icon:'🗂️',action:()=>window.open('https://app.agencybloc.com/','_blank')},
 {name:'CSG Portal',section:'Portals',icon:'🧰',action:()=>window.open('https://www.insurancetoolsportal.com/','_blank')},
