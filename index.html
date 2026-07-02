@@ -17011,5 +17011,58 @@ body.hub-show-backtop #hubBackTopBtn { opacity: 1; visibility: visible; transfor
 })();
 </script>
 
+
+
+<style id="checklist-one-tap-close-css-20260702">
+/* One-tap Daily Checklist close fix */
+#checklistPanel .cl-panel-close {
+  min-width: 66px !important;
+  height: 34px !important;
+  padding: 0 9px !important;
+  border-radius: 999px !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+  pointer-events: auto !important;
+  z-index: 99999 !important;
+}
+#checklistPanel .cl-panel-drag-button {
+  min-width: 54px !important;
+  height: 32px !important;
+  pointer-events: auto !important;
+}
+@media (max-width: 390px) {
+  #checklistPanel .cl-panel-close { min-width: 58px !important; height: 32px !important; padding: 0 7px !important; }
+  #checklistPanel .cl-panel-drag-button { min-width: 48px !important; height: 30px !important; padding: 0 7px !important; }
+}
+</style>
+<script id="checklist-one-tap-close-js-20260702">
+(function(){
+  'use strict';
+  function closeChecklistNow(){
+    var panel = document.getElementById('checklistPanel');
+    if (!panel) return;
+    panel.classList.remove('open','checklist-dragging');
+    panel.style.display = 'none';
+    var desktopBtn = document.getElementById('desktopChecklistBtn');
+    var mobileBtn = document.getElementById('mobileChecklistBtn');
+    if (desktopBtn) desktopBtn.setAttribute('aria-expanded','false');
+    if (mobileBtn) mobileBtn.setAttribute('aria-expanded','false');
+  }
+  function oneTapClose(e){
+    var target = e.target && e.target.closest ? e.target.closest('#checklistPanel .cl-panel-close') : null;
+    if (!target) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    closeChecklistNow();
+  }
+  ['pointerdown','mousedown','touchstart','click'].forEach(function(type){
+    document.addEventListener(type, oneTapClose, { capture:true, passive:false });
+  });
+  window.closeChecklistNow = closeChecklistNow;
+  window.MEDI_HUB_CHECKLIST_CLOSE_FIX = 'one-tap-20260702';
+})();
+</script>
+
 </body>
 </html>
