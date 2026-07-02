@@ -4257,6 +4257,40 @@ cursor: pointer; white-space: nowrap;
 @media (max-width: 640px) { .banner-emoji-library-grid { grid-template-columns: repeat(6, minmax(32px,1fr)); } .banner-emoji-choice { min-height: 38px; font-size: 20px; } }
 </style>
 
+
+<style id="banner-emoji-visible-admin-fix-20260702">
+#bannerEmojiLibrary.banner-emoji-library-admin-visible {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  margin: 12px 0 4px !important;
+  padding: 14px !important;
+  border: 2px solid rgba(251,191,36,.55) !important;
+  border-radius: 14px !important;
+  background: linear-gradient(180deg, rgba(251,191,36,.14), rgba(15,23,42,.7)) !important;
+  box-shadow: 0 0 22px rgba(251,191,36,.12) !important;
+}
+#bannerEmojiLibrary .banner-emoji-library-title {
+  font-size: 12px !important;
+  color: #fef3c7 !important;
+}
+#bannerEmojiLibrary .banner-emoji-library-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(34px, 1fr)) !important;
+  gap: 8px !important;
+}
+#bannerEmojiLibrary .banner-emoji-choice {
+  min-height: 38px !important;
+  font-size: 22px !important;
+}
+@media (max-width: 700px) {
+  #bannerEmojiLibrary .banner-emoji-library-grid { grid-template-columns: repeat(6, minmax(38px, 1fr)) !important; }
+  #bannerEmojiLibrary .banner-emoji-choice { min-height: 44px !important; font-size: 24px !important; }
+}
+</style>
+
 </head>
 <body class="hub-login-pending">
 <div id="hubLoginGate" style="position:fixed;inset:0;z-index:12000;background:rgba(8,15,32,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -5447,6 +5481,47 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div>
 <label style="font-size:11px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Message</label>
 <textarea id="bannerText" rows="3" placeholder="e.g. AEP starts Oct 15 — all agents must complete AHIP by Oct 1." style="width:100%;margin-top:6px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;resize:vertical;outline:none;"></textarea>
+</div>
+<div id="bannerEmojiLibrary" class="banner-emoji-library banner-emoji-library-admin-visible" aria-label="Banner emoji library">
+<div class="banner-emoji-library-title"><span>Emoji Library — click one to use as the banner icon</span><span>Dog included 🐶 🐕 🐾</span></div>
+<div class="banner-emoji-library-grid">
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📢" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Announcement" aria-label="Announcement">📢</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🚨" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Urgent" aria-label="Urgent">🚨</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="⚠️" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Warning" aria-label="Warning">⚠️</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🔔" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Reminder" aria-label="Reminder">🔔</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🎉" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Celebration" aria-label="Celebration">🎉</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🏆" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Win" aria-label="Win">🏆</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🌟" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Important" aria-label="Important">🌟</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🔥" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Hot" aria-label="Hot">🔥</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📌" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Pinned" aria-label="Pinned">📌</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📋" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Checklist" aria-label="Checklist">📋</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📅" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Calendar" aria-label="Calendar">📅</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="⏰" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Deadline" aria-label="Deadline">⏰</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📝" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Note" aria-label="Note">📝</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📨" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Mail" aria-label="Mail">📨</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📞" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Call" aria-label="Call">📞</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="💻" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Training" aria-label="Training">💻</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="📊" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Stats" aria-label="Stats">📊</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="💰" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Money" aria-label="Money">💰</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🎯" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Goal" aria-label="Goal">🎯</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="✅" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Complete" aria-label="Complete">✅</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="👏" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Congrats" aria-label="Congrats">👏</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🚀" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Launch" aria-label="Launch">🚀</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="💡" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Tip" aria-label="Tip">💡</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🔒" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Secure" aria-label="Secure">🔒</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="💊" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Health" aria-label="Health">💊</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🩺" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Insurance" aria-label="Insurance">🩺</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🤝" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Partner" aria-label="Partner">🤝</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="👤" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Agent" aria-label="Agent">👤</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="👥" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Team" aria-label="Team">👥</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🏥" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Care" aria-label="Care">🏥</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🏠" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Home" aria-label="Home">🏠</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🚗" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Travel" aria-label="Travel">🚗</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🐶" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Dog face" aria-label="Dog face">🐶</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🐕" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Dog" aria-label="Dog">🐕</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🐾" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Paws" aria-label="Paws">🐾</button>
+<button type="button" class="banner-emoji-choice" data-banner-emoji="🦊" onclick="window.setBannerEmoji && window.setBannerEmoji(this.getAttribute('data-banner-emoji'))" title="Fox" aria-label="Fox">🦊</button>
+</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
 <div>
@@ -8871,6 +8946,35 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
+
+
+<script id="banner-emoji-visible-admin-script-20260702">
+window.setBannerEmoji = function(value) {
+  value = value || '📢';
+  var input = document.getElementById('bannerIcon');
+  if (input) {
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  var previewIcon = document.getElementById('bannerPreviewIcon');
+  if (previewIcon) previewIcon.textContent = value;
+  document.querySelectorAll('.banner-emoji-choice').forEach(function(btn){
+    btn.classList.toggle('is-selected', btn.getAttribute('data-banner-emoji') === value);
+  });
+  if (typeof updateBannerPreview === 'function') { try { updateBannerPreview(); } catch(e) {} }
+};
+document.addEventListener('click', function(e){
+  var btn = e.target.closest && e.target.closest('.banner-emoji-choice');
+  if (!btn) return;
+  e.preventDefault();
+  window.setBannerEmoji(btn.getAttribute('data-banner-emoji') || btn.textContent.trim() || '📢');
+});
+document.addEventListener('DOMContentLoaded', function(){
+  var input = document.getElementById('bannerIcon');
+  if (input) window.setBannerEmoji(input.value || '📢');
+});
+</script>
 
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
