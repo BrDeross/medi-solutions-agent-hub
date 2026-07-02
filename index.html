@@ -3738,47 +3738,20 @@ transform: none !important;
 .announcement-inner {
 display: flex;
 align-items: center;
-gap: 12px;
-padding: 14px 28px;
-background: linear-gradient(90deg, rgba(251,191,36,.28) 0%, rgba(251,191,36,.12) 100%);
-border-bottom: 2px solid rgba(251,191,36,.55);
-box-shadow: 0 6px 22px rgba(251,191,36,.14), inset 0 0 0 1px rgba(255,255,255,.05);
-min-height: 58px;
-animation: announcementPulse 2.8s ease-in-out infinite;
+gap: 10px;
+padding: 10px 24px;
+background: linear-gradient(90deg, rgba(251,191,36,.18) 0%, rgba(251,191,36,.08) 100%);
+border-bottom: 1px solid rgba(251,191,36,.35);
+min-height: 42px;
 }
-.announcement-icon { font-size: 22px; flex-shrink: 0; }
-.announcement-label {
-flex-shrink: 0;
-font-family: 'Plus Jakarta Sans', sans-serif;
-font-size: 11px;
-font-weight: 900;
-letter-spacing: .08em;
-text-transform: uppercase;
-color: #111827;
-background: #fbbf24;
-border-radius: 999px;
-padding: 5px 10px;
-box-shadow: 0 0 14px rgba(251,191,36,.35);
-}
+.announcement-icon { font-size: 16px; flex-shrink: 0; }
 .announcement-text {
 flex: 1;
 font-family: 'Plus Jakarta Sans', sans-serif;
-font-size: 16px;
-font-weight: 800;
-color: #fff7d6;
-line-height: 1.35;
-}
-@keyframes announcementPulse {
-0%, 100% { box-shadow: 0 6px 22px rgba(251,191,36,.14), inset 0 0 0 1px rgba(255,255,255,.05); }
-50% { box-shadow: 0 8px 30px rgba(251,191,36,.28), inset 0 0 0 1px rgba(255,255,255,.08); }
-}
-@media (max-width: 640px) {
-.announcement-inner { align-items:flex-start; padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
-.announcement-icon { font-size: 20px; }
-.announcement-label { font-size: 10px; padding: 4px 8px; }
-.announcement-text { flex-basis: 100%; font-size: 14px; }
-.announcement-dismiss { position:absolute; right:10px; top:10px; }
-#announcementBanner { position: relative !important; }
+font-size: 13px;
+font-weight: 600;
+color: #fde68a;
+line-height: 1.4;
 }
 .announcement-dismiss {
 background: transparent;
@@ -3795,17 +3768,14 @@ transition: background .15s, color .15s;
 /* Colour variants */
 #announcementBanner.banner-blue .announcement-inner { background: linear-gradient(90deg,rgba(59,130,246,.18),rgba(59,130,246,.08)); border-color: rgba(59,130,246,.35); }
 #announcementBanner.banner-blue .announcement-text { color: #93c5fd; }
-#announcementBanner.banner-blue .announcement-label { background:#60a5fa; color:#061329; box-shadow:0 0 14px rgba(96,165,250,.35); }
 #announcementBanner.banner-blue .announcement-dismiss { border-color: rgba(59,130,246,.3); color: rgba(59,130,246,.6); }
 #announcementBanner.banner-blue .announcement-dismiss:hover { background: rgba(59,130,246,.12); color: #60a5fa; }
 #announcementBanner.banner-green .announcement-inner { background: linear-gradient(90deg,rgba(52,211,153,.18),rgba(52,211,153,.08)); border-color: rgba(52,211,153,.35); }
 #announcementBanner.banner-green .announcement-text { color: #6ee7b7; }
-#announcementBanner.banner-green .announcement-label { background:#34d399; color:#052e22; box-shadow:0 0 14px rgba(52,211,153,.35); }
 #announcementBanner.banner-green .announcement-dismiss { border-color: rgba(52,211,153,.3); color: rgba(52,211,153,.6); }
 #announcementBanner.banner-green .announcement-dismiss:hover { background: rgba(52,211,153,.12); color: #34d399; }
 #announcementBanner.banner-rose .announcement-inner { background: linear-gradient(90deg,rgba(251,113,133,.18),rgba(251,113,133,.08)); border-color: rgba(251,113,133,.35); }
 #announcementBanner.banner-rose .announcement-text { color: #fda4af; }
-#announcementBanner.banner-rose .announcement-label { background:#fb7185; color:#3f0712; box-shadow:0 0 14px rgba(251,113,133,.35); }
 #announcementBanner.banner-rose .announcement-dismiss { border-color: rgba(251,113,133,.3); color: rgba(251,113,133,.6); }
 #announcementBanner.banner-rose .announcement-dismiss:hover { background: rgba(251,113,133,.12); color: #fb7185; }
 /* ── AGENT DIRECTORY ── */
@@ -4067,6 +4037,125 @@ cursor: pointer; white-space: nowrap;
   .anc-filter-grid { grid-template-columns:1fr; }
 }
 
+
+
+/* === BANNER NOTICE BOOST - added 2026-07-02 === */
+#announcementBanner .announcement-inner {
+  min-height: 66px !important;
+  padding: 16px 30px !important;
+  gap: 16px !important;
+  border: 1px solid rgba(251,191,36,.45) !important;
+  border-left: 7px solid #fbbf24 !important;
+  border-radius: 0 0 14px 14px !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.30), 0 0 24px rgba(251,191,36,.16) !important;
+  background: linear-gradient(90deg, rgba(251,191,36,.32), rgba(251,191,36,.13)) !important;
+  animation: hubBannerPulse 2.6s ease-in-out infinite !important;
+}
+#announcementBanner .announcement-icon {
+  font-size: 28px !important;
+  line-height: 1 !important;
+}
+#announcementBanner .announcement-text {
+  font-size: 17px !important;
+  font-weight: 850 !important;
+  letter-spacing: .01em !important;
+  line-height: 1.35 !important;
+  color: #fff7d6 !important;
+}
+#announcementBanner .announcement-text::before {
+  content: 'IMPORTANT UPDATE';
+  display: inline-flex;
+  align-items: center;
+  margin-right: 12px;
+  margin-bottom: 2px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(251,191,36,.24);
+  border: 1px solid rgba(251,191,36,.55);
+  color: #fef3c7;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  vertical-align: middle;
+}
+#announcementBanner .announcement-dismiss {
+  font-size: 13px !important;
+  padding: 6px 10px !important;
+  border-radius: 9px !important;
+}
+#announcementBanner.banner-blue .announcement-inner {
+  background: linear-gradient(90deg, rgba(59,130,246,.33), rgba(59,130,246,.13)) !important;
+  border-color: rgba(59,130,246,.50) !important;
+  border-left-color: #60a5fa !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.30), 0 0 24px rgba(59,130,246,.18) !important;
+}
+#announcementBanner.banner-blue .announcement-text::before {
+  background: rgba(59,130,246,.25);
+  border-color: rgba(147,197,253,.58);
+  color: #dbeafe;
+}
+#announcementBanner.banner-green .announcement-inner {
+  background: linear-gradient(90deg, rgba(34,197,94,.33), rgba(34,197,94,.13)) !important;
+  border-color: rgba(34,197,94,.50) !important;
+  border-left-color: #4ade80 !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.30), 0 0 24px rgba(34,197,94,.18) !important;
+}
+#announcementBanner.banner-green .announcement-text::before {
+  background: rgba(34,197,94,.25);
+  border-color: rgba(134,239,172,.58);
+  color: #dcfce7;
+}
+#announcementBanner.banner-rose .announcement-inner {
+  background: linear-gradient(90deg, rgba(244,63,94,.34), rgba(244,63,94,.14)) !important;
+  border-color: rgba(244,63,94,.52) !important;
+  border-left-color: #fb7185 !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.30), 0 0 24px rgba(244,63,94,.18) !important;
+}
+#announcementBanner.banner-rose .announcement-text::before {
+  background: rgba(244,63,94,.26);
+  border-color: rgba(253,164,175,.60);
+  color: #ffe4e6;
+}
+#bannerPreviewInner {
+  min-height: 58px !important;
+  padding: 14px 18px !important;
+  border-left: 6px solid #fbbf24 !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.22) !important;
+}
+#bannerPreviewIcon { font-size: 26px !important; }
+#bannerPreviewText { font-size: 16px !important; font-weight: 850 !important; }
+#bannerPreviewText::before {
+  content: 'IMPORTANT UPDATE';
+  display: inline-flex;
+  margin-right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(251,191,36,.24);
+  border: 1px solid rgba(251,191,36,.5);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+@keyframes hubBannerPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.12); }
+}
+@media (max-width: 640px) {
+  #announcementBanner .announcement-inner {
+    min-height: 60px !important;
+    padding: 13px 16px !important;
+    gap: 10px !important;
+    border-radius: 0 0 12px 12px !important;
+  }
+  #announcementBanner .announcement-icon { font-size: 24px !important; }
+  #announcementBanner .announcement-text { font-size: 15px !important; }
+  #announcementBanner .announcement-text::before {
+    display: flex;
+    width: fit-content;
+    margin: 0 0 5px 0;
+  }
+}
+
 </style>
 </head>
 <body class="hub-login-pending">
@@ -4183,7 +4272,6 @@ cursor: pointer; white-space: nowrap;
 <div id="announcementBanner" style="display:none;">
 <div class="announcement-inner">
 <span class="announcement-icon" id="announcementIcon">📢</span>
-<span class="announcement-label">IMPORTANT UPDATE</span>
 <span class="announcement-text" id="announcementText"></span>
 <button class="announcement-dismiss" onclick="dismissBanner()" aria-label="Dismiss">✕</button>
 </div>
