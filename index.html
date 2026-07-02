@@ -11904,6 +11904,25 @@ return n === 'total certified' || n.startsWith('total certified ');
 function normalizeCertAgents(agents) {
 return (Array.isArray(agents) ? agents : []).filter(a => a && a.name && !isCertSummaryRow(a));
 }
+function getCertCarrierColumns() {
+const metaCols = Array.isArray(_certMeta?.carriers) ? _certMeta.carriers.map(c => String(c||'').trim()).filter(Boolean) : [];
+if (metaCols.length) return metaCols;
+const seen = [];
+_certAgents.forEach(a => {
+Object.keys(a?.certs || {}).forEach(k => {
+const key = String(k||'').trim();
+if (key && !seen.some(x => x.toLowerCase() === key.toLowerCase())) seen.push(key);
+});
+});
+return seen.length ? seen : CERT_CARRIERS.slice();
+}
+function isCertNonCarrierColumn(h, nameKey, yearKey) {
+const col = String(h || '').trim();
+if (!col) return true;
+if (nameKey && col.toLowerCase() === String(nameKey).trim().toLowerCase()) return true;
+if (yearKey && col.toLowerCase() === String(yearKey).trim().toLowerCase()) return true;
+return false;
+}
 function renderCertAdminPreview(show) {
 const preview = document.getElementById('certAdminPreview');
 const previewRows = document.getElementById('certPreviewRows');
@@ -11918,10 +11937,11 @@ previewRows.innerHTML = '<div style="padding:8px 0;font-size:12px;color:var(--mu
 return;
 }
 previewRows.innerHTML = _certAgents.map((a, idx) => {
-const count = CERT_CARRIERS.filter(c => isCertified(a.certs?.[c])).length;
+const carrierCols = getCertCarrierColumns();
+const count = carrierCols.filter(c => isCertified(a.certs?.[c])).length;
 return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
 <span style="color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pesc(a.name)}</span>
-<span style="color:var(--accent-2);font-family:'JetBrains Mono',monospace;white-space:nowrap;">${count}/${CERT_CARRIERS.length} certs</span>
+<span style="color:var(--accent-2);font-family:'JetBrains Mono',monospace;white-space:nowrap;">${count}/${carrierCols.length} certs</span>
 <button type="button" onclick="removeCertAgent(${idx})" style="border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.12);color:#ff6b6b;border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Remove</button>
 </div>`;
 }).join('');
@@ -11960,8 +11980,8 @@ return;
 }
 const year = _certMeta.year || '';
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-// Determine which carriers actually appear in data
-const activeCols = CERT_CARRIERS.filter(c => _certAgents.some(a => a.certs && a.certs[c] !== undefined));
+// Show all certification columns from the uploaded file/saved metadata so no carrier columns disappear.
+const activeCols = getCertCarrierColumns();
 const headerCells = activeCols.map(c =>
 `<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">${pesc(c)}</th>`
 ).join('');
@@ -11991,9 +12011,9 @@ ${cells}
 </tr>`;
 }).join('');
 el.innerHTML = `
-<div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);">
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:12px;border:1px solid var(--border);">
 ${year ? `<div style="padding:10px 16px;font-size:12px;color:var(--muted-2);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);">Certification Year: <strong style="color:var(--text);">${pesc(year)}</strong>${_certMeta.updatedAt ? ' &nbsp;·&nbsp; Updated: '+new Date(_certMeta.updatedAt).toLocaleDateString() : ''}</div>` : ''}
-<table style="width:100%;border-collapse:collapse;min-width:600px;">
+<table style="width:100%;border-collapse:collapse;min-width:${Math.max(1100, 330 + activeCols.length * 92)}px;">
 <thead>
 <tr>
 <th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Agent</th>
@@ -12051,14 +12071,14 @@ return obj;
 }
 const nameKey = headers.find(h => /agent.?name|name/i.test(h)) || headers[0];
 const yearKey = headers.find(h => /year/i.test(h));
+const certHeaders = headers.filter(h => !isCertNonCarrierColumn(h, nameKey, yearKey));
 const agents = [];
 rows.forEach(r => {
 const name = (r[nameKey]||'').trim();
 if (!name) return;
 const year = yearKey ? String(r[yearKey]).trim() : '';
 const certs = {};
-CERT_CARRIERS.forEach(c => {
-// Try exact match then case-insensitive
+certHeaders.forEach(c => {
 const key = headers.find(h => h === c) || headers.find(h => h.toLowerCase() === c.toLowerCase());
 if (key) certs[c] = String(r[key]||'').trim();
 });
@@ -12066,7 +12086,8 @@ agents.push({ name, year, certs });
 });
 if (!agents.length) { setErr('✗ No agent rows found. Check column headers.'); return; }
 _certAgents = normalizeCertAgents(agents);
-setOk(`✓ Loaded ${_certAgents.length} agent${_certAgents.length!==1?'s':''} — review below, remove any unwanted rows, then Save & Publish.`);
+_certMeta = Object.assign({}, _certMeta || {}, { carriers: certHeaders, year: (_certAgents[0]?.year || yearKey || '') });
+setOk(`✓ Loaded ${_certAgents.length} agent${_certAgents.length!==1?'s':''} with ${certHeaders.length} certification column${certHeaders.length!==1?'s':''} — review below, remove any unwanted rows, then Save & Publish.`);
 renderCertTracker();
 renderCertAdminPreview(true);
 } catch(err) { setErr('Parse error: ' + err.message); }
@@ -12101,8 +12122,8 @@ renderCertAdminPreview(false);
 function saveCertData() {
 _certAgents = normalizeCertAgents(_certAgents);
 if (!_certAgents.length) { alert('No data to save. Upload a file first.'); return; }
-const year = _certAgents[0]?.year || new Date().getFullYear();
-_certMeta = { year, updatedAt: new Date().toISOString() };
+const year = _certAgents[0]?.year || _certMeta.year || new Date().getFullYear();
+_certMeta = Object.assign({}, _certMeta || {}, { year, carriers: getCertCarrierColumns(), updatedAt: new Date().toISOString() });
 const data = { agents: _certAgents, meta: _certMeta };
 localStorage.setItem(CERT_KEY, JSON.stringify(data));
 const payload = JSON.stringify(data);
