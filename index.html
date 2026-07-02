@@ -4052,7 +4052,7 @@ cursor: pointer; white-space: nowrap;
   animation: hubBannerPulse 2.6s ease-in-out infinite !important;
 }
 #announcementBanner .announcement-icon {
-  font-size: 28px !important;
+  font-size: 18px !important;
   line-height: 1 !important;
 }
 #announcementBanner .announcement-text {
@@ -8615,555 +8615,6 @@ tr.deduct td { color: #dc2626; background: #fff5f5; }
 ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + notes + '</p>' : ''}
 <div class="note">This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation.</div>
 
-<style id="checklist-banner-visible-fix-20260702-v2">
-/* === Visible checklist drag + high-illumination banner fix v2 === */
-#checklistPanel.open {
-  position: fixed !important;
-  z-index: 99990 !important;
-  outline: 2px solid rgba(251,191,36,.34) !important;
-  box-shadow: 0 18px 60px rgba(0,0,0,.72), 0 0 34px rgba(251,191,36,.28) !important;
-}
-#checklistPanel .cl-panel-header {
-  cursor: move !important;
-  cursor: grab !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  touch-action: none !important;
-  gap: 10px !important;
-  background: linear-gradient(90deg, #10285a, #173a79) !important;
-  border-bottom: 1px solid rgba(251,191,36,.30) !important;
-}
-#checklistPanel.checklist-dragging .cl-panel-header { cursor: grabbing !important; }
-#checklistPanel .cl-panel-title { pointer-events: none !important; }
-#checklistPanel .cl-move-handle-v2 {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin-left: auto !important;
-  padding: 4px 10px !important;
-  border-radius: 999px !important;
-  background: rgba(251,191,36,.24) !important;
-  border: 1px solid rgba(251,191,36,.72) !important;
-  color: #fff7cc !important;
-  font-size: 10px !important;
-  font-weight: 950 !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-  box-shadow: 0 0 14px rgba(251,191,36,.34) !important;
-  animation: clHandleGlowV2 1.25s ease-in-out infinite !important;
-  pointer-events: none !important;
-}
-@keyframes clHandleGlowV2 {
-  0%, 100% { filter: brightness(1); box-shadow: 0 0 10px rgba(251,191,36,.24); }
-  50% { filter: brightness(1.35); box-shadow: 0 0 24px rgba(251,191,36,.58); }
-}
-#checklistPanel.checklist-dragged { right: auto !important; bottom: auto !important; }
-#announcementBanner {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 99980 !important;
-  width: 100% !important;
-  isolation: isolate !important;
-}
-#announcementBanner .announcement-inner {
-  position: relative !important;
-  overflow: hidden !important;
-  min-height: 72px !important;
-  padding: 16px 30px !important;
-  gap: 16px !important;
-  border: 2px solid rgba(251,191,36,.86) !important;
-  border-left: 12px solid #f59e0b !important;
-  background: linear-gradient(90deg, rgba(180,83,9,.96), rgba(251,191,36,.46), rgba(120,53,15,.94)) !important;
-  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 44px rgba(251,191,36,.62), 0 0 100px rgba(251,191,36,.30), inset 0 0 28px rgba(255,255,255,.16) !important;
-  animation: hubBannerBeaconV2 1.1s ease-in-out infinite !important;
-}
-#announcementBanner .announcement-inner::before {
-  content: '' !important;
-  position: absolute !important;
-  inset: -60% -20% !important;
-  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,.42), transparent 28%), linear-gradient(115deg, transparent 0%, transparent 35%, rgba(255,255,255,.34) 49%, transparent 63%, transparent 100%) !important;
-  transform: translateX(-45%) !important;
-  animation: hubBannerSweepV2 1.8s ease-in-out infinite !important;
-  pointer-events: none !important;
-}
-#announcementBanner .announcement-icon {
-  font-size: 34px !important;
-  line-height: 1 !important;
-  filter: drop-shadow(0 0 13px rgba(255,255,255,.70)) !important;
-  animation: hubBannerIconV2 .9s ease-in-out infinite !important;
-}
-#announcementBanner .announcement-text {
-  font-size: 18px !important;
-  font-weight: 950 !important;
-  line-height: 1.35 !important;
-  color: #fff8d1 !important;
-  text-shadow: 0 2px 8px rgba(0,0,0,.45), 0 0 18px rgba(255,255,255,.20) !important;
-}
-#announcementBanner .announcement-text::before {
-  content: 'IMPORTANT UPDATE' !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  margin-right: 12px !important;
-  padding: 5px 10px !important;
-  border-radius: 999px !important;
-  background: rgba(17,24,39,.58) !important;
-  border: 1px solid rgba(255,255,255,.62) !important;
-  color: #ffffff !important;
-  font-size: 11px !important;
-  font-weight: 1000 !important;
-  letter-spacing: .10em !important;
-  text-shadow: none !important;
-  box-shadow: 0 0 18px rgba(255,255,255,.24) !important;
-}
-#announcementBanner .announcement-dismiss {
-  font-size: 14px !important;
-  padding: 6px 10px !important;
-  background: rgba(0,0,0,.20) !important;
-  border-color: rgba(255,255,255,.42) !important;
-  color: rgba(255,255,255,.86) !important;
-}
-#announcementBanner.banner-blue .announcement-inner {
-  border-color: rgba(147,197,253,.90) !important;
-  border-left-color: #60a5fa !important;
-  background: linear-gradient(90deg, rgba(30,64,175,.98), rgba(59,130,246,.54), rgba(30,58,138,.96)) !important;
-  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 50px rgba(96,165,250,.62), 0 0 110px rgba(96,165,250,.28), inset 0 0 28px rgba(255,255,255,.16) !important;
-}
-#announcementBanner.banner-green .announcement-inner {
-  border-color: rgba(134,239,172,.90) !important;
-  border-left-color: #22c55e !important;
-  background: linear-gradient(90deg, rgba(20,83,45,.98), rgba(34,197,94,.50), rgba(22,101,52,.96)) !important;
-  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 50px rgba(74,222,128,.62), 0 0 110px rgba(74,222,128,.28), inset 0 0 28px rgba(255,255,255,.16) !important;
-}
-#announcementBanner.banner-rose .announcement-inner {
-  border-color: rgba(253,164,175,.92) !important;
-  border-left-color: #fb7185 !important;
-  background: linear-gradient(90deg, rgba(136,19,55,.98), rgba(244,63,94,.56), rgba(159,18,57,.96)) !important;
-  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 54px rgba(251,113,133,.66), 0 0 116px rgba(251,113,133,.30), inset 0 0 28px rgba(255,255,255,.16) !important;
-}
-@keyframes hubBannerBeaconV2 { 0%, 100% { filter: brightness(1) saturate(1); } 50% { filter: brightness(1.42) saturate(1.38); } }
-@keyframes hubBannerSweepV2 { 0%, 28% { transform: translateX(-58%); opacity: 0; } 46% { opacity: .95; } 76%, 100% { transform: translateX(58%); opacity: 0; } }
-@keyframes hubBannerIconV2 { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.16); } }
-@media (max-width: 640px) {
-  #announcementBanner .announcement-inner { min-height: 78px !important; padding: 14px 16px !important; border-left-width: 9px !important; }
-  #announcementBanner .announcement-icon { font-size: 30px !important; }
-  #announcementBanner .announcement-text { font-size: 16px !important; }
-  #announcementBanner .announcement-text::before { display: flex !important; width: fit-content !important; margin: 0 0 6px 0 !important; }
-}
-</style>
-
-<script id="checklist-drag-visible-runtime-20260702-v2">
-(function(){
-  'use strict';
-  var storageKey = 'mediChecklistPanelPositionV2';
-  function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
-  function readSaved(){ try { var raw = localStorage.getItem(storageKey) || localStorage.getItem('mediChecklistPanelPosition'); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
-  function writeSaved(pos){ try { localStorage.setItem(storageKey, JSON.stringify(pos)); } catch(e){} }
-  function panelBounds(panel){ return { maxLeft: Math.max(8, window.innerWidth - panel.offsetWidth - 8), maxTop: Math.max(8, window.innerHeight - panel.offsetHeight - 8) }; }
-  function applyPosition(panel, pos){
-    if (!panel || !pos || typeof pos.left !== 'number' || typeof pos.top !== 'number') return false;
-    var b = panelBounds(panel);
-    panel.classList.add('checklist-dragged');
-    panel.style.position = 'fixed';
-    panel.style.right = 'auto';
-    panel.style.bottom = 'auto';
-    panel.style.left = clamp(pos.left, 8, b.maxLeft) + 'px';
-    panel.style.top = clamp(pos.top, 8, b.maxTop) + 'px';
-    return true;
-  }
-  function initDrag(){
-    var panel = document.getElementById('checklistPanel');
-    if (!panel) return;
-    var header = panel.querySelector('.cl-panel-header');
-    if (!header) return;
-    header.querySelectorAll('.cl-move-handle-v2').forEach(function(el){ el.remove(); });
-    if (panel.dataset.dragV2Ready === '1') return;
-    panel.dataset.dragV2Ready = '1';
-    header.title = 'Click and drag this header to move the checklist. Double-click to reset.';
-    var dragging = false, pointerId = null, startX = 0, startY = 0, startLeft = 0, startTop = 0;
-    function begin(clientX, clientY, id, ev){
-      if (ev && ev.target && ev.target.closest && ev.target.closest('.cl-panel-close')) return;
-      var rect = panel.getBoundingClientRect();
-      dragging = true; pointerId = id;
-      startX = clientX; startY = clientY; startLeft = rect.left; startTop = rect.top;
-      panel.classList.add('checklist-dragging','checklist-dragged');
-      panel.style.position = 'fixed';
-      panel.style.right = 'auto'; panel.style.bottom = 'auto';
-      panel.style.left = startLeft + 'px'; panel.style.top = startTop + 'px';
-      if (ev && ev.preventDefault) ev.preventDefault();
-      try { if (ev && ev.target && ev.target.setPointerCapture && id !== null) ev.target.setPointerCapture(id); } catch(e){}
-    }
-    function move(clientX, clientY, id, ev){
-      if (!dragging) return;
-      if (pointerId !== null && id !== null && id !== pointerId) return;
-      var b = panelBounds(panel);
-      var left = clamp(startLeft + (clientX - startX), 8, b.maxLeft);
-      var top = clamp(startTop + (clientY - startY), 8, b.maxTop);
-      panel.style.left = left + 'px'; panel.style.top = top + 'px';
-      if (ev && ev.preventDefault) ev.preventDefault();
-    }
-    function end(){
-      if (!dragging) return;
-      dragging = false; pointerId = null;
-      panel.classList.remove('checklist-dragging');
-      var rect = panel.getBoundingClientRect();
-      writeSaved({ left: rect.left, top: rect.top });
-    }
-    header.addEventListener('pointerdown', function(e){ begin(e.clientX, e.clientY, e.pointerId, e); }, { passive:false });
-    document.addEventListener('pointermove', function(e){ move(e.clientX, e.clientY, e.pointerId, e); }, { passive:false });
-    document.addEventListener('pointerup', end, { passive:true });
-    document.addEventListener('pointercancel', end, { passive:true });
-    header.addEventListener('mousedown', function(e){ if (!window.PointerEvent) begin(e.clientX, e.clientY, null, e); }, { passive:false });
-    document.addEventListener('mousemove', function(e){ if (!window.PointerEvent) move(e.clientX, e.clientY, null, e); }, { passive:false });
-    document.addEventListener('mouseup', end, { passive:true });
-    header.addEventListener('touchstart', function(e){ if (window.PointerEvent) return; var t=e.touches && e.touches[0]; if(t) begin(t.clientX, t.clientY, null, e); }, { passive:false });
-    document.addEventListener('touchmove', function(e){ if (window.PointerEvent) return; var t=e.touches && e.touches[0]; if(t) move(t.clientX, t.clientY, null, e); }, { passive:false });
-    document.addEventListener('touchend', end, { passive:true });
-    header.addEventListener('dblclick', function(e){
-      try { localStorage.removeItem(storageKey); localStorage.removeItem('mediChecklistPanelPosition'); } catch(err){}
-      panel.classList.remove('checklist-dragged','checklist-dragging');
-      panel.style.left=''; panel.style.top=''; panel.style.right=''; panel.style.bottom='';
-      e.preventDefault();
-    });
-    window.applyChecklistDragPosition = function(){ applyPosition(panel, readSaved()); };
-    window.resetChecklistPanelPosition = function(){
-      try { localStorage.removeItem(storageKey); localStorage.removeItem('mediChecklistPanelPosition'); } catch(e){}
-      panel.classList.remove('checklist-dragged','checklist-dragging');
-      panel.style.left=''; panel.style.top=''; panel.style.right=''; panel.style.bottom='';
-    };
-    applyPosition(panel, readSaved());
-    console.log('[Checklist] drag v2 enabled');
-  }
-  function patchToggle(){
-    if (window.__checklistDragV2TogglePatched) return;
-    if (typeof window.toggleChecklist !== 'function') return;
-    var original = window.toggleChecklist;
-    window.toggleChecklist = function(forceOpen){
-      var result = original.apply(this, arguments);
-      setTimeout(function(){ initDrag(); var panel = document.getElementById('checklistPanel'); if (panel && panel.classList.contains('open')) applyPosition(panel, readSaved()); }, 0);
-      return result;
-    };
-    window.__checklistDragV2TogglePatched = true;
-  }
-  function boot(){ initDrag(); patchToggle(); setTimeout(function(){ initDrag(); patchToggle(); }, 400); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-  window.enableChecklistDragV2 = boot;
-})();
-</script>
-
-
-
-<style id="checklist-close-accessibility-fix-20260702">
-/* === Daily Checklist close button accessibility fix - 2026-07-02 === */
-#checklistPanel .cl-panel-header {
-  position: relative !important;
-  min-height: 58px !important;
-  padding: 14px 118px 14px 16px !important;
-  gap: 10px !important;
-}
-#checklistPanel .cl-panel-title {
-  min-width: 0 !important;
-  line-height: 1.2 !important;
-}
-#checklistPanel .cl-panel-header::after {
-  position: absolute !important;
-  right: 96px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  margin: 0 !important;
-}
-#checklistPanel .cl-panel-close {
-  position: absolute !important;
-  right: 12px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  width: auto !important;
-  min-width: 74px !important;
-  height: 38px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 5px !important;
-  padding: 0 12px !important;
-  border-radius: 999px !important;
-  background: rgba(244,63,94,.34) !important;
-  border: 1px solid rgba(251,113,133,.82) !important;
-  color: #fff !important;
-  font-size: 24px !important;
-  font-weight: 900 !important;
-  line-height: 1 !important;
-  opacity: 1 !important;
-  box-shadow: 0 0 0 3px rgba(244,63,94,.14), 0 0 20px rgba(251,113,133,.46) !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,.55) !important;
-  z-index: 20 !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-#checklistPanel .cl-panel-close::after {
-  content: 'CLOSE';
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: .08em;
-  line-height: 1;
-}
-#checklistPanel .cl-panel-close:hover,
-#checklistPanel .cl-panel-close:focus-visible {
-  background: rgba(244,63,94,.58) !important;
-  border-color: rgba(255,255,255,.82) !important;
-  color: #fff !important;
-  outline: none !important;
-  box-shadow: 0 0 0 4px rgba(244,63,94,.22), 0 0 28px rgba(251,113,133,.72) !important;
-}
-@media (max-width: 768px) {
-  #checklistPanel .cl-panel-header {
-    min-height: 68px !important;
-    padding: 14px 112px 14px 16px !important;
-  }
-  #checklistPanel .cl-panel-header::after {
-    display: none !important;
-  }
-  #checklistPanel .cl-panel-title {
-    font-size: 14px !important;
-  }
-  #checklistPanel .cl-panel-close {
-    right: 12px !important;
-    min-width: 92px !important;
-    height: 50px !important;
-    border-radius: 16px !important;
-    font-size: 30px !important;
-    background: rgba(244,63,94,.58) !important;
-    border: 2px solid rgba(255,255,255,.72) !important;
-    box-shadow: 0 0 0 4px rgba(244,63,94,.22), 0 0 30px rgba(251,113,133,.78) !important;
-  }
-  #checklistPanel .cl-panel-close::after {
-    font-size: 10px !important;
-  }
-}
-</style>
-
-
-
-
-
-<script id="banner-emoji-visible-admin-script-20260702">
-window.setBannerEmoji = function(value) {
-  value = value || '📢';
-  var input = document.getElementById('bannerIcon');
-  if (input) {
-    input.value = value;
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-  var previewIcon = document.getElementById('bannerPreviewIcon');
-  if (previewIcon) previewIcon.textContent = value;
-  document.querySelectorAll('.banner-emoji-choice').forEach(function(btn){
-    btn.classList.toggle('is-selected', btn.getAttribute('data-banner-emoji') === value);
-  });
-  if (typeof updateBannerPreview === 'function') { try { updateBannerPreview(); } catch(e) {} }
-};
-document.addEventListener('click', function(e){
-  var btn = e.target.closest && e.target.closest('.banner-emoji-choice');
-  if (!btn) return;
-  e.preventDefault();
-  window.setBannerEmoji(btn.getAttribute('data-banner-emoji') || btn.textContent.trim() || '📢');
-});
-document.addEventListener('DOMContentLoaded', function(){
-  var input = document.getElementById('bannerIcon');
-  if (input) window.setBannerEmoji(input.value || '📢');
-});
-</script>
-
-
-
-
-<style id="checklist-header-clean-v3-20260702">
-#checklistPanel .cl-panel-header {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto !important;
-  align-items: center !important;
-  gap: 16px !important;
-  min-height: 64px !important;
-  padding: 12px 14px !important;
-  box-sizing: border-box !important;
-  background: linear-gradient(90deg, #10285a, #173a79) !important;
-  border-bottom: 1px solid rgba(251,191,36,.30) !important;
-  cursor: grab !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  touch-action: none !important;
-}
-#checklistPanel.checklist-dragging .cl-panel-header { cursor: grabbing !important; }
-#checklistPanel .cl-panel-header::before,
-#checklistPanel .cl-panel-header::after {
-  content: none !important;
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-#checklistPanel .cl-panel-title {
-  grid-column: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  min-width: 0 !important;
-  color: #fff !important;
-  font-size: 15px !important;
-  font-weight: 900 !important;
-  line-height: 1.15 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  pointer-events: none !important;
-}
-#checklistPanel .cl-panel-title::after { content: none !important; display: none !important; }
-#checklistPanel .cl-panel-close {
-  grid-column: 2 !important;
-  position: static !important;
-  transform: none !important;
-  justify-self: end !important;
-  align-self: center !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  min-width: 108px !important;
-  height: 50px !important;
-  padding: 0 15px !important;
-  border-radius: 16px !important;
-  border: 2px solid rgba(255,255,255,.78) !important;
-  background: rgba(244,63,94,.66) !important;
-  color: #fff !important;
-  font-size: 0 !important;
-  font-weight: 1000 !important;
-  line-height: 1 !important;
-  opacity: 1 !important;
-  box-shadow: 0 0 0 4px rgba(244,63,94,.20), 0 0 30px rgba(251,113,133,.80) !important;
-  z-index: 500 !important;
-  cursor: pointer !important;
-  touch-action: manipulation !important;
-}
-#checklistPanel .cl-panel-close::before {
-  content: '✕' !important;
-  font-size: 28px !important;
-  font-weight: 1000 !important;
-  line-height: 1 !important;
-}
-#checklistPanel .cl-panel-close::after {
-  content: 'CLOSE' !important;
-  font-size: 10px !important;
-  font-weight: 1000 !important;
-  letter-spacing: .08em !important;
-}
-#checklistPanel .cl-panel-header > *:not(.cl-panel-title):not(.cl-panel-close) {
-  display: none !important;
-  visibility: hidden !important;
-  width: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-@media (max-width: 390px) {
-  #checklistPanel .cl-panel-header { gap: 10px !important; padding: 12px !important; }
-  #checklistPanel .cl-panel-title { font-size: 14px !important; }
-  #checklistPanel .cl-panel-close { min-width: 90px !important; height: 52px !important; padding: 0 10px !important; }
-  #checklistPanel .cl-panel-close::after { content: 'EXIT' !important; }
-}
-</style>
-<script id="checklist-header-clean-v3-runtime-20260702">
-(function(){
-  'use strict';
-  var storageKey = 'mediChecklistPanelPositionV3';
-  function clamp(n,min,max){ return Math.min(Math.max(n,min),max); }
-  function getPanel(){ return document.getElementById('checklistPanel'); }
-  function getHeader(){ var p = getPanel(); return p ? p.querySelector('.cl-panel-header') : null; }
-  function closePanel(){
-    if (typeof window.toggleChecklist === 'function') { window.toggleChecklist(false); return; }
-    var p = getPanel(); if (p) p.classList.remove('open');
-  }
-  function normalizeHeader(){
-    var header = getHeader();
-    if (!header) return;
-    var title = header.querySelector('.cl-panel-title');
-    var close = header.querySelector('.cl-panel-close');
-    var needs = !title || !close || header.children.length !== 2;
-    if (needs) {
-      header.innerHTML = '<div class="cl-panel-title">✅ Daily Checklist</div><button class="cl-panel-close" type="button" aria-label="Close daily checklist" title="Close checklist">✕</button>';
-      title = header.querySelector('.cl-panel-title');
-      close = header.querySelector('.cl-panel-close');
-    }
-    Array.prototype.slice.call(header.children).forEach(function(child){
-      if (!child.classList || (!child.classList.contains('cl-panel-title') && !child.classList.contains('cl-panel-close'))) child.remove();
-    });
-    if (close && close.dataset.cleanCloseV3 !== '1') {
-      close.dataset.cleanCloseV3 = '1';
-      close.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); closePanel(); });
-      close.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
-    }
-    header.dataset.cleanHeaderV3 = '1';
-  }
-  function readPos(){
-    try {
-      var raw = localStorage.getItem(storageKey) || localStorage.getItem('mediChecklistPanelPositionV2') || localStorage.getItem('mediChecklistPanelPosition');
-      return raw ? JSON.parse(raw) : null;
-    } catch(e){ return null; }
-  }
-  function savePos(left, top){ try { localStorage.setItem(storageKey, JSON.stringify({ left:left, top:top })); } catch(e){} }
-  function applyPos(){
-    var p = getPanel(); var pos = readPos();
-    if (!p || !pos || typeof pos.left !== 'number' || typeof pos.top !== 'number') return;
-    var maxLeft = Math.max(8, window.innerWidth - p.offsetWidth - 8);
-    var maxTop = Math.max(8, window.innerHeight - p.offsetHeight - 8);
-    p.classList.add('checklist-dragged');
-    p.style.position = 'fixed'; p.style.right = 'auto'; p.style.bottom = 'auto';
-    p.style.left = clamp(pos.left, 8, maxLeft) + 'px';
-    p.style.top = clamp(pos.top, 8, maxTop) + 'px';
-  }
-  function wireMove(){
-    var panel = getPanel(); var header = getHeader();
-    if (!panel || !header || header.dataset.moveV3 === '1') return;
-    header.dataset.moveV3 = '1';
-    var moving = false, pid = null, sx = 0, sy = 0, sl = 0, st = 0;
-    header.addEventListener('pointerdown', function(e){
-      if (e.target && e.target.closest && e.target.closest('.cl-panel-close')) return;
-      var rect = panel.getBoundingClientRect();
-      moving = true; pid = e.pointerId; sx = e.clientX; sy = e.clientY; sl = rect.left; st = rect.top;
-      panel.classList.add('checklist-dragging','checklist-dragged');
-      panel.style.position = 'fixed'; panel.style.right = 'auto'; panel.style.bottom = 'auto';
-      panel.style.left = sl + 'px'; panel.style.top = st + 'px';
-      try { header.setPointerCapture(pid); } catch(err){}
-      e.preventDefault();
-    }, { passive:false });
-    header.addEventListener('pointermove', function(e){
-      if (!moving || e.pointerId !== pid) return;
-      var maxLeft = Math.max(8, window.innerWidth - panel.offsetWidth - 8);
-      var maxTop = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
-      panel.style.left = clamp(sl + e.clientX - sx, 8, maxLeft) + 'px';
-      panel.style.top = clamp(st + e.clientY - sy, 8, maxTop) + 'px';
-      e.preventDefault();
-    }, { passive:false });
-    function done(e){
-      if (pid !== null && e && e.pointerId !== pid) return;
-      if (!moving) return;
-      moving = false; pid = null; panel.classList.remove('checklist-dragging');
-      var rect = panel.getBoundingClientRect(); savePos(rect.left, rect.top);
-    }
-    header.addEventListener('pointerup', done);
-    header.addEventListener('pointercancel', done);
-    header.addEventListener('dblclick', function(e){
-      try { localStorage.removeItem(storageKey); localStorage.removeItem('mediChecklistPanelPositionV2'); localStorage.removeItem('mediChecklistPanelPosition'); } catch(err){}
-      panel.classList.remove('checklist-dragged','checklist-dragging');
-      panel.style.left=''; panel.style.top=''; panel.style.right=''; panel.style.bottom='';
-      e.preventDefault();
-    });
-  }
-  function boot(){ normalizeHeader(); wireMove(); applyPos(); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-  setTimeout(boot, 50); setTimeout(boot, 250); setTimeout(boot, 1000);
-  setInterval(function(){ normalizeHeader(); wireMove(); }, 250);
-  window.checklistCleanV3 = boot;
-  console.log('[Checklist] clean header v3 active');
-})();
-</script>
 
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
@@ -17313,6 +16764,250 @@ console.log('[Medi Hub Tracking] Active · session:', _sid);
   setInterval(function(){ normalizeHeader(); wireMove(); }, 250);
   window.checklistCleanV3 = boot;
   console.log('[Checklist] clean header v3 active');
+})();
+</script>
+
+
+<style id="checklist-small-controls-final-20260702">
+#checklistPanel .cl-panel-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 52px !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+}
+#checklistPanel .cl-panel-title {
+  grid-column: 1 !important;
+  min-width: 0 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-title::after { content: none !important; display: none !important; }
+#checklistPanel .cl-panel-drag-button {
+  grid-column: 2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 58px !important;
+  height: 32px !important;
+  padding: 0 9px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(147,197,253,.75) !important;
+  background: rgba(37,99,235,.45) !important;
+  color: #dbeafe !important;
+  font-size: 9px !important;
+  font-weight: 1000 !important;
+  letter-spacing: .06em !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: auto !important;
+  margin: 0 !important;
+  box-shadow: 0 0 10px rgba(96,165,250,.28) !important;
+  cursor: grab !important;
+  touch-action: none !important;
+  pointer-events: auto !important;
+}
+#checklistPanel.checklist-dragging .cl-panel-drag-button { cursor: grabbing !important; }
+#checklistPanel .cl-panel-close {
+  grid-column: 3 !important;
+  position: static !important;
+  transform: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-width: 68px !important;
+  height: 34px !important;
+  padding: 0 9px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.76) !important;
+  background: rgba(244,63,94,.58) !important;
+  color: #fff !important;
+  font-size: 0 !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: auto !important;
+  margin: 0 !important;
+  box-shadow: 0 0 0 2px rgba(244,63,94,.12), 0 0 14px rgba(251,113,133,.46) !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  pointer-events: auto !important;
+}
+#checklistPanel .cl-panel-close::before {
+  content: '✕' !important;
+  display: inline-block !important;
+  font-size: 17px !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+}
+#checklistPanel .cl-panel-close::after {
+  content: 'CLOSE' !important;
+  display: inline-block !important;
+  font-size: 8px !important;
+  font-weight: 1000 !important;
+  letter-spacing: .05em !important;
+  line-height: 1 !important;
+}
+#checklistPanel .cl-panel-header > *:not(.cl-panel-title):not(.cl-panel-drag-button):not(.cl-panel-close) {
+  display: none !important;
+}
+@media (max-width: 390px) {
+  #checklistPanel .cl-panel-header { gap: 6px !important; padding: 10px !important; }
+  #checklistPanel .cl-panel-title { font-size: 14px !important; }
+  #checklistPanel .cl-panel-drag-button { min-width: 50px !important; height: 30px !important; padding: 0 7px !important; font-size: 8px !important; }
+  #checklistPanel .cl-panel-close { min-width: 58px !important; height: 32px !important; padding: 0 7px !important; }
+  #checklistPanel .cl-panel-close::before { font-size: 16px !important; }
+  #checklistPanel .cl-panel-close::after { content: 'EXIT' !important; font-size: 8px !important; }
+}
+</style>
+<script id="checklist-small-controls-final-runtime-20260702">
+(function(){
+  'use strict';
+  var storageKey = 'mediChecklistPanelPositionV3';
+  function panel(){ return document.getElementById('checklistPanel'); }
+  function header(){ var p = panel(); return p ? p.querySelector('.cl-panel-header') : null; }
+  function closePanel(){ if (typeof window.toggleChecklist === 'function') window.toggleChecklist(false); else { var p = panel(); if (p) p.classList.remove('open'); } }
+  function normalizeSmallControls(){
+    var h = header();
+    if (!h) return;
+    var title = h.querySelector('.cl-panel-title');
+    var drag = h.querySelector('.cl-panel-drag-button');
+    var close = h.querySelector('.cl-panel-close');
+    if (!title || !drag || !close || h.children.length !== 3) {
+      h.innerHTML = '<div class="cl-panel-title">✅ Daily Checklist</div><button class="cl-panel-drag-button" type="button" aria-label="Move daily checklist" title="Click and drag to move">MOVE</button><button class="cl-panel-close" type="button" aria-label="Close daily checklist" title="Close checklist">✕</button>';
+      title = h.querySelector('.cl-panel-title');
+      drag = h.querySelector('.cl-panel-drag-button');
+      close = h.querySelector('.cl-panel-close');
+    }
+    Array.prototype.slice.call(h.children).forEach(function(child){
+      if (!child.classList || (!child.classList.contains('cl-panel-title') && !child.classList.contains('cl-panel-drag-button') && !child.classList.contains('cl-panel-close'))) child.remove();
+    });
+    close = h.querySelector('.cl-panel-close');
+    drag = h.querySelector('.cl-panel-drag-button');
+    if (close && close.dataset.smallCloseFinal !== '1') {
+      close.dataset.smallCloseFinal = '1';
+      close.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); closePanel(); });
+      close.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+    }
+    if (drag && drag.dataset.smallDragFinal !== '1') {
+      drag.dataset.smallDragFinal = '1';
+      drag.addEventListener('pointerdown', function(e){ e.stopPropagation(); startDrag(e); }, { passive:false });
+    }
+  }
+  function clamp(n,min,max){ return Math.min(Math.max(n,min),max); }
+  var moving=false, pid=null, sx=0, sy=0, sl=0, st=0;
+  function save(left, top){ try { localStorage.setItem(storageKey, JSON.stringify({ left:left, top:top })); } catch(e){} }
+  function startDrag(e){
+    var p = panel(); var h = header(); if (!p || !h) return;
+    var rect = p.getBoundingClientRect();
+    moving = true; pid = e.pointerId; sx = e.clientX; sy = e.clientY; sl = rect.left; st = rect.top;
+    p.classList.add('checklist-dragging','checklist-dragged');
+    p.style.position = 'fixed'; p.style.right = 'auto'; p.style.bottom = 'auto'; p.style.left = sl + 'px'; p.style.top = st + 'px';
+    try { e.target.setPointerCapture(pid); } catch(err) {}
+    e.preventDefault();
+  }
+  window.addEventListener('pointermove', function(e){
+    if (!moving || e.pointerId !== pid) return;
+    var p = panel(); if (!p) return;
+    var maxLeft = Math.max(8, window.innerWidth - p.offsetWidth - 8);
+    var maxTop = Math.max(8, window.innerHeight - p.offsetHeight - 8);
+    p.style.left = clamp(sl + e.clientX - sx, 8, maxLeft) + 'px';
+    p.style.top = clamp(st + e.clientY - sy, 8, maxTop) + 'px';
+    e.preventDefault();
+  }, { passive:false });
+  window.addEventListener('pointerup', function(e){
+    if (!moving || e.pointerId !== pid) return;
+    moving = false; pid = null;
+    var p = panel(); if (p) { p.classList.remove('checklist-dragging'); var r = p.getBoundingClientRect(); save(r.left, r.top); }
+  });
+  function boot(){ normalizeSmallControls(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  setTimeout(boot, 50); setTimeout(boot, 250); setTimeout(boot, 1000);
+  setInterval(boot, 75);
+  window.MEDI_HUB_CHECKLIST_FIX = 'small-controls-20260702';
+})();
+</script>
+
+
+<style id="hub-floating-tools-css-20260702">
+/* === Hub refresh + back-to-top controls === */
+#hubFloatingTools {
+  position: fixed !important;
+  right: 18px !important;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 99995 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  pointer-events: none !important;
+}
+.hub-floating-btn {
+  pointer-events: auto !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.55) !important;
+  background: rgba(20, 48, 100, .92) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.35), 0 0 16px rgba(96,165,250,.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 21px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+  backdrop-filter: blur(10px) !important;
+}
+.hub-floating-btn:active { transform: scale(.96) !important; }
+#hubBackTopBtn { opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity .18s ease, transform .18s ease, visibility .18s ease; }
+body.hub-show-backtop #hubBackTopBtn { opacity: 1; visibility: visible; transform: translateY(0); }
+@media (max-width: 768px) {
+  #hubFloatingTools {
+    right: 12px !important;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 8px !important;
+  }
+  .hub-floating-btn {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 19px !important;
+  }
+}
+</style>
+<script id="hub-floating-tools-js-20260702">
+(function(){
+  'use strict';
+  function ensureTools(){
+    var existing = document.getElementById('hubFloatingTools');
+    if (existing) return existing;
+    var wrap = document.createElement('div');
+    wrap.id = 'hubFloatingTools';
+    wrap.innerHTML = '<button id="hubRefreshBtn" class="hub-floating-btn" type="button" title="Refresh hub" aria-label="Refresh hub">↻</button><button id="hubBackTopBtn" class="hub-floating-btn" type="button" title="Back to top" aria-label="Back to top">↑</button>';
+    document.body.appendChild(wrap);
+    var refresh = document.getElementById('hubRefreshBtn');
+    var top = document.getElementById('hubBackTopBtn');
+    if (refresh) refresh.addEventListener('click', function(){ window.location.reload(); });
+    if (top) top.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    return wrap;
+  }
+  function onScroll(){
+    if (window.scrollY > 260) document.body.classList.add('hub-show-backtop');
+    else document.body.classList.remove('hub-show-backtop');
+  }
+  function boot(){ ensureTools(); onScroll(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.MEDI_HUB_FLOATING_TOOLS = 'refresh-top-20260702';
 })();
 </script>
 
