@@ -16773,5 +16773,177 @@ console.log('[Medi Hub Tracking] Active · session:', _sid);
 })();
 </script>
 
+
+<style id="checklist-final-mobile-clean-20260702">
+/* === Final Daily Checklist header cleanup - 2026-07-02 === */
+#checklistPanel .cl-panel-header {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  min-height: 64px !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+  background: linear-gradient(90deg, #10285a, #173a79) !important;
+  border-bottom: 1px solid rgba(251,191,36,.30) !important;
+  cursor: grab !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: none !important;
+}
+#checklistPanel.checklist-dragging .cl-panel-header { cursor: grabbing !important; }
+#checklistPanel .cl-panel-header::after,
+#checklistPanel .cl-move-handle-v2 {
+  content: none !important;
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-title {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 116px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  color: #fff !important;
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-title::after {
+  content: 'Drag header to move' !important;
+  display: block !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .04em !important;
+  color: rgba(253,230,138,.92) !important;
+  line-height: 1.1 !important;
+}
+#checklistPanel .cl-panel-close {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+  width: auto !important;
+  min-width: 98px !important;
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 14px !important;
+  background: rgba(244,63,94,.58) !important;
+  border: 2px solid rgba(255,255,255,.74) !important;
+  color: #fff !important;
+  font-size: 0 !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 0 4px rgba(244,63,94,.18), 0 0 24px rgba(251,113,133,.62) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.55) !important;
+  cursor: pointer !important;
+  z-index: 50 !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+}
+#checklistPanel .cl-panel-close::before {
+  content: '✕' !important;
+  display: inline-block !important;
+  font-size: 24px !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+}
+#checklistPanel .cl-panel-close::after {
+  content: 'CLOSE' !important;
+  display: inline-block !important;
+  font-size: 10px !important;
+  font-weight: 1000 !important;
+  letter-spacing: .08em !important;
+  line-height: 1 !important;
+}
+#checklistPanel .cl-panel-close:hover,
+#checklistPanel .cl-panel-close:focus-visible {
+  background: rgba(244,63,94,.72) !important;
+  border-color: rgba(255,255,255,.96) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 5px rgba(244,63,94,.24), 0 0 32px rgba(251,113,133,.82) !important;
+}
+@media (max-width: 768px) {
+  #checklistPanel .cl-panel-header {
+    min-height: 76px !important;
+    padding: 13px 14px !important;
+    gap: 12px !important;
+  }
+  #checklistPanel .cl-panel-title {
+    max-width: calc(100% - 108px) !important;
+    font-size: 15px !important;
+  }
+  #checklistPanel .cl-panel-title::after {
+    font-size: 10px !important;
+  }
+  #checklistPanel .cl-panel-close {
+    min-width: 98px !important;
+    height: 54px !important;
+    border-radius: 16px !important;
+    padding: 0 12px !important;
+  }
+  #checklistPanel .cl-panel-close::before { font-size: 30px !important; }
+  #checklistPanel .cl-panel-close::after { font-size: 10px !important; }
+}
+@media (max-width: 390px) {
+  #checklistPanel .cl-panel-header { gap: 10px !important; }
+  #checklistPanel .cl-panel-title { max-width: calc(100% - 94px) !important; font-size: 14px !important; }
+  #checklistPanel .cl-panel-close { min-width: 84px !important; height: 52px !important; padding: 0 10px !important; }
+  #checklistPanel .cl-panel-close::before { font-size: 28px !important; }
+  #checklistPanel .cl-panel-close::after { content: 'EXIT' !important; font-size: 10px !important; }
+}
+</style>
+<script id="checklist-final-mobile-clean-runtime-20260702">
+(function(){
+  function cleanChecklistHeader(){
+    var panel = document.getElementById('checklistPanel');
+    if (!panel) return;
+    panel.querySelectorAll('.cl-move-handle-v2').forEach(function(el){ el.remove(); });
+    var close = panel.querySelector('.cl-panel-close');
+    if (close) {
+      close.setAttribute('aria-label', 'Close daily checklist');
+      close.setAttribute('title', 'Close checklist');
+    }
+  }
+  function watchHeader(){
+    var panel = document.getElementById('checklistPanel');
+    var header = panel && panel.querySelector('.cl-panel-header');
+    if (!header || header.dataset.finalCleanWatch === '1') return;
+    header.dataset.finalCleanWatch = '1';
+    try {
+      new MutationObserver(cleanChecklistHeader).observe(header, { childList: true, subtree: true });
+    } catch(e) {}
+  }
+  function boot(){ cleanChecklistHeader(); watchHeader(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  setTimeout(boot, 250);
+  setTimeout(boot, 1000);
+  setInterval(cleanChecklistHeader, 1500);
+  window.cleanChecklistHeaderFinal = boot;
+})();
+</script>
+
 </body>
 </html>
