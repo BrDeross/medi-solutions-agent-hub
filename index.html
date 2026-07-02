@@ -11905,16 +11905,18 @@ function normalizeCertAgents(agents) {
 return (Array.isArray(agents) ? agents : []).filter(a => a && a.name && !isCertSummaryRow(a));
 }
 function getCertCarrierColumns() {
-const metaCols = Array.isArray(_certMeta?.carriers) ? _certMeta.carriers.map(c => String(c||'').trim()).filter(Boolean) : [];
-if (metaCols.length) return metaCols;
+// Always build a union so saved metadata with only 8 columns cannot hide other carriers.
 const seen = [];
-_certAgents.forEach(a => {
-Object.keys(a?.certs || {}).forEach(k => {
-const key = String(k||'').trim();
+const addCol = c => {
+const key = String(c || '').trim();
 if (key && !seen.some(x => x.toLowerCase() === key.toLowerCase())) seen.push(key);
+};
+CERT_CARRIERS.forEach(addCol);
+if (Array.isArray(_certMeta?.carriers)) _certMeta.carriers.forEach(addCol);
+_certAgents.forEach(a => {
+Object.keys(a?.certs || {}).forEach(addCol);
 });
-});
-return seen.length ? seen : CERT_CARRIERS.slice();
+return seen;
 }
 function isCertNonCarrierColumn(h, nameKey, yearKey) {
 const col = String(h || '').trim();
@@ -11982,6 +11984,7 @@ const year = _certMeta.year || '';
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 // Show all certification columns from the uploaded file/saved metadata so no carrier columns disappear.
 const activeCols = getCertCarrierColumns();
+console.log('[CERT LOAD] rendering carrier columns:', activeCols.length, activeCols);
 const headerCells = activeCols.map(c =>
 `<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">${pesc(c)}</th>`
 ).join('');
@@ -12011,9 +12014,9 @@ ${cells}
 </tr>`;
 }).join('');
 el.innerHTML = `
-<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:12px;border:1px solid var(--border);">
+<div style="display:block;width:100%;max-width:100%;overflow-x:scroll;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:12px;border:1px solid var(--border);padding-bottom:10px;">
 ${year ? `<div style="padding:10px 16px;font-size:12px;color:var(--muted-2);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);">Certification Year: <strong style="color:var(--text);">${pesc(year)}</strong>${_certMeta.updatedAt ? ' &nbsp;·&nbsp; Updated: '+new Date(_certMeta.updatedAt).toLocaleDateString() : ''}</div>` : ''}
-<table style="width:100%;border-collapse:collapse;min-width:${Math.max(1100, 330 + activeCols.length * 92)}px;">
+<table style="width:max-content;border-collapse:collapse;min-width:${Math.max(1700, 420 + activeCols.length * 110)}px;">
 <thead>
 <tr>
 <th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Agent</th>
