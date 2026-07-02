@@ -8973,6 +8973,198 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 
+
+<style id="checklist-header-clean-v3-20260702">
+#checklistPanel .cl-panel-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 16px !important;
+  min-height: 64px !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+  background: linear-gradient(90deg, #10285a, #173a79) !important;
+  border-bottom: 1px solid rgba(251,191,36,.30) !important;
+  cursor: grab !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: none !important;
+}
+#checklistPanel.checklist-dragging .cl-panel-header { cursor: grabbing !important; }
+#checklistPanel .cl-panel-header::before,
+#checklistPanel .cl-panel-header::after {
+  content: none !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+#checklistPanel .cl-panel-title {
+  grid-column: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-title::after { content: none !important; display: none !important; }
+#checklistPanel .cl-panel-close {
+  grid-column: 2 !important;
+  position: static !important;
+  transform: none !important;
+  justify-self: end !important;
+  align-self: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-width: 108px !important;
+  height: 50px !important;
+  padding: 0 15px !important;
+  border-radius: 16px !important;
+  border: 2px solid rgba(255,255,255,.78) !important;
+  background: rgba(244,63,94,.66) !important;
+  color: #fff !important;
+  font-size: 0 !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 0 4px rgba(244,63,94,.20), 0 0 30px rgba(251,113,133,.80) !important;
+  z-index: 500 !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+}
+#checklistPanel .cl-panel-close::before {
+  content: '✕' !important;
+  font-size: 28px !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+}
+#checklistPanel .cl-panel-close::after {
+  content: 'CLOSE' !important;
+  font-size: 10px !important;
+  font-weight: 1000 !important;
+  letter-spacing: .08em !important;
+}
+#checklistPanel .cl-panel-header > *:not(.cl-panel-title):not(.cl-panel-close) {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+@media (max-width: 390px) {
+  #checklistPanel .cl-panel-header { gap: 10px !important; padding: 12px !important; }
+  #checklistPanel .cl-panel-title { font-size: 14px !important; }
+  #checklistPanel .cl-panel-close { min-width: 90px !important; height: 52px !important; padding: 0 10px !important; }
+  #checklistPanel .cl-panel-close::after { content: 'EXIT' !important; }
+}
+</style>
+<script id="checklist-header-clean-v3-runtime-20260702">
+(function(){
+  'use strict';
+  var storageKey = 'mediChecklistPanelPositionV3';
+  function clamp(n,min,max){ return Math.min(Math.max(n,min),max); }
+  function getPanel(){ return document.getElementById('checklistPanel'); }
+  function getHeader(){ var p = getPanel(); return p ? p.querySelector('.cl-panel-header') : null; }
+  function closePanel(){
+    if (typeof window.toggleChecklist === 'function') { window.toggleChecklist(false); return; }
+    var p = getPanel(); if (p) p.classList.remove('open');
+  }
+  function normalizeHeader(){
+    var header = getHeader();
+    if (!header) return;
+    var title = header.querySelector('.cl-panel-title');
+    var close = header.querySelector('.cl-panel-close');
+    var needs = !title || !close || header.children.length !== 2;
+    if (needs) {
+      header.innerHTML = '<div class="cl-panel-title">✅ Daily Checklist</div><button class="cl-panel-close" type="button" aria-label="Close daily checklist" title="Close checklist">✕</button>';
+      title = header.querySelector('.cl-panel-title');
+      close = header.querySelector('.cl-panel-close');
+    }
+    Array.prototype.slice.call(header.children).forEach(function(child){
+      if (!child.classList || (!child.classList.contains('cl-panel-title') && !child.classList.contains('cl-panel-close'))) child.remove();
+    });
+    if (close && close.dataset.cleanCloseV3 !== '1') {
+      close.dataset.cleanCloseV3 = '1';
+      close.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); closePanel(); });
+      close.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+    }
+    header.dataset.cleanHeaderV3 = '1';
+  }
+  function readPos(){
+    try {
+      var raw = localStorage.getItem(storageKey) || localStorage.getItem('mediChecklistPanelPositionV2') || localStorage.getItem('mediChecklistPanelPosition');
+      return raw ? JSON.parse(raw) : null;
+    } catch(e){ return null; }
+  }
+  function savePos(left, top){ try { localStorage.setItem(storageKey, JSON.stringify({ left:left, top:top })); } catch(e){} }
+  function applyPos(){
+    var p = getPanel(); var pos = readPos();
+    if (!p || !pos || typeof pos.left !== 'number' || typeof pos.top !== 'number') return;
+    var maxLeft = Math.max(8, window.innerWidth - p.offsetWidth - 8);
+    var maxTop = Math.max(8, window.innerHeight - p.offsetHeight - 8);
+    p.classList.add('checklist-dragged');
+    p.style.position = 'fixed'; p.style.right = 'auto'; p.style.bottom = 'auto';
+    p.style.left = clamp(pos.left, 8, maxLeft) + 'px';
+    p.style.top = clamp(pos.top, 8, maxTop) + 'px';
+  }
+  function wireMove(){
+    var panel = getPanel(); var header = getHeader();
+    if (!panel || !header || header.dataset.moveV3 === '1') return;
+    header.dataset.moveV3 = '1';
+    var moving = false, pid = null, sx = 0, sy = 0, sl = 0, st = 0;
+    header.addEventListener('pointerdown', function(e){
+      if (e.target && e.target.closest && e.target.closest('.cl-panel-close')) return;
+      var rect = panel.getBoundingClientRect();
+      moving = true; pid = e.pointerId; sx = e.clientX; sy = e.clientY; sl = rect.left; st = rect.top;
+      panel.classList.add('checklist-dragging','checklist-dragged');
+      panel.style.position = 'fixed'; panel.style.right = 'auto'; panel.style.bottom = 'auto';
+      panel.style.left = sl + 'px'; panel.style.top = st + 'px';
+      try { header.setPointerCapture(pid); } catch(err){}
+      e.preventDefault();
+    }, { passive:false });
+    header.addEventListener('pointermove', function(e){
+      if (!moving || e.pointerId !== pid) return;
+      var maxLeft = Math.max(8, window.innerWidth - panel.offsetWidth - 8);
+      var maxTop = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
+      panel.style.left = clamp(sl + e.clientX - sx, 8, maxLeft) + 'px';
+      panel.style.top = clamp(st + e.clientY - sy, 8, maxTop) + 'px';
+      e.preventDefault();
+    }, { passive:false });
+    function done(e){
+      if (pid !== null && e && e.pointerId !== pid) return;
+      if (!moving) return;
+      moving = false; pid = null; panel.classList.remove('checklist-dragging');
+      var rect = panel.getBoundingClientRect(); savePos(rect.left, rect.top);
+    }
+    header.addEventListener('pointerup', done);
+    header.addEventListener('pointercancel', done);
+    header.addEventListener('dblclick', function(e){
+      try { localStorage.removeItem(storageKey); localStorage.removeItem('mediChecklistPanelPositionV2'); localStorage.removeItem('mediChecklistPanelPosition'); } catch(err){}
+      panel.classList.remove('checklist-dragged','checklist-dragging');
+      panel.style.left=''; panel.style.top=''; panel.style.right=''; panel.style.bottom='';
+      e.preventDefault();
+    });
+  }
+  function boot(){ normalizeHeader(); wireMove(); applyPos(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  setTimeout(boot, 50); setTimeout(boot, 250); setTimeout(boot, 1000);
+  setInterval(function(){ normalizeHeader(); wireMove(); }, 250);
+  window.checklistCleanV3 = boot;
+  console.log('[Checklist] clean header v3 active');
+})();
+</script>
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -16929,6 +17121,198 @@ console.log('[Medi Hub Tracking] Active · session:', _sid);
   setInterval(cleanChecklistDragPill, 300);
   window.cleanChecklistDragPill = cleanChecklistDragPill;
   console.log('[Checklist] DRAG pill hard remove active');
+})();
+</script>
+
+
+<style id="checklist-header-clean-v3-20260702">
+#checklistPanel .cl-panel-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 16px !important;
+  min-height: 64px !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+  background: linear-gradient(90deg, #10285a, #173a79) !important;
+  border-bottom: 1px solid rgba(251,191,36,.30) !important;
+  cursor: grab !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: none !important;
+}
+#checklistPanel.checklist-dragging .cl-panel-header { cursor: grabbing !important; }
+#checklistPanel .cl-panel-header::before,
+#checklistPanel .cl-panel-header::after {
+  content: none !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+#checklistPanel .cl-panel-title {
+  grid-column: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-title::after { content: none !important; display: none !important; }
+#checklistPanel .cl-panel-close {
+  grid-column: 2 !important;
+  position: static !important;
+  transform: none !important;
+  justify-self: end !important;
+  align-self: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-width: 108px !important;
+  height: 50px !important;
+  padding: 0 15px !important;
+  border-radius: 16px !important;
+  border: 2px solid rgba(255,255,255,.78) !important;
+  background: rgba(244,63,94,.66) !important;
+  color: #fff !important;
+  font-size: 0 !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 0 4px rgba(244,63,94,.20), 0 0 30px rgba(251,113,133,.80) !important;
+  z-index: 500 !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+}
+#checklistPanel .cl-panel-close::before {
+  content: '✕' !important;
+  font-size: 28px !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+}
+#checklistPanel .cl-panel-close::after {
+  content: 'CLOSE' !important;
+  font-size: 10px !important;
+  font-weight: 1000 !important;
+  letter-spacing: .08em !important;
+}
+#checklistPanel .cl-panel-header > *:not(.cl-panel-title):not(.cl-panel-close) {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+@media (max-width: 390px) {
+  #checklistPanel .cl-panel-header { gap: 10px !important; padding: 12px !important; }
+  #checklistPanel .cl-panel-title { font-size: 14px !important; }
+  #checklistPanel .cl-panel-close { min-width: 90px !important; height: 52px !important; padding: 0 10px !important; }
+  #checklistPanel .cl-panel-close::after { content: 'EXIT' !important; }
+}
+</style>
+<script id="checklist-header-clean-v3-runtime-20260702">
+(function(){
+  'use strict';
+  var storageKey = 'mediChecklistPanelPositionV3';
+  function clamp(n,min,max){ return Math.min(Math.max(n,min),max); }
+  function getPanel(){ return document.getElementById('checklistPanel'); }
+  function getHeader(){ var p = getPanel(); return p ? p.querySelector('.cl-panel-header') : null; }
+  function closePanel(){
+    if (typeof window.toggleChecklist === 'function') { window.toggleChecklist(false); return; }
+    var p = getPanel(); if (p) p.classList.remove('open');
+  }
+  function normalizeHeader(){
+    var header = getHeader();
+    if (!header) return;
+    var title = header.querySelector('.cl-panel-title');
+    var close = header.querySelector('.cl-panel-close');
+    var needs = !title || !close || header.children.length !== 2;
+    if (needs) {
+      header.innerHTML = '<div class="cl-panel-title">✅ Daily Checklist</div><button class="cl-panel-close" type="button" aria-label="Close daily checklist" title="Close checklist">✕</button>';
+      title = header.querySelector('.cl-panel-title');
+      close = header.querySelector('.cl-panel-close');
+    }
+    Array.prototype.slice.call(header.children).forEach(function(child){
+      if (!child.classList || (!child.classList.contains('cl-panel-title') && !child.classList.contains('cl-panel-close'))) child.remove();
+    });
+    if (close && close.dataset.cleanCloseV3 !== '1') {
+      close.dataset.cleanCloseV3 = '1';
+      close.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); closePanel(); });
+      close.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+    }
+    header.dataset.cleanHeaderV3 = '1';
+  }
+  function readPos(){
+    try {
+      var raw = localStorage.getItem(storageKey) || localStorage.getItem('mediChecklistPanelPositionV2') || localStorage.getItem('mediChecklistPanelPosition');
+      return raw ? JSON.parse(raw) : null;
+    } catch(e){ return null; }
+  }
+  function savePos(left, top){ try { localStorage.setItem(storageKey, JSON.stringify({ left:left, top:top })); } catch(e){} }
+  function applyPos(){
+    var p = getPanel(); var pos = readPos();
+    if (!p || !pos || typeof pos.left !== 'number' || typeof pos.top !== 'number') return;
+    var maxLeft = Math.max(8, window.innerWidth - p.offsetWidth - 8);
+    var maxTop = Math.max(8, window.innerHeight - p.offsetHeight - 8);
+    p.classList.add('checklist-dragged');
+    p.style.position = 'fixed'; p.style.right = 'auto'; p.style.bottom = 'auto';
+    p.style.left = clamp(pos.left, 8, maxLeft) + 'px';
+    p.style.top = clamp(pos.top, 8, maxTop) + 'px';
+  }
+  function wireMove(){
+    var panel = getPanel(); var header = getHeader();
+    if (!panel || !header || header.dataset.moveV3 === '1') return;
+    header.dataset.moveV3 = '1';
+    var moving = false, pid = null, sx = 0, sy = 0, sl = 0, st = 0;
+    header.addEventListener('pointerdown', function(e){
+      if (e.target && e.target.closest && e.target.closest('.cl-panel-close')) return;
+      var rect = panel.getBoundingClientRect();
+      moving = true; pid = e.pointerId; sx = e.clientX; sy = e.clientY; sl = rect.left; st = rect.top;
+      panel.classList.add('checklist-dragging','checklist-dragged');
+      panel.style.position = 'fixed'; panel.style.right = 'auto'; panel.style.bottom = 'auto';
+      panel.style.left = sl + 'px'; panel.style.top = st + 'px';
+      try { header.setPointerCapture(pid); } catch(err){}
+      e.preventDefault();
+    }, { passive:false });
+    header.addEventListener('pointermove', function(e){
+      if (!moving || e.pointerId !== pid) return;
+      var maxLeft = Math.max(8, window.innerWidth - panel.offsetWidth - 8);
+      var maxTop = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
+      panel.style.left = clamp(sl + e.clientX - sx, 8, maxLeft) + 'px';
+      panel.style.top = clamp(st + e.clientY - sy, 8, maxTop) + 'px';
+      e.preventDefault();
+    }, { passive:false });
+    function done(e){
+      if (pid !== null && e && e.pointerId !== pid) return;
+      if (!moving) return;
+      moving = false; pid = null; panel.classList.remove('checklist-dragging');
+      var rect = panel.getBoundingClientRect(); savePos(rect.left, rect.top);
+    }
+    header.addEventListener('pointerup', done);
+    header.addEventListener('pointercancel', done);
+    header.addEventListener('dblclick', function(e){
+      try { localStorage.removeItem(storageKey); localStorage.removeItem('mediChecklistPanelPositionV2'); localStorage.removeItem('mediChecklistPanelPosition'); } catch(err){}
+      panel.classList.remove('checklist-dragged','checklist-dragging');
+      panel.style.left=''; panel.style.top=''; panel.style.right=''; panel.style.bottom='';
+      e.preventDefault();
+    });
+  }
+  function boot(){ normalizeHeader(); wireMove(); applyPos(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  setTimeout(boot, 50); setTimeout(boot, 250); setTimeout(boot, 1000);
+  setInterval(function(){ normalizeHeader(); wireMove(); }, 250);
+  window.checklistCleanV3 = boot;
+  console.log('[Checklist] clean header v3 active');
 })();
 </script>
 
