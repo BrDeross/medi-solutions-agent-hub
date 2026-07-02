@@ -4171,7 +4171,8 @@ cursor: pointer; white-space: nowrap;
   touch-action: none !important;
 }
 #checklistPanel .cl-panel-header::after {
-  content: 'DRAG';
+  content: none !important;
+  display: none !important;
   margin-left: auto;
   margin-right: 10px;
   padding: 3px 7px;
@@ -8774,13 +8775,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (!panel) return;
     var header = panel.querySelector('.cl-panel-header');
     if (!header) return;
-    if (!header.querySelector('.cl-move-handle-v2')) {
-      var handle = document.createElement('span');
-      handle.className = 'cl-move-handle-v2';
-      handle.textContent = 'DRAG';
-      var close = header.querySelector('.cl-panel-close');
-      if (close) header.insertBefore(handle, close); else header.appendChild(handle);
-    }
+    header.querySelectorAll('.cl-move-handle-v2').forEach(function(el){ el.remove(); });
     if (panel.dataset.dragV2Ready === '1') return;
     panel.dataset.dragV2Ready = '1';
     header.title = 'Click and drag this header to move the checklist. Double-click to reset.';
@@ -16600,180 +16595,6 @@ console.log('[Medi Hub Tracking] Active · session:', _sid);
 </script>
 
 
-<style id="checklist-uniform-controls-fix-20260702">
-/* === Daily Checklist uniform header controls - 2026-07-02 === */
-#checklistPanel .cl-panel-header {
-  position: relative !important;
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto auto !important;
-  align-items: center !important;
-  gap: 10px !important;
-  min-height: 58px !important;
-  padding: 10px 12px !important;
-  background: linear-gradient(90deg, #10285a, #173a79) !important;
-  border-bottom: 1px solid rgba(251,191,36,.30) !important;
-  cursor: grab !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  touch-action: none !important;
-}
-#checklistPanel .cl-panel-header::after {
-  content: none !important;
-  display: none !important;
-}
-#checklistPanel .cl-panel-title {
-  grid-column: 1 !important;
-  min-width: 0 !important;
-  font-size: 14px !important;
-  line-height: 1.15 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  pointer-events: none !important;
-}
-#checklistPanel .cl-move-handle-v2 {
-  grid-column: 2 !important;
-  position: static !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 34px !important;
-  min-width: 62px !important;
-  margin: 0 !important;
-  padding: 0 12px !important;
-  border-radius: 999px !important;
-  background: rgba(251,191,36,.24) !important;
-  border: 1px solid rgba(251,191,36,.72) !important;
-  color: #fff7cc !important;
-  font-size: 10px !important;
-  font-weight: 950 !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-  box-shadow: 0 0 14px rgba(251,191,36,.34) !important;
-  pointer-events: none !important;
-}
-#checklistPanel .cl-panel-close {
-  grid-column: 3 !important;
-  position: static !important;
-  right: auto !important;
-  top: auto !important;
-  transform: none !important;
-  width: auto !important;
-  min-width: 82px !important;
-  height: 38px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  margin: 0 !important;
-  padding: 0 12px !important;
-  border-radius: 999px !important;
-  background: rgba(244,63,94,.50) !important;
-  border: 1px solid rgba(255,255,255,.70) !important;
-  color: #fff !important;
-  font-size: 22px !important;
-  font-weight: 950 !important;
-  line-height: 1 !important;
-  opacity: 1 !important;
-  box-shadow: 0 0 0 3px rgba(244,63,94,.15), 0 0 20px rgba(251,113,133,.55) !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,.55) !important;
-  cursor: pointer !important;
-  z-index: 3 !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-#checklistPanel .cl-panel-close::after {
-  content: 'CLOSE' !important;
-  font-size: 9px !important;
-  font-weight: 950 !important;
-  letter-spacing: .08em !important;
-  line-height: 1 !important;
-}
-#checklistPanel .cl-panel-close:hover,
-#checklistPanel .cl-panel-close:focus-visible {
-  background: rgba(244,63,94,.68) !important;
-  border-color: rgba(255,255,255,.90) !important;
-  outline: none !important;
-  box-shadow: 0 0 0 4px rgba(244,63,94,.22), 0 0 28px rgba(251,113,133,.75) !important;
-}
-#checklistPanel.checklist-dragging .cl-panel-header { cursor: grabbing !important; }
-@media (max-width: 768px) {
-  #checklistPanel .cl-panel-header {
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    grid-template-rows: auto auto !important;
-    min-height: 82px !important;
-    gap: 8px 10px !important;
-    padding: 12px !important;
-  }
-  #checklistPanel .cl-panel-title {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-    font-size: 15px !important;
-  }
-  #checklistPanel .cl-panel-close {
-    grid-column: 2 !important;
-    grid-row: 1 / span 2 !important;
-    min-width: 86px !important;
-    height: 54px !important;
-    border-radius: 16px !important;
-    font-size: 30px !important;
-    padding: 0 10px !important;
-  }
-  #checklistPanel .cl-panel-close::after {
-    font-size: 10px !important;
-  }
-  #checklistPanel .cl-move-handle-v2 {
-    grid-column: 1 !important;
-    grid-row: 2 !important;
-    justify-self: start !important;
-    height: 28px !important;
-    min-width: 98px !important;
-    font-size: 10px !important;
-    box-shadow: 0 0 16px rgba(251,191,36,.40) !important;
-  }
-}
-@media (max-width: 390px) {
-  #checklistPanel .cl-panel-header {
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    min-height: 86px !important;
-  }
-  #checklistPanel .cl-panel-close {
-    min-width: 78px !important;
-    height: 52px !important;
-    font-size: 28px !important;
-  }
-  #checklistPanel .cl-panel-close::after { content: 'EXIT' !important; }
-}
-</style>
-<script id="checklist-uniform-controls-runtime-20260702">
-(function(){
-  function ensureChecklistHeaderControls(){
-    var panel = document.getElementById('checklistPanel');
-    if (!panel) return;
-    var header = panel.querySelector('.cl-panel-header');
-    if (!header) return;
-    var close = header.querySelector('.cl-panel-close');
-    var handle = header.querySelector('.cl-move-handle-v2');
-    if (!handle) {
-      handle = document.createElement('span');
-      handle.className = 'cl-move-handle-v2';
-      handle.textContent = 'DRAG';
-      if (close) header.insertBefore(handle, close); else header.appendChild(handle);
-    } else {
-      handle.textContent = 'DRAG';
-    }
-    if (close) {
-      close.setAttribute('aria-label', 'Close daily checklist');
-      close.title = 'Close checklist';
-    }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensureChecklistHeaderControls); else ensureChecklistHeaderControls();
-  setTimeout(ensureChecklistHeaderControls, 250);
-  setTimeout(ensureChecklistHeaderControls, 1000);
-  window.fixChecklistHeaderControls = ensureChecklistHeaderControls;
-})();
-</script>
-
-
 <style id="checklist-final-mobile-clean-20260702">
 /* === Final Daily Checklist header cleanup - 2026-07-02 === */
 #checklistPanel .cl-panel-header {
@@ -16940,10 +16761,58 @@ console.log('[Medi Hub Tracking] Active · session:', _sid);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   setTimeout(boot, 250);
   setTimeout(boot, 1000);
-  setInterval(cleanChecklistHeader, 1500);
+  setInterval(cleanChecklistHeader, 250);
   window.cleanChecklistHeaderFinal = boot;
 })();
 </script>
 
+
+
+<style id="checklist-close-no-drag-final-20260702b">
+#checklistPanel .cl-move-handle-v2,
+#checklistPanel .cl-panel-header::after {
+  content: none !important;
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  min-height: 66px !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+}
+#checklistPanel .cl-panel-close {
+  flex: 0 0 auto !important;
+  min-width: 102px !important;
+  height: 50px !important;
+  border-radius: 16px !important;
+  z-index: 100 !important;
+}
+</style>
+<script id="checklist-close-no-drag-final-runtime-20260702b">
+(function(){
+  function clean(){
+    var panel = document.getElementById('checklistPanel');
+    if (!panel) return;
+    panel.querySelectorAll('.cl-move-handle-v2').forEach(function(el){ el.remove(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', clean); else clean();
+  setTimeout(clean, 50);
+  setTimeout(clean, 250);
+  setTimeout(clean, 1000);
+  setInterval(clean, 250);
+})();
+</script>
 </body>
 </html>
