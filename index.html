@@ -3738,20 +3738,47 @@ transform: none !important;
 .announcement-inner {
 display: flex;
 align-items: center;
-gap: 10px;
-padding: 10px 24px;
-background: linear-gradient(90deg, rgba(251,191,36,.18) 0%, rgba(251,191,36,.08) 100%);
-border-bottom: 1px solid rgba(251,191,36,.35);
-min-height: 42px;
+gap: 12px;
+padding: 14px 28px;
+background: linear-gradient(90deg, rgba(251,191,36,.28) 0%, rgba(251,191,36,.12) 100%);
+border-bottom: 2px solid rgba(251,191,36,.55);
+box-shadow: 0 6px 22px rgba(251,191,36,.14), inset 0 0 0 1px rgba(255,255,255,.05);
+min-height: 58px;
+animation: announcementPulse 2.8s ease-in-out infinite;
 }
-.announcement-icon { font-size: 16px; flex-shrink: 0; }
+.announcement-icon { font-size: 22px; flex-shrink: 0; }
+.announcement-label {
+flex-shrink: 0;
+font-family: 'Plus Jakarta Sans', sans-serif;
+font-size: 11px;
+font-weight: 900;
+letter-spacing: .08em;
+text-transform: uppercase;
+color: #111827;
+background: #fbbf24;
+border-radius: 999px;
+padding: 5px 10px;
+box-shadow: 0 0 14px rgba(251,191,36,.35);
+}
 .announcement-text {
 flex: 1;
 font-family: 'Plus Jakarta Sans', sans-serif;
-font-size: 13px;
-font-weight: 600;
-color: #fde68a;
-line-height: 1.4;
+font-size: 16px;
+font-weight: 800;
+color: #fff7d6;
+line-height: 1.35;
+}
+@keyframes announcementPulse {
+0%, 100% { box-shadow: 0 6px 22px rgba(251,191,36,.14), inset 0 0 0 1px rgba(255,255,255,.05); }
+50% { box-shadow: 0 8px 30px rgba(251,191,36,.28), inset 0 0 0 1px rgba(255,255,255,.08); }
+}
+@media (max-width: 640px) {
+.announcement-inner { align-items:flex-start; padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
+.announcement-icon { font-size: 20px; }
+.announcement-label { font-size: 10px; padding: 4px 8px; }
+.announcement-text { flex-basis: 100%; font-size: 14px; }
+.announcement-dismiss { position:absolute; right:10px; top:10px; }
+#announcementBanner { position: relative !important; }
 }
 .announcement-dismiss {
 background: transparent;
@@ -3768,14 +3795,17 @@ transition: background .15s, color .15s;
 /* Colour variants */
 #announcementBanner.banner-blue .announcement-inner { background: linear-gradient(90deg,rgba(59,130,246,.18),rgba(59,130,246,.08)); border-color: rgba(59,130,246,.35); }
 #announcementBanner.banner-blue .announcement-text { color: #93c5fd; }
+#announcementBanner.banner-blue .announcement-label { background:#60a5fa; color:#061329; box-shadow:0 0 14px rgba(96,165,250,.35); }
 #announcementBanner.banner-blue .announcement-dismiss { border-color: rgba(59,130,246,.3); color: rgba(59,130,246,.6); }
 #announcementBanner.banner-blue .announcement-dismiss:hover { background: rgba(59,130,246,.12); color: #60a5fa; }
 #announcementBanner.banner-green .announcement-inner { background: linear-gradient(90deg,rgba(52,211,153,.18),rgba(52,211,153,.08)); border-color: rgba(52,211,153,.35); }
 #announcementBanner.banner-green .announcement-text { color: #6ee7b7; }
+#announcementBanner.banner-green .announcement-label { background:#34d399; color:#052e22; box-shadow:0 0 14px rgba(52,211,153,.35); }
 #announcementBanner.banner-green .announcement-dismiss { border-color: rgba(52,211,153,.3); color: rgba(52,211,153,.6); }
 #announcementBanner.banner-green .announcement-dismiss:hover { background: rgba(52,211,153,.12); color: #34d399; }
 #announcementBanner.banner-rose .announcement-inner { background: linear-gradient(90deg,rgba(251,113,133,.18),rgba(251,113,133,.08)); border-color: rgba(251,113,133,.35); }
 #announcementBanner.banner-rose .announcement-text { color: #fda4af; }
+#announcementBanner.banner-rose .announcement-label { background:#fb7185; color:#3f0712; box-shadow:0 0 14px rgba(251,113,133,.35); }
 #announcementBanner.banner-rose .announcement-dismiss { border-color: rgba(251,113,133,.3); color: rgba(251,113,133,.6); }
 #announcementBanner.banner-rose .announcement-dismiss:hover { background: rgba(251,113,133,.12); color: #fb7185; }
 /* ── AGENT DIRECTORY ── */
@@ -4153,6 +4183,7 @@ cursor: pointer; white-space: nowrap;
 <div id="announcementBanner" style="display:none;">
 <div class="announcement-inner">
 <span class="announcement-icon" id="announcementIcon">📢</span>
+<span class="announcement-label">IMPORTANT UPDATE</span>
 <span class="announcement-text" id="announcementText"></span>
 <button class="announcement-dismiss" onclick="dismissBanner()" aria-label="Dismiss">✕</button>
 </div>
@@ -11894,21 +11925,27 @@ document.addEventListener('DOMContentLoaded', ()=>{
 <script id="cert-tracker-script">
 // ── CARRIER CERT TRACKER ───────────────────────────────────────────────────
 const CERT_KEY = 'cert_tracker_v1';
-const CERT_CARRIERS = ['RTS','AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
-let _certAgents = []; // [{name, year, certs:{RTS:'Y', AHIP:'', ...}}]
+const CERT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
+let _certAgents = []; // [{name, year, certs:{AHIP:'', ...}}]
 let _certMeta = {};
 function isCertSummaryRow(agent) {
 const n = String(agent?.name || '').trim().toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ');
 return n === 'total certified' || n.startsWith('total certified ');
 }
 function normalizeCertAgents(agents) {
-return (Array.isArray(agents) ? agents : []).filter(a => a && a.name && !isCertSummaryRow(a));
+return (Array.isArray(agents) ? agents : []).filter(a => a && a.name && !isCertSummaryRow(a)).map(a => {
+const certs = Object.assign({}, a.certs || {});
+Object.keys(certs).forEach(k => { if (String(k).trim().toLowerCase() === 'rts') delete certs[k]; });
+return Object.assign({}, a, { certs });
+});
 }
 function getCertCarrierColumns() {
 // Always build a union so saved metadata with only 8 columns cannot hide other carriers.
+// RTS is intentionally excluded from Hub Cert display and progress counts.
 const seen = [];
 const addCol = c => {
 const key = String(c || '').trim();
+if (!key || key.toLowerCase() === 'rts') return;
 if (key && !seen.some(x => x.toLowerCase() === key.toLowerCase())) seen.push(key);
 };
 CERT_CARRIERS.forEach(addCol);
@@ -12074,7 +12111,7 @@ return obj;
 }
 const nameKey = headers.find(h => /agent.?name|name/i.test(h)) || headers[0];
 const yearKey = headers.find(h => /year/i.test(h));
-const certHeaders = headers.filter(h => !isCertNonCarrierColumn(h, nameKey, yearKey));
+const certHeaders = headers.filter(h => !isCertNonCarrierColumn(h, nameKey, yearKey) && String(h||'').trim().toLowerCase() !== 'rts');
 const agents = [];
 rows.forEach(r => {
 const name = (r[nameKey]||'').trim();
