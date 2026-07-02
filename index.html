@@ -8971,6 +8971,8 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -16814,5 +16816,121 @@ console.log('[Medi Hub Tracking] Active · session:', _sid);
   setInterval(clean, 250);
 })();
 </script>
+
+<style id="checklist-drag-pill-hard-remove-20260702">
+/* Hard remove any leftover Daily Checklist DRAG badge/pill */
+#checklistPanel .cl-panel-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  column-gap: 14px !important;
+  min-height: 66px !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+}
+#checklistPanel .cl-panel-header::before,
+#checklistPanel .cl-panel-header::after {
+  content: "" !important;
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-header > *:not(.cl-panel-title):not(.cl-panel-close) {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-move-handle-v2,
+#checklistPanel .checklist-drag-pill,
+#checklistPanel .drag-pill,
+#checklistPanel [class*="drag"][class*="pill"],
+#checklistPanel [class*="move"][class*="handle"] {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-title {
+  grid-column: 1 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  pointer-events: none !important;
+}
+#checklistPanel .cl-panel-title::after {
+  content: "Drag header to move" !important;
+  display: block !important;
+  margin-top: 3px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: rgba(253,230,138,.88) !important;
+  line-height: 1.1 !important;
+}
+#checklistPanel .cl-panel-close {
+  grid-column: 2 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  position: static !important;
+  transform: none !important;
+  min-width: 104px !important;
+  height: 50px !important;
+  border-radius: 16px !important;
+  z-index: 200 !important;
+}
+@media (max-width: 390px) {
+  #checklistPanel .cl-panel-header { column-gap: 10px !important; padding: 12px !important; }
+  #checklistPanel .cl-panel-title { font-size: 14px !important; }
+  #checklistPanel .cl-panel-close { min-width: 88px !important; height: 50px !important; }
+  #checklistPanel .cl-panel-close::after { content: "EXIT" !important; }
+}
+</style>
+<script id="checklist-drag-pill-hard-remove-runtime-20260702">
+(function(){
+  function isDragJunk(el){
+    if (!el || !el.textContent) return false;
+    var txt = el.textContent.trim().toUpperCase();
+    if (txt === 'DRAG') return true;
+    var cls = String(el.className || '').toLowerCase();
+    return (cls.indexOf('drag') !== -1 && cls.indexOf('pill') !== -1) ||
+           (cls.indexOf('move') !== -1 && cls.indexOf('handle') !== -1);
+  }
+  function cleanChecklistDragPill(){
+    var panel = document.getElementById('checklistPanel');
+    if (!panel) return;
+    var header = panel.querySelector('.cl-panel-header');
+    if (!header) return;
+    Array.prototype.slice.call(header.children).forEach(function(child){
+      if (child.classList && (child.classList.contains('cl-panel-title') || child.classList.contains('cl-panel-close'))) return;
+      if (isDragJunk(child) || child.textContent.trim().toUpperCase() === 'DRAG') child.remove();
+    });
+    panel.querySelectorAll('.cl-move-handle-v2,.checklist-drag-pill,.drag-pill,[class*="drag"][class*="pill"],[class*="move"][class*="handle"]').forEach(function(el){ el.remove(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cleanChecklistDragPill); else cleanChecklistDragPill();
+  setTimeout(cleanChecklistDragPill, 50);
+  setTimeout(cleanChecklistDragPill, 250);
+  setTimeout(cleanChecklistDragPill, 750);
+  setTimeout(cleanChecklistDragPill, 1500);
+  setInterval(cleanChecklistDragPill, 300);
+  window.cleanChecklistDragPill = cleanChecklistDragPill;
+  console.log('[Checklist] DRAG pill hard remove active');
+})();
+</script>
+
 </body>
 </html>
