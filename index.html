@@ -8486,6 +8486,248 @@ tr.deduct td { color: #dc2626; background: #fff5f5; }
 </table>
 ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + notes + '</p>' : ''}
 <div class="note">This is a planning estimate — not underwriting or product advice. Use it to frame the protection conversation.</div>
+
+<style id="checklist-banner-visible-fix-20260702-v2">
+/* === Visible checklist drag + high-illumination banner fix v2 === */
+#checklistPanel.open {
+  position: fixed !important;
+  z-index: 99990 !important;
+  outline: 2px solid rgba(251,191,36,.34) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.72), 0 0 34px rgba(251,191,36,.28) !important;
+}
+#checklistPanel .cl-panel-header {
+  cursor: move !important;
+  cursor: grab !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: none !important;
+  gap: 10px !important;
+  background: linear-gradient(90deg, #10285a, #173a79) !important;
+  border-bottom: 1px solid rgba(251,191,36,.30) !important;
+}
+#checklistPanel.checklist-dragging .cl-panel-header { cursor: grabbing !important; }
+#checklistPanel .cl-panel-title { pointer-events: none !important; }
+#checklistPanel .cl-move-handle-v2 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: auto !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(251,191,36,.24) !important;
+  border: 1px solid rgba(251,191,36,.72) !important;
+  color: #fff7cc !important;
+  font-size: 10px !important;
+  font-weight: 950 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 0 14px rgba(251,191,36,.34) !important;
+  animation: clHandleGlowV2 1.25s ease-in-out infinite !important;
+  pointer-events: none !important;
+}
+@keyframes clHandleGlowV2 {
+  0%, 100% { filter: brightness(1); box-shadow: 0 0 10px rgba(251,191,36,.24); }
+  50% { filter: brightness(1.35); box-shadow: 0 0 24px rgba(251,191,36,.58); }
+}
+#checklistPanel.checklist-dragged { right: auto !important; bottom: auto !important; }
+#announcementBanner {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 99980 !important;
+  width: 100% !important;
+  isolation: isolate !important;
+}
+#announcementBanner .announcement-inner {
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 72px !important;
+  padding: 16px 30px !important;
+  gap: 16px !important;
+  border: 2px solid rgba(251,191,36,.86) !important;
+  border-left: 12px solid #f59e0b !important;
+  background: linear-gradient(90deg, rgba(180,83,9,.96), rgba(251,191,36,.46), rgba(120,53,15,.94)) !important;
+  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 44px rgba(251,191,36,.62), 0 0 100px rgba(251,191,36,.30), inset 0 0 28px rgba(255,255,255,.16) !important;
+  animation: hubBannerBeaconV2 1.1s ease-in-out infinite !important;
+}
+#announcementBanner .announcement-inner::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: -60% -20% !important;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,.42), transparent 28%), linear-gradient(115deg, transparent 0%, transparent 35%, rgba(255,255,255,.34) 49%, transparent 63%, transparent 100%) !important;
+  transform: translateX(-45%) !important;
+  animation: hubBannerSweepV2 1.8s ease-in-out infinite !important;
+  pointer-events: none !important;
+}
+#announcementBanner .announcement-icon {
+  font-size: 34px !important;
+  line-height: 1 !important;
+  filter: drop-shadow(0 0 13px rgba(255,255,255,.70)) !important;
+  animation: hubBannerIconV2 .9s ease-in-out infinite !important;
+}
+#announcementBanner .announcement-text {
+  font-size: 18px !important;
+  font-weight: 950 !important;
+  line-height: 1.35 !important;
+  color: #fff8d1 !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,.45), 0 0 18px rgba(255,255,255,.20) !important;
+}
+#announcementBanner .announcement-text::before {
+  content: 'IMPORTANT UPDATE' !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  margin-right: 12px !important;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(17,24,39,.58) !important;
+  border: 1px solid rgba(255,255,255,.62) !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 1000 !important;
+  letter-spacing: .10em !important;
+  text-shadow: none !important;
+  box-shadow: 0 0 18px rgba(255,255,255,.24) !important;
+}
+#announcementBanner .announcement-dismiss {
+  font-size: 14px !important;
+  padding: 6px 10px !important;
+  background: rgba(0,0,0,.20) !important;
+  border-color: rgba(255,255,255,.42) !important;
+  color: rgba(255,255,255,.86) !important;
+}
+#announcementBanner.banner-blue .announcement-inner {
+  border-color: rgba(147,197,253,.90) !important;
+  border-left-color: #60a5fa !important;
+  background: linear-gradient(90deg, rgba(30,64,175,.98), rgba(59,130,246,.54), rgba(30,58,138,.96)) !important;
+  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 50px rgba(96,165,250,.62), 0 0 110px rgba(96,165,250,.28), inset 0 0 28px rgba(255,255,255,.16) !important;
+}
+#announcementBanner.banner-green .announcement-inner {
+  border-color: rgba(134,239,172,.90) !important;
+  border-left-color: #22c55e !important;
+  background: linear-gradient(90deg, rgba(20,83,45,.98), rgba(34,197,94,.50), rgba(22,101,52,.96)) !important;
+  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 50px rgba(74,222,128,.62), 0 0 110px rgba(74,222,128,.28), inset 0 0 28px rgba(255,255,255,.16) !important;
+}
+#announcementBanner.banner-rose .announcement-inner {
+  border-color: rgba(253,164,175,.92) !important;
+  border-left-color: #fb7185 !important;
+  background: linear-gradient(90deg, rgba(136,19,55,.98), rgba(244,63,94,.56), rgba(159,18,57,.96)) !important;
+  box-shadow: 0 18px 52px rgba(0,0,0,.48), 0 0 54px rgba(251,113,133,.66), 0 0 116px rgba(251,113,133,.30), inset 0 0 28px rgba(255,255,255,.16) !important;
+}
+@keyframes hubBannerBeaconV2 { 0%, 100% { filter: brightness(1) saturate(1); } 50% { filter: brightness(1.42) saturate(1.38); } }
+@keyframes hubBannerSweepV2 { 0%, 28% { transform: translateX(-58%); opacity: 0; } 46% { opacity: .95; } 76%, 100% { transform: translateX(58%); opacity: 0; } }
+@keyframes hubBannerIconV2 { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.16); } }
+@media (max-width: 640px) {
+  #announcementBanner .announcement-inner { min-height: 78px !important; padding: 14px 16px !important; border-left-width: 9px !important; }
+  #announcementBanner .announcement-icon { font-size: 30px !important; }
+  #announcementBanner .announcement-text { font-size: 16px !important; }
+  #announcementBanner .announcement-text::before { display: flex !important; width: fit-content !important; margin: 0 0 6px 0 !important; }
+}
+</style>
+
+<script id="checklist-drag-visible-runtime-20260702-v2">
+(function(){
+  'use strict';
+  var storageKey = 'mediChecklistPanelPositionV2';
+  function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+  function readSaved(){ try { var raw = localStorage.getItem(storageKey) || localStorage.getItem('mediChecklistPanelPosition'); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
+  function writeSaved(pos){ try { localStorage.setItem(storageKey, JSON.stringify(pos)); } catch(e){} }
+  function panelBounds(panel){ return { maxLeft: Math.max(8, window.innerWidth - panel.offsetWidth - 8), maxTop: Math.max(8, window.innerHeight - panel.offsetHeight - 8) }; }
+  function applyPosition(panel, pos){
+    if (!panel || !pos || typeof pos.left !== 'number' || typeof pos.top !== 'number') return false;
+    var b = panelBounds(panel);
+    panel.classList.add('checklist-dragged');
+    panel.style.position = 'fixed';
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+    panel.style.left = clamp(pos.left, 8, b.maxLeft) + 'px';
+    panel.style.top = clamp(pos.top, 8, b.maxTop) + 'px';
+    return true;
+  }
+  function initDrag(){
+    var panel = document.getElementById('checklistPanel');
+    if (!panel) return;
+    var header = panel.querySelector('.cl-panel-header');
+    if (!header) return;
+    if (!header.querySelector('.cl-move-handle-v2')) {
+      var handle = document.createElement('span');
+      handle.className = 'cl-move-handle-v2';
+      handle.textContent = 'DRAG';
+      var close = header.querySelector('.cl-panel-close');
+      if (close) header.insertBefore(handle, close); else header.appendChild(handle);
+    }
+    if (panel.dataset.dragV2Ready === '1') return;
+    panel.dataset.dragV2Ready = '1';
+    header.title = 'Click and drag this header to move the checklist. Double-click to reset.';
+    var dragging = false, pointerId = null, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+    function begin(clientX, clientY, id, ev){
+      if (ev && ev.target && ev.target.closest && ev.target.closest('.cl-panel-close')) return;
+      var rect = panel.getBoundingClientRect();
+      dragging = true; pointerId = id;
+      startX = clientX; startY = clientY; startLeft = rect.left; startTop = rect.top;
+      panel.classList.add('checklist-dragging','checklist-dragged');
+      panel.style.position = 'fixed';
+      panel.style.right = 'auto'; panel.style.bottom = 'auto';
+      panel.style.left = startLeft + 'px'; panel.style.top = startTop + 'px';
+      if (ev && ev.preventDefault) ev.preventDefault();
+      try { if (ev && ev.target && ev.target.setPointerCapture && id !== null) ev.target.setPointerCapture(id); } catch(e){}
+    }
+    function move(clientX, clientY, id, ev){
+      if (!dragging) return;
+      if (pointerId !== null && id !== null && id !== pointerId) return;
+      var b = panelBounds(panel);
+      var left = clamp(startLeft + (clientX - startX), 8, b.maxLeft);
+      var top = clamp(startTop + (clientY - startY), 8, b.maxTop);
+      panel.style.left = left + 'px'; panel.style.top = top + 'px';
+      if (ev && ev.preventDefault) ev.preventDefault();
+    }
+    function end(){
+      if (!dragging) return;
+      dragging = false; pointerId = null;
+      panel.classList.remove('checklist-dragging');
+      var rect = panel.getBoundingClientRect();
+      writeSaved({ left: rect.left, top: rect.top });
+    }
+    header.addEventListener('pointerdown', function(e){ begin(e.clientX, e.clientY, e.pointerId, e); }, { passive:false });
+    document.addEventListener('pointermove', function(e){ move(e.clientX, e.clientY, e.pointerId, e); }, { passive:false });
+    document.addEventListener('pointerup', end, { passive:true });
+    document.addEventListener('pointercancel', end, { passive:true });
+    header.addEventListener('mousedown', function(e){ if (!window.PointerEvent) begin(e.clientX, e.clientY, null, e); }, { passive:false });
+    document.addEventListener('mousemove', function(e){ if (!window.PointerEvent) move(e.clientX, e.clientY, null, e); }, { passive:false });
+    document.addEventListener('mouseup', end, { passive:true });
+    header.addEventListener('touchstart', function(e){ if (window.PointerEvent) return; var t=e.touches && e.touches[0]; if(t) begin(t.clientX, t.clientY, null, e); }, { passive:false });
+    document.addEventListener('touchmove', function(e){ if (window.PointerEvent) return; var t=e.touches && e.touches[0]; if(t) move(t.clientX, t.clientY, null, e); }, { passive:false });
+    document.addEventListener('touchend', end, { passive:true });
+    header.addEventListener('dblclick', function(e){
+      try { localStorage.removeItem(storageKey); localStorage.removeItem('mediChecklistPanelPosition'); } catch(err){}
+      panel.classList.remove('checklist-dragged','checklist-dragging');
+      panel.style.left=''; panel.style.top=''; panel.style.right=''; panel.style.bottom='';
+      e.preventDefault();
+    });
+    window.applyChecklistDragPosition = function(){ applyPosition(panel, readSaved()); };
+    window.resetChecklistPanelPosition = function(){
+      try { localStorage.removeItem(storageKey); localStorage.removeItem('mediChecklistPanelPosition'); } catch(e){}
+      panel.classList.remove('checklist-dragged','checklist-dragging');
+      panel.style.left=''; panel.style.top=''; panel.style.right=''; panel.style.bottom='';
+    };
+    applyPosition(panel, readSaved());
+    console.log('[Checklist] drag v2 enabled');
+  }
+  function patchToggle(){
+    if (window.__checklistDragV2TogglePatched) return;
+    if (typeof window.toggleChecklist !== 'function') return;
+    var original = window.toggleChecklist;
+    window.toggleChecklist = function(forceOpen){
+      var result = original.apply(this, arguments);
+      setTimeout(function(){ initDrag(); var panel = document.getElementById('checklistPanel'); if (panel && panel.classList.contains('open')) applyPosition(panel, readSaved()); }, 0);
+      return result;
+    };
+    window.__checklistDragV2TogglePatched = true;
+  }
+  function boot(){ initDrag(); patchToggle(); setTimeout(function(){ initDrag(); patchToggle(); }, 400); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  window.enableChecklistDragV2 = boot;
+})();
+</script>
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
