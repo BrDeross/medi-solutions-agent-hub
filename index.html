@@ -4880,7 +4880,10 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <p>Upcoming Friday meeting schedule and topics</p>
 </div>
 </div>
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+<button type="button" onclick="downloadAllFridayMeetingsIcs()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(99,179,237,.35);background:rgba(99,179,237,.14);color:var(--accent-2);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 0 14px rgba(99,179,237,.14);">📅 Add All to Calendar</button>
 <span class="count-chip" id="fridayMeetingCount">0 meetings</span>
+</div>
 </div>
 <div id="fridayMeetingList" style="display:flex;flex-direction:column;gap:12px;">
 <div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings scheduled yet.</div>
@@ -10901,15 +10904,114 @@ body: JSON.stringify({ hub: 'medi', data: payload })
 .catch(e => { console.error('[FM SAVE]', e); showSnuToast('\u26a0 Save failed — check connection.'); });
 });
 }
+
+function getSortedFridayMeetings() {
+return [..._fridayMeetings].sort((a,b) => new Date(a.dateISO || a.date || 0) - new Date(b.dateISO || b.date || 0));
+}
+function fridayIcsEscape(value) {
+return String(value || '').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+}
+function fridayPad(n) { return String(n).padStart(2,'0'); }
+function fridayStampUtc(d) {
+return d.getUTCFullYear() + fridayPad(d.getUTCMonth()+1) + fridayPad(d.getUTCDate()) + 'T' + fridayPad(d.getUTCHours()) + fridayPad(d.getUTCMinutes()) + fridayPad(d.getUTCSeconds()) + 'Z';
+}
+function fridayLocalStamp(d) {
+return d.getFullYear() + fridayPad(d.getMonth()+1) + fridayPad(d.getDate()) + 'T' + fridayPad(d.getHours()) + fridayPad(d.getMinutes()) + '00';
+}
+function parseFridayTimeParts(timeText) {
+const txt = String(timeText || '').replace(/\b(EST|EDT|ET)\b/ig,'').trim();
+const m = txt.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+if (!m) return { hour: 9, minute: 0, hasTime: false };
+let hour = parseInt(m[1], 10);
+const minute = m[2] ? parseInt(m[2], 10) : 0;
+const ap = (m[3] || '').toUpperCase();
+if (ap === 'PM' && hour < 12) hour += 12;
+if (ap === 'AM' && hour === 12) hour = 0;
+return { hour, minute, hasTime: true };
+}
+function parseFridayMeetingDate(m) {
+if (!m) return null;
+if (m.dateISO) {
+const iso = String(m.dateISO).trim();
+if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+const parts = iso.split('-').map(Number);
+return new Date(parts[0], parts[1]-1, parts[2]);
+}
+}
+const raw = String(m.date || '').trim();
+if (!raw) return null;
+const d = new Date(raw + ' 12:00:00');
+return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function buildFridayIcs(meetings, fileBaseName) {
+const valid = (meetings || []).map(m => {
+const base = parseFridayMeetingDate(m);
+if (!base) return null;
+const t = parseFridayTimeParts(m.time);
+const start = new Date(base.getFullYear(), base.getMonth(), base.getDate(), t.hour, t.minute, 0);
+const end = new Date(start.getTime() + 60 * 60 * 1000);
+return { m, start, end };
+}).filter(Boolean);
+if (!valid.length) {
+if (typeof showSnuToast === 'function') showSnuToast('⚠ No dated meetings available to add.');
+return false;
+}
+const now = fridayStampUtc(new Date());
+let lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//My Medi Hub//Friday Meetings//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+valid.forEach(({m,start,end}, idx) => {
+const topic = m.topic || 'Friday Team Meeting';
+const linkText = m.link ? '\nJoin Meeting: ' + m.link : '';
+const resText = m.link2 ? '\nResource/Login: ' + m.link2 : '';
+const desc = [m.notes || '', linkText, resText].join('').trim();
+const loc = m.type === 'virtual' ? (m.link || 'Virtual Meeting') : 'In Person';
+const uid = 'medi-hub-friday-' + String(m.id || idx || start.getTime()).replace(/[^a-zA-Z0-9_-]/g,'') + '@medi-solutions-agent-hub';
+lines.push('BEGIN:VEVENT');
+lines.push('UID:' + uid);
+lines.push('DTSTAMP:' + now);
+lines.push('DTSTART;TZID=America/New_York:' + fridayLocalStamp(start));
+lines.push('DTEND;TZID=America/New_York:' + fridayLocalStamp(end));
+lines.push('SUMMARY:' + fridayIcsEscape(topic));
+if (desc) lines.push('DESCRIPTION:' + fridayIcsEscape(desc));
+lines.push('LOCATION:' + fridayIcsEscape(loc));
+if (m.link) lines.push('URL:' + fridayIcsEscape(m.link));
+lines.push('BEGIN:VALARM');
+lines.push('TRIGGER:-PT15M');
+lines.push('ACTION:DISPLAY');
+lines.push('DESCRIPTION:' + fridayIcsEscape(topic));
+lines.push('END:VALARM');
+lines.push('END:VEVENT');
+});
+lines.push('END:VCALENDAR');
+const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = (fileBaseName || 'my-medi-hub-meetings').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'') + '.ics';
+document.body.appendChild(a);
+a.click();
+setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 250);
+if (typeof showSnuToast === 'function') showSnuToast('📅 Calendar file ready. Open/import it to add meetings.');
+return true;
+}
+function downloadAllFridayMeetingsIcs() {
+buildFridayIcs(getSortedFridayMeetings(), 'my-medi-hub-all-friday-meetings');
+}
+function downloadFridayMeetingIcs(sortedIndex) {
+const meetings = getSortedFridayMeetings();
+const m = meetings[Number(sortedIndex)];
+if (!m) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Meeting not found.'); return; }
+const title = 'my-medi-hub-' + String(m.topic || 'meeting').toLowerCase();
+buildFridayIcs([m], title);
+}
+
 function renderFridayMeetings() {
 const el = document.getElementById('fridayMeetingList');
 const badge = document.getElementById('fridayMeetingCount');
 if (!el) return;
-const meetings = [..._fridayMeetings].sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
+const meetings = getSortedFridayMeetings();
 if (badge) badge.textContent = meetings.length + ' meeting' + (meetings.length!==1?'s':'');
 if (!meetings.length) { el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings scheduled yet.</div>'; return; }
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-el.innerHTML = meetings.map(m => `
+el.innerHTML = meetings.map((m,i) => `
 <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;">
 <div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:70px;">
 <div style="font-size:22px;">${m.type==='virtual'?'\ud83d\udcbb':'\ud83c\udfe2'}</div>
@@ -10922,6 +11024,7 @@ ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">\u
 ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
 ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udcf9 Join Meeting</a>`:''}
 ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udd17 Resource / Login</a>`:''}
+<button type="button" onclick="downloadFridayMeetingIcs(${i})" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 14px;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.34);border-radius:8px;color:#34d399;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">📅 Add to Calendar</button>
 </div>
 </div>`).join('');
 }
@@ -10994,7 +11097,7 @@ const rawDate = _dp?.value || '';
 const origDate = _dp?.dataset?.originalDate || '';
 const fmtDate = rawDate ? new Date(rawDate + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : origDate;
 if (_dp) { _dp.dataset.originalDate = ''; _dp.title = ''; }
-_fridayMeetings.push({ id: Date.now(), date: fmtDate, time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), link2: gv('fridayLink2'), type: _fridayType });
+_fridayMeetings.push({ id: Date.now(), date: fmtDate, dateISO: rawDate || '', time: gv('fridayTime'), topic, notes: gv('fridayNotes'), link: gv('fridayLink'), link2: gv('fridayLink2'), type: _fridayType });
 ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(id => { const e=document.getElementById(id);if(e)e.value=''; });
 const dp = document.getElementById('fridayDatePicker'); if (dp) dp.value = '';
 setFridayType('in-person');
@@ -12328,52 +12431,46 @@ return;
 }
 const year = _certMeta.year || '';
 const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Show all certification columns from the uploaded file/saved metadata so no carrier columns disappear.
 const activeCols = getCertCarrierColumns();
 console.log('[CERT LOAD] rendering carrier columns:', activeCols.length, activeCols);
-
-const certYes = '<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;background:#dcfce7;border:1px solid #16a34a;color:#15803d;font-size:16px;font-weight:900;box-shadow:0 0 0 3px rgba(34,197,94,.12);">✓</span>';
-const certNo = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;background:#f1f5f9;border:1px solid #cbd5e1;color:#94a3b8;font-size:13px;">—</span>';
-
 const headerCells = activeCols.map(c =>
-`<th style="padding:10px 10px;font-size:10px;font-weight:900;color:#111827;text-align:center;white-space:nowrap;border-bottom:1px solid #cbd5e1;background:#dbeafe;text-transform:uppercase;letter-spacing:.03em;">${pesc(c)}</th>`
+`<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">${pesc(c)}</th>`
 ).join('');
-
-const rows = [..._certAgents].sort((a,b) => (a.name||'').localeCompare(b.name||'')).map((a, idx) => {
+const rows = [..._certAgents].sort((a,b) => (a.name||'').localeCompare(b.name||'')).map(a => {
 const certCount = activeCols.filter(c => isCertified(a.certs?.[c])).length;
 const total = activeCols.length;
 const pct = total ? Math.round(certCount/total*100) : 0;
-const rowBg = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
 const cells = activeCols.map(c => {
 const val = a.certs?.[c];
 const cert = isCertified(val);
-return `<td style="text-align:center;padding:8px 6px;border-bottom:1px solid #e2e8f0;background:${rowBg};">
-${cert ? certYes : certNo}
+return `<td style="text-align:center;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.04);">
+<span style="font-size:14px;">${cert ? '✅' : '⬜'}</span>
 </td>`;
 }).join('');
 return `<tr>
-<td style="padding:10px 12px;font-size:13px;font-weight:800;color:#0f172a;border-bottom:1px solid #e2e8f0;background:${rowBg};white-space:nowrap;position:sticky;left:0;z-index:2;box-shadow:8px 0 12px rgba(15,23,42,.08);">${pesc(a.name||'')}</td>
-<td style="padding:10px 10px;font-size:12px;color:#111827;border-bottom:1px solid #e2e8f0;background:${rowBg};text-align:center;font-weight:700;">${pesc(a.year||year||'')}</td>
-<td style="padding:10px 10px;border-bottom:1px solid #e2e8f0;background:${rowBg};">
-<div style="display:flex;align-items:center;gap:8px;min-width:150px;">
-<div style="flex:1;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
-<div style="height:100%;width:${pct}%;background:${pct===100?'#16a34a':'#2563eb'};border-radius:999px;"></div>
+<td style="padding:8px 12px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;">${pesc(a.name||'')}</td>
+<td style="padding:8px 10px;font-size:12px;color:var(--muted-2);border-bottom:1px solid rgba(255,255,255,.04);text-align:center;">${pesc(a.year||year||'')}</td>
+<td style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);">
+<div style="display:flex;align-items:center;gap:8px;">
+<div style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;">
+<div style="height:100%;width:${pct}%;background:${pct===100?'#22c55e':'var(--accent)'};border-radius:4px;"></div>
 </div>
-<span style="font-size:11px;color:${pct===100?'#15803d':'#334155'};font-weight:900;min-width:38px;">${certCount}/${total}</span>
+<span style="font-size:11px;color:${pct===100?'#22c55e':'var(--muted)'};font-weight:700;min-width:32px;">${certCount}/${total}</span>
 </div>
 </td>
 ${cells}
 </tr>`;
 }).join('');
-
 el.innerHTML = `
-<div style="display:block;width:100%;max-width:100%;overflow-x:scroll;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:14px;border:1px solid #bfdbfe;padding-bottom:10px;background:#eff6ff;box-shadow:0 16px 35px rgba(15,23,42,.22);">
-${year ? `<div style="padding:12px 16px;font-size:12px;color:#1e293b;border-bottom:1px solid #bfdbfe;background:#e0f2fe;font-weight:700;">Certification Year: <strong style="color:#0f172a;">${pesc(year)}</strong>${_certMeta.updatedAt ? ' &nbsp;·&nbsp; Updated: '+new Date(_certMeta.updatedAt).toLocaleDateString() : ''}</div>` : ''}
-<table style="width:max-content;border-collapse:separate;border-spacing:0;min-width:${Math.max(1700, 420 + activeCols.length * 110)}px;background:#ffffff;">
+<div style="display:block;width:100%;max-width:100%;overflow-x:scroll;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:12px;border:1px solid var(--border);padding-bottom:10px;">
+${year ? `<div style="padding:10px 16px;font-size:12px;color:var(--muted-2);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);">Certification Year: <strong style="color:var(--text);">${pesc(year)}</strong>${_certMeta.updatedAt ? ' &nbsp;·&nbsp; Updated: '+new Date(_certMeta.updatedAt).toLocaleDateString() : ''}</div>` : ''}
+<table style="width:max-content;border-collapse:collapse;min-width:${Math.max(1700, 420 + activeCols.length * 110)}px;">
 <thead>
 <tr>
-<th style="padding:10px 12px;font-size:11px;font-weight:900;color:#0f172a;text-align:left;border-bottom:1px solid #cbd5e1;background:#dbeafe;position:sticky;left:0;z-index:3;text-transform:uppercase;letter-spacing:.04em;box-shadow:8px 0 12px rgba(15,23,42,.08);">Agent</th>
-<th style="padding:10px 10px;font-size:10px;font-weight:900;color:#111827;text-align:center;border-bottom:1px solid #cbd5e1;background:#dbeafe;text-transform:uppercase;letter-spacing:.04em;">Year</th>
-<th style="padding:10px 10px;font-size:10px;font-weight:900;color:#111827;text-align:left;border-bottom:1px solid #cbd5e1;background:#dbeafe;text-transform:uppercase;letter-spacing:.04em;">Progress</th>
+<th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Agent</th>
+<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Year</th>
+<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Progress</th>
 ${headerCells}
 </tr>
 </thead>
@@ -12381,7 +12478,6 @@ ${headerCells}
 </table>
 </div>`;
 }
-
 function isCertified(val) {
 if (!val) return false;
 const s = String(val).trim().toLowerCase();
