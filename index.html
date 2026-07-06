@@ -12619,35 +12619,35 @@ if (document.getElementById('certTrackerLockedStyles')) return;
 const st = document.createElement('style');
 st.id = 'certTrackerLockedStyles';
 st.textContent = `
-#certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:18px;border:1px solid rgba(37,99,235,.18);background:linear-gradient(180deg,#ffffff,#f3f8ff);box-shadow:0 18px 42px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.9);padding-bottom:12px;}
-#certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(37,99,235,.14);background:linear-gradient(90deg,#eaf4ff,#f2fbf6);font-size:12px;color:#31547a;min-width:max-content;}
+#certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:18px;border:1px solid rgba(37,99,235,.18);background:linear-gradient(180deg,#f8fbff,#eef5fc);box-shadow:0 12px 28px rgba(15,23,42,.09),inset 0 1px 0 rgba(255,255,255,.72);padding-bottom:12px;}
+#certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(37,99,235,.14);background:linear-gradient(90deg,#edf5fd,#f4f8fb);font-size:12px;color:#38536f;min-width:max-content;}
 #certTrackerContent .cert-lock-meta strong{color:#0f2f66;}
-#certTrackerContent .cert-scroll-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 14px;background:#f7fbff;border-bottom:1px solid rgba(37,99,235,.12);min-width:max-content;}
+#certTrackerContent .cert-scroll-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 14px;background:#f1f6fb;border-bottom:1px solid rgba(37,99,235,.10);min-width:max-content;}
 #certTrackerContent .cert-scroll-label{margin-right:auto;font-size:11px;font-weight:900;letter-spacing:.25px;text-transform:uppercase;color:#356ea8;}
 #certTrackerContent .cert-scroll-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(37,99,235,.22);background:linear-gradient(180deg,#ffffff,#eaf4ff);color:#164c8e;border-radius:999px;min-width:42px;height:34px;padding:0 13px;font-size:18px;font-weight:1000;cursor:pointer;box-shadow:0 8px 18px rgba(37,99,235,.12);}
 #certTrackerContent .cert-scroll-btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(37,99,235,.18);}
 #certTrackerContent .cert-scroll-btn:active{transform:translateY(0);}
 #certTrackerContent .cert-scroll-btn.home{font-size:11px;letter-spacing:.35px;text-transform:uppercase;min-width:68px;}
-#certTrackerContent .cert-lock-table{width:max-content;border-collapse:separate;border-spacing:0;min-width:1720px;background:#fff;}
+#certTrackerContent .cert-lock-table{width:max-content;border-collapse:separate;border-spacing:0;min-width:1720px;background:#fdfefe;}
 #certTrackerContent .cert-lock-table th{position:sticky;top:0;z-index:2;padding:11px 10px;font-size:10px;font-weight:950;letter-spacing:.58px;text-transform:uppercase;color:#245a93;text-align:center;white-space:nowrap;border-bottom:1px solid rgba(37,99,235,.16);background:#eaf4ff;}
-#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{position:sticky;left:0;z-index:3;text-align:left;min-width:210px;max-width:260px;background:#ffffff;box-shadow:10px 0 18px rgba(15,23,42,.08);}
+#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{position:sticky;left:0;z-index:3;text-align:left;min-width:210px;max-width:260px;background:#fdfefe;box-shadow:8px 0 14px rgba(15,23,42,.06);}
 #certTrackerContent .cert-lock-table th.cert-agent-head{z-index:4;background:#eaf4ff;}
-#certTrackerContent .cert-lock-table td{padding:10px 10px;border-bottom:1px solid rgba(15,23,42,.065);font-size:12px;color:#21364f;white-space:nowrap;background:#fff;}
-#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td{background-color:#f7fbff;}
-#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td.cert-agent-cell{background:#f7fbff;}
-#certTrackerContent .cert-lock-table tbody tr:hover td{background-color:#eef7ff;}
-#certTrackerContent .cert-lock-table tbody tr:hover td.cert-agent-cell{background-color:#eef7ff;}
+#certTrackerContent .cert-lock-table td{padding:10px 10px;border-bottom:1px solid rgba(15,23,42,.065);font-size:12px;color:#21364f;white-space:nowrap;background:#fdfefe;} 
+#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td{background-color:#f3f7fb;}
+#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td.cert-agent-cell{background:#f3f7fb;}
+#certTrackerContent .cert-lock-table tbody tr:hover td{background-color:#eaf2fa;}
+#certTrackerContent .cert-lock-table tbody tr:hover td.cert-agent-cell{background-color:#eaf2fa;}
 #certTrackerContent .cert-agent-name{font-size:13px;font-weight:900;color:#10233f;overflow:hidden;text-overflow:ellipsis;}
 #certTrackerContent .cert-year-cell{color:#356ea8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;}
 #certTrackerContent .cert-progress-wrap{display:flex;align-items:center;gap:8px;min-width:160px;}
 #certTrackerContent .cert-progress-track{height:9px;flex:1;border-radius:999px;background:#dbe8f6;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.12);}
 #certTrackerContent .cert-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#60a5fa,#22c55e);box-shadow:0 0 12px rgba(34,197,94,.22);}
 #certTrackerContent .cert-progress-num{min-width:48px;text-align:right;color:#245a93;font-size:11px;font-weight:900;font-family:'JetBrains Mono',monospace;}
-#certTrackerContent .cert-cell{min-width:96px;text-align:center;}
-#certTrackerContent .cert-mark{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;min-width:38px;border-radius:999px;border:2px solid transparent;font-size:23px;font-weight:1000;line-height:1;}
-#certTrackerContent .cert-mark.yes{color:#ffffff;background:linear-gradient(180deg,#22c55e,#16a34a);border-color:rgba(21,128,61,.34);box-shadow:0 5px 16px rgba(34,197,94,.30),inset 0 1px 0 rgba(255,255,255,.35);}
-#certTrackerContent .cert-mark.no{color:#a7b4c5;background:#eef3f8;border-color:#d7e2ee;font-size:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8);}
-@media(max-width:760px){#certTrackerContent .cert-lock-table{min-width:1500px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-cell{min-width:82px;}#certTrackerContent .cert-mark{width:34px;height:34px;min-width:34px;font-size:20px;}}
+#certTrackerContent .cert-cell{min-width:90px;text-align:center;}
+#certTrackerContent .cert-mark{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;min-width:28px;border-radius:999px;border:1px solid transparent;font-size:17px;font-weight:900;line-height:1;}
+#certTrackerContent .cert-mark.yes{color:#ffffff;background:linear-gradient(180deg,#34c977,#1fa45b);border-color:rgba(21,128,61,.24);box-shadow:0 3px 9px rgba(34,197,94,.18),inset 0 1px 0 rgba(255,255,255,.28);}
+#certTrackerContent .cert-mark.no{color:#a9b6c5;background:#edf2f7;border-color:#d9e3ee;font-size:15px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7);}
+@media(max-width:760px){#certTrackerContent .cert-lock-table{min-width:1450px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-cell{min-width:76px;}#certTrackerContent .cert-mark{width:26px;height:26px;min-width:26px;font-size:16px;}}
 `;
 document.head.appendChild(st);
 }
@@ -12827,25 +12827,79 @@ renderCertAdminPreview(false);
 }
 }).catch(() => {});
 }
-function saveCertData() {
+async function saveCertData() {
 _certAgents = normalizeCertAgents(_certAgents);
 if (!_certAgents.length) { alert('No data to save. Upload a file first.'); return; }
 const year = _certAgents[0]?.year || _certMeta.year || new Date().getFullYear();
 _certMeta = Object.assign({}, _certMeta || {}, { year, carriers: CERT_CARRIERS.slice(), displayLocked: true, displayVersion: 'light-checks-v1', updatedAt: new Date().toISOString() });
 const data = { agents: _certAgents, meta: _certMeta };
-localStorage.setItem(CERT_KEY, JSON.stringify(data));
 const payload = JSON.stringify(data);
-fetch(`${CERT_SUPA_URL}/rest/v1/cert_tracker?hub=eq.${CERT_HUB}`, {
-method: 'DELETE', headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY }
-}).then(() => fetch(`${CERT_SUPA_URL}/rest/v1/cert_tracker`, {
-method: 'POST',
-headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-body: JSON.stringify({ hub: CERT_HUB, data: payload })
-})).then(() => { renderCertTracker(); renderCertAdminPreview(true); alert('✅ Certification data saved and synced!'); })
-.catch(() => { renderCertTracker(); alert('✅ Saved locally (cloud sync failed).'); });
-const inp = document.getElementById('certCsvInput'); if (inp) inp.value = '';
-const status = document.getElementById('certCsvStatus'); if (status) { status.textContent=''; status.className='csv-status'; }
-const preview = document.getElementById('certAdminPreview'); if (preview) preview.style.display = 'none';
+const base = `${CERT_SUPA_URL}/rest/v1/cert_tracker`;
+const authHeaders = { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' };
+const status = document.getElementById('certCsvStatus');
+if (status) { status.textContent = 'Saving Cert data to cloud...'; status.className = 'csv-status'; }
+function parseSavedCert(raw) {
+  if (!raw) return null;
+  const obj = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  return { agents: normalizeCertAgents(obj.agents), meta: obj.meta || {} };
+}
+async function readCloudCert() {
+  const r = await fetch(`${base}?hub=eq.${CERT_HUB}&select=data&limit=1`, { headers: authHeaders });
+  const text = await r.text();
+  if (!r.ok) throw new Error('Cert cloud read failed ' + r.status + ': ' + text.slice(0, 300));
+  const rows = text ? JSON.parse(text) : [];
+  if (!rows || !rows.length || !rows[0].data) return null;
+  return parseSavedCert(rows[0].data);
+}
+try {
+  console.log('[CERT SAVE] Saving', _certAgents.length, 'agents to Supabase');
+  let r = await fetch(`${base}?hub=eq.${CERT_HUB}`, {
+    method: 'PATCH',
+    headers: Object.assign({}, authHeaders, { 'Prefer': 'return=minimal' }),
+    body: JSON.stringify({ data: payload })
+  });
+  let body = await r.text();
+  if (!r.ok) throw new Error('Cert PATCH failed ' + r.status + ': ' + body.slice(0, 500));
+  let saved = await readCloudCert();
+  if (!saved || !saved.agents.length) {
+    r = await fetch(base, {
+      method: 'POST',
+      headers: Object.assign({}, authHeaders, { 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ hub: CERT_HUB, data: payload })
+    });
+    body = await r.text();
+    if (!r.ok && r.status !== 409) throw new Error('Cert POST failed ' + r.status + ': ' + body.slice(0, 500));
+    if (r.status === 409) {
+      r = await fetch(`${base}?hub=eq.${CERT_HUB}`, {
+        method: 'PATCH',
+        headers: Object.assign({}, authHeaders, { 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ data: payload })
+      });
+      body = await r.text();
+      if (!r.ok) throw new Error('Cert retry PATCH failed ' + r.status + ': ' + body.slice(0, 500));
+    }
+    saved = await readCloudCert();
+  }
+  if (!saved || saved.agents.length !== _certAgents.length) {
+    throw new Error('Cert verify failed: cloud has ' + (saved?.agents?.length || 0) + ' agents; local has ' + _certAgents.length);
+  }
+  _certAgents = saved.agents;
+  _certMeta = Object.assign({}, saved.meta || {}, { carriers: CERT_CARRIERS.slice(), displayLocked: true, displayVersion: 'light-checks-v1' });
+  localStorage.setItem(CERT_KEY, JSON.stringify({ agents: _certAgents, meta: _certMeta }));
+  renderCertTracker();
+  renderCertAdminPreview(true);
+  if (status) { status.textContent = '✓ Certification data saved globally to Supabase.'; status.className = 'csv-status ok'; }
+  alert('✅ Certification data saved globally.');
+  const inp = document.getElementById('certCsvInput'); if (inp) inp.value = '';
+  const preview = document.getElementById('certAdminPreview'); if (preview) preview.style.display = 'none';
+} catch(err) {
+  console.error('[CERT SAVE ERROR]', err);
+  localStorage.setItem(CERT_KEY, JSON.stringify(data));
+  renderCertTracker();
+  renderCertAdminPreview(true);
+  if (status) { status.textContent = '✗ Cloud save failed: ' + err.message; status.className = 'csv-status err'; }
+  alert('Certification data saved only on this device. Cloud/global save failed. Check console for [CERT SAVE ERROR].');
+}
 }
 function clearCertData() {
 if (!confirm('Clear all certification data? This cannot be undone.')) return;
