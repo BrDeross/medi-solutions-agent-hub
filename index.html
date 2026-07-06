@@ -4881,7 +4881,8 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-<button type="button" onclick="downloadAllFridayMeetingsIcs()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(99,179,237,.35);background:rgba(99,179,237,.14);color:var(--accent-2);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 0 14px rgba(99,179,237,.14);">📅 Add All to Calendar</button>
+<button type="button" onclick="openAllFridayMeetingsIcs()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(99,179,237,.35);background:rgba(99,179,237,.14);color:var(--accent-2);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 0 14px rgba(99,179,237,.14);">📅 Open All Calendar File</button>
+<button type="button" onclick="downloadAllFridayMeetingsIcs()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(16,185,129,.35);background:rgba(16,185,129,.12);color:#34d399;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">⬇ Download .ics</button>
 <span class="count-chip" id="fridayMeetingCount">0 meetings</span>
 </div>
 </div>
@@ -10989,7 +10990,7 @@ const loc = m.type === 'virtual' ? (m.link || 'Virtual Meeting') : 'In Person';
 const uid = 'medi-hub-friday-' + String(m.id || idx || start.getTime()).replace(/[^a-zA-Z0-9_-]/g,'') + '@medi-solutions-agent-hub';
 return { m, start, end, topic, desc, loc, uid };
 }
-function buildFridayIcs(meetings, fileBaseName) {
+function buildFridayIcs(meetings, fileBaseName, mode) {
 const valid = (meetings || []).map((m, idx) => fridayMeetingEventParts(m, idx)).filter(Boolean);
 if (!valid.length) {
 if (typeof showSnuToast === 'function') showSnuToast('⚠ No dated meetings available to add.');
@@ -11020,18 +11021,31 @@ lines.push('END:VEVENT');
 lines.push('END:VCALENDAR');
 const icsText = lines.flatMap(fridayFoldIcsLine).join('\r\n') + '\r\n';
 const blob = new Blob([icsText], { type: 'text/calendar;charset=utf-8' });
-const a = document.createElement('a');
-a.href = URL.createObjectURL(blob);
-a.download = (fileBaseName || 'my-medi-hub-meetings').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'') + '.ics';
-a.rel = 'noopener';
-document.body.appendChild(a);
-a.click();
-setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-if (typeof showSnuToast === 'function') showSnuToast('📅 Calendar file downloaded. If it does not open, use the Google/Outlook buttons for one meeting or import the .ics file.');
+const fileName = (fileBaseName || 'my-medi-hub-meetings').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'') + '.ics';
+const url = URL.createObjectURL(blob);
+if (mode === 'open') {
+const opened = window.open(url, '_blank', 'noopener');
+if (!opened) window.location.href = url;
+setTimeout(() => { URL.revokeObjectURL(url); }, 30000);
+if (typeof showSnuToast === 'function') showSnuToast('📅 Calendar file opened. If your device does not launch Calendar, use Download .ics and import the file.');
 return true;
 }
+const a = document.createElement('a');
+a.href = url;
+a.download = fileName;
+a.rel = 'noopener';
+a.type = 'text/calendar';
+document.body.appendChild(a);
+a.click();
+setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+if (typeof showSnuToast === 'function') showSnuToast('📅 Calendar file downloaded. On mobile, import it from Downloads/Files if it does not open automatically.');
+return true;
+}
+function openAllFridayMeetingsIcs() {
+buildFridayIcs(getSortedFridayMeetings(), 'my-medi-hub-all-friday-meetings', 'open');
+}
 function downloadAllFridayMeetingsIcs() {
-buildFridayIcs(getSortedFridayMeetings(), 'my-medi-hub-all-friday-meetings');
+buildFridayIcs(getSortedFridayMeetings(), 'my-medi-hub-all-friday-meetings', 'download');
 }
 function downloadFridayMeetingIcs(sortedIndex) {
 const meetings = getSortedFridayMeetings();
