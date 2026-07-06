@@ -12500,32 +12500,66 @@ const CERT_KEY = 'cert_tracker_v1';
 const CERT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
 let _certAgents = []; // [{name, year, certs:{AHIP:'', ...}}]
 let _certMeta = {};
+function certNormKey(v) {
+return String(v || '').trim().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function normalizeCertCarrierName(name) {
+const raw = String(name || '').trim();
+const k = certNormKey(raw);
+if (!k || k === 'rts' || k === 'ready to sell') return '';
+const direct = CERT_CARRIERS.find(c => certNormKey(c) === k);
+if (direct) return direct;
+const aliases = [
+['AARP/UHC', ['aarp', 'uhc', 'aarp uhc', 'aarp united healthcare', 'united healthcare', 'unitedhealthcare']],
+['AETNA MA', ['aetna', 'aetna ma', 'aetna medicare', 'aetna medicare advantage']],
+['AMERIHEALTH/IBC', ['amerihealth', 'ibc', 'amerihealth ibc', 'amerihealth caritas', 'independence', 'independence blue cross']],
+['ANTHEM', ['anthem', 'anthem bcbs', 'bcbs anthem']],
+['CIGNA MA', ['cigna', 'cigna ma', 'cigna medicare', 'cigna medicare advantage']],
+['GetCovered', ['getcovered', 'get covered', 'getcoverednj', 'get covered nj']],
+['WELLCARE', ['wellcare', 'well care']],
+['HUMANA', ['humana']],
+['CLOVER', ['clover']],
+['Ambetter', ['ambetter']],
+['Oscar', ['oscar']],
+['Devoted', ['devoted']],
+['HBC', ['hbc']],
+['AHIP', ['ahip']]
+];
+for (const [canonical, keys] of aliases) {
+if (keys.some(a => certNormKey(a) === k)) return canonical;
+}
+return '';
+}
 function isCertSummaryRow(agent) {
 const n = String(agent?.name || '').trim().toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ');
 return n === 'total certified' || n.startsWith('total certified ');
 }
+function mergeCertValue(existing, incoming) {
+if (isCertified(existing)) return existing;
+if (isCertified(incoming)) return incoming;
+return existing || incoming || '';
+}
 function normalizeCertAgents(agents) {
 return (Array.isArray(agents) ? agents : []).filter(a => a && a.name && !isCertSummaryRow(a)).map(a => {
-const certs = Object.assign({}, a.certs || {});
-Object.keys(certs).forEach(k => { if (String(k).trim().toLowerCase() === 'rts') delete certs[k]; });
+const certs = {};
+Object.keys(a.certs || {}).forEach(k => {
+const canonical = normalizeCertCarrierName(k);
+if (!canonical) return;
+certs[canonical] = mergeCertValue(certs[canonical], String(a.certs[k] || '').trim());
+});
 return Object.assign({}, a, { certs });
 });
 }
 function getCertCarrierColumns() {
-// Always build a union so saved metadata with only 8 columns cannot hide other carriers.
-// RTS is intentionally excluded from Hub Cert display and progress counts.
-const seen = [];
-const addCol = c => {
-const key = String(c || '').trim();
-if (!key || key.toLowerCase() === 'rts') return;
-if (key && !seen.some(x => x.toLowerCase() === key.toLowerCase())) seen.push(key);
-};
-CERT_CARRIERS.forEach(addCol);
-if (Array.isArray(_certMeta?.carriers)) _certMeta.carriers.forEach(addCol);
-_certAgents.forEach(a => {
-Object.keys(a?.certs || {}).forEach(addCol);
+// Weekly CSV uploads update values only. The visible Cert layout/columns stay locked here.
+// Never let uploaded headers or old cloud metadata add duplicate carrier columns.
+const seen = new Set();
+return CERT_CARRIERS.map(c => normalizeCertCarrierName(c) || c).filter(c => {
+  const k = certNormKey(c);
+  if (!k || k === 'rts' || seen.has(k)) return false;
+  seen.add(k);
+  return true;
 });
-return seen;
 }
 function isCertNonCarrierColumn(h, nameKey, yearKey) {
 const col = String(h || '').trim();
@@ -12588,6 +12622,12 @@ st.textContent = `
 #certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:18px;border:1px solid rgba(37,99,235,.18);background:linear-gradient(180deg,#ffffff,#f3f8ff);box-shadow:0 18px 42px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.9);padding-bottom:12px;}
 #certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(37,99,235,.14);background:linear-gradient(90deg,#eaf4ff,#f2fbf6);font-size:12px;color:#31547a;min-width:max-content;}
 #certTrackerContent .cert-lock-meta strong{color:#0f2f66;}
+#certTrackerContent .cert-scroll-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 14px;background:#f7fbff;border-bottom:1px solid rgba(37,99,235,.12);min-width:max-content;}
+#certTrackerContent .cert-scroll-label{margin-right:auto;font-size:11px;font-weight:900;letter-spacing:.25px;text-transform:uppercase;color:#356ea8;}
+#certTrackerContent .cert-scroll-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(37,99,235,.22);background:linear-gradient(180deg,#ffffff,#eaf4ff);color:#164c8e;border-radius:999px;min-width:42px;height:34px;padding:0 13px;font-size:18px;font-weight:1000;cursor:pointer;box-shadow:0 8px 18px rgba(37,99,235,.12);}
+#certTrackerContent .cert-scroll-btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(37,99,235,.18);}
+#certTrackerContent .cert-scroll-btn:active{transform:translateY(0);}
+#certTrackerContent .cert-scroll-btn.home{font-size:11px;letter-spacing:.35px;text-transform:uppercase;min-width:68px;}
 #certTrackerContent .cert-lock-table{width:max-content;border-collapse:separate;border-spacing:0;min-width:1720px;background:#fff;}
 #certTrackerContent .cert-lock-table th{position:sticky;top:0;z-index:2;padding:11px 10px;font-size:10px;font-weight:950;letter-spacing:.58px;text-transform:uppercase;color:#245a93;text-align:center;white-space:nowrap;border-bottom:1px solid rgba(37,99,235,.16);background:#eaf4ff;}
 #certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{position:sticky;left:0;z-index:3;text-align:left;min-width:210px;max-width:260px;background:#ffffff;box-shadow:10px 0 18px rgba(15,23,42,.08);}
@@ -12608,8 +12648,16 @@ st.textContent = `
 #certTrackerContent .cert-mark.yes{color:#ffffff;background:linear-gradient(180deg,#22c55e,#16a34a);border-color:rgba(21,128,61,.34);box-shadow:0 5px 16px rgba(34,197,94,.30),inset 0 1px 0 rgba(255,255,255,.35);}
 #certTrackerContent .cert-mark.no{color:#a7b4c5;background:#eef3f8;border-color:#d7e2ee;font-size:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8);}
 @media(max-width:760px){#certTrackerContent .cert-lock-table{min-width:1500px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-cell{min-width:82px;}#certTrackerContent .cert-mark{width:34px;height:34px;min-width:34px;font-size:20px;}}
-``;
+`;
 document.head.appendChild(st);
+}
+function scrollCertTable(dir) {
+const shell = document.querySelector('#certTrackerContent .cert-lock-shell');
+if (!shell) return;
+const amount = Math.max(320, Math.floor(shell.clientWidth * 0.72));
+if (dir === 'home') { shell.scrollTo({ left: 0, behavior: 'smooth' }); return; }
+if (dir === 'end') { shell.scrollTo({ left: shell.scrollWidth, behavior: 'smooth' }); return; }
+shell.scrollBy({ left: dir * amount, behavior: 'smooth' });
 }
 function renderCertTracker() {
 ensureCertTrackerDisplayStyles();
@@ -12652,6 +12700,13 @@ const metaRight = _certMeta.updatedAt ? `Updated: ${new Date(_certMeta.updatedAt
 el.innerHTML = `
 <div class="cert-lock-shell">
 <div class="cert-lock-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>
+<div class="cert-scroll-controls" aria-label="Certification table scroll controls">
+<span class="cert-scroll-label">Carrier columns</span>
+<button type="button" class="cert-scroll-btn home" onclick="scrollCertTable('home')" title="Back to agent names">Start</button>
+<button type="button" class="cert-scroll-btn" onclick="scrollCertTable(-1)" title="Scroll carriers left">&#8592;</button>
+<button type="button" class="cert-scroll-btn" onclick="scrollCertTable(1)" title="Scroll carriers right">&#8594;</button>
+<button type="button" class="cert-scroll-btn home" onclick="scrollCertTable('end')" title="Jump to last carrier">End</button>
+</div>
 <table class="cert-lock-table" style="min-width:${Math.max(1720, 460 + activeCols.length * 112)}px;">
 <thead>
 <tr>
@@ -12710,23 +12765,37 @@ return obj;
 }
 const nameKey = headers.find(h => /agent.?name|name/i.test(h)) || headers[0];
 const yearKey = headers.find(h => /year/i.test(h));
-const certHeaders = headers.filter(h => !isCertNonCarrierColumn(h, nameKey, yearKey) && String(h||'').trim().toLowerCase() !== 'rts');
+const certHeaderMap = [];
+headers.forEach(h => {
+if (isCertNonCarrierColumn(h, nameKey, yearKey)) return;
+const canonical = normalizeCertCarrierName(h);
+if (!canonical) return;
+let entry = certHeaderMap.find(x => x.canonical === canonical);
+if (!entry) {
+  entry = { canonical, sources: [] };
+  certHeaderMap.push(entry);
+}
+if (!entry.sources.some(src => String(src).toLowerCase() === String(h).toLowerCase())) entry.sources.push(h);
+});
 const agents = [];
 rows.forEach(r => {
 const name = (r[nameKey]||'').trim();
 if (!name) return;
 const year = yearKey ? String(r[yearKey]).trim() : '';
 const certs = {};
-certHeaders.forEach(c => {
-const key = headers.find(h => h === c) || headers.find(h => h.toLowerCase() === c.toLowerCase());
-if (key) certs[c] = String(r[key]||'').trim();
+certHeaderMap.forEach(({sources, canonical}) => {
+(sources || []).forEach(source => {
+const key = headers.find(h => h === source) || headers.find(h => String(h).toLowerCase() === String(source).toLowerCase());
+if (key) certs[canonical] = mergeCertValue(certs[canonical], String(r[key]||'').trim());
+});
 });
 agents.push({ name, year, certs });
 });
 if (!agents.length) { setErr('✗ No agent rows found. Check column headers.'); return; }
 _certAgents = normalizeCertAgents(agents);
-_certMeta = Object.assign({}, _certMeta || {}, { carriers: getCertCarrierColumns(), year: (_certAgents[0]?.year || yearKey || '') });
-setOk(`✓ Loaded ${_certAgents.length} agent${_certAgents.length!==1?'s':''} with ${certHeaders.length} certification column${certHeaders.length!==1?'s':''} — review below, remove any unwanted rows, then Save & Publish.`);
+_certMeta = Object.assign({}, _certMeta || {}, { carriers: CERT_CARRIERS.slice(), year: (_certAgents[0]?.year || yearKey || '') });
+const matchedCols = [...new Set(certHeaderMap.map(x => x.canonical))];
+setOk(`✓ Loaded ${_certAgents.length} agent${_certAgents.length!==1?'s':''} with ${matchedCols.length} locked certification column${matchedCols.length!==1?'s':''} — review below, remove any unwanted rows, then Save & Publish.`);
 renderCertTracker();
 renderCertAdminPreview(true);
 } catch(err) { setErr('Parse error: ' + err.message); }
@@ -12762,7 +12831,7 @@ function saveCertData() {
 _certAgents = normalizeCertAgents(_certAgents);
 if (!_certAgents.length) { alert('No data to save. Upload a file first.'); return; }
 const year = _certAgents[0]?.year || _certMeta.year || new Date().getFullYear();
-_certMeta = Object.assign({}, _certMeta || {}, { year, carriers: getCertCarrierColumns(), displayLocked: true, displayVersion: 'light-checks-v1', updatedAt: new Date().toISOString() });
+_certMeta = Object.assign({}, _certMeta || {}, { year, carriers: CERT_CARRIERS.slice(), displayLocked: true, displayVersion: 'light-checks-v1', updatedAt: new Date().toISOString() });
 const data = { agents: _certAgents, meta: _certMeta };
 localStorage.setItem(CERT_KEY, JSON.stringify(data));
 const payload = JSON.stringify(data);
