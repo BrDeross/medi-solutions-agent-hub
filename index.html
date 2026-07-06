@@ -4881,8 +4881,10 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-<button type="button" onclick="openAllFridayMeetingsIcs()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(99,179,237,.35);background:rgba(99,179,237,.14);color:var(--accent-2);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 0 14px rgba(99,179,237,.14);">📅 Open All Calendar File</button>
-<button type="button" onclick="downloadAllFridayMeetingsIcs()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(16,185,129,.35);background:rgba(16,185,129,.12);color:#34d399;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">⬇ Download .ics</button>
+<button type="button" onclick="startFridayAllCalendarFlow('google')" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(66,133,244,.42);background:rgba(66,133,244,.16);color:#93c5fd;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 0 14px rgba(66,133,244,.14);">Google: Add All</button>
+<button type="button" onclick="startFridayAllCalendarFlow('outlook')" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid rgba(0,120,212,.42);background:rgba(0,120,212,.16);color:#7dd3fc;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">Outlook: Add All</button>
+<div style="width:100%;font-size:11px;color:var(--muted-2);margin-top:4px;line-height:1.45;">Use Google or Outlook buttons. Bulk .ics downloads were removed because mobile browsers were downloading them without opening Calendar.</div>
+
 <span class="count-chip" id="fridayMeetingCount">0 meetings</span>
 </div>
 </div>
@@ -11091,6 +11093,74 @@ const url = getFridayMeetingCalendarUrl(sortedIndex, service);
 if (!url) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Meeting needs a valid date/time first.'); return; }
 window.open(url, '_blank', 'noopener');
 }
+function fridayCalendarHtmlEscape(value) {
+return String(value || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function getFridayCalendarValidIndexes() {
+const meetings = getSortedFridayMeetings();
+const out = [];
+meetings.forEach((m, i) => { if (fridayMeetingEventParts(m, i)) out.push(i); });
+return out;
+}
+window._fridayAllCalendarFlow = window._fridayAllCalendarFlow || null;
+function startFridayAllCalendarFlow(service) {
+const svc = service === 'outlook' ? 'outlook' : 'google';
+const indexes = getFridayCalendarValidIndexes();
+if (!indexes.length) { if (typeof showSnuToast === 'function') showSnuToast('⚠ No dated meetings available to add.'); return; }
+window._fridayAllCalendarFlow = { service: svc, indexes: indexes, pos: 0 };
+renderFridayAllCalendarFlow();
+}
+function closeFridayAllCalendarFlow() {
+const modal = document.getElementById('fridayAllCalendarModal');
+if (modal) modal.remove();
+window._fridayAllCalendarFlow = null;
+}
+function skipFridayAllCalendarEvent() {
+const flow = window._fridayAllCalendarFlow;
+if (!flow) return;
+flow.pos += 1;
+renderFridayAllCalendarFlow();
+}
+function openCurrentFridayAllCalendarEvent() {
+const flow = window._fridayAllCalendarFlow;
+if (!flow) return;
+const sortedIndex = flow.indexes[flow.pos];
+const url = getFridayMeetingCalendarUrl(sortedIndex, flow.service);
+if (!url) { skipFridayAllCalendarEvent(); return; }
+window.open(url, '_blank', 'noopener');
+flow.pos += 1;
+setTimeout(renderFridayAllCalendarFlow, 150);
+}
+function renderFridayAllCalendarFlow() {
+const flow = window._fridayAllCalendarFlow;
+if (!flow) return;
+let modal = document.getElementById('fridayAllCalendarModal');
+if (!modal) {
+modal = document.createElement('div');
+modal.id = 'fridayAllCalendarModal';
+modal.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(2,6,23,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;';
+document.body.appendChild(modal);
+}
+const total = flow.indexes.length;
+if (flow.pos >= total) {
+modal.innerHTML = '<div style="width:min(520px,94vw);background:#0f172a;border:1px solid rgba(99,179,237,.35);border-radius:18px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.45);color:#e5e7eb;font-family:inherit;text-align:center;"><div style="font-size:34px;margin-bottom:8px;">✅</div><div style="font-size:20px;font-weight:900;margin-bottom:6px;">All meeting links opened</div><div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:18px;">Confirm/save each event in your calendar tabs. This method avoids the broken mobile bulk .ics open behavior and does not require an API.</div><button type="button" onclick="closeFridayAllCalendarFlow()" style="padding:10px 18px;border-radius:999px;border:1px solid rgba(99,179,237,.42);background:rgba(99,179,237,.18);color:#bfdbfe;font-weight:900;cursor:pointer;font-family:inherit;">Close</button></div>';
+return;
+}
+const sortedIndex = flow.indexes[flow.pos];
+const meetings = getSortedFridayMeetings();
+const parts = fridayMeetingEventParts(meetings[sortedIndex], sortedIndex);
+const serviceLabel = flow.service === 'outlook' ? 'Outlook' : 'Google Calendar';
+const title = parts ? fridayCalendarHtmlEscape(parts.topic) : 'Meeting';
+const when = parts ? fridayCalendarHtmlEscape((meetings[sortedIndex].date || '') + (meetings[sortedIndex].time ? ' at ' + meetings[sortedIndex].time : '')) : '';
+modal.innerHTML = '<div style="width:min(560px,94vw);background:#0f172a;border:1px solid rgba(99,179,237,.35);border-radius:18px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.45);color:#e5e7eb;font-family:inherit;">' +
+'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:12px;"><div><div style="font-size:12px;font-weight:900;color:#93c5fd;letter-spacing:.08em;text-transform:uppercase;">Add all meetings one-by-one</div><div style="font-size:20px;font-weight:950;margin-top:4px;">' + serviceLabel + '</div></div><button type="button" onclick="closeFridayAllCalendarFlow()" style="border:1px solid rgba(248,113,113,.45);background:rgba(248,113,113,.14);color:#fecaca;border-radius:999px;padding:8px 12px;font-weight:900;cursor:pointer;font-family:inherit;">Close</button></div>' +
+'<div style="height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:16px;"><div style="height:100%;width:' + Math.round((flow.pos/total)*100) + '%;background:#60a5fa;"></div></div>' +
+'<div style="font-size:13px;color:#94a3b8;margin-bottom:8px;">Meeting ' + (flow.pos + 1) + ' of ' + total + '</div>' +
+'<div style="border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:14px;padding:16px;margin-bottom:16px;"><div style="font-size:17px;font-weight:900;margin-bottom:6px;">' + title + '</div><div style="font-size:13px;color:#cbd5e1;">' + when + '</div></div>' +
+'<div style="font-size:13px;color:#94a3b8;line-height:1.55;margin-bottom:16px;">Click <b>Open this meeting</b>, then save it in the calendar tab that opens. Come back here and click again for the next meeting. Browsers block true bulk calendar adds without Google/Microsoft API access.</div>' +
+'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><button type="button" onclick="skipFridayAllCalendarEvent()" style="padding:10px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(148,163,184,.10);color:#cbd5e1;font-weight:900;cursor:pointer;font-family:inherit;">Skip</button><button type="button" onclick="openCurrentFridayAllCalendarEvent()" style="padding:10px 16px;border-radius:999px;border:1px solid rgba(96,165,250,.55);background:rgba(96,165,250,.22);color:#dbeafe;font-weight:950;cursor:pointer;font-family:inherit;box-shadow:0 0 18px rgba(96,165,250,.18);">Open this meeting</button></div>' +
+'</div>';
+}
 
 function renderFridayMeetings() {
 const el = document.getElementById('fridayMeetingList');
@@ -11113,7 +11183,6 @@ ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">\u
 ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
 ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udcf9 Join Meeting</a>`:''}
 ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udd17 Resource / Login</a>`:''}
-<button type="button" onclick="downloadFridayMeetingIcs(${i})" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 12px;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.34);border-radius:8px;color:#34d399;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">📅 .ics</button>
 <button type="button" onclick="openFridayMeetingCalendar(${i}, 'google')" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 12px;background:rgba(66,133,244,.14);border:1px solid rgba(66,133,244,.35);border-radius:8px;color:#93c5fd;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">Google</button>
 <button type="button" onclick="openFridayMeetingCalendar(${i}, 'outlook')" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 12px;background:rgba(0,120,212,.14);border:1px solid rgba(0,120,212,.35);border-radius:8px;color:#7dd3fc;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">Outlook</button>
 </div>
@@ -17374,6 +17443,7 @@ body.hub-show-backtop #hubBackTopBtn { opacity: 1; visibility: visible; transfor
   setTimeout(boot, 1000);
   setInterval(boot, 500);
 })();
+window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 </script>
 
 </body>
