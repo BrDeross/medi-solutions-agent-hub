@@ -10943,28 +10943,61 @@ if (!raw) return null;
 const d = new Date(raw + ' 12:00:00');
 return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
-function buildFridayIcs(meetings, fileBaseName) {
-const valid = (meetings || []).map(m => {
+function fridayFoldIcsLine(line) {
+line = String(line || '');
+const out = [];
+while (line.length > 72) {
+out.push(line.slice(0, 72));
+line = ' ' + line.slice(72);
+}
+out.push(line);
+return out;
+}
+function fridayTimezoneBlock() {
+return [
+'BEGIN:VTIMEZONE',
+'TZID:America/New_York',
+'X-LIC-LOCATION:America/New_York',
+'BEGIN:DAYLIGHT',
+'TZOFFSETFROM:-0500',
+'TZOFFSETTO:-0400',
+'TZNAME:EDT',
+'DTSTART:19700308T020000',
+'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU',
+'END:DAYLIGHT',
+'BEGIN:STANDARD',
+'TZOFFSETFROM:-0400',
+'TZOFFSETTO:-0500',
+'TZNAME:EST',
+'DTSTART:19701101T020000',
+'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU',
+'END:STANDARD',
+'END:VTIMEZONE'
+];
+}
+function fridayMeetingEventParts(m, idx) {
 const base = parseFridayMeetingDate(m);
 if (!base) return null;
 const t = parseFridayTimeParts(m.time);
 const start = new Date(base.getFullYear(), base.getMonth(), base.getDate(), t.hour, t.minute, 0);
 const end = new Date(start.getTime() + 60 * 60 * 1000);
-return { m, start, end };
-}).filter(Boolean);
-if (!valid.length) {
-if (typeof showSnuToast === 'function') showSnuToast('⚠ No dated meetings available to add.');
-return false;
-}
-const now = fridayStampUtc(new Date());
-let lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//My Medi Hub//Friday Meetings//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
-valid.forEach(({m,start,end}, idx) => {
 const topic = m.topic || 'Friday Team Meeting';
 const linkText = m.link ? '\nJoin Meeting: ' + m.link : '';
 const resText = m.link2 ? '\nResource/Login: ' + m.link2 : '';
 const desc = [m.notes || '', linkText, resText].join('').trim();
 const loc = m.type === 'virtual' ? (m.link || 'Virtual Meeting') : 'In Person';
 const uid = 'medi-hub-friday-' + String(m.id || idx || start.getTime()).replace(/[^a-zA-Z0-9_-]/g,'') + '@medi-solutions-agent-hub';
+return { m, start, end, topic, desc, loc, uid };
+}
+function buildFridayIcs(meetings, fileBaseName) {
+const valid = (meetings || []).map((m, idx) => fridayMeetingEventParts(m, idx)).filter(Boolean);
+if (!valid.length) {
+if (typeof showSnuToast === 'function') showSnuToast('⚠ No dated meetings available to add.');
+return false;
+}
+const now = fridayStampUtc(new Date());
+let lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//My Medi Hub//Friday Meetings//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:My Medi Hub Friday Meetings','X-WR-TIMEZONE:America/New_York', ...fridayTimezoneBlock()];
+valid.forEach(({topic,desc,loc,uid,start,end}) => {
 lines.push('BEGIN:VEVENT');
 lines.push('UID:' + uid);
 lines.push('DTSTAMP:' + now);
@@ -10973,7 +11006,10 @@ lines.push('DTEND;TZID=America/New_York:' + fridayLocalStamp(end));
 lines.push('SUMMARY:' + fridayIcsEscape(topic));
 if (desc) lines.push('DESCRIPTION:' + fridayIcsEscape(desc));
 lines.push('LOCATION:' + fridayIcsEscape(loc));
-if (m.link) lines.push('URL:' + fridayIcsEscape(m.link));
+lines.push('STATUS:CONFIRMED');
+lines.push('TRANSP:OPAQUE');
+lines.push('CLASS:PUBLIC');
+if (loc && /^https?:\/\//i.test(loc)) lines.push('URL:' + fridayIcsEscape(loc));
 lines.push('BEGIN:VALARM');
 lines.push('TRIGGER:-PT15M');
 lines.push('ACTION:DISPLAY');
@@ -10982,14 +11018,16 @@ lines.push('END:VALARM');
 lines.push('END:VEVENT');
 });
 lines.push('END:VCALENDAR');
-const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
+const icsText = lines.flatMap(fridayFoldIcsLine).join('\r\n') + '\r\n';
+const blob = new Blob([icsText], { type: 'text/calendar;charset=utf-8' });
 const a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
 a.download = (fileBaseName || 'my-medi-hub-meetings').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'') + '.ics';
+a.rel = 'noopener';
 document.body.appendChild(a);
 a.click();
-setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 250);
-if (typeof showSnuToast === 'function') showSnuToast('📅 Calendar file ready. Open/import it to add meetings.');
+setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+if (typeof showSnuToast === 'function') showSnuToast('📅 Calendar file downloaded. If it does not open, use the Google/Outlook buttons for one meeting or import the .ics file.');
 return true;
 }
 function downloadAllFridayMeetingsIcs() {
@@ -11001,6 +11039,43 @@ const m = meetings[Number(sortedIndex)];
 if (!m) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Meeting not found.'); return; }
 const title = 'my-medi-hub-' + String(m.topic || 'meeting').toLowerCase();
 buildFridayIcs([m], title);
+}
+function fridayGoogleDateStamp(d) {
+return fridayStampUtc(d);
+}
+function fridayOutlookIsoUtc(d) {
+return d.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+function getFridayMeetingCalendarUrl(sortedIndex, service) {
+const meetings = getSortedFridayMeetings();
+const parts = fridayMeetingEventParts(meetings[Number(sortedIndex)], sortedIndex);
+if (!parts) return '';
+const details = [parts.desc || '', 'Added from My Medi Hub.'].filter(Boolean).join('\n\n');
+if (service === 'google') {
+const params = new URLSearchParams({
+action: 'TEMPLATE',
+text: parts.topic,
+dates: fridayGoogleDateStamp(parts.start) + '/' + fridayGoogleDateStamp(parts.end),
+details: details,
+location: parts.loc || ''
+});
+return 'https://calendar.google.com/calendar/render?' + params.toString();
+}
+const params = new URLSearchParams({
+path: '/calendar/action/compose',
+rru: 'addevent',
+subject: parts.topic,
+startdt: fridayOutlookIsoUtc(parts.start),
+enddt: fridayOutlookIsoUtc(parts.end),
+body: details,
+location: parts.loc || ''
+});
+return 'https://outlook.office.com/calendar/0/deeplink/compose?' + params.toString();
+}
+function openFridayMeetingCalendar(sortedIndex, service) {
+const url = getFridayMeetingCalendarUrl(sortedIndex, service);
+if (!url) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Meeting needs a valid date/time first.'); return; }
+window.open(url, '_blank', 'noopener');
 }
 
 function renderFridayMeetings() {
@@ -11024,7 +11099,9 @@ ${m.time?`<div style="font-size:13px;color:var(--muted-2);margin-bottom:6px;">\u
 ${m.notes?`<div style="font-size:13px;color:var(--muted);line-height:1.6;">${pesc(m.notes)}</div>`:''}
 ${m.link?`<a href="${pesc(m.link)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--accent);border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udcf9 Join Meeting</a>`:''}
 ${m.link2?`<a href="${pesc(m.link2)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 14px;background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);border-radius:8px;color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none;">\ud83d\udd17 Resource / Login</a>`:''}
-<button type="button" onclick="downloadFridayMeetingIcs(${i})" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 14px;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.34);border-radius:8px;color:#34d399;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">📅 Add to Calendar</button>
+<button type="button" onclick="downloadFridayMeetingIcs(${i})" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 12px;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.34);border-radius:8px;color:#34d399;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">📅 .ics</button>
+<button type="button" onclick="openFridayMeetingCalendar(${i}, 'google')" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 12px;background:rgba(66,133,244,.14);border:1px solid rgba(66,133,244,.35);border-radius:8px;color:#93c5fd;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">Google</button>
+<button type="button" onclick="openFridayMeetingCalendar(${i}, 'outlook')" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;padding:7px 12px;background:rgba(0,120,212,.14);border:1px solid rgba(0,120,212,.35);border-radius:8px;color:#7dd3fc;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;">Outlook</button>
 </div>
 </div>`).join('');
 }
