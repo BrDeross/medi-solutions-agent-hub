@@ -12585,29 +12585,30 @@ if (document.getElementById('certTrackerLockedStyles')) return;
 const st = document.createElement('style');
 st.id = 'certTrackerLockedStyles';
 st.textContent = `
-#certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:16px;border:1px solid rgba(96,165,250,.28);background:linear-gradient(180deg,rgba(15,35,74,.88),rgba(12,28,62,.92));box-shadow:0 18px 44px rgba(2,8,23,.22),inset 0 1px 0 rgba(255,255,255,.06);padding-bottom:10px;}
-#certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(96,165,250,.2);background:linear-gradient(90deg,rgba(37,99,235,.16),rgba(34,197,94,.08));font-size:12px;color:#cfe6ff;min-width:max-content;}
-#certTrackerContent .cert-lock-meta strong{color:#fff;}
-#certTrackerContent .cert-lock-table{width:max-content;border-collapse:separate;border-spacing:0;min-width:1720px;}
-#certTrackerContent .cert-lock-table th{position:sticky;top:0;z-index:2;padding:10px 10px;font-size:10px;font-weight:900;letter-spacing:.55px;text-transform:uppercase;color:#9ed3ff;text-align:center;white-space:nowrap;border-bottom:1px solid rgba(96,165,250,.24);background:rgba(15,34,75,.96);}
-#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{position:sticky;left:0;z-index:3;text-align:left;min-width:210px;max-width:260px;background:rgba(15,34,75,.98);box-shadow:10px 0 16px rgba(2,8,23,.16);}
-#certTrackerContent .cert-lock-table th.cert-agent-head{z-index:4;}
-#certTrackerContent .cert-lock-table td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.055);font-size:12px;color:#dbeafe;white-space:nowrap;}
-#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td{background-color:rgba(255,255,255,.018);}
-#certTrackerContent .cert-lock-table tbody tr:hover td{background-color:rgba(96,165,250,.095);}
-#certTrackerContent .cert-lock-table tbody tr:hover td.cert-agent-cell{background-color:rgba(21,48,102,.98);}
-#certTrackerContent .cert-agent-name{font-size:13px;font-weight:850;color:#fff;overflow:hidden;text-overflow:ellipsis;}
-#certTrackerContent .cert-year-cell{color:#93c5fd;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;}
+#certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:18px;border:1px solid rgba(37,99,235,.18);background:linear-gradient(180deg,#ffffff,#f3f8ff);box-shadow:0 18px 42px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.9);padding-bottom:12px;}
+#certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(37,99,235,.14);background:linear-gradient(90deg,#eaf4ff,#f2fbf6);font-size:12px;color:#31547a;min-width:max-content;}
+#certTrackerContent .cert-lock-meta strong{color:#0f2f66;}
+#certTrackerContent .cert-lock-table{width:max-content;border-collapse:separate;border-spacing:0;min-width:1720px;background:#fff;}
+#certTrackerContent .cert-lock-table th{position:sticky;top:0;z-index:2;padding:11px 10px;font-size:10px;font-weight:950;letter-spacing:.58px;text-transform:uppercase;color:#245a93;text-align:center;white-space:nowrap;border-bottom:1px solid rgba(37,99,235,.16);background:#eaf4ff;}
+#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{position:sticky;left:0;z-index:3;text-align:left;min-width:210px;max-width:260px;background:#ffffff;box-shadow:10px 0 18px rgba(15,23,42,.08);}
+#certTrackerContent .cert-lock-table th.cert-agent-head{z-index:4;background:#eaf4ff;}
+#certTrackerContent .cert-lock-table td{padding:10px 10px;border-bottom:1px solid rgba(15,23,42,.065);font-size:12px;color:#21364f;white-space:nowrap;background:#fff;}
+#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td{background-color:#f7fbff;}
+#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td.cert-agent-cell{background:#f7fbff;}
+#certTrackerContent .cert-lock-table tbody tr:hover td{background-color:#eef7ff;}
+#certTrackerContent .cert-lock-table tbody tr:hover td.cert-agent-cell{background-color:#eef7ff;}
+#certTrackerContent .cert-agent-name{font-size:13px;font-weight:900;color:#10233f;overflow:hidden;text-overflow:ellipsis;}
+#certTrackerContent .cert-year-cell{color:#356ea8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;}
 #certTrackerContent .cert-progress-wrap{display:flex;align-items:center;gap:8px;min-width:160px;}
-#certTrackerContent .cert-progress-track{height:8px;flex:1;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.28);}
-#certTrackerContent .cert-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#38bdf8,#22c55e);box-shadow:0 0 12px rgba(34,197,94,.28);}
-#certTrackerContent .cert-progress-num{min-width:42px;text-align:right;color:#9ed3ff;font-size:11px;font-weight:850;font-family:'JetBrains Mono',monospace;}
+#certTrackerContent .cert-progress-track{height:9px;flex:1;border-radius:999px;background:#dbe8f6;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.12);}
+#certTrackerContent .cert-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#60a5fa,#22c55e);box-shadow:0 0 12px rgba(34,197,94,.22);}
+#certTrackerContent .cert-progress-num{min-width:48px;text-align:right;color:#245a93;font-size:11px;font-weight:900;font-family:'JetBrains Mono',monospace;}
 #certTrackerContent .cert-cell{min-width:96px;text-align:center;}
-#certTrackerContent .cert-mark{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;border-radius:999px;border:1px solid rgba(148,163,184,.18);font-size:14px;font-weight:900;}
-#certTrackerContent .cert-mark.yes{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.42);box-shadow:0 0 12px rgba(34,197,94,.16);}
-#certTrackerContent .cert-mark.no{background:rgba(148,163,184,.08);border-color:rgba(148,163,184,.14);opacity:.72;}
-@media(max-width:760px){#certTrackerContent .cert-lock-table{min-width:1500px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-cell{min-width:82px;}}
-`;
+#certTrackerContent .cert-mark{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;min-width:38px;border-radius:999px;border:2px solid transparent;font-size:23px;font-weight:1000;line-height:1;}
+#certTrackerContent .cert-mark.yes{color:#ffffff;background:linear-gradient(180deg,#22c55e,#16a34a);border-color:rgba(21,128,61,.34);box-shadow:0 5px 16px rgba(34,197,94,.30),inset 0 1px 0 rgba(255,255,255,.35);}
+#certTrackerContent .cert-mark.no{color:#a7b4c5;background:#eef3f8;border-color:#d7e2ee;font-size:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8);}
+@media(max-width:760px){#certTrackerContent .cert-lock-table{min-width:1500px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-cell{min-width:82px;}#certTrackerContent .cert-mark{width:34px;height:34px;min-width:34px;font-size:20px;}}
+``;
 document.head.appendChild(st);
 }
 function renderCertTracker() {
@@ -12632,7 +12633,7 @@ const total = activeCols.length;
 const pct = total ? Math.round(certCount/total*100) : 0;
 const cells = activeCols.map(c => {
 const cert = isCertified(a.certs?.[c]);
-return `<td class="cert-cell"><span class="cert-mark ${cert ? 'yes' : 'no'}" title="${pesc(c)}">${cert ? '✅' : '—'}</span></td>`;
+return `<td class="cert-cell"><span class="cert-mark ${cert ? 'yes' : 'no'}" title="${pesc(c)}">${cert ? '&#10003;' : '&ndash;'}</span></td>`;
 }).join('');
 return `<tr>
 <td class="cert-agent-cell"><div class="cert-agent-name">${pesc(a.name||'')}</div></td>
@@ -12761,7 +12762,7 @@ function saveCertData() {
 _certAgents = normalizeCertAgents(_certAgents);
 if (!_certAgents.length) { alert('No data to save. Upload a file first.'); return; }
 const year = _certAgents[0]?.year || _certMeta.year || new Date().getFullYear();
-_certMeta = Object.assign({}, _certMeta || {}, { year, carriers: getCertCarrierColumns(), updatedAt: new Date().toISOString() });
+_certMeta = Object.assign({}, _certMeta || {}, { year, carriers: getCertCarrierColumns(), displayLocked: true, displayVersion: 'light-checks-v1', updatedAt: new Date().toISOString() });
 const data = { agents: _certAgents, meta: _certMeta };
 localStorage.setItem(CERT_KEY, JSON.stringify(data));
 const payload = JSON.stringify(data);
