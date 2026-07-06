@@ -6115,13 +6115,13 @@ Upload a CSV or Excel file with one row per agent and one column per month. Requ
 <div id="adminTabCerts" class="admin-tab-panel">
 <div class="admin-section-title">🎓 Carrier Certification Tracker</div>
 <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
-Upload your certification CSV or Excel file. Columns: <code>Agent Name</code>, <code>Certification Year</code>, then one column per carrier (<code>RTS</code>, <code>AHIP</code>, <code>AARP/UHC</code>, etc.).<br>
+Upload your certification CSV or Excel file. Columns: <code>Agent Name</code>, <code>Certification Year</code>, then one column per carrier (<code>AHIP</code>, <code>AARP/UHC</code>, etc.).<br>
 Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <strong>N</strong> for not certified.
 </p>
 <div class="csv-drop-zone" id="certCsvDrop" onclick="document.getElementById('certCsvInput').click()">
 <div class="csv-drop-icon">📂</div>
 <div class="csv-drop-text">Drop CSV/Excel here or <span>click to browse</span></div>
-<div class="csv-drop-hint">Columns: Agent Name, Certification Year, RTS, AHIP, AARP/UHC…</div>
+<div class="csv-drop-hint">Columns: Agent Name, Certification Year, AHIP, AARP/UHC…</div>
 <input type="file" id="certCsvInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCertCsvFile(this.files[0])">
 </div>
 <div class="csv-status" id="certCsvStatus"></div>
@@ -12580,57 +12580,83 @@ renderCertAdminPreview(false);
 // Always fetch from Supabase for latest data
 loadCertDataFromSupabase();
 }
+function ensureCertTrackerDisplayStyles() {
+if (document.getElementById('certTrackerLockedStyles')) return;
+const st = document.createElement('style');
+st.id = 'certTrackerLockedStyles';
+st.textContent = `
+#certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:16px;border:1px solid rgba(96,165,250,.28);background:linear-gradient(180deg,rgba(15,35,74,.88),rgba(12,28,62,.92));box-shadow:0 18px 44px rgba(2,8,23,.22),inset 0 1px 0 rgba(255,255,255,.06);padding-bottom:10px;}
+#certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(96,165,250,.2);background:linear-gradient(90deg,rgba(37,99,235,.16),rgba(34,197,94,.08));font-size:12px;color:#cfe6ff;min-width:max-content;}
+#certTrackerContent .cert-lock-meta strong{color:#fff;}
+#certTrackerContent .cert-lock-table{width:max-content;border-collapse:separate;border-spacing:0;min-width:1720px;}
+#certTrackerContent .cert-lock-table th{position:sticky;top:0;z-index:2;padding:10px 10px;font-size:10px;font-weight:900;letter-spacing:.55px;text-transform:uppercase;color:#9ed3ff;text-align:center;white-space:nowrap;border-bottom:1px solid rgba(96,165,250,.24);background:rgba(15,34,75,.96);}
+#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{position:sticky;left:0;z-index:3;text-align:left;min-width:210px;max-width:260px;background:rgba(15,34,75,.98);box-shadow:10px 0 16px rgba(2,8,23,.16);}
+#certTrackerContent .cert-lock-table th.cert-agent-head{z-index:4;}
+#certTrackerContent .cert-lock-table td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.055);font-size:12px;color:#dbeafe;white-space:nowrap;}
+#certTrackerContent .cert-lock-table tbody tr:nth-child(even) td{background-color:rgba(255,255,255,.018);}
+#certTrackerContent .cert-lock-table tbody tr:hover td{background-color:rgba(96,165,250,.095);}
+#certTrackerContent .cert-lock-table tbody tr:hover td.cert-agent-cell{background-color:rgba(21,48,102,.98);}
+#certTrackerContent .cert-agent-name{font-size:13px;font-weight:850;color:#fff;overflow:hidden;text-overflow:ellipsis;}
+#certTrackerContent .cert-year-cell{color:#93c5fd;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;}
+#certTrackerContent .cert-progress-wrap{display:flex;align-items:center;gap:8px;min-width:160px;}
+#certTrackerContent .cert-progress-track{height:8px;flex:1;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.28);}
+#certTrackerContent .cert-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#38bdf8,#22c55e);box-shadow:0 0 12px rgba(34,197,94,.28);}
+#certTrackerContent .cert-progress-num{min-width:42px;text-align:right;color:#9ed3ff;font-size:11px;font-weight:850;font-family:'JetBrains Mono',monospace;}
+#certTrackerContent .cert-cell{min-width:96px;text-align:center;}
+#certTrackerContent .cert-mark{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;border-radius:999px;border:1px solid rgba(148,163,184,.18);font-size:14px;font-weight:900;}
+#certTrackerContent .cert-mark.yes{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.42);box-shadow:0 0 12px rgba(34,197,94,.16);}
+#certTrackerContent .cert-mark.no{background:rgba(148,163,184,.08);border-color:rgba(148,163,184,.14);opacity:.72;}
+@media(max-width:760px){#certTrackerContent .cert-lock-table{min-width:1500px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-cell{min-width:82px;}}
+`;
+document.head.appendChild(st);
+}
 function renderCertTracker() {
+ensureCertTrackerDisplayStyles();
 const el = document.getElementById('certTrackerContent');
 const badge = document.getElementById('certAgentCount');
 if (!el) return;
+_certAgents = normalizeCertAgents(_certAgents);
 if (badge) badge.textContent = _certAgents.length + ' agent' + (_certAgents.length !== 1 ? 's' : '');
 if (!_certAgents.length) {
 el.innerHTML = '<div class="trip-empty">No certification data yet — admin can upload a CSV below.</div>';
 return;
 }
 const year = _certMeta.year || '';
-const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-// Show all certification columns from the uploaded file/saved metadata so no carrier columns disappear.
-const activeCols = getCertCarrierColumns();
-console.log('[CERT LOAD] rendering carrier columns:', activeCols.length, activeCols);
-const headerCells = activeCols.map(c =>
-`<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">${pesc(c)}</th>`
-).join('');
+const pesc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const activeCols = getCertCarrierColumns().filter(c => String(c || '').trim().toLowerCase() !== 'rts');
+console.log('[CERT LOAD] locked display rendering carrier columns:', activeCols.length, activeCols);
+const headerCells = activeCols.map(c => `<th>${pesc(c)}</th>`).join('');
 const rows = [..._certAgents].sort((a,b) => (a.name||'').localeCompare(b.name||'')).map(a => {
 const certCount = activeCols.filter(c => isCertified(a.certs?.[c])).length;
 const total = activeCols.length;
 const pct = total ? Math.round(certCount/total*100) : 0;
 const cells = activeCols.map(c => {
-const val = a.certs?.[c];
-const cert = isCertified(val);
-return `<td style="text-align:center;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.04);">
-<span style="font-size:14px;">${cert ? '✅' : '⬜'}</span>
-</td>`;
+const cert = isCertified(a.certs?.[c]);
+return `<td class="cert-cell"><span class="cert-mark ${cert ? 'yes' : 'no'}" title="${pesc(c)}">${cert ? '✅' : '—'}</span></td>`;
 }).join('');
 return `<tr>
-<td style="padding:8px 12px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;">${pesc(a.name||'')}</td>
-<td style="padding:8px 10px;font-size:12px;color:var(--muted-2);border-bottom:1px solid rgba(255,255,255,.04);text-align:center;">${pesc(a.year||year||'')}</td>
-<td style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);">
-<div style="display:flex;align-items:center;gap:8px;">
-<div style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;">
-<div style="height:100%;width:${pct}%;background:${pct===100?'#22c55e':'var(--accent)'};border-radius:4px;"></div>
-</div>
-<span style="font-size:11px;color:${pct===100?'#22c55e':'var(--muted)'};font-weight:700;min-width:32px;">${certCount}/${total}</span>
+<td class="cert-agent-cell"><div class="cert-agent-name">${pesc(a.name||'')}</div></td>
+<td class="cert-year-cell">${pesc(a.year||year||'')}</td>
+<td>
+<div class="cert-progress-wrap">
+<div class="cert-progress-track"><div class="cert-progress-fill" style="width:${pct}%;"></div></div>
+<span class="cert-progress-num">${certCount}/${total}</span>
 </div>
 </td>
 ${cells}
 </tr>`;
 }).join('');
+const metaLeft = year ? `Certification Year: <strong>${pesc(year)}</strong>` : 'Certification Year';
+const metaRight = _certMeta.updatedAt ? `Updated: ${new Date(_certMeta.updatedAt).toLocaleDateString()}` : `${activeCols.length} carrier columns`;
 el.innerHTML = `
-<div style="display:block;width:100%;max-width:100%;overflow-x:scroll;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:12px;border:1px solid var(--border);padding-bottom:10px;">
-${year ? `<div style="padding:10px 16px;font-size:12px;color:var(--muted-2);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);">Certification Year: <strong style="color:var(--text);">${pesc(year)}</strong>${_certMeta.updatedAt ? ' &nbsp;·&nbsp; Updated: '+new Date(_certMeta.updatedAt).toLocaleDateString() : ''}</div>` : ''}
-<table style="width:max-content;border-collapse:collapse;min-width:${Math.max(1700, 420 + activeCols.length * 110)}px;">
+<div class="cert-lock-shell">
+<div class="cert-lock-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>
+<table class="cert-lock-table" style="min-width:${Math.max(1720, 460 + activeCols.length * 112)}px;">
 <thead>
 <tr>
-<th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Agent</th>
-<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:center;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Year</th>
-<th style="padding:8px 10px;font-size:10px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03);">Progress</th>
+<th class="cert-agent-head">Agent</th>
+<th>Year</th>
+<th>Progress</th>
 ${headerCells}
 </tr>
 </thead>
@@ -12698,7 +12724,7 @@ agents.push({ name, year, certs });
 });
 if (!agents.length) { setErr('✗ No agent rows found. Check column headers.'); return; }
 _certAgents = normalizeCertAgents(agents);
-_certMeta = Object.assign({}, _certMeta || {}, { carriers: certHeaders, year: (_certAgents[0]?.year || yearKey || '') });
+_certMeta = Object.assign({}, _certMeta || {}, { carriers: getCertCarrierColumns(), year: (_certAgents[0]?.year || yearKey || '') });
 setOk(`✓ Loaded ${_certAgents.length} agent${_certAgents.length!==1?'s':''} with ${certHeaders.length} certification column${certHeaders.length!==1?'s':''} — review below, remove any unwanted rows, then Save & Publish.`);
 renderCertTracker();
 renderCertAdminPreview(true);
