@@ -12655,6 +12655,9 @@ st.textContent = `
 #certTrackerContent .cert-lock-table tbody tr:hover td{background-color:#d4f4f2;}
 #certTrackerContent .cert-lock-table tbody tr:hover td.cert-agent-cell{background:#d4f4f2;}
 #certTrackerContent .cert-agent-name{font-size:13px;font-weight:950;color:#0f172a;overflow:hidden;text-overflow:ellipsis;}
+#certTrackerContent .cert-agent-print-btn{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:#0f172a;font:inherit;font-size:13px;font-weight:950;padding:0;margin:0;text-align:left;cursor:pointer;display:inline-flex;align-items:center;gap:6px;max-width:100%;}
+#certTrackerContent .cert-agent-print-btn:hover{color:#047c7a;text-decoration:underline;text-underline-offset:3px;}
+#certTrackerContent .cert-print-icon{font-size:11px;opacity:.72;line-height:1;}
 #certTrackerContent .cert-year-cell{color:#0f766e;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:900;}
 #certTrackerContent .cert-progress-wrap{display:flex;align-items:center;gap:8px;min-width:160px;}
 #certTrackerContent .cert-progress-track{height:9px;flex:1;border-radius:999px;background:#d7dee8;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.14);}
@@ -12676,6 +12679,43 @@ if (dir === 'home') { shell.scrollTo({ left: 0, behavior: 'smooth' }); return; }
 if (dir === 'end') { shell.scrollTo({ left: shell.scrollWidth, behavior: 'smooth' }); return; }
 shell.scrollBy({ left: dir * amount, behavior: 'smooth' });
 }
+
+function certEscapeHtml(s) {
+return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function getSortedCertAgents() {
+return [...normalizeCertAgents(_certAgents)].sort((a,b) => (a.name||'').localeCompare(b.name||''));
+}
+function printCertAgentRow(index) {
+const activeCols = getCertCarrierColumns().filter(c => String(c || '').trim().toLowerCase() !== 'rts');
+const sortedAgents = getSortedCertAgents();
+const agent = sortedAgents[index];
+if (!agent) { alert('Could not find this agent row to print.'); return; }
+const year = agent.year || _certMeta.year || '';
+const certCount = activeCols.filter(c => isCertified(agent.certs?.[c])).length;
+const total = activeCols.length;
+const pct = total ? Math.round(certCount / total * 100) : 0;
+const updated = _certMeta.updatedAt ? new Date(_certMeta.updatedAt).toLocaleDateString() : new Date().toLocaleDateString();
+const carrierRows = activeCols.map(c => {
+const yes = isCertified(agent.certs?.[c]);
+return `<tr><td>${certEscapeHtml(c)}</td><td class="${yes ? 'yes' : 'no'}">${yes ? 'Certified' : 'Not certified'}</td></tr>`;
+}).join('');
+const html = `<!doctype html><html><head><meta charset="utf-8"><title>${certEscapeHtml(agent.name)} Certification Row</title><style>
+body{font-family:Arial,Helvetica,sans-serif;margin:28px;color:#0f172a;background:#fff;}
+.print-head{border:2px solid #00a8a3;border-radius:16px;padding:16px 18px;margin-bottom:18px;background:linear-gradient(100deg,#fff5f7,#e9fffd);}
+h1{font-size:24px;margin:0 0 6px 0;} .sub{font-size:13px;color:#475569;margin:0;}
+.summary{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px 0;}
+.pill{border-radius:999px;padding:8px 12px;background:#e6fffb;border:1px solid #99f6e4;font-weight:800;font-size:13px;}
+.progress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:10px 0 18px 0;}
+.fill{height:100%;background:linear-gradient(90deg,#dc143c,#00c2b8);width:${pct}%;}
+table{width:100%;border-collapse:collapse;border:1px solid #cbd5e1;} th{background:#00a8a3;color:#fff;text-align:left;padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;} td{padding:9px 10px;border-bottom:1px solid #e2e8f0;font-size:13px;} tr:nth-child(even) td{background:#f8fafc;} .yes{color:#047857;font-weight:900;} .no{color:#64748b;font-weight:700;} .footer{margin-top:16px;font-size:11px;color:#64748b;} @media print{body{margin:18px}.no-print{display:none!important}}
+</style></head><body><div class="print-head"><h1>${certEscapeHtml(agent.name)}</h1><p class="sub">Carrier Certification Tracker${year ? ' - ' + certEscapeHtml(year) : ''}</p></div><div class="summary"><span class="pill">${certCount}/${total} certified</span><span class="pill">${pct}% complete</span><span class="pill">Updated ${certEscapeHtml(updated)}</span></div><div class="progress"><div class="fill"></div></div><table><thead><tr><th>Carrier</th><th>Status</th></tr></thead><tbody>${carrierRows}</tbody></table><div class="footer">Printed from My Medi Hub. Use this as a personal certification tracking snapshot.</div><script>setTimeout(function(){ window.focus(); window.print(); }, 350);<\/script></body></html>`;
+const w = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+if (!w) { alert('Allow pop-ups for this site to print this certification row.'); return; }
+w.document.open();
+w.document.write(html);
+w.document.close();
+}
 function renderCertTracker() {
 ensureCertTrackerDisplayStyles();
 const el = document.getElementById('certTrackerContent');
@@ -12693,7 +12733,8 @@ const activeCols = getCertCarrierColumns().filter(c => String(c || '').trim().to
 const certTableWidth = Math.max(1900, 620 + activeCols.length * 120);
 console.log('[CERT LOAD] locked display rendering carrier columns:', activeCols.length, activeCols);
 const headerCells = activeCols.map(c => `<th>${pesc(c)}</th>`).join('');
-const rows = [..._certAgents].sort((a,b) => (a.name||'').localeCompare(b.name||'')).map(a => {
+const sortedAgents = getSortedCertAgents();
+const rows = sortedAgents.map((a, idx) => {
 const certCount = activeCols.filter(c => isCertified(a.certs?.[c])).length;
 const total = activeCols.length;
 const pct = total ? Math.round(certCount/total*100) : 0;
@@ -12702,7 +12743,7 @@ const cert = isCertified(a.certs?.[c]);
 return `<td class="cert-cell"><span class="cert-mark ${cert ? 'yes' : 'no'}" title="${pesc(c)}">${cert ? '&#10003;' : '&ndash;'}</span></td>`;
 }).join('');
 return `<tr>
-<td class="cert-agent-cell"><div class="cert-agent-name">${pesc(a.name||'')}</div></td>
+<td class="cert-agent-cell"><button type="button" class="cert-agent-print-btn" onclick="printCertAgentRow(${idx})" title="Print this agent certification row"><span class="cert-agent-name">${pesc(a.name||'')}</span><span class="cert-print-icon">&#128424;</span></button></td>
 <td class="cert-year-cell">${pesc(a.year||year||'')}</td>
 <td>
 <div class="cert-progress-wrap">
