@@ -3940,6 +3940,26 @@ transition: background .15s, color .15s;
 }
 .carrier-number-placeholder-card strong { display:block; color:#fff; font-size:13px; margin-bottom:6px; }
 .carrier-number-placeholder-card span { display:block; color:var(--muted); font-size:12px; line-height:1.45; }
+
+/* Carrier Directory - Phase 4 combined directory */
+.carrier-combined-panel { padding: 20px; }
+.carrier-combined-grid { display:grid; grid-template-columns: minmax(280px, .92fr) minmax(340px, 1.18fr); gap: 16px; align-items:start; }
+.carrier-combined-card { background: rgba(15,23,42,.22); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:14px; min-width:0; }
+.carrier-combined-card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+.carrier-combined-card-head h3 { margin:0 0 4px; color:#fff; font-size:15px; }
+.carrier-combined-card-head p { margin:0; color:var(--muted); font-size:12px; line-height:1.45; }
+.carrier-contact-list { display:grid; gap:10px; max-height: 640px; overflow:auto; padding-right:4px; }
+.carrier-contact-card { border:1px solid rgba(255,255,255,.09); background:rgba(255,255,255,.04); border-radius:14px; padding:13px; }
+.carrier-contact-name { color:#fff; font-weight:800; font-size:14px; margin-bottom:9px; display:flex; align-items:center; gap:8px; }
+.carrier-contact-meta { display:grid; gap:6px; }
+.carrier-contact-row { display:grid; grid-template-columns: 90px minmax(0,1fr); gap:8px; align-items:start; font-size:12px; }
+.carrier-contact-label { color:var(--muted-2); font-weight:800; text-transform:uppercase; letter-spacing:.45px; font-size:10px; }
+.carrier-contact-value { color:var(--muted); overflow-wrap:anywhere; }
+.carrier-contact-value a { color:var(--accent-2); text-decoration:none; }
+.carrier-contact-value a:hover { text-decoration:underline; }
+@media (max-width: 980px) { .carrier-combined-grid { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .carrier-number-upload-actions { width:100%; flex-direction:column; align-items:stretch; } .carrier-number-upload-actions .admin-btn { width:100%; } }
+
 /* ── NOTIFICATION SYSTEM ── */
 .notif-toast-wrap { position:fixed; bottom:24px; right:24px; z-index:10000; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
 .notif-toast { background:#1e3a6e; border:1px solid var(--border-2); border-radius:14px; padding:14px 18px; max-width:340px; box-shadow:0 8px 32px rgba(0,0,0,.5); pointer-events:all; display:flex; gap:12px; align-items:flex-start; animation:toastIn .3s ease; }
@@ -4896,58 +4916,86 @@ Agent Command Center
 </div>
 </section>
 
-<!-- CARRIER & AGENT NUMBER DIRECTORY - Phase 3 live directory -->
+<!-- CARRIER DIRECTORY - Phase 4 combined carrier contacts and agent numbers -->
 <section class="section hub-permission-hidden" id="carrier-agent-numbers" data-permission-required="carrier_directory_view">
 <div class="wrap">
 <div class="section-head">
 <div class="sh-left">
 <div class="sh-icon teal">🪪</div>
 <div>
-<h2>Carrier &amp; Agent Number <span style="color:var(--accent-2)">Directory</span></h2>
-<p>Search carrier writing numbers by agent, carrier, product type, and status.</p>
+<h2>Carrier <span style="color:var(--accent-2)">Directory</span></h2>
+<p>Carrier contacts, websites, contracting links, and agent writing numbers.</p>
 </div>
 </div>
 <span class="count-chip" id="carrierNumberCount">Loading…</span>
 </div>
 
-<div class="carrier-number-panel">
+<div class="carrier-number-panel carrier-combined-panel">
   <div class="carrier-number-topbar">
-    <input id="carrierNumberSearch" class="admin-input carrier-number-search" placeholder="🔍 Search agent, carrier, writing number, status, product, state…" autocomplete="off">
+    <input id="carrierNumberSearch" class="admin-input carrier-number-search" placeholder="🔍 Search carrier, phone, website, agent number, status, product, state…" autocomplete="off">
     <button type="button" class="admin-btn" id="carrierNumberRefreshBtn">Refresh</button>
-    <button type="button" class="admin-btn" id="carrierNumberTemplateBtn">Download CSV Template</button>
+    <button type="button" class="admin-btn" id="carrierContactTemplateBtn">Carrier Info CSV Template</button>
+    <button type="button" class="admin-btn" id="carrierNumberTemplateBtn">Agent Numbers CSV Template</button>
   </div>
 
   <div class="hub-permission-note" id="carrierPermissionDebug">Loading carrier directory permission…</div>
 
   <div id="carrierNumberUploadPanel" class="carrier-number-upload" style="display:none;">
     <div>
-      <strong>Admin CSV Upload</strong>
-      <span>Columns: agent_name, email, carrier, agent_number, status, product_type, state, notes.</span>
+      <strong>Admin CSV Uploads</strong>
+      <span>Carrier Info CSV updates carrier phone, website, support, contracting, product, state, and notes. Agent Numbers CSV updates writing numbers by email.</span>
     </div>
     <div class="carrier-number-upload-actions">
+      <input id="carrierContactCsvInput" type="file" accept=".csv,text/csv" style="display:none;">
       <input id="carrierNumberCsvInput" type="file" accept=".csv,text/csv" style="display:none;">
-      <button type="button" class="admin-btn" id="carrierNumberUploadBtn">Upload CSV</button>
+      <button type="button" class="admin-btn" id="carrierContactUploadBtn">Upload Carrier Info CSV</button>
+      <button type="button" class="admin-btn" id="carrierNumberUploadBtn">Upload Agent Numbers CSV</button>
+      <button type="button" class="admin-btn" id="carrierMigrateOldBtn" title="Copies the old Carrier Contacts tool records into this new Carrier Directory table.">Pull From Old Carrier Contacts</button>
     </div>
   </div>
 
-  <div class="carrier-number-table-wrap">
-    <table class="carrier-number-table">
-      <thead>
-        <tr>
-          <th>Agent</th>
-          <th>Email</th>
-          <th>Carrier</th>
-          <th>Agent Number</th>
-          <th>Status</th>
-          <th>Product</th>
-          <th>State</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody id="carrierNumberTbody">
-        <tr><td colspan="8" class="carrier-number-empty">Loading carrier numbers…</td></tr>
-      </tbody>
-    </table>
+  <div class="carrier-combined-grid">
+    <div class="carrier-combined-card">
+      <div class="carrier-combined-card-head">
+        <div>
+          <h3>Carrier Contact Info</h3>
+          <p>Phone numbers, portals, support contacts, products, states, and notes.</p>
+        </div>
+        <span class="count-chip" id="carrierContactCount">0 carriers</span>
+      </div>
+      <div id="carrierContactList" class="carrier-contact-list">
+        <div class="carrier-number-empty">Loading carrier contacts…</div>
+      </div>
+    </div>
+
+    <div class="carrier-combined-card">
+      <div class="carrier-combined-card-head">
+        <div>
+          <h3 id="carrierNumbersTitle">My Agent Numbers</h3>
+          <p id="carrierNumbersSub">Writing numbers are restricted by logged-in email unless you are admin.</p>
+        </div>
+        <span class="count-chip" id="carrierWritingCount">0 numbers</span>
+      </div>
+      <div class="carrier-number-table-wrap">
+        <table class="carrier-number-table">
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Email</th>
+              <th>Carrier</th>
+              <th>Agent Number</th>
+              <th>Status</th>
+              <th>Product</th>
+              <th>State</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="carrierNumberTbody">
+            <tr><td colspan="8" class="carrier-number-empty">Loading agent numbers…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -17939,61 +17987,79 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   var CN_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'.replace('eyJpc3MiOiJIUzI1NiIsInJlZiI6','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6');
   var CN_HUB = 'medi';
   var carrierRows = [];
+  var carrierContacts = [];
 
   function getCurrentHubUser(){
     if (window.HUB_CURRENT_USER && window.HUB_CURRENT_USER.email) return window.HUB_CURRENT_USER;
-    try {
-      var raw = sessionStorage.getItem('medi_hub_current_user');
-      if (raw) return JSON.parse(raw);
-    } catch(e) {}
+    try { var raw = sessionStorage.getItem('medi_hub_current_user'); if (raw) return JSON.parse(raw); } catch(e) {}
     return null;
   }
   function isAdminLike(profile){
     var role = String((profile && profile.role) || '').toLowerCase();
     var perms = (profile && profile.permissions) || {};
-    return role === 'admin' || role === 'manager' || role === 'internal' || perms.admin === true;
+    return role === 'admin' || perms.admin === true || perms.carrier_directory_scope === 'all';
   }
   function canUpload(profile){
     var perms = (profile && profile.permissions) || {};
     return isAdminLike(profile) || perms.carrier_directory_upload === true || perms.carrier_directory_upload === 'true';
   }
-  function scopeFor(profile){
-    var perms = (profile && profile.permissions) || {};
-    if (isAdminLike(profile)) return 'all';
-    return String(perms.carrier_directory_scope || 'self').toLowerCase();
-  }
   function esc(value){
-    return String(value == null ? '' : value)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
-  function setStatus(text){
-    var count = document.getElementById('carrierNumberCount');
-    if (count) count.textContent = text;
+  function safeUrl(url){
+    var s = String(url || '').trim();
+    if (!s) return '';
+    if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+    return s;
   }
-  function updateDebug(profile, rows){
+  function setText(id, text){ var el = document.getElementById(id); if (el) el.textContent = text; }
+  function updateDebug(profile){
     var dbg = document.getElementById('carrierPermissionDebug');
     if (!dbg) return;
     var email = (profile && profile.email) || 'current user';
     var role = (profile && profile.role) || 'agent';
-    var scope = scopeFor(profile || {});
-    dbg.textContent = 'Visible for ' + email + ' · role: ' + role + ' · carrier_directory_scope: ' + scope + ' · records loaded: ' + (rows ? rows.length : 0);
+    var scope = isAdminLike(profile) ? 'all admin view' : 'self only';
+    dbg.textContent = 'Visible for ' + email + ' · role: ' + role + ' · writing number access: ' + scope + ' · carrier contacts: ' + carrierContacts.length + ' · agent number records: ' + carrierRows.length;
+  }
+  function getSearch(){ var s = document.getElementById('carrierNumberSearch'); return String((s && s.value) || '').trim().toLowerCase(); }
+  function matchRow(row, q){
+    if (!q) return true;
+    return Object.keys(row || {}).map(function(k){ return row[k]; }).join(' ').toLowerCase().indexOf(q) !== -1;
+  }
+  function renderCarrierContacts(){
+    var list = document.getElementById('carrierContactList');
+    if (!list) return;
+    var q = getSearch();
+    var rows = carrierContacts.filter(function(r){ return matchRow(r, q); });
+    setText('carrierContactCount', rows.length + ' carrier' + (rows.length === 1 ? '' : 's'));
+    if (!rows.length) { list.innerHTML = '<div class="carrier-number-empty">No carrier contact records found.</div>'; return; }
+    list.innerHTML = rows.map(function(c){
+      var website = safeUrl(c.website || c.portal || c.url || '');
+      var contract = safeUrl(c.contracting_link || '');
+      var phone = c.phone || c.broker_phone || '';
+      var support = c.broker_support_email || c.support_email || '';
+      return '<div class="carrier-contact-card">' +
+        '<div class="carrier-contact-name">📞 ' + esc(c.carrier || c.name || '') + '</div>' +
+        '<div class="carrier-contact-meta">' +
+          (phone ? '<div class="carrier-contact-row"><div class="carrier-contact-label">Phone</div><div class="carrier-contact-value"><a href="tel:' + esc(phone) + '">' + esc(phone) + '</a></div></div>' : '') +
+          (website ? '<div class="carrier-contact-row"><div class="carrier-contact-label">Website</div><div class="carrier-contact-value"><a href="' + esc(website) + '" target="_blank" rel="noopener">Open site ↗</a></div></div>' : '') +
+          (support ? '<div class="carrier-contact-row"><div class="carrier-contact-label">Support</div><div class="carrier-contact-value">' + esc(support) + '</div></div>' : '') +
+          (contract ? '<div class="carrier-contact-row"><div class="carrier-contact-label">Contracting</div><div class="carrier-contact-value"><a href="' + esc(contract) + '" target="_blank" rel="noopener">Open link ↗</a></div></div>' : '') +
+          (c.products ? '<div class="carrier-contact-row"><div class="carrier-contact-label">Products</div><div class="carrier-contact-value">' + esc(c.products) + '</div></div>' : '') +
+          (c.states ? '<div class="carrier-contact-row"><div class="carrier-contact-label">States</div><div class="carrier-contact-value">' + esc(c.states) + '</div></div>' : '') +
+          (c.notes ? '<div class="carrier-contact-row"><div class="carrier-contact-label">Notes</div><div class="carrier-contact-value">' + esc(c.notes) + '</div></div>' : '') +
+        '</div></div>';
+    }).join('');
   }
   function renderCarrierRows(){
     var body = document.getElementById('carrierNumberTbody');
-    var search = document.getElementById('carrierNumberSearch');
     if (!body) return;
-    var q = String((search && search.value) || '').trim().toLowerCase();
-    var filtered = carrierRows.filter(function(r){
-      if (!q) return true;
-      return [r.agent_name, r.email, r.carrier, r.agent_number, r.status, r.product_type, r.state, r.notes]
-        .join(' ').toLowerCase().indexOf(q) !== -1;
-    });
-    setStatus(filtered.length + ' record' + (filtered.length === 1 ? '' : 's'));
-    if (!filtered.length) {
-      body.innerHTML = '<tr><td colspan="8" class="carrier-number-empty">No carrier number records found.</td></tr>';
-      return;
-    }
-    body.innerHTML = filtered.map(function(r){
+    var q = getSearch();
+    var rows = carrierRows.filter(function(r){ return matchRow(r, q); });
+    setText('carrierWritingCount', rows.length + ' number' + (rows.length === 1 ? '' : 's'));
+    setText('carrierNumberCount', (carrierContacts.length + rows.length) + ' records');
+    if (!rows.length) { body.innerHTML = '<tr><td colspan="8" class="carrier-number-empty">No agent number records found.</td></tr>'; return; }
+    body.innerHTML = rows.map(function(r){
       return '<tr>' +
         '<td><strong>' + esc(r.agent_name || '') + '</strong></td>' +
         '<td>' + esc(r.email || '') + '</td>' +
@@ -18006,155 +18072,138 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       '</tr>';
     }).join('');
   }
+  function renderAll(){ renderCarrierContacts(); renderCarrierRows(); updateDebug(getCurrentHubUser()); }
+  function headers(extra){
+    var h = { 'apikey': CN_SUPA_KEY, 'Authorization': 'Bearer ' + CN_SUPA_KEY, 'Cache-Control': 'no-cache' };
+    if (extra) Object.keys(extra).forEach(function(k){ h[k] = extra[k]; });
+    return h;
+  }
+  function loadCarrierContacts(){
+    var url = CN_SUPA_URL + '/rest/v1/carrier_directory?hub=eq.' + encodeURIComponent(CN_HUB) + '&select=id,carrier,phone,website,broker_support_email,contracting_link,products,states,notes,updated_at&order=carrier.asc';
+    return fetch(url, { headers: headers() }).then(function(r){ if (!r.ok) throw new Error('Carrier contact load failed: ' + r.status); return r.json(); }).then(function(rows){ carrierContacts = Array.isArray(rows) ? rows : []; });
+  }
   function loadCarrierRows(){
-    var section = document.getElementById('carrier-agent-numbers');
-    if (!section) return;
     var profile = getCurrentHubUser();
-    if (!profile || !profile.email) {
-      setStatus('Waiting for login…');
-      return;
-    }
-    var scope = scopeFor(profile);
+    if (!profile || !profile.email) return Promise.resolve();
+    var title = document.getElementById('carrierNumbersTitle');
+    var sub = document.getElementById('carrierNumbersSub');
+    var all = isAdminLike(profile);
+    if (title) title.textContent = all ? 'All Agent Numbers' : 'My Agent Numbers';
+    if (sub) sub.textContent = all ? 'Admin view: all writing numbers are visible.' : 'Only writing numbers tied to your logged-in email are visible.';
     var url = CN_SUPA_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(CN_HUB) + '&select=id,agent_name,email,carrier,agent_number,status,product_type,state,notes,updated_at&order=agent_name.asc,carrier.asc';
-    if (scope !== 'all') url += '&email=eq.' + encodeURIComponent(String(profile.email).toLowerCase());
-    setStatus('Loading…');
-    fetch(url, { headers: { 'apikey': CN_SUPA_KEY, 'Authorization': 'Bearer ' + CN_SUPA_KEY, 'Cache-Control': 'no-cache' }})
-      .then(function(r){ if (!r.ok) throw new Error('Carrier directory load failed: ' + r.status); return r.json(); })
-      .then(function(rows){
-        carrierRows = Array.isArray(rows) ? rows : [];
-        updateDebug(profile, carrierRows);
-        var uploadPanel = document.getElementById('carrierNumberUploadPanel');
-        if (uploadPanel) uploadPanel.style.display = canUpload(profile) ? 'flex' : 'none';
-        renderCarrierRows();
-      })
-      .catch(function(err){
-        console.warn('[Carrier Directory] Load unavailable:', err && err.message ? err.message : err);
-        carrierRows = [];
-        updateDebug(profile, []);
-        setStatus('Unavailable');
-        var body = document.getElementById('carrierNumberTbody');
-        if (body) body.innerHTML = '<tr><td colspan="8" class="carrier-number-empty">Carrier directory is temporarily unavailable. Try Refresh.</td></tr>';
-      });
+    if (!all) url += '&email=eq.' + encodeURIComponent(String(profile.email).toLowerCase());
+    return fetch(url, { headers: headers() }).then(function(r){ if (!r.ok) throw new Error('Agent number load failed: ' + r.status); return r.json(); }).then(function(rows){ carrierRows = Array.isArray(rows) ? rows : []; });
   }
-  function csvEscape(value){
-    var s = String(value == null ? '' : value);
-    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
-    return s;
+  function loadCarrierDirectory(){
+    setText('carrierNumberCount','Loading…');
+    Promise.all([loadCarrierContacts(), loadCarrierRows()]).then(function(){
+      var profile = getCurrentHubUser();
+      var uploadPanel = document.getElementById('carrierNumberUploadPanel');
+      if (uploadPanel) uploadPanel.style.display = canUpload(profile) ? 'flex' : 'none';
+      renderAll();
+    }).catch(function(err){
+      console.warn('[Carrier Directory] Load unavailable:', err && err.message ? err.message : err);
+      setText('carrierNumberCount','Unavailable');
+      var list = document.getElementById('carrierContactList');
+      if (list) list.innerHTML = '<div class="carrier-number-empty">Carrier directory is temporarily unavailable. Try Refresh.</div>';
+      var body = document.getElementById('carrierNumberTbody');
+      if (body) body.innerHTML = '<tr><td colspan="8" class="carrier-number-empty">Agent numbers are temporarily unavailable. Try Refresh.</td></tr>';
+    });
   }
-  function downloadTemplate(){
-    var lines = [
-      ['agent_name','email','carrier','agent_number','status','product_type','state','notes'],
-      ['Brian DeRoss','brdeross@fjins.net','Aetna','123456','Active','Medicare','NJ','Example only']
-    ];
-    var csv = lines.map(function(row){ return row.map(csvEscape).join(','); }).join('\n');
+  function csvEscape(value){ var s = String(value == null ? '' : value); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+  function downloadCsv(filename, rows){
+    var csv = rows.map(function(row){ return row.map(csvEscape).join(','); }).join('\n');
     var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'carrier_agent_numbers_template.csv';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 500);
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 500);
   }
+  function downloadContactTemplate(){ downloadCsv('carrier_directory_template.csv', [['carrier','phone','website','broker_support_email','contracting_link','products','states','notes'], ['Aetna','800-000-0000','https://www.aetna.com','broker@example.com','https://example.com/contracting','Medicare','NJ, PA','Example only']]); }
+  function downloadNumberTemplate(){ downloadCsv('carrier_agent_numbers_template.csv', [['agent_name','email','carrier','agent_number','status','product_type','state','notes'], ['Brian DeRoss','brdeross@fjins.net','Aetna','123456','Active','Medicare','NJ','Example only']]); }
   function parseCsv(text){
     var rows = [], row = [], cell = '', inQuotes = false;
-    for (var i=0; i<text.length; i++) {
-      var ch = text[i], next = text[i+1];
-      if (ch === '"') {
-        if (inQuotes && next === '"') { cell += '"'; i++; }
-        else inQuotes = !inQuotes;
-      } else if (ch === ',' && !inQuotes) { row.push(cell); cell = ''; }
-      else if ((ch === '\n' || ch === '\r') && !inQuotes) {
-        if (ch === '\r' && next === '\n') i++;
-        row.push(cell); cell = '';
-        if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row);
-        row = [];
-      } else cell += ch;
-    }
-    row.push(cell);
-    if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row);
-    return rows;
+    for (var i=0; i<text.length; i++) { var ch = text[i], next = text[i+1]; if (ch === '"') { if (inQuotes && next === '"') { cell += '"'; i++; } else inQuotes = !inQuotes; } else if (ch === ',' && !inQuotes) { row.push(cell); cell = ''; } else if ((ch === '\n' || ch === '\r') && !inQuotes) { if (ch === '\r' && next === '\n') i++; row.push(cell); cell = ''; if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row); row = []; } else cell += ch; }
+    row.push(cell); if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row); return rows;
   }
-  function importCsvFile(file){
-    var profile = getCurrentHubUser();
-    if (!canUpload(profile)) { alert('You do not have permission to upload carrier records.'); return; }
-    if (!file) return;
-    if (!confirm('This will replace all Carrier & Agent Number records for this Hub with the CSV contents. Continue?')) return;
+  function parseCsvObjects(text){
+    var parsed = parseCsv(String(text || ''));
+    if (parsed.length < 2) throw new Error('CSV has no data rows.');
+    var headersRow = parsed[0].map(function(h){ return String(h || '').trim().toLowerCase().replace(/\s+/g, '_'); });
+    return parsed.slice(1).map(function(r){ var obj = {}; headersRow.forEach(function(h, idx){ obj[h] = String(r[idx] == null ? '' : r[idx]).trim(); }); return obj; });
+  }
+  function replaceTable(table, rows){
+    return fetch(CN_SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(CN_HUB), { method:'DELETE', headers: headers() }).then(function(r){
+      if (!r.ok) throw new Error('Delete/replace step failed for ' + table + ': ' + r.status);
+      if (!rows.length) return r;
+      return fetch(CN_SUPA_URL + '/rest/v1/' + table, { method:'POST', headers: headers({ 'Content-Type':'application/json', 'Prefer':'return=minimal' }), body: JSON.stringify(rows) });
+    }).then(function(r){ if (r && !r.ok) throw new Error('Upload step failed for ' + table + ': ' + r.status); });
+  }
+  function importContactsFile(file){
+    var profile = getCurrentHubUser(); if (!canUpload(profile)) { alert('You do not have permission to upload carrier records.'); return; } if (!file) return;
+    if (!confirm('This will replace all Carrier Info records for this Hub with the CSV contents. Continue?')) return;
     var reader = new FileReader();
     reader.onload = function(){
       try {
-        var parsed = parseCsv(String(reader.result || ''));
-        if (parsed.length < 2) throw new Error('CSV has no data rows.');
-        var headers = parsed[0].map(function(h){ return String(h || '').trim().toLowerCase().replace(/\s+/g, '_'); });
-        var required = ['agent_name','email','carrier','agent_number'];
-        required.forEach(function(h){ if (headers.indexOf(h) === -1) throw new Error('Missing required column: ' + h); });
-        var rows = parsed.slice(1).map(function(r){
-          var obj = { hub: CN_HUB };
-          headers.forEach(function(h, idx){ obj[h] = String(r[idx] == null ? '' : r[idx]).trim(); });
-          return {
-            hub: CN_HUB,
-            agent_name: obj.agent_name || '',
-            email: String(obj.email || '').toLowerCase(),
-            carrier: obj.carrier || '',
-            agent_number: obj.agent_number || '',
-            status: obj.status || '',
-            product_type: obj.product_type || '',
-            state: obj.state || '',
-            notes: obj.notes || ''
-          };
-        }).filter(function(r){ return r.email && r.carrier; });
-        if (!rows.length) throw new Error('No valid rows found.');
-        fetch(CN_SUPA_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(CN_HUB), {
-          method: 'DELETE',
-          headers: { 'apikey': CN_SUPA_KEY, 'Authorization': 'Bearer ' + CN_SUPA_KEY }
-        }).then(function(r){
-          if (!r.ok) throw new Error('Delete/replace step failed: ' + r.status);
-          return fetch(CN_SUPA_URL + '/rest/v1/carrier_agent_numbers', {
-            method: 'POST',
-            headers: { 'apikey': CN_SUPA_KEY, 'Authorization': 'Bearer ' + CN_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-            body: JSON.stringify(rows)
-          });
-        }).then(function(r){
-          if (!r.ok) throw new Error('Upload step failed: ' + r.status);
-          alert('Carrier directory uploaded: ' + rows.length + ' record(s).');
-          loadCarrierRows();
-        }).catch(function(err){
-          console.error('[Carrier Directory] CSV upload failed:', err);
-          alert('CSV upload failed: ' + (err && err.message ? err.message : err));
-        });
-      } catch(err) {
-        alert('CSV import error: ' + (err && err.message ? err.message : err));
-      }
+        var objs = parseCsvObjects(reader.result);
+        var rows = objs.map(function(o){ return { hub: CN_HUB, carrier: o.carrier || o.name || '', phone: o.phone || o.broker_phone || '', website: o.website || o.url || o.portal || '', broker_support_email: o.broker_support_email || o.support_email || '', contracting_link: o.contracting_link || '', products: o.products || '', states: o.states || '', notes: o.notes || '' }; }).filter(function(r){ return r.carrier; });
+        if (!rows.length) throw new Error('No valid carrier rows found.');
+        replaceTable('carrier_directory', rows).then(function(){ alert('Carrier info uploaded: ' + rows.length + ' record(s).'); loadCarrierDirectory(); }).catch(function(err){ alert('Carrier info upload failed: ' + (err && err.message ? err.message : err)); });
+      } catch(err) { alert('CSV import error: ' + (err && err.message ? err.message : err)); }
     };
     reader.readAsText(file);
   }
+  function importNumbersFile(file){
+    var profile = getCurrentHubUser(); if (!canUpload(profile)) { alert('You do not have permission to upload agent number records.'); return; } if (!file) return;
+    if (!confirm('This will replace all Agent Number records for this Hub with the CSV contents. Continue?')) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var objs = parseCsvObjects(reader.result);
+        var rows = objs.map(function(o){ return { hub: CN_HUB, agent_name: o.agent_name || o.name || '', email: String(o.email || '').toLowerCase(), carrier: o.carrier || '', agent_number: o.agent_number || o.writing_number || '', status: o.status || '', product_type: o.product_type || o.product || '', state: o.state || '', notes: o.notes || '' }; }).filter(function(r){ return r.email && r.carrier; });
+        if (!rows.length) throw new Error('No valid agent number rows found.');
+        replaceTable('carrier_agent_numbers', rows).then(function(){ alert('Agent numbers uploaded: ' + rows.length + ' record(s).'); loadCarrierDirectory(); }).catch(function(err){ alert('Agent number upload failed: ' + (err && err.message ? err.message : err)); });
+      } catch(err) { alert('CSV import error: ' + (err && err.message ? err.message : err)); }
+    };
+    reader.readAsText(file);
+  }
+  function normalizeOldCarrierRows(data){
+    var arr = [];
+    if (Array.isArray(data)) arr = data;
+    else if (data && Array.isArray(data.data)) arr = data.data;
+    else if (data && Array.isArray(data.rows)) arr = data.rows;
+    else if (data && Array.isArray(data.carriers)) arr = data.carriers;
+    return arr.map(function(c){ return { hub: CN_HUB, carrier: c.carrier || c.name || '', phone: c.phone || '', website: c.website || c.url || '', broker_support_email: c.broker_support_email || '', contracting_link: c.contracting_link || '', products: c.products || '', states: c.states || '', notes: [c.auth ? ('Prior Auth: ' + c.auth) : '', c.notes || ''].filter(Boolean).join(' | ') }; }).filter(function(r){ return r.carrier; });
+  }
+  function migrateOldCarrierContacts(){
+    var profile = getCurrentHubUser(); if (!canUpload(profile)) { alert('You do not have permission to migrate carrier records.'); return; }
+    if (!confirm('This will copy records from the old Carrier Contacts tool into the new Carrier Directory table and replace current Carrier Info records. Continue?')) return;
+    var url = CN_SUPA_URL + '/rest/v1/carrier_contacts?hub=eq.' + encodeURIComponent(CN_HUB) + '&select=data';
+    fetch(url, { headers: headers() }).then(function(r){ if (!r.ok) throw new Error('Old Carrier Contacts load failed: ' + r.status); return r.json(); }).then(function(rows){
+      var merged = [];
+      (Array.isArray(rows) ? rows : []).forEach(function(row){
+        var data = row && row.data;
+        if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) {} }
+        merged = merged.concat(normalizeOldCarrierRows(data));
+      });
+      var seen = {}, clean = [];
+      merged.forEach(function(r){ var key = String(r.carrier).trim().toLowerCase(); if (!seen[key]) { seen[key]=1; clean.push(r); } });
+      if (!clean.length) throw new Error('No old carrier contact records found to migrate.');
+      return replaceTable('carrier_directory', clean).then(function(){ alert('Migrated ' + clean.length + ' carrier contact record(s).'); loadCarrierDirectory(); });
+    }).catch(function(err){ alert('Migration failed: ' + (err && err.message ? err.message : err)); });
+  }
   function bindCarrierDirectory(){
-    var search = document.getElementById('carrierNumberSearch');
-    if (search && !search.dataset.bound) { search.dataset.bound = '1'; search.addEventListener('input', renderCarrierRows); }
-    var refresh = document.getElementById('carrierNumberRefreshBtn');
-    if (refresh && !refresh.dataset.bound) { refresh.dataset.bound = '1'; refresh.addEventListener('click', loadCarrierRows); }
-    var template = document.getElementById('carrierNumberTemplateBtn');
-    if (template && !template.dataset.bound) { template.dataset.bound = '1'; template.addEventListener('click', downloadTemplate); }
-    var uploadBtn = document.getElementById('carrierNumberUploadBtn');
-    var input = document.getElementById('carrierNumberCsvInput');
-    if (uploadBtn && input && !uploadBtn.dataset.bound) {
-      uploadBtn.dataset.bound = '1';
-      uploadBtn.addEventListener('click', function(){ input.value = ''; input.click(); });
-      input.addEventListener('change', function(){ importCsvFile(input.files && input.files[0]); });
-    }
+    var search = document.getElementById('carrierNumberSearch'); if (search && !search.dataset.bound) { search.dataset.bound = '1'; search.addEventListener('input', renderAll); }
+    var refresh = document.getElementById('carrierNumberRefreshBtn'); if (refresh && !refresh.dataset.bound) { refresh.dataset.bound = '1'; refresh.addEventListener('click', loadCarrierDirectory); }
+    var ct = document.getElementById('carrierContactTemplateBtn'); if (ct && !ct.dataset.bound) { ct.dataset.bound = '1'; ct.addEventListener('click', downloadContactTemplate); }
+    var nt = document.getElementById('carrierNumberTemplateBtn'); if (nt && !nt.dataset.bound) { nt.dataset.bound = '1'; nt.addEventListener('click', downloadNumberTemplate); }
+    var cu = document.getElementById('carrierContactUploadBtn'), ci = document.getElementById('carrierContactCsvInput'); if (cu && ci && !cu.dataset.bound) { cu.dataset.bound = '1'; cu.addEventListener('click', function(){ ci.value=''; ci.click(); }); ci.addEventListener('change', function(){ importContactsFile(ci.files && ci.files[0]); }); }
+    var nu = document.getElementById('carrierNumberUploadBtn'), ni = document.getElementById('carrierNumberCsvInput'); if (nu && ni && !nu.dataset.bound) { nu.dataset.bound = '1'; nu.addEventListener('click', function(){ ni.value=''; ni.click(); }); ni.addEventListener('change', function(){ importNumbersFile(ni.files && ni.files[0]); }); }
+    var migrate = document.getElementById('carrierMigrateOldBtn'); if (migrate && !migrate.dataset.bound) { migrate.dataset.bound = '1'; migrate.addEventListener('click', migrateOldCarrierContacts); }
   }
-  window.refreshCarrierAgentDirectory = loadCarrierRows;
-  function initCarrierDirectory(){
-    bindCarrierDirectory();
-    loadCarrierRows();
-  }
+  window.refreshCarrierAgentDirectory = loadCarrierDirectory;
   document.addEventListener('DOMContentLoaded', function(){
-    initCarrierDirectory();
+    bindCarrierDirectory();
+    loadCarrierDirectory();
     var tries = 0;
-    var timer = setInterval(function(){
-      tries++;
-      bindCarrierDirectory();
-      if (getCurrentHubUser() && getCurrentHubUser().email) loadCarrierRows();
-      if (tries >= 8) clearInterval(timer);
-    }, 700);
+    var timer = setInterval(function(){ tries++; bindCarrierDirectory(); if (getCurrentHubUser() && getCurrentHubUser().email) loadCarrierDirectory(); if (tries >= 8) clearInterval(timer); }, 700);
   });
 })();
 </script>
