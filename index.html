@@ -3873,6 +3873,11 @@ transition: background .15s, color .15s;
 .carrier-number-upload strong { display:block; color:#fff; font-size:14px; margin-bottom:4px; }
 .carrier-number-upload span { display:block; color:var(--muted); font-size:12px; line-height:1.45; }
 .carrier-number-upload-actions { display:flex; gap:8px; align-items:center; }
+.carrier-admin-toggle { opacity:.82; padding:9px 12px; }
+.carrier-admin-tools-panel { margin-top: 8px; background: rgba(15,23,42,.38); border-style: dashed; }
+.carrier-admin-tools-panel .carrier-number-upload-actions { flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 720px) { .carrier-admin-tools-panel .carrier-number-upload-actions { justify-content: stretch; } }
+
 .carrier-number-table-wrap {
   width: 100%;
   overflow-x: auto;
@@ -4934,23 +4939,24 @@ Agent Command Center
   <div class="carrier-number-topbar">
     <input id="carrierNumberSearch" class="admin-input carrier-number-search" placeholder="🔍 Search carrier, phone, website, agent number, status, product, state…" autocomplete="off">
     <button type="button" class="admin-btn" id="carrierNumberRefreshBtn">Refresh</button>
-    <button type="button" class="admin-btn" id="carrierContactTemplateBtn">Carrier Info CSV Template</button>
-    <button type="button" class="admin-btn" id="carrierNumberTemplateBtn">Agent Numbers CSV Template</button>
+    <button type="button" class="admin-btn carrier-admin-toggle" id="carrierAdminToolsToggle" style="display:none;">Admin Tools</button>
   </div>
 
   <div class="hub-permission-note" id="carrierPermissionDebug">Loading carrier directory permission…</div>
 
-  <div id="carrierNumberUploadPanel" class="carrier-number-upload" style="display:none;">
+  <div id="carrierNumberUploadPanel" class="carrier-number-upload carrier-admin-tools-panel" style="display:none;">
     <div>
-      <strong>Admin CSV Uploads</strong>
-      <span>Carrier Info CSV updates carrier phone, website, support, contracting, product, state, and notes. Agent Numbers CSV updates writing numbers by email.</span>
+      <strong>Admin CSV Tools</strong>
+      <span>Use only when updating carrier contact info or agent writing numbers. Migration is complete, so the old migration button is hidden.</span>
     </div>
     <div class="carrier-number-upload-actions">
       <input id="carrierContactCsvInput" type="file" accept=".csv,text/csv" style="display:none;">
       <input id="carrierNumberCsvInput" type="file" accept=".csv,text/csv" style="display:none;">
-      <button type="button" class="admin-btn" id="carrierContactUploadBtn">Upload Carrier Info CSV</button>
-      <button type="button" class="admin-btn" id="carrierNumberUploadBtn">Upload Agent Numbers CSV</button>
-      <button type="button" class="admin-btn" id="carrierMigrateOldBtn" title="Copies the old Carrier Contacts tool records into this new Carrier Directory table.">Pull From Old Carrier Contacts</button>
+      <button type="button" class="admin-btn" id="carrierContactTemplateBtn">Carrier Info Template</button>
+      <button type="button" class="admin-btn" id="carrierNumberTemplateBtn">Agent Numbers Template</button>
+      <button type="button" class="admin-btn" id="carrierContactUploadBtn">Upload Carrier Info</button>
+      <button type="button" class="admin-btn" id="carrierNumberUploadBtn">Upload Agent Numbers</button>
+      <button type="button" class="admin-btn" id="carrierMigrateOldBtn" style="display:none;" aria-hidden="true" title="Migration already completed.">Pull From Old Carrier Contacts</button>
     </div>
   </div>
 
@@ -18099,7 +18105,9 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     Promise.all([loadCarrierContacts(), loadCarrierRows()]).then(function(){
       var profile = getCurrentHubUser();
       var uploadPanel = document.getElementById('carrierNumberUploadPanel');
-      if (uploadPanel) uploadPanel.style.display = canUpload(profile) ? 'flex' : 'none';
+      var adminToggle = document.getElementById('carrierAdminToolsToggle');
+      if (adminToggle) adminToggle.style.display = canUpload(profile) ? 'inline-flex' : 'none';
+      if (uploadPanel && !uploadPanel.dataset.open) uploadPanel.style.display = 'none';
       renderAll();
     }).catch(function(err){
       console.warn('[Carrier Directory] Load unavailable:', err && err.message ? err.message : err);
@@ -18254,6 +18262,17 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function bindCarrierDirectory(){
     var search = document.getElementById('carrierNumberSearch'); if (search && !search.dataset.bound) { search.dataset.bound = '1'; search.addEventListener('input', renderAll); }
     var refresh = document.getElementById('carrierNumberRefreshBtn'); if (refresh && !refresh.dataset.bound) { refresh.dataset.bound = '1'; refresh.addEventListener('click', loadCarrierDirectory); }
+    var adminToggle = document.getElementById('carrierAdminToolsToggle');
+    var uploadPanel = document.getElementById('carrierNumberUploadPanel');
+    if (adminToggle && uploadPanel && !adminToggle.dataset.bound) {
+      adminToggle.dataset.bound = '1';
+      adminToggle.addEventListener('click', function(){
+        var open = uploadPanel.dataset.open === '1';
+        if (open) { uploadPanel.dataset.open = ''; uploadPanel.style.display = 'none'; adminToggle.textContent = 'Admin Tools'; }
+        else { uploadPanel.dataset.open = '1'; uploadPanel.style.display = 'flex'; adminToggle.textContent = 'Hide Admin Tools'; }
+      });
+    }
+    var migrateBtn = document.getElementById('carrierMigrateOldBtn'); if (migrateBtn) migrateBtn.style.display = 'none';
     var ct = document.getElementById('carrierContactTemplateBtn'); if (ct && !ct.dataset.bound) { ct.dataset.bound = '1'; ct.addEventListener('click', downloadContactTemplate); }
     var nt = document.getElementById('carrierNumberTemplateBtn'); if (nt && !nt.dataset.bound) { nt.dataset.bound = '1'; nt.addEventListener('click', downloadNumberTemplate); }
     var cu = document.getElementById('carrierContactUploadBtn'), ci = document.getElementById('carrierContactCsvInput'); if (cu && ci && !cu.dataset.bound) { cu.dataset.bound = '1'; cu.addEventListener('click', function(){ ci.value=''; ci.click(); }); ci.addEventListener('change', function(){ importContactsFile(ci.files && ci.files[0]); }); }
