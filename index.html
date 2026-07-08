@@ -18170,24 +18170,86 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     else if (data && Array.isArray(data.data)) arr = data.data;
     else if (data && Array.isArray(data.rows)) arr = data.rows;
     else if (data && Array.isArray(data.carriers)) arr = data.carriers;
-    return arr.map(function(c){ return { hub: CN_HUB, carrier: c.carrier || c.name || '', phone: c.phone || '', website: c.website || c.url || '', broker_support_email: c.broker_support_email || '', contracting_link: c.contracting_link || '', products: c.products || '', states: c.states || '', notes: [c.auth ? ('Prior Auth: ' + c.auth) : '', c.notes || ''].filter(Boolean).join(' | ') }; }).filter(function(r){ return r.carrier; });
+    else if (data && typeof data === 'object' && (data.name || data.carrier)) arr = [data];
+    return arr.map(function(c){
+      return {
+        hub: CN_HUB,
+        carrier: c.carrier || c.name || c.carrier_name || '',
+        phone: c.phone || c.broker_phone || c.support_phone || '',
+        website: c.website || c.url || c.portal || c.portal_url || '',
+        broker_support_email: c.broker_support_email || c.support_email || c.email || '',
+        contracting_link: c.contracting_link || c.contracting_url || '',
+        products: c.products || c.product_type || '',
+        states: c.states || c.state || '',
+        notes: [
+          c.auth ? ('Prior Auth: ' + c.auth) : '',
+          c.prior_auth ? ('Prior Auth: ' + c.prior_auth) : '',
+          c.notes || ''
+        ].filter(Boolean).join(' | ')
+      };
+    }).filter(function(r){ return String(r.carrier || '').trim(); });
+  }
+  function dedupeCarrierContacts(list){
+    var seen = {}, clean = [];
+    (list || []).forEach(function(r){
+      var key = String(r.carrier || '').trim().toLowerCase();
+      if (!key || seen[key]) return;
+      seen[key] = 1;
+      clean.push(r);
+    });
+    return clean;
+  }
+  function fetchOldCarrierContactsFromSupabase(){
+    var urls = [
+      CN_SUPA_URL + '/rest/v1/carrier_contacts?hub=eq.' + encodeURIComponent(CN_HUB) + '&select=*',
+      CN_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(CN_HUB) + '&key=eq.carrier_contacts&select=data',
+      CN_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(CN_HUB) + '&key=eq.carriers&select=data'
+    ];
+    var merged = [];
+    return urls.reduce(function(p, url){
+      return p.then(function(){
+        if (merged.length) return;
+        return fetch(url, { headers: headers() }).then(function(r){
+          if (!r.ok) return [];
+          return r.json();
+        }).then(function(rows){
+          (Array.isArray(rows) ? rows : []).forEach(function(row){
+            var data = row && Object.prototype.hasOwnProperty.call(row, 'data') ? row.data : row;
+            if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) {} }
+            merged = merged.concat(normalizeOldCarrierRows(data));
+          });
+        }).catch(function(){});
+      });
+    }, Promise.resolve()).then(function(){ return dedupeCarrierContacts(merged); });
+  }
+  function getOldCarrierContactsFromCurrentPage(){
+    var merged = [];
+    try {
+      if (typeof window._csvBridgeGetCarriers === 'function') {
+        merged = merged.concat(normalizeOldCarrierRows(window._csvBridgeGetCarriers() || []));
+      }
+    } catch(e) {}
+    return dedupeCarrierContacts(merged);
   }
   function migrateOldCarrierContacts(){
     var profile = getCurrentHubUser(); if (!canUpload(profile)) { alert('You do not have permission to migrate carrier records.'); return; }
     if (!confirm('This will copy records from the old Carrier Contacts tool into the new Carrier Directory table and replace current Carrier Info records. Continue?')) return;
-    var url = CN_SUPA_URL + '/rest/v1/carrier_contacts?hub=eq.' + encodeURIComponent(CN_HUB) + '&select=data';
-    fetch(url, { headers: headers() }).then(function(r){ if (!r.ok) throw new Error('Old Carrier Contacts load failed: ' + r.status); return r.json(); }).then(function(rows){
-      var merged = [];
-      (Array.isArray(rows) ? rows : []).forEach(function(row){
-        var data = row && row.data;
-        if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) {} }
-        merged = merged.concat(normalizeOldCarrierRows(data));
-      });
-      var seen = {}, clean = [];
-      merged.forEach(function(r){ var key = String(r.carrier).trim().toLowerCase(); if (!seen[key]) { seen[key]=1; clean.push(r); } });
-      if (!clean.length) throw new Error('No old carrier contact records found to migrate.');
+
+    function finish(clean){
+      clean = dedupeCarrierContacts(clean || []);
+      if (!clean.length) throw new Error('No old carrier contact records found. Open the old Carrier Contacts tool once, confirm records are visible there, then click this button again. If it still fails, export Carrier Contacts CSV from the old Admin Carriers tab and upload it here with Upload Carrier Info CSV.');
       return replaceTable('carrier_directory', clean).then(function(){ alert('Migrated ' + clean.length + ' carrier contact record(s).'); loadCarrierDirectory(); });
-    }).catch(function(err){ alert('Migration failed: ' + (err && err.message ? err.message : err)); });
+    }
+
+    var pageRows = getOldCarrierContactsFromCurrentPage();
+    if (pageRows.length) { finish(pageRows).catch(function(err){ alert('Migration failed: ' + (err && err.message ? err.message : err)); }); return; }
+
+    try { if (typeof window.initCarriers === 'function') window.initCarriers(); } catch(e) {}
+    setTimeout(function(){
+      pageRows = getOldCarrierContactsFromCurrentPage();
+      if (pageRows.length) { finish(pageRows).catch(function(err){ alert('Migration failed: ' + (err && err.message ? err.message : err)); }); return; }
+      fetchOldCarrierContactsFromSupabase().then(finish).catch(function(err){ alert('Migration failed: ' + (err && err.message ? err.message : err)); });
+    }, 1200);
   }
   function bindCarrierDirectory(){
     var search = document.getElementById('carrierNumberSearch'); if (search && !search.dataset.bound) { search.dataset.bound = '1'; search.addEventListener('input', renderAll); }
