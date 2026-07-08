@@ -3827,6 +3827,38 @@ transition: background .15s, color .15s;
 .carrier-row-val { font-size:12px; color:var(--muted); }
 .carrier-row-val a { color:var(--accent-2); text-decoration:none; }
 .carrier-row-val a:hover { text-decoration:underline; }
+
+/* Phase 2 permissions: section visibility */
+.hub-permission-hidden { display: none !important; }
+.hub-permission-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(45,212,191,.28);
+  background: rgba(45,212,191,.08);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.carrier-number-placeholder {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+}
+.carrier-number-placeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(210px,1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.carrier-number-placeholder-card {
+  background: rgba(15,23,42,.34);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 14px;
+}
+.carrier-number-placeholder-card strong { display:block; color:#fff; font-size:13px; margin-bottom:6px; }
+.carrier-number-placeholder-card span { display:block; color:var(--muted); font-size:12px; line-height:1.45; }
 /* ── NOTIFICATION SYSTEM ── */
 .notif-toast-wrap { position:fixed; bottom:24px; right:24px; z-index:10000; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
 .notif-toast { background:#1e3a6e; border:1px solid var(--border-2); border-radius:14px; padding:14px 18px; max-width:340px; box-shadow:0 8px 32px rgba(0,0,0,.5); pointer-events:all; display:flex; gap:12px; align-items:flex-start; animation:toastIn .3s ease; }
@@ -4782,6 +4814,35 @@ Agent Command Center
 </div>
 </div>
 </section>
+
+<!-- CARRIER & AGENT NUMBER DIRECTORY - Phase 2 permission test -->
+<section class="section hub-permission-hidden" id="carrier-agent-numbers" data-permission-required="carrier_directory_view">
+<div class="wrap">
+<div class="section-head">
+<div class="sh-left">
+<div class="sh-icon teal">🪪</div>
+<div>
+<h2>Carrier &amp; Agent Number <span style="color:var(--accent-2)">Directory</span></h2>
+<p>Search carrier writing numbers by agent, carrier, product type, and status.</p>
+</div>
+</div>
+<span class="count-chip">Phase 2 test</span>
+</div>
+<div class="carrier-number-placeholder">
+<div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;">Permission test section is active</div>
+<div style="font-size:13px;color:var(--muted);line-height:1.6;">
+This new section is visible only when the logged-in user's permissions include <strong style="color:#fff;">carrier_directory_view</strong>, or when the user is an admin. CSV upload and live carrier-number records will be added in the next phase.
+</div>
+<div class="carrier-number-placeholder-grid">
+<div class="carrier-number-placeholder-card"><strong>Agent/GAs</strong><span>Future view: only their own carrier numbers.</span></div>
+<div class="carrier-number-placeholder-card"><strong>Internal/Admin</strong><span>Future view: searchable directory across all agents.</span></div>
+<div class="carrier-number-placeholder-card"><strong>Admin CSV Upload</strong><span>Future upload columns: agent name, email, carrier, agent number, status, product type, state, notes.</span></div>
+</div>
+<div class="hub-permission-note" id="carrierPermissionDebug">Visible because your current Hub profile has permission.</div>
+</div>
+</div>
+</section>
+
 <!-- WEEKLY PRACTICE CLIENT -->
 <section class="section" id="practice-client">
 <div class="wrap">
@@ -8795,10 +8856,37 @@ function loadHubUserProfile(userEmail) {
     return null;
   });
 }
+function hubUserIsAdmin(profile) {
+  var role = String((profile && profile.role) || '').toLowerCase();
+  var perms = (profile && profile.permissions) || {};
+  return role === 'admin' || perms.admin === true;
+}
+function hubHasPermission(profile, key) {
+  if (!key) return true;
+  if (hubUserIsAdmin(profile)) return true;
+  var perms = (profile && profile.permissions) || {};
+  return perms[key] === true || perms[key] === 'true' || perms[key] === 'all';
+}
+function applyHubPermissionVisibility(profile) {
+  var controlled = document.querySelectorAll('[data-permission-required]');
+  controlled.forEach(function(el){
+    var key = el.getAttribute('data-permission-required');
+    if (hubHasPermission(profile, key)) {
+      el.classList.remove('hub-permission-hidden');
+    } else {
+      el.classList.add('hub-permission-hidden');
+    }
+  });
+  var dbg = document.getElementById('carrierPermissionDebug');
+  if (dbg && profile) {
+    dbg.textContent = 'Visible for ' + (profile.email || 'current user') + ' · role: ' + (profile.role || 'agent') + ' · carrier_directory_view: ' + (hubHasPermission(profile, 'carrier_directory_view') ? 'yes' : 'no');
+  }
+}
 function applyHubPermissionsNoop(profile) {
-  // Phase 1 only: load and store permissions without hiding sections yet.
+  // Phase 2: load/store permissions and apply visibility to sections marked with data-permission-required.
   window.HUB_CURRENT_USER = profile || null;
   try { sessionStorage.setItem('medi_hub_current_user', JSON.stringify(profile || null)); } catch(e) {}
+  applyHubPermissionVisibility(profile || {});
   console.log('[Hub Permissions] Loaded profile:', profile ? { email: profile.email, role: profile.role, status: profile.status, permissions: profile.permissions } : null);
 }
 function finishLogin(session) {
