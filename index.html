@@ -3839,6 +3839,87 @@ transition: background .15s, color .15s;
   color: var(--muted);
   font-size: 12px;
 }
+
+
+/* Carrier & Agent Number Directory - Phase 3 */
+.carrier-number-panel {
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 16px 44px rgba(0,0,0,.12);
+}
+.carrier-number-topbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.carrier-number-search { max-width: 520px; min-width: 260px; flex: 1; }
+.carrier-number-upload {
+  margin-top: 12px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(125,211,252,.24);
+  background: rgba(14,165,233,.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.carrier-number-upload strong { display:block; color:#fff; font-size:14px; margin-bottom:4px; }
+.carrier-number-upload span { display:block; color:var(--muted); font-size:12px; line-height:1.45; }
+.carrier-number-upload-actions { display:flex; gap:8px; align-items:center; }
+.carrier-number-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+}
+.carrier-number-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+  background: rgba(15,23,42,.30);
+}
+.carrier-number-table th,
+.carrier-number-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  text-align: left;
+  font-size: 12.5px;
+  vertical-align: top;
+}
+.carrier-number-table th {
+  color: #fff;
+  font-weight: 800;
+  background: rgba(15,23,42,.48);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.carrier-number-table td { color: var(--muted); }
+.carrier-number-table td strong { color: #fff; }
+.carrier-number-empty { text-align:center !important; padding:22px !important; color:var(--muted) !important; }
+.carrier-status-pill {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(125,211,252,.12);
+  color: #bae6fd;
+  border: 1px solid rgba(125,211,252,.22);
+}
+@media (max-width: 720px) {
+  .carrier-number-panel { padding: 14px; }
+  .carrier-number-topbar { align-items: stretch; }
+  .carrier-number-search { min-width: 100%; }
+}
+
 .carrier-number-placeholder {
   background: rgba(255,255,255,.04);
   border: 1px solid var(--border);
@@ -4815,7 +4896,7 @@ Agent Command Center
 </div>
 </section>
 
-<!-- CARRIER & AGENT NUMBER DIRECTORY - Phase 2 permission test -->
+<!-- CARRIER & AGENT NUMBER DIRECTORY - Phase 3 live directory -->
 <section class="section hub-permission-hidden" id="carrier-agent-numbers" data-permission-required="carrier_directory_view">
 <div class="wrap">
 <div class="section-head">
@@ -4826,19 +4907,48 @@ Agent Command Center
 <p>Search carrier writing numbers by agent, carrier, product type, and status.</p>
 </div>
 </div>
-<span class="count-chip">Phase 2 test</span>
+<span class="count-chip" id="carrierNumberCount">Loading…</span>
 </div>
-<div class="carrier-number-placeholder">
-<div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;">Permission test section is active</div>
-<div style="font-size:13px;color:var(--muted);line-height:1.6;">
-This new section is visible only when the logged-in user's permissions include <strong style="color:#fff;">carrier_directory_view</strong>, or when the user is an admin. CSV upload and live carrier-number records will be added in the next phase.
-</div>
-<div class="carrier-number-placeholder-grid">
-<div class="carrier-number-placeholder-card"><strong>Agent/GAs</strong><span>Future view: only their own carrier numbers.</span></div>
-<div class="carrier-number-placeholder-card"><strong>Internal/Admin</strong><span>Future view: searchable directory across all agents.</span></div>
-<div class="carrier-number-placeholder-card"><strong>Admin CSV Upload</strong><span>Future upload columns: agent name, email, carrier, agent number, status, product type, state, notes.</span></div>
-</div>
-<div class="hub-permission-note" id="carrierPermissionDebug">Visible because your current Hub profile has permission.</div>
+
+<div class="carrier-number-panel">
+  <div class="carrier-number-topbar">
+    <input id="carrierNumberSearch" class="admin-input carrier-number-search" placeholder="🔍 Search agent, carrier, writing number, status, product, state…" autocomplete="off">
+    <button type="button" class="admin-btn" id="carrierNumberRefreshBtn">Refresh</button>
+    <button type="button" class="admin-btn" id="carrierNumberTemplateBtn">Download CSV Template</button>
+  </div>
+
+  <div class="hub-permission-note" id="carrierPermissionDebug">Loading carrier directory permission…</div>
+
+  <div id="carrierNumberUploadPanel" class="carrier-number-upload" style="display:none;">
+    <div>
+      <strong>Admin CSV Upload</strong>
+      <span>Columns: agent_name, email, carrier, agent_number, status, product_type, state, notes.</span>
+    </div>
+    <div class="carrier-number-upload-actions">
+      <input id="carrierNumberCsvInput" type="file" accept=".csv,text/csv" style="display:none;">
+      <button type="button" class="admin-btn" id="carrierNumberUploadBtn">Upload CSV</button>
+    </div>
+  </div>
+
+  <div class="carrier-number-table-wrap">
+    <table class="carrier-number-table">
+      <thead>
+        <tr>
+          <th>Agent</th>
+          <th>Email</th>
+          <th>Carrier</th>
+          <th>Agent Number</th>
+          <th>Status</th>
+          <th>Product</th>
+          <th>State</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="carrierNumberTbody">
+        <tr><td colspan="8" class="carrier-number-empty">Loading carrier numbers…</td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </div>
 </section>
@@ -17820,6 +17930,233 @@ body.hub-show-backtop #hubBackTopBtn { opacity: 1; visibility: visible; transfor
   setInterval(boot, 500);
 })();
 window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
+</script>
+
+
+<script>
+(function(){
+  var CN_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var CN_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'.replace('eyJpc3MiOiJIUzI1NiIsInJlZiI6','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6');
+  var CN_HUB = 'medi';
+  var carrierRows = [];
+
+  function getCurrentHubUser(){
+    if (window.HUB_CURRENT_USER && window.HUB_CURRENT_USER.email) return window.HUB_CURRENT_USER;
+    try {
+      var raw = sessionStorage.getItem('medi_hub_current_user');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return null;
+  }
+  function isAdminLike(profile){
+    var role = String((profile && profile.role) || '').toLowerCase();
+    var perms = (profile && profile.permissions) || {};
+    return role === 'admin' || role === 'manager' || role === 'internal' || perms.admin === true;
+  }
+  function canUpload(profile){
+    var perms = (profile && profile.permissions) || {};
+    return isAdminLike(profile) || perms.carrier_directory_upload === true || perms.carrier_directory_upload === 'true';
+  }
+  function scopeFor(profile){
+    var perms = (profile && profile.permissions) || {};
+    if (isAdminLike(profile)) return 'all';
+    return String(perms.carrier_directory_scope || 'self').toLowerCase();
+  }
+  function esc(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function setStatus(text){
+    var count = document.getElementById('carrierNumberCount');
+    if (count) count.textContent = text;
+  }
+  function updateDebug(profile, rows){
+    var dbg = document.getElementById('carrierPermissionDebug');
+    if (!dbg) return;
+    var email = (profile && profile.email) || 'current user';
+    var role = (profile && profile.role) || 'agent';
+    var scope = scopeFor(profile || {});
+    dbg.textContent = 'Visible for ' + email + ' · role: ' + role + ' · carrier_directory_scope: ' + scope + ' · records loaded: ' + (rows ? rows.length : 0);
+  }
+  function renderCarrierRows(){
+    var body = document.getElementById('carrierNumberTbody');
+    var search = document.getElementById('carrierNumberSearch');
+    if (!body) return;
+    var q = String((search && search.value) || '').trim().toLowerCase();
+    var filtered = carrierRows.filter(function(r){
+      if (!q) return true;
+      return [r.agent_name, r.email, r.carrier, r.agent_number, r.status, r.product_type, r.state, r.notes]
+        .join(' ').toLowerCase().indexOf(q) !== -1;
+    });
+    setStatus(filtered.length + ' record' + (filtered.length === 1 ? '' : 's'));
+    if (!filtered.length) {
+      body.innerHTML = '<tr><td colspan="8" class="carrier-number-empty">No carrier number records found.</td></tr>';
+      return;
+    }
+    body.innerHTML = filtered.map(function(r){
+      return '<tr>' +
+        '<td><strong>' + esc(r.agent_name || '') + '</strong></td>' +
+        '<td>' + esc(r.email || '') + '</td>' +
+        '<td><strong>' + esc(r.carrier || '') + '</strong></td>' +
+        '<td>' + esc(r.agent_number || '') + '</td>' +
+        '<td><span class="carrier-status-pill">' + esc(r.status || '') + '</span></td>' +
+        '<td>' + esc(r.product_type || '') + '</td>' +
+        '<td>' + esc(r.state || '') + '</td>' +
+        '<td>' + esc(r.notes || '') + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  function loadCarrierRows(){
+    var section = document.getElementById('carrier-agent-numbers');
+    if (!section) return;
+    var profile = getCurrentHubUser();
+    if (!profile || !profile.email) {
+      setStatus('Waiting for login…');
+      return;
+    }
+    var scope = scopeFor(profile);
+    var url = CN_SUPA_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(CN_HUB) + '&select=id,agent_name,email,carrier,agent_number,status,product_type,state,notes,updated_at&order=agent_name.asc,carrier.asc';
+    if (scope !== 'all') url += '&email=eq.' + encodeURIComponent(String(profile.email).toLowerCase());
+    setStatus('Loading…');
+    fetch(url, { headers: { 'apikey': CN_SUPA_KEY, 'Authorization': 'Bearer ' + CN_SUPA_KEY, 'Cache-Control': 'no-cache' }})
+      .then(function(r){ if (!r.ok) throw new Error('Carrier directory load failed: ' + r.status); return r.json(); })
+      .then(function(rows){
+        carrierRows = Array.isArray(rows) ? rows : [];
+        updateDebug(profile, carrierRows);
+        var uploadPanel = document.getElementById('carrierNumberUploadPanel');
+        if (uploadPanel) uploadPanel.style.display = canUpload(profile) ? 'flex' : 'none';
+        renderCarrierRows();
+      })
+      .catch(function(err){
+        console.warn('[Carrier Directory] Load unavailable:', err && err.message ? err.message : err);
+        carrierRows = [];
+        updateDebug(profile, []);
+        setStatus('Unavailable');
+        var body = document.getElementById('carrierNumberTbody');
+        if (body) body.innerHTML = '<tr><td colspan="8" class="carrier-number-empty">Carrier directory is temporarily unavailable. Try Refresh.</td></tr>';
+      });
+  }
+  function csvEscape(value){
+    var s = String(value == null ? '' : value);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function downloadTemplate(){
+    var lines = [
+      ['agent_name','email','carrier','agent_number','status','product_type','state','notes'],
+      ['Brian DeRoss','brdeross@fjins.net','Aetna','123456','Active','Medicare','NJ','Example only']
+    ];
+    var csv = lines.map(function(row){ return row.map(csvEscape).join(','); }).join('\n');
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'carrier_agent_numbers_template.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 500);
+  }
+  function parseCsv(text){
+    var rows = [], row = [], cell = '', inQuotes = false;
+    for (var i=0; i<text.length; i++) {
+      var ch = text[i], next = text[i+1];
+      if (ch === '"') {
+        if (inQuotes && next === '"') { cell += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (ch === ',' && !inQuotes) { row.push(cell); cell = ''; }
+      else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+        if (ch === '\r' && next === '\n') i++;
+        row.push(cell); cell = '';
+        if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row);
+        row = [];
+      } else cell += ch;
+    }
+    row.push(cell);
+    if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row);
+    return rows;
+  }
+  function importCsvFile(file){
+    var profile = getCurrentHubUser();
+    if (!canUpload(profile)) { alert('You do not have permission to upload carrier records.'); return; }
+    if (!file) return;
+    if (!confirm('This will replace all Carrier & Agent Number records for this Hub with the CSV contents. Continue?')) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var parsed = parseCsv(String(reader.result || ''));
+        if (parsed.length < 2) throw new Error('CSV has no data rows.');
+        var headers = parsed[0].map(function(h){ return String(h || '').trim().toLowerCase().replace(/\s+/g, '_'); });
+        var required = ['agent_name','email','carrier','agent_number'];
+        required.forEach(function(h){ if (headers.indexOf(h) === -1) throw new Error('Missing required column: ' + h); });
+        var rows = parsed.slice(1).map(function(r){
+          var obj = { hub: CN_HUB };
+          headers.forEach(function(h, idx){ obj[h] = String(r[idx] == null ? '' : r[idx]).trim(); });
+          return {
+            hub: CN_HUB,
+            agent_name: obj.agent_name || '',
+            email: String(obj.email || '').toLowerCase(),
+            carrier: obj.carrier || '',
+            agent_number: obj.agent_number || '',
+            status: obj.status || '',
+            product_type: obj.product_type || '',
+            state: obj.state || '',
+            notes: obj.notes || ''
+          };
+        }).filter(function(r){ return r.email && r.carrier; });
+        if (!rows.length) throw new Error('No valid rows found.');
+        fetch(CN_SUPA_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(CN_HUB), {
+          method: 'DELETE',
+          headers: { 'apikey': CN_SUPA_KEY, 'Authorization': 'Bearer ' + CN_SUPA_KEY }
+        }).then(function(r){
+          if (!r.ok) throw new Error('Delete/replace step failed: ' + r.status);
+          return fetch(CN_SUPA_URL + '/rest/v1/carrier_agent_numbers', {
+            method: 'POST',
+            headers: { 'apikey': CN_SUPA_KEY, 'Authorization': 'Bearer ' + CN_SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+            body: JSON.stringify(rows)
+          });
+        }).then(function(r){
+          if (!r.ok) throw new Error('Upload step failed: ' + r.status);
+          alert('Carrier directory uploaded: ' + rows.length + ' record(s).');
+          loadCarrierRows();
+        }).catch(function(err){
+          console.error('[Carrier Directory] CSV upload failed:', err);
+          alert('CSV upload failed: ' + (err && err.message ? err.message : err));
+        });
+      } catch(err) {
+        alert('CSV import error: ' + (err && err.message ? err.message : err));
+      }
+    };
+    reader.readAsText(file);
+  }
+  function bindCarrierDirectory(){
+    var search = document.getElementById('carrierNumberSearch');
+    if (search && !search.dataset.bound) { search.dataset.bound = '1'; search.addEventListener('input', renderCarrierRows); }
+    var refresh = document.getElementById('carrierNumberRefreshBtn');
+    if (refresh && !refresh.dataset.bound) { refresh.dataset.bound = '1'; refresh.addEventListener('click', loadCarrierRows); }
+    var template = document.getElementById('carrierNumberTemplateBtn');
+    if (template && !template.dataset.bound) { template.dataset.bound = '1'; template.addEventListener('click', downloadTemplate); }
+    var uploadBtn = document.getElementById('carrierNumberUploadBtn');
+    var input = document.getElementById('carrierNumberCsvInput');
+    if (uploadBtn && input && !uploadBtn.dataset.bound) {
+      uploadBtn.dataset.bound = '1';
+      uploadBtn.addEventListener('click', function(){ input.value = ''; input.click(); });
+      input.addEventListener('change', function(){ importCsvFile(input.files && input.files[0]); });
+    }
+  }
+  window.refreshCarrierAgentDirectory = loadCarrierRows;
+  function initCarrierDirectory(){
+    bindCarrierDirectory();
+    loadCarrierRows();
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    initCarrierDirectory();
+    var tries = 0;
+    var timer = setInterval(function(){
+      tries++;
+      bindCarrierDirectory();
+      if (getCurrentHubUser() && getCurrentHubUser().email) loadCarrierRows();
+      if (tries >= 8) clearInterval(timer);
+    }, 700);
+  });
+})();
 </script>
 
 </body>
