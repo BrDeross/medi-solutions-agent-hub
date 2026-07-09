@@ -3969,6 +3969,9 @@ transition: background .15s, color .15s;
 .hub-perm-user-meta{font-size:11px;color:var(--muted-2);margin-top:3px;word-break:break-all;}
 .hub-perm-badge{display:inline-flex;align-items:center;border:1px solid rgba(56,189,248,.35);background:rgba(56,189,248,.10);color:#bae6fd;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:800;margin-top:7px;text-transform:uppercase;letter-spacing:.45px;}
 .hub-perm-editor-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px;}
+.hub-perm-editor-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.hub-perm-delete-btn{border:1px solid rgba(248,113,113,.32);background:rgba(248,113,113,.12);color:#fecaca;border-radius:10px;padding:9px 12px;font-weight:900;font-size:12px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+.hub-perm-delete-btn:hover{background:rgba(248,113,113,.20);border-color:rgba(248,113,113,.55);}
 .hub-perm-editor-title{font-family:'Space Grotesk',sans-serif;color:#fff;font-size:18px;font-weight:800;}
 .hub-perm-editor-sub{font-size:12px;color:var(--muted-2);margin-top:3px;word-break:break-all;}
 .hub-perm-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px;}
@@ -5900,7 +5903,10 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
             <div class="hub-perm-editor-title" id="hubPermEditorTitle">Select a user</div>
             <div class="hub-perm-editor-sub" id="hubPermEditorSub">Choose an email on the left or click New User.</div>
           </div>
-          <button class="admin-save-btn" type="button" onclick="saveHubUserAdmin()">Save Permissions</button>
+          <div class="hub-perm-editor-actions">
+            <button class="hub-perm-delete-btn" type="button" onclick="deleteHubUserAdmin()">Delete User</button>
+            <button class="admin-save-btn" type="button" onclick="saveHubUserAdmin()">Save Permissions</button>
+          </div>
         </div>
 
         <div class="hub-perm-form-grid">
@@ -5960,7 +5966,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
           <label><input type="checkbox" data-hub-perm="admin"> Admin Tools</label>
         </div>
         <div class="hub-perm-note">
-          Best default: internal agents get internal tools but not GA Resources. GAs get GA Resources but not internal production boards. Only admin should receive Admin Tools and all carrier numbers.
+          Best default: internal agents get internal tools but not GA Resources. GAs get GA Resources but not internal production boards. Only admin should receive Admin Tools and all carrier numbers. Delete User removes Hub access only; use Inactive instead when you want to preserve the user in the permission list.
         </div>
 
         <div class="hub-perm-note" style="margin-top:12px;">
@@ -19320,6 +19326,46 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     });
   };
 
+
+
+  window.deleteHubUserAdmin = function(){
+    var email = getCurrentEditorEmail();
+    if (!email || email.indexOf('@') < 0) { alert('Select a valid user/email before deleting.'); return; }
+    if (email === 'agent@example.com') { alert('This is only the placeholder user. Nothing to delete.'); return; }
+    var currentEmail = '';
+    try {
+      if (typeof getCurrentHubUser === 'function' && getCurrentHubUser()) currentEmail = String(getCurrentHubUser().email || '').toLowerCase();
+      if (!currentEmail) currentEmail = String(localStorage.getItem('mh_user_email') || localStorage.getItem('mediHubEmail') || localStorage.getItem('hub_user_email') || '').toLowerCase();
+    } catch(e) {}
+    if (currentEmail && email === currentEmail) {
+      alert('You cannot delete the account you are currently logged in with. Use another admin account first, or set this user inactive instead.');
+      return;
+    }
+    var name = String(document.getElementById('hubPermName')?.value || '').trim() || email;
+    var confirmOne = confirm('Delete Hub access for ' + name + ' (' + email + ')?\n\nThis removes the user from hub_users and blocks future login through the permission system. It does not delete old agent directory records, carrier numbers, cert data, or historical analytics.');
+    if (!confirmOne) return;
+    var confirmTwo = confirm('Final confirmation: remove this user\'s Hub access now?');
+    if (!confirmTwo) return;
+    setPermStatus('Deleting ' + email + '...', false);
+    Promise.allSettled([
+      fetch(HP_URL + '/rest/v1/hub_device_sessions?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(email), { method:'DELETE', headers: hpHeaders() }),
+      fetch(HP_URL + '/rest/v1/hub_device_requests?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(email), { method:'DELETE', headers: hpHeaders() })
+    ]).then(function(){
+      return fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(email), { method:'DELETE', headers: hpHeaders({ 'Prefer':'return=representation' }) });
+    }).then(function(r){
+      if (!r.ok) return r.text().then(function(t){ throw new Error('Delete failed: ' + r.status + ' ' + t); });
+      return r.text();
+    }).then(function(){
+      setPermStatus('Deleted Hub access for ' + email + '.', true);
+      hubUsersAdminSelected = null;
+      fillHubUserEditor({});
+      loadHubUsersAdmin();
+    }).catch(function(err){
+      setPermStatus(err && err.message ? err.message : String(err), false);
+      alert('Delete failed: ' + (err && err.message ? err.message : err));
+    });
+  };
+
   function escapeHtml(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
 
 
@@ -19491,43 +19537,89 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     var el = document.getElementById('hubPermMigrationStatus');
     if (el) { el.textContent = msg || ''; el.style.color = good ? '#86efac' : 'var(--muted-2)'; }
   }
+  function flattenDirectoryUsersFromAny(value){
+    var out = [];
+    var seenObjects = [];
+    function parseMaybeString(v){
+      if (typeof v !== 'string') return v;
+      var s = v.trim();
+      if (!s) return null;
+      if ((s[0] === '[' || s[0] === '{')) {
+        try { return JSON.parse(s); } catch(e) { return v; }
+      }
+      return v;
+    }
+    function looksLikePerson(o){
+      if (!o || typeof o !== 'object' || Array.isArray(o)) return false;
+      var email = o.email || o.Email || o.email_address || o.agent_email || o.AgentEmail || o['Agent Email'] || o.mail || o.user_email;
+      var name = o.name || o.Name || o.full_name || o.agent_name || o['Agent Name'] || o.display_name;
+      return !!(email && String(email).indexOf('@') > -1 && name);
+    }
+    function walk(v){
+      v = parseMaybeString(v);
+      if (!v) return;
+      if (Array.isArray(v)) { v.forEach(walk); return; }
+      if (typeof v !== 'object') return;
+      if (seenObjects.indexOf(v) >= 0) return;
+      seenObjects.push(v);
+      if (looksLikePerson(v)) { out.push(v); return; }
+      ['agents','items','rows','data','directory','contacts','users','people','records','staff','team'].forEach(function(k){
+        if (v[k]) walk(v[k]);
+      });
+      Object.keys(v).forEach(function(k){
+        if (['agents','items','rows','data','directory','contacts','users','people','records','staff','team'].indexOf(k) >= 0) return;
+        var child = v[k];
+        if (Array.isArray(child)) walk(child);
+      });
+    }
+    walk(value);
+    return out;
+  }
   function normalizeDirectoryPayload(data){
-    if (!data) return [];
-    if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return []; } }
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data.agents)) return data.agents;
-    if (Array.isArray(data.items)) return data.items;
-    if (Array.isArray(data.rows)) return data.rows;
-    if (Array.isArray(data.data)) return data.data;
-    return [];
+    return flattenDirectoryUsersFromAny(data);
   }
   function getOldDirectoryUsers(){
+    var collected = [];
     try {
       if (typeof window._csvBridgeGetDir === 'function') {
-        var local = window._csvBridgeGetDir() || [];
-        if (local.length) return Promise.resolve(local);
+        collected = collected.concat(flattenDirectoryUsersFromAny(window._csvBridgeGetDir() || []));
       }
     } catch(e) {}
-    return fetch(HP_URL + '/rest/v1/agent_directory?hub=eq.' + encodeURIComponent(HP_HUB) + '&select=data', {
+    return fetch(HP_URL + '/rest/v1/agent_directory?select=*', {
       headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
     }).then(function(r){ if (!r.ok) throw new Error('Agent Directory load failed: ' + r.status); return r.json(); })
     .then(function(rows){
-      var out = [];
-      (rows || []).forEach(function(row){ out = out.concat(normalizeDirectoryPayload(row.data)); });
-      return out;
+      (rows || []).forEach(function(row){
+        if (!row) return;
+        if (!row.hub || String(row.hub).toLowerCase() === String(HP_HUB).toLowerCase()) {
+          collected = collected.concat(flattenDirectoryUsersFromAny(row.data));
+          collected = collected.concat(flattenDirectoryUsersFromAny(row.data_preview));
+          collected = collected.concat(flattenDirectoryUsersFromAny(row));
+        }
+      });
+      var byEmail = {};
+      collected.forEach(function(u){
+        var p = buildUserPayloadFromDirectoryUser(u || {});
+        if (p && !byEmail[p.email]) byEmail[p.email] = u;
+      });
+      return Object.keys(byEmail).map(function(k){ return byEmail[k]; });
     });
   }
   function inferHubRoleFromDirectoryUser(u){
-    var raw = [u.role, u.category, u.tag, u.title, u.type].join(' ').toLowerCase();
-    if (/admin|upper management|owner|principal/.test(raw)) return 'admin';
-    if (/manager|director|supervisor|lead/.test(raw)) return 'manager';
-    if (/ga|outside|broker|general agent|partner/.test(raw)) return 'ga';
+    var raw = [u.role, u.Role, u.category, u.tag, u.title, u.type, u.territory].join(' ').toLowerCase();
+    if (/admin|upper management|owner|principal|president/.test(raw)) return 'admin';
+    if (/manager|director|supervisor|lead|team leader/.test(raw)) return 'manager';
+    if (/(^|\s|\b)ga(\b|\s|$)|outside|broker|general agent|partner|buckley/.test(raw)) return 'ga';
     return 'internal';
   }
   function buildUserPayloadFromDirectoryUser(u){
-    var email = String(u.email || u.Email || u.email_address || u.agent_email || '').trim().toLowerCase();
+    var email = String(u.email || u.Email || u.email_address || u.agent_email || u.AgentEmail || u['Agent Email'] || u.mail || u.user_email || '').trim().toLowerCase();
     if (!email || email.indexOf('@') < 0) return null;
-    var name = String(u.name || u.full_name || u.agent_name || u.Name || '').trim() || email;
+    var first = String(u.first_name || u.FirstName || u.first || '').trim();
+    var last = String(u.last_name || u.LastName || u.last || '').trim();
+    var name = String(u.name || u.Name || u.full_name || u.agent_name || u['Agent Name'] || u.display_name || '').trim();
+    if (!name && (first || last)) name = (first + ' ' + last).trim();
+    if (!name) name = email;
     var role = inferHubRoleFromDirectoryUser(u);
     var preset = presetFor(role);
     return {
@@ -19562,7 +19654,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   }
   function migrateDirectoryUsersToHubUsers(){
     if (!confirm('This will copy missing emails from the existing Agent Directory into hub_users. Existing hub_users records will not be overwritten. Continue?')) return;
-    setMigrationStatus('Reading existing Agent Directory...', false);
+    setMigrationStatus('Reading existing Agent Directory from agent_directory table...', false);
     Promise.all([getOldDirectoryUsers(), loadExistingHubUserEmails()]).then(function(results){
       var oldUsers = results[0] || [];
       var existing = results[1] || new Set();
