@@ -9429,207 +9429,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
-<script>
-/* Phase 11: Hub Permission Manager */
-(function(){
-  var HP_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var HP_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
-  var HP_HUB = 'medi';
-  var hubUsersAdminRows = [];
-  var hubUsersAdminSelected = null;
 
-  function hpHeaders(extra){
-    return Object.assign({
-      'apikey': HP_KEY,
-      'Authorization': 'Bearer ' + HP_KEY,
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache'
-    }, extra || {});
-  }
-  function normalizePerms(perms){
-    if (!perms) return {};
-    if (typeof perms === 'string') { try { return JSON.parse(perms) || {}; } catch(e) { return {}; } }
-    return perms || {};
-  }
-  function setPermStatus(msg, good){
-    var el = document.getElementById('hubPermStatus');
-    if (el) { el.textContent = msg || ''; el.style.color = good ? '#86efac' : 'var(--muted-2)'; }
-  }
-  function getCurrentEditorEmail(){ return String(document.getElementById('hubPermEmail')?.value || '').trim().toLowerCase(); }
-  function presetFor(role){
-    role = String(role || 'agent').toLowerCase();
-    if (role === 'admin') return {
-      role:'admin', status:'active', allowed_devices:3, require_device_approval:false,
-      permissions:{ agent_tools:true, ga_tools:true, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:true, carrier_directory_view:true, carrier_directory_scope:'all', carrier_directory_upload:true, carrier_directory_edit:true, device_approvals:true }
-    };
-    if (role === 'ga') return {
-      role:'ga', status:'active', allowed_devices:1, require_device_approval:true,
-      permissions:{ agent_tools:false, ga_tools:true, forms:true, videos:true, cert_tracker:false, trip_tracker:false, leaderboard:false, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
-    };
-    if (role === 'manager') return {
-      role:'manager', status:'active', allowed_devices:2, require_device_approval:false,
-      permissions:{ agent_tools:true, ga_tools:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
-    };
-    return {
-      role:'internal', status:'active', allowed_devices:2, require_device_approval:false,
-      permissions:{ agent_tools:true, ga_tools:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
-    };
-  }
-
-  window.loadHubUsersAdmin = function(){
-    setPermStatus('Loading users...', false);
-    fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&select=id,name,email,role,status,permissions,allowed_devices,require_device_approval,updated_at&order=email.asc', {
-      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
-    }).then(function(r){
-      if (!r.ok) throw new Error('Load failed: ' + r.status);
-      return r.json();
-    }).then(function(rows){
-      hubUsersAdminRows = (rows || []).map(function(row){ row.permissions = normalizePerms(row.permissions); return row; });
-      setPermStatus('Loaded ' + hubUsersAdminRows.length + ' Hub user(s).', true);
-      renderHubUsersAdminList();
-    }).catch(function(err){
-      setPermStatus('Permission users failed to load: ' + (err && err.message ? err.message : err), false);
-    });
-  };
-
-  window.renderHubUsersAdminList = function(){
-    var list = document.getElementById('hubPermUserList');
-    if (!list) return;
-    var q = String(document.getElementById('hubPermSearch')?.value || '').trim().toLowerCase();
-    var rows = hubUsersAdminRows.filter(function(r){
-      var hay = [r.name, r.email, r.role, r.status].join(' ').toLowerCase();
-      return !q || hay.indexOf(q) >= 0;
-    });
-    if (!rows.length) { list.innerHTML = '<div class="hub-perm-status">No matching users.</div>'; return; }
-    list.innerHTML = rows.map(function(r){
-      var active = hubUsersAdminSelected && String(hubUsersAdminSelected.email).toLowerCase() === String(r.email).toLowerCase() ? ' active' : '';
-      var perms = normalizePerms(r.permissions);
-      var flags = [];
-      if (perms.ga_tools) flags.push('GA');
-      if (perms.agent_tools) flags.push('Internal');
-      if (perms.admin) flags.push('Admin');
-      return '<div class="hub-perm-user-item' + active + '" onclick="selectHubUserAdmin(\'' + encodeURIComponent(r.email || '') + '\')">'
-        + '<div class="hub-perm-user-name">' + escapeHtml(r.name || '(No name)') + '</div>'
-        + '<div class="hub-perm-user-meta">' + escapeHtml(r.email || '') + '</div>'
-        + '<div class="hub-perm-user-meta">Role: ' + escapeHtml(r.role || 'agent') + ' · Status: ' + escapeHtml(r.status || 'active') + '</div>'
-        + '<div class="hub-perm-badge">' + escapeHtml(flags.join(' / ') || 'Limited') + '</div>'
-        + '</div>';
-    }).join('');
-  };
-
-  window.selectHubUserAdmin = function(encodedEmail){
-    var email = decodeURIComponent(encodedEmail || '').toLowerCase();
-    var row = hubUsersAdminRows.find(function(r){ return String(r.email || '').toLowerCase() === email; });
-    if (!row) return;
-    hubUsersAdminSelected = JSON.parse(JSON.stringify(row));
-    fillHubUserEditor(hubUsersAdminSelected);
-    renderHubUsersAdminList();
-  };
-
-  window.newHubUserAdmin = function(){
-    var def = presetFor('internal');
-    hubUsersAdminSelected = { hub: HP_HUB, name:'', email:'', role:def.role, status:def.status, allowed_devices:def.allowed_devices, require_device_approval:def.require_device_approval, permissions:def.permissions };
-    fillHubUserEditor(hubUsersAdminSelected);
-    renderHubUsersAdminList();
-  };
-
-  function fillHubUserEditor(row){
-    row = row || {};
-    var perms = normalizePerms(row.permissions);
-    var title = document.getElementById('hubPermEditorTitle');
-    var sub = document.getElementById('hubPermEditorSub');
-    if (title) title.textContent = row.email ? (row.name || row.email) : 'New Hub User';
-    if (sub) sub.textContent = row.email || 'Enter the user email and choose permissions.';
-    setVal('hubPermName', row.name || '');
-    setVal('hubPermEmail', String(row.email || '').toLowerCase());
-    setVal('hubPermRole', row.role || 'internal');
-    setVal('hubPermStatusField', row.status || 'active');
-    setVal('hubPermAllowedDevices', row.allowed_devices || row.allowedDevices || 1);
-    setVal('hubPermDeviceApproval', String(!!(row.require_device_approval || row.requireDeviceApproval)));
-    setVal('hubPermCarrierScope', perms.carrier_directory_scope || 'self');
-    document.querySelectorAll('[data-hub-perm]').forEach(function(cb){
-      var key = cb.getAttribute('data-hub-perm');
-      cb.checked = perms[key] === true || perms[key] === 'true' || perms[key] === 'all';
-    });
-  }
-  function setVal(id, val){ var el = document.getElementById(id); if (el) el.value = val; }
-
-  window.hubPermRoleChanged = function(){
-    var role = String(document.getElementById('hubPermRole')?.value || '').toLowerCase();
-    if (!hubUsersAdminSelected || !hubUsersAdminSelected.email) return;
-    // Do not auto-overwrite existing users on simple role dropdown changes. Use preset selector intentionally.
-  };
-
-  window.applyHubPermPreset = function(role){
-    if (!role) return;
-    var def = presetFor(role);
-    var currentEmail = getCurrentEditorEmail();
-    var currentName = String(document.getElementById('hubPermName')?.value || '').trim();
-    fillHubUserEditor({
-      name: currentName,
-      email: currentEmail,
-      role: def.role,
-      status: def.status,
-      allowed_devices: def.allowed_devices,
-      require_device_approval: def.require_device_approval,
-      permissions: def.permissions
-    });
-  };
-
-  window.saveHubUserAdmin = function(){
-    var name = String(document.getElementById('hubPermName')?.value || '').trim();
-    var email = getCurrentEditorEmail();
-    if (!email || email.indexOf('@') < 0) { alert('Enter a valid email.'); return; }
-    var permissions = {};
-    document.querySelectorAll('[data-hub-perm]').forEach(function(cb){ permissions[cb.getAttribute('data-hub-perm')] = !!cb.checked; });
-    permissions.carrier_directory_scope = String(document.getElementById('hubPermCarrierScope')?.value || 'self');
-    var payload = {
-      hub: HP_HUB,
-      name: name || email,
-      email: email,
-      role: String(document.getElementById('hubPermRole')?.value || 'agent').toLowerCase(),
-      status: String(document.getElementById('hubPermStatusField')?.value || 'active').toLowerCase(),
-      allowed_devices: Number(document.getElementById('hubPermAllowedDevices')?.value || 1),
-      require_device_approval: String(document.getElementById('hubPermDeviceApproval')?.value || 'false') === 'true',
-      permissions: permissions,
-      updated_at: new Date().toISOString()
-    };
-    setPermStatus('Saving ' + email + '...', false);
-    fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(email) + '&select=id', {
-      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
-    }).then(function(r){ if (!r.ok) throw new Error('Lookup failed: ' + r.status); return r.json(); })
-    .then(function(existing){
-      if (existing && existing.length) {
-        return fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(email), {
-          method: 'PATCH', headers: hpHeaders({ 'Prefer':'return=representation' }), body: JSON.stringify(payload)
-        });
-      }
-      return fetch(HP_URL + '/rest/v1/hub_users', {
-        method: 'POST', headers: hpHeaders({ 'Prefer':'return=representation' }), body: JSON.stringify(payload)
-      });
-    }).then(function(r){
-      if (!r.ok) return r.text().then(function(t){ throw new Error('Save failed: ' + r.status + ' ' + t); });
-      return r.json();
-    }).then(function(rows){
-      setPermStatus('Saved permissions for ' + email + '.', true);
-      hubUsersAdminSelected = rows && rows[0] ? rows[0] : payload;
-      hubUsersAdminSelected.permissions = normalizePerms(hubUsersAdminSelected.permissions);
-      loadHubUsersAdmin();
-    }).catch(function(err){
-      setPermStatus(err && err.message ? err.message : String(err), false);
-      alert('Permission save failed: ' + (err && err.message ? err.message : err));
-    });
-  };
-
-  function escapeHtml(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
-
-  var oldSwitch = window.switchAdminTab;
-  window.switchAdminTab = function(name, btn){
-    if (typeof oldSwitch === 'function') oldSwitch(name, btn);
-    if (name === 'permissions') setTimeout(function(){ window.loadHubUsersAdmin && window.loadHubUsersAdmin(); }, 80);
-  };
-})();
-</script>
 
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
@@ -19215,6 +19015,210 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     var tries = 0;
     var timer = setInterval(function(){ tries++; bindCarrierDirectory(); if (getCurrentHubUser() && getCurrentHubUser().email) loadCarrierDirectory(); if (tries >= 8) clearInterval(timer); }, 700);
   });
+})();
+</script>
+
+
+
+<script>
+/* Phase 11: Hub Permission Manager */
+(function(){
+  var HP_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var HP_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var HP_HUB = 'medi';
+  var hubUsersAdminRows = [];
+  var hubUsersAdminSelected = null;
+
+  function hpHeaders(extra){
+    return Object.assign({
+      'apikey': HP_KEY,
+      'Authorization': 'Bearer ' + HP_KEY,
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    }, extra || {});
+  }
+  function normalizePerms(perms){
+    if (!perms) return {};
+    if (typeof perms === 'string') { try { return JSON.parse(perms) || {}; } catch(e) { return {}; } }
+    return perms || {};
+  }
+  function setPermStatus(msg, good){
+    var el = document.getElementById('hubPermStatus');
+    if (el) { el.textContent = msg || ''; el.style.color = good ? '#86efac' : 'var(--muted-2)'; }
+  }
+  function getCurrentEditorEmail(){ return String(document.getElementById('hubPermEmail')?.value || '').trim().toLowerCase(); }
+  function presetFor(role){
+    role = String(role || 'agent').toLowerCase();
+    if (role === 'admin') return {
+      role:'admin', status:'active', allowed_devices:3, require_device_approval:false,
+      permissions:{ agent_tools:true, ga_tools:true, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:true, carrier_directory_view:true, carrier_directory_scope:'all', carrier_directory_upload:true, carrier_directory_edit:true, device_approvals:true }
+    };
+    if (role === 'ga') return {
+      role:'ga', status:'active', allowed_devices:1, require_device_approval:true,
+      permissions:{ agent_tools:false, ga_tools:true, forms:true, videos:true, cert_tracker:false, trip_tracker:false, leaderboard:false, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+    };
+    if (role === 'manager') return {
+      role:'manager', status:'active', allowed_devices:2, require_device_approval:false,
+      permissions:{ agent_tools:true, ga_tools:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+    };
+    return {
+      role:'internal', status:'active', allowed_devices:2, require_device_approval:false,
+      permissions:{ agent_tools:true, ga_tools:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+    };
+  }
+
+  window.loadHubUsersAdmin = function(){
+    setPermStatus('Loading users...', false);
+    fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&select=id,name,email,role,status,permissions,allowed_devices,require_device_approval,updated_at&order=email.asc', {
+      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
+    }).then(function(r){
+      if (!r.ok) throw new Error('Load failed: ' + r.status);
+      return r.json();
+    }).then(function(rows){
+      hubUsersAdminRows = (rows || []).map(function(row){ row.permissions = normalizePerms(row.permissions); return row; });
+      setPermStatus('Loaded ' + hubUsersAdminRows.length + ' Hub user(s).', true);
+      renderHubUsersAdminList();
+    }).catch(function(err){
+      setPermStatus('Permission users failed to load: ' + (err && err.message ? err.message : err), false);
+    });
+  };
+
+  window.renderHubUsersAdminList = function(){
+    var list = document.getElementById('hubPermUserList');
+    if (!list) return;
+    var q = String(document.getElementById('hubPermSearch')?.value || '').trim().toLowerCase();
+    var rows = hubUsersAdminRows.filter(function(r){
+      var hay = [r.name, r.email, r.role, r.status].join(' ').toLowerCase();
+      return !q || hay.indexOf(q) >= 0;
+    });
+    if (!rows.length) { list.innerHTML = '<div class="hub-perm-status">No matching users.</div>'; return; }
+    list.innerHTML = rows.map(function(r){
+      var active = hubUsersAdminSelected && String(hubUsersAdminSelected.email).toLowerCase() === String(r.email).toLowerCase() ? ' active' : '';
+      var perms = normalizePerms(r.permissions);
+      var flags = [];
+      if (perms.ga_tools) flags.push('GA');
+      if (perms.agent_tools) flags.push('Internal');
+      if (perms.admin) flags.push('Admin');
+      return '<div class="hub-perm-user-item' + active + '" onclick="selectHubUserAdmin(\'' + encodeURIComponent(r.email || '') + '\')">'
+        + '<div class="hub-perm-user-name">' + escapeHtml(r.name || '(No name)') + '</div>'
+        + '<div class="hub-perm-user-meta">' + escapeHtml(r.email || '') + '</div>'
+        + '<div class="hub-perm-user-meta">Role: ' + escapeHtml(r.role || 'agent') + ' · Status: ' + escapeHtml(r.status || 'active') + '</div>'
+        + '<div class="hub-perm-badge">' + escapeHtml(flags.join(' / ') || 'Limited') + '</div>'
+        + '</div>';
+    }).join('');
+  };
+
+  window.selectHubUserAdmin = function(encodedEmail){
+    var email = decodeURIComponent(encodedEmail || '').toLowerCase();
+    var row = hubUsersAdminRows.find(function(r){ return String(r.email || '').toLowerCase() === email; });
+    if (!row) return;
+    hubUsersAdminSelected = JSON.parse(JSON.stringify(row));
+    fillHubUserEditor(hubUsersAdminSelected);
+    renderHubUsersAdminList();
+  };
+
+  window.newHubUserAdmin = function(){
+    var def = presetFor('internal');
+    hubUsersAdminSelected = { hub: HP_HUB, name:'', email:'', role:def.role, status:def.status, allowed_devices:def.allowed_devices, require_device_approval:def.require_device_approval, permissions:def.permissions };
+    fillHubUserEditor(hubUsersAdminSelected);
+    renderHubUsersAdminList();
+  };
+
+  function fillHubUserEditor(row){
+    row = row || {};
+    var perms = normalizePerms(row.permissions);
+    var title = document.getElementById('hubPermEditorTitle');
+    var sub = document.getElementById('hubPermEditorSub');
+    if (title) title.textContent = row.email ? (row.name || row.email) : 'New Hub User';
+    if (sub) sub.textContent = row.email || 'Enter the user email and choose permissions.';
+    setVal('hubPermName', row.name || '');
+    setVal('hubPermEmail', String(row.email || '').toLowerCase());
+    setVal('hubPermRole', row.role || 'internal');
+    setVal('hubPermStatusField', row.status || 'active');
+    setVal('hubPermAllowedDevices', row.allowed_devices || row.allowedDevices || 1);
+    setVal('hubPermDeviceApproval', String(!!(row.require_device_approval || row.requireDeviceApproval)));
+    setVal('hubPermCarrierScope', perms.carrier_directory_scope || 'self');
+    document.querySelectorAll('[data-hub-perm]').forEach(function(cb){
+      var key = cb.getAttribute('data-hub-perm');
+      cb.checked = perms[key] === true || perms[key] === 'true' || perms[key] === 'all';
+    });
+  }
+  function setVal(id, val){ var el = document.getElementById(id); if (el) el.value = val; }
+
+  window.hubPermRoleChanged = function(){
+    var role = String(document.getElementById('hubPermRole')?.value || '').toLowerCase();
+    if (!hubUsersAdminSelected || !hubUsersAdminSelected.email) return;
+    // Do not auto-overwrite existing users on simple role dropdown changes. Use preset selector intentionally.
+  };
+
+  window.applyHubPermPreset = function(role){
+    if (!role) return;
+    var def = presetFor(role);
+    var currentEmail = getCurrentEditorEmail();
+    var currentName = String(document.getElementById('hubPermName')?.value || '').trim();
+    fillHubUserEditor({
+      name: currentName,
+      email: currentEmail,
+      role: def.role,
+      status: def.status,
+      allowed_devices: def.allowed_devices,
+      require_device_approval: def.require_device_approval,
+      permissions: def.permissions
+    });
+  };
+
+  window.saveHubUserAdmin = function(){
+    var name = String(document.getElementById('hubPermName')?.value || '').trim();
+    var email = getCurrentEditorEmail();
+    if (!email || email.indexOf('@') < 0) { alert('Enter a valid email.'); return; }
+    var permissions = {};
+    document.querySelectorAll('[data-hub-perm]').forEach(function(cb){ permissions[cb.getAttribute('data-hub-perm')] = !!cb.checked; });
+    permissions.carrier_directory_scope = String(document.getElementById('hubPermCarrierScope')?.value || 'self');
+    var payload = {
+      hub: HP_HUB,
+      name: name || email,
+      email: email,
+      role: String(document.getElementById('hubPermRole')?.value || 'agent').toLowerCase(),
+      status: String(document.getElementById('hubPermStatusField')?.value || 'active').toLowerCase(),
+      allowed_devices: Number(document.getElementById('hubPermAllowedDevices')?.value || 1),
+      require_device_approval: String(document.getElementById('hubPermDeviceApproval')?.value || 'false') === 'true',
+      permissions: permissions,
+      updated_at: new Date().toISOString()
+    };
+    setPermStatus('Saving ' + email + '...', false);
+    fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(email) + '&select=id', {
+      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
+    }).then(function(r){ if (!r.ok) throw new Error('Lookup failed: ' + r.status); return r.json(); })
+    .then(function(existing){
+      if (existing && existing.length) {
+        return fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(email), {
+          method: 'PATCH', headers: hpHeaders({ 'Prefer':'return=representation' }), body: JSON.stringify(payload)
+        });
+      }
+      return fetch(HP_URL + '/rest/v1/hub_users', {
+        method: 'POST', headers: hpHeaders({ 'Prefer':'return=representation' }), body: JSON.stringify(payload)
+      });
+    }).then(function(r){
+      if (!r.ok) return r.text().then(function(t){ throw new Error('Save failed: ' + r.status + ' ' + t); });
+      return r.json();
+    }).then(function(rows){
+      setPermStatus('Saved permissions for ' + email + '.', true);
+      hubUsersAdminSelected = rows && rows[0] ? rows[0] : payload;
+      hubUsersAdminSelected.permissions = normalizePerms(hubUsersAdminSelected.permissions);
+      loadHubUsersAdmin();
+    }).catch(function(err){
+      setPermStatus(err && err.message ? err.message : String(err), false);
+      alert('Permission save failed: ' + (err && err.message ? err.message : err));
+    });
+  };
+
+  function escapeHtml(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+  var oldSwitch = window.switchAdminTab;
+  window.switchAdminTab = function(name, btn){
+    if (typeof oldSwitch === 'function') oldSwitch(name, btn);
+    if (name === 'permissions') setTimeout(function(){ window.loadHubUsersAdmin && window.loadHubUsersAdmin(); }, 80);
+  };
 })();
 </script>
 
