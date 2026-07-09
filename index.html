@@ -5962,6 +5962,27 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
         <div class="hub-perm-note">
           Best default: internal agents get internal tools but not GA Resources. GAs get GA Resources but not internal production boards. Only admin should receive Admin Tools and all carrier numbers.
         </div>
+
+        <div class="hub-perm-note" style="margin-top:12px;">
+          <strong>Bulk User CSV Update</strong><br>
+          Use this when adding or updating multiple Hub users. Upload mode is <strong>update/add only</strong>: matching emails are updated, new emails are added, and users not in the CSV are left alone.
+        </div>
+        <div class="hub-perm-toolbar" style="margin-top:10px;flex-wrap:wrap;">
+          <button class="admin-add-btn" type="button" id="hubPermTemplateBtn">⬇ Download User CSV Template</button>
+          <button class="admin-add-btn" type="button" id="hubPermExportBtn">⬇ Export Current Users</button>
+          <button class="admin-save-btn" type="button" id="hubPermBulkUploadBtn">📂 Upload User CSV</button>
+          <input id="hubPermBulkCsvInput" type="file" accept=".csv,text/csv" style="display:none;">
+        </div>
+        <div id="hubPermBulkStatus" class="hub-perm-status" style="margin-top:8px;">Bulk upload is ready.</div>
+
+        <div class="hub-perm-note" style="margin-top:14px;">
+          <strong>One-Time Directory Migration</strong><br>
+          Use this to copy approved users from the existing Agent Directory into <strong>hub_users</strong>. It adds missing emails only and does not overwrite users already in this permission table.
+        </div>
+        <div class="hub-perm-toolbar" style="margin-top:10px;flex-wrap:wrap;">
+          <button class="admin-save-btn" type="button" id="hubPermMigrateDirBtn">↪ Migrate Existing Directory Users</button>
+        </div>
+        <div id="hubPermMigrationStatus" class="hub-perm-status" style="margin-top:8px;">Migration tool is ready.</div>
       </div>
     </div>
   </div>
@@ -19301,6 +19322,285 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 
   function escapeHtml(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
 
+
+  function hpCsvEscape(value){
+    var s = String(value == null ? '' : value);
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function hpDownloadCsv(filename, rows){
+    var csv = rows.map(function(row){ return row.map(hpCsvEscape).join(','); }).join('\n');
+    var blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 500);
+  }
+  function hpParseCsv(text){
+    var rows = [], row = [], cell = '', inQuotes = false;
+    text = String(text || '');
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i], next = text[i + 1];
+      if (ch === '"') {
+        if (inQuotes && next === '"') { cell += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (ch === ',' && !inQuotes) {
+        row.push(cell); cell = '';
+      } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+        if (ch === '\r' && next === '\n') i++;
+        row.push(cell); cell = '';
+        if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row);
+        row = [];
+      } else {
+        cell += ch;
+      }
+    }
+    row.push(cell);
+    if (row.some(function(v){ return String(v).trim() !== ''; })) rows.push(row);
+    return rows;
+  }
+  function hpParseCsvObjects(text){
+    var parsed = hpParseCsv(text);
+    if (parsed.length < 2) throw new Error('CSV has no data rows.');
+    var header = parsed[0].map(function(h){ return String(h || '').trim().toLowerCase().replace(/\s+/g, '_'); });
+    return parsed.slice(1).map(function(r, rowIdx){
+      var obj = { _row_number: rowIdx + 2 };
+      header.forEach(function(h, idx){ obj[h] = String(r[idx] == null ? '' : r[idx]).trim(); });
+      return obj;
+    });
+  }
+  function hpBool(v, fallback){
+    if (v == null || String(v).trim() === '') return fallback;
+    var s = String(v).trim().toLowerCase();
+    if (['true','yes','y','1','on','x','checked'].indexOf(s) >= 0) return true;
+    if (['false','no','n','0','off','unchecked'].indexOf(s) >= 0) return false;
+    return fallback;
+  }
+  function hpNum(v, fallback){
+    var n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+  function hubPermCsvHeaders(){
+    return ['name','email','role','status','allowed_devices','require_device_approval','agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','leaderboard','carrier_directory_view','carrier_directory_scope','carrier_directory_upload','carrier_directory_edit','device_approvals','admin'];
+  }
+  function downloadHubUserTemplate(){
+    var headers = hubPermCsvHeaders();
+    hpDownloadCsv('hub_user_permissions_template.csv', [
+      headers,
+      ['Jane Internal','jane.internal@example.com','internal','active','2','false','true','false','true','true','true','true','true','true','self','false','false','false','false'],
+      ['John GA','john.ga@example.com','ga','active','1','true','false','true','true','true','false','false','false','true','self','false','false','false','false']
+    ]);
+  }
+  function exportHubUsersCsv(){
+    var rows = [hubPermCsvHeaders()];
+    (hubUsersAdminRows || []).forEach(function(u){
+      var p = normalizePerms(u.permissions);
+      rows.push([
+        u.name || '', u.email || '', u.role || '', u.status || '', u.allowed_devices || '', u.require_device_approval ? 'true' : 'false',
+        p.agent_tools ? 'true' : 'false', p.ga_tools ? 'true' : 'false', p.forms ? 'true' : 'false', p.videos ? 'true' : 'false',
+        p.cert_tracker ? 'true' : 'false', p.trip_tracker ? 'true' : 'false', p.leaderboard ? 'true' : 'false',
+        p.carrier_directory_view ? 'true' : 'false', p.carrier_directory_scope || 'self',
+        p.carrier_directory_upload ? 'true' : 'false', p.carrier_directory_edit ? 'true' : 'false', p.device_approvals ? 'true' : 'false', p.admin ? 'true' : 'false'
+      ]);
+    });
+    hpDownloadCsv('hub_user_permissions_export.csv', rows);
+  }
+  function buildUserPayloadFromCsvRow(row){
+    var email = String(row.email || '').trim().toLowerCase();
+    if (!email || email.indexOf('@') < 0) throw new Error('Row ' + row._row_number + ': missing/invalid email.');
+    var role = String(row.role || 'agent').trim().toLowerCase();
+    if (['admin','internal','ga','manager','agent'].indexOf(role) < 0) role = 'agent';
+    var preset = presetFor(role);
+    var perms = Object.assign({}, normalizePerms(preset.permissions));
+    ['agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','leaderboard','carrier_directory_view','carrier_directory_upload','carrier_directory_edit','device_approvals','admin'].forEach(function(key){
+      if (Object.prototype.hasOwnProperty.call(row, key) && String(row[key]).trim() !== '') perms[key] = hpBool(row[key], !!perms[key]);
+    });
+    if (String(row.carrier_directory_scope || '').trim()) perms.carrier_directory_scope = String(row.carrier_directory_scope).trim().toLowerCase() === 'all' ? 'all' : 'self';
+    return {
+      hub: HP_HUB,
+      name: String(row.name || '').trim() || email,
+      email: email,
+      role: role,
+      status: String(row.status || preset.status || 'active').trim().toLowerCase() === 'inactive' ? 'inactive' : 'active',
+      allowed_devices: hpNum(row.allowed_devices, preset.allowed_devices || 1),
+      require_device_approval: hpBool(row.require_device_approval, !!preset.require_device_approval),
+      permissions: perms,
+      updated_at: new Date().toISOString()
+    };
+  }
+  function saveOneHubUserPayload(payload){
+    return fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(payload.email) + '&select=id', {
+      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
+    }).then(function(r){ if (!r.ok) throw new Error('Lookup failed for ' + payload.email + ': ' + r.status); return r.json(); })
+    .then(function(existing){
+      if (existing && existing.length) {
+        return fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&email=eq.' + encodeURIComponent(payload.email), {
+          method:'PATCH', headers: hpHeaders({ 'Prefer':'return=minimal' }), body: JSON.stringify(payload)
+        }).then(function(r){ if (!r.ok) return r.text().then(function(t){ throw new Error('Update failed for ' + payload.email + ': ' + r.status + ' ' + t); }); return 'updated'; });
+      }
+      return fetch(HP_URL + '/rest/v1/hub_users', {
+        method:'POST', headers: hpHeaders({ 'Prefer':'return=minimal' }), body: JSON.stringify(payload)
+      }).then(function(r){ if (!r.ok) return r.text().then(function(t){ throw new Error('Add failed for ' + payload.email + ': ' + r.status + ' ' + t); }); return 'added'; });
+    });
+  }
+  function setBulkStatus(msg, good){
+    var el = document.getElementById('hubPermBulkStatus');
+    if (el) { el.textContent = msg; el.style.color = good ? '#86efac' : 'var(--muted-2)'; }
+  }
+  function importHubUsersCsvFile(file){
+    if (!file) return;
+    if (!confirm('This will add new users and update matching emails in hub_users. Users not included in this CSV will be left alone. Continue?')) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var objects = hpParseCsvObjects(reader.result);
+        var payloads = [];
+        var skipped = 0;
+        objects.forEach(function(row){
+          try { payloads.push(buildUserPayloadFromCsvRow(row)); }
+          catch(e) { console.warn('[Hub Permissions] CSV row skipped:', e && e.message ? e.message : e); skipped++; }
+        });
+        if (!payloads.length) throw new Error('No valid user rows found.');
+        setBulkStatus('Uploading ' + payloads.length + ' user(s)...', false);
+        var added = 0, updated = 0;
+        payloads.reduce(function(p, payload){
+          return p.then(function(){
+            return saveOneHubUserPayload(payload).then(function(result){ if (result === 'added') added++; else updated++; });
+          });
+        }, Promise.resolve()).then(function(){
+          var msg = 'Bulk update complete. Added: ' + added + '. Updated: ' + updated + '. Skipped: ' + skipped + '.';
+          setBulkStatus(msg, true);
+          alert(msg);
+          loadHubUsersAdmin();
+        }).catch(function(err){
+          setBulkStatus('Bulk upload failed: ' + (err && err.message ? err.message : err), false);
+          alert('Bulk upload failed: ' + (err && err.message ? err.message : err));
+        });
+      } catch(err) {
+        setBulkStatus('CSV import error: ' + (err && err.message ? err.message : err), false);
+        alert('CSV import error: ' + (err && err.message ? err.message : err));
+      }
+    };
+    reader.readAsText(file);
+  }
+
+
+  function setMigrationStatus(msg, good){
+    var el = document.getElementById('hubPermMigrationStatus');
+    if (el) { el.textContent = msg || ''; el.style.color = good ? '#86efac' : 'var(--muted-2)'; }
+  }
+  function normalizeDirectoryPayload(data){
+    if (!data) return [];
+    if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return []; } }
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.agents)) return data.agents;
+    if (Array.isArray(data.items)) return data.items;
+    if (Array.isArray(data.rows)) return data.rows;
+    if (Array.isArray(data.data)) return data.data;
+    return [];
+  }
+  function getOldDirectoryUsers(){
+    try {
+      if (typeof window._csvBridgeGetDir === 'function') {
+        var local = window._csvBridgeGetDir() || [];
+        if (local.length) return Promise.resolve(local);
+      }
+    } catch(e) {}
+    return fetch(HP_URL + '/rest/v1/agent_directory?hub=eq.' + encodeURIComponent(HP_HUB) + '&select=data', {
+      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
+    }).then(function(r){ if (!r.ok) throw new Error('Agent Directory load failed: ' + r.status); return r.json(); })
+    .then(function(rows){
+      var out = [];
+      (rows || []).forEach(function(row){ out = out.concat(normalizeDirectoryPayload(row.data)); });
+      return out;
+    });
+  }
+  function inferHubRoleFromDirectoryUser(u){
+    var raw = [u.role, u.category, u.tag, u.title, u.type].join(' ').toLowerCase();
+    if (/admin|upper management|owner|principal/.test(raw)) return 'admin';
+    if (/manager|director|supervisor|lead/.test(raw)) return 'manager';
+    if (/ga|outside|broker|general agent|partner/.test(raw)) return 'ga';
+    return 'internal';
+  }
+  function buildUserPayloadFromDirectoryUser(u){
+    var email = String(u.email || u.Email || u.email_address || u.agent_email || '').trim().toLowerCase();
+    if (!email || email.indexOf('@') < 0) return null;
+    var name = String(u.name || u.full_name || u.agent_name || u.Name || '').trim() || email;
+    var role = inferHubRoleFromDirectoryUser(u);
+    var preset = presetFor(role);
+    return {
+      hub: HP_HUB,
+      name: name,
+      email: email,
+      role: preset.role || role,
+      status: 'active',
+      allowed_devices: preset.allowed_devices || 1,
+      require_device_approval: !!preset.require_device_approval,
+      permissions: Object.assign({}, normalizePerms(preset.permissions)),
+      updated_at: new Date().toISOString()
+    };
+  }
+  function loadExistingHubUserEmails(){
+    return fetch(HP_URL + '/rest/v1/hub_users?hub=eq.' + encodeURIComponent(HP_HUB) + '&select=email', {
+      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
+    }).then(function(r){ if (!r.ok) throw new Error('hub_users lookup failed: ' + r.status); return r.json(); })
+    .then(function(rows){
+      var set = new Set();
+      (rows || []).forEach(function(r){ if (r.email) set.add(String(r.email).toLowerCase()); });
+      return set;
+    });
+  }
+  function addOneMigratedHubUser(payload){
+    return fetch(HP_URL + '/rest/v1/hub_users', {
+      method:'POST', headers: hpHeaders({ 'Prefer':'return=minimal' }), body: JSON.stringify(payload)
+    }).then(function(r){
+      if (!r.ok) return r.text().then(function(t){ throw new Error('Add failed for ' + payload.email + ': ' + r.status + ' ' + t); });
+      return true;
+    });
+  }
+  function migrateDirectoryUsersToHubUsers(){
+    if (!confirm('This will copy missing emails from the existing Agent Directory into hub_users. Existing hub_users records will not be overwritten. Continue?')) return;
+    setMigrationStatus('Reading existing Agent Directory...', false);
+    Promise.all([getOldDirectoryUsers(), loadExistingHubUserEmails()]).then(function(results){
+      var oldUsers = results[0] || [];
+      var existing = results[1] || new Set();
+      var seen = new Set();
+      var payloads = [];
+      var noEmail = 0;
+      oldUsers.forEach(function(u){
+        var p = buildUserPayloadFromDirectoryUser(u || {});
+        if (!p) { noEmail++; return; }
+        if (seen.has(p.email)) return;
+        seen.add(p.email);
+        if (existing.has(p.email)) return;
+        payloads.push(p);
+      });
+      if (!payloads.length) {
+        var noneMsg = 'Migration complete. No missing users found. Existing users skipped: ' + existing.size + '. Directory rows without email: ' + noEmail + '.';
+        setMigrationStatus(noneMsg, true);
+        alert(noneMsg);
+        loadHubUsersAdmin();
+        return;
+      }
+      setMigrationStatus('Adding ' + payloads.length + ' missing user(s) to hub_users...', false);
+      var added = 0;
+      payloads.reduce(function(promise, payload){
+        return promise.then(function(){ return addOneMigratedHubUser(payload).then(function(){ added++; }); });
+      }, Promise.resolve()).then(function(){
+        var msg = 'Migration complete. Added: ' + added + '. Already existed/skipped: ' + (seen.size - payloads.length) + '. Directory rows without email: ' + noEmail + '.';
+        setMigrationStatus(msg, true);
+        alert(msg);
+        loadHubUsersAdmin();
+      });
+    }).catch(function(err){
+      var msg = 'Migration failed: ' + (err && err.message ? err.message : err);
+      setMigrationStatus(msg, false);
+      alert(msg);
+    });
+  }
+
   function bindPermissionManagerControls(){
     try {
       var refreshBtn = Array.from(document.querySelectorAll('#adminTabPermissions button')).find(function(b){ return String(b.textContent || '').trim().toLowerCase() === 'refresh'; });
@@ -19320,6 +19620,28 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
           e.stopPropagation();
           if (typeof window.newHubUserAdmin === 'function') window.newHubUserAdmin();
         });
+      }
+      var templateBtn = document.getElementById('hubPermTemplateBtn');
+      if (templateBtn && !templateBtn.dataset.hubPermBound) {
+        templateBtn.dataset.hubPermBound = '1';
+        templateBtn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); downloadHubUserTemplate(); });
+      }
+      var exportBtn = document.getElementById('hubPermExportBtn');
+      if (exportBtn && !exportBtn.dataset.hubPermBound) {
+        exportBtn.dataset.hubPermBound = '1';
+        exportBtn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); exportHubUsersCsv(); });
+      }
+      var uploadBtn = document.getElementById('hubPermBulkUploadBtn');
+      var uploadInput = document.getElementById('hubPermBulkCsvInput');
+      if (uploadBtn && uploadInput && !uploadBtn.dataset.hubPermBound) {
+        uploadBtn.dataset.hubPermBound = '1';
+        uploadBtn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); uploadInput.value = ''; uploadInput.click(); });
+        uploadInput.addEventListener('change', function(){ importHubUsersCsvFile(uploadInput.files && uploadInput.files[0]); });
+      }
+      var migrateBtn = document.getElementById('hubPermMigrateDirBtn');
+      if (migrateBtn && !migrateBtn.dataset.hubPermBound) {
+        migrateBtn.dataset.hubPermBound = '1';
+        migrateBtn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); migrateDirectoryUsersToHubUsers(); });
       }
     } catch(e) { console.warn('[Hub Permissions] bind controls failed:', e); }
   }
