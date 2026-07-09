@@ -4622,12 +4622,12 @@ cursor: pointer; white-space: nowrap;
 <a href="#quick-access">Portals</a>
 <a href="#libraries">Libraries</a>
 <a href="#updates">Updates</a>
-<a href="#leaderboard">Leaderboard</a>
-<a href="#ytd-board">📊 YTD</a>
+<a href="#leaderboard" data-permission-required="leaderboard">Leaderboard</a>
+<a href="#ytd-board" data-permission-required="leaderboard">📊 YTD</a>
 <a href="#video-library">Videos</a>
 <a href="#practice-client">🎯 Practice</a>
-<a href="#trip-tracker">🏝️ Trip</a>
-<a href="#cert-tracker">🎓 Certs</a>
+<a href="#trip-tracker" data-permission-required="trip_tracker">🏝️ Trip</a>
+<a href="#cert-tracker" data-permission-required="cert_tracker">🎓 Certs</a>
 <a href="#friday-meetings">📅 Meetings</a>
 <a href="#operations-ai">Agent AI</a>
 <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
@@ -4678,7 +4678,7 @@ cursor: pointer; white-space: nowrap;
 <span class="checklist-trigger-count" id="desktopChecklistProgress"></span>
 </button>
 <button class="admin-trigger" id="agentLoginBtn" onclick="openAgentLogin()">👤 Agent Login</button>
-<button class="admin-trigger" onclick="openAdmin()">⚙️ SNU Admin</button>
+<button class="admin-trigger" onclick="openAdmin()" data-permission-required="admin">⚙️ SNU Admin</button>
 <div class="infobar-divider"></div>
 <div class="live-clock" id="liveClock">--:-- --</div>
 <div id="agentLoginBadge" style="font-size:11px;color:var(--muted-2);white-space:nowrap;"></div>
@@ -4691,12 +4691,12 @@ cursor: pointer; white-space: nowrap;
 <a href="#quick-access" onclick="closeNav()">🔗 Portals</a>
 <a href="#libraries" onclick="closeNav()">📖 Libraries</a>
 <a href="#updates" onclick="closeNav()">📡 Updates</a>
-<a href="#leaderboard" onclick="closeNav()">🏆 Leaderboard</a>
-<a href="#ytd-board" onclick="closeNav()">📊 YTD</a>
+<a href="#leaderboard" onclick="closeNav()" data-permission-required="leaderboard">🏆 Leaderboard</a>
+<a href="#ytd-board" onclick="closeNav()" data-permission-required="leaderboard">📊 YTD</a>
 <a href="#video-library" onclick="closeNav()">🎬 Videos</a>
 <a href="#practice-client" onclick="closeNav()">🎯 Practice</a>
-<a href="#trip-tracker" onclick="closeNav()">🏝️ Trip</a>
-<a href="#cert-tracker" onclick="closeNav()">🎓 Certs</a>
+<a href="#trip-tracker" onclick="closeNav()" data-permission-required="trip_tracker">🏝️ Trip</a>
+<a href="#cert-tracker" onclick="closeNav()" data-permission-required="cert_tracker">🎓 Certs</a>
 <a href="#friday-meetings" onclick="closeNav()">📅 Meetings</a>
 <a href="#operations-ai" onclick="closeNav()">🤖 Agent AI</a>
 <a class="pill" href="https://app.agencybloc.com/" target="_blank" rel="noopener noreferrer">AgencyBloc ↗</a>
@@ -5276,7 +5276,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </section>
 <!-- CARRIER CERT TRACKER -->
-<section class="section" id="cert-tracker">
+<section class="section hub-permission-hidden" id="cert-tracker" data-permission-required="cert_tracker">
 <div class="wrap">
 <div class="section-head">
 <div class="sh-left">
@@ -5318,7 +5318,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </section>
 <!-- SNU — SHOW N UP NEWSLETTER -->
-<section class="section" id="leaderboard">
+<section class="section hub-permission-hidden" id="leaderboard" data-permission-required="leaderboard">
 <div class="wrap">
 <div class="section-head">
 <div class="sh-left">
@@ -5375,7 +5375,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </section>
 <!-- YEAR-TO-DATE PRODUCTION -->
-<section class="section" id="ytd-board">
+<section class="section hub-permission-hidden" id="ytd-board" data-permission-required="leaderboard">
 <div class="wrap">
 <div class="section-head">
 <div class="sh-left">
@@ -5396,7 +5396,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </section>
 <!-- INCENTIVE TRIP TRACKER -->
-<section class="section" id="trip-tracker">
+<section class="section hub-permission-hidden" id="trip-tracker" data-permission-required="trip_tracker">
 <div class="wrap">
 <div class="section-head">
 <div class="sh-left">
@@ -5462,7 +5462,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <a class="mbn-item" href="#libraries"><span class="mbn-item-icon">📖</span>Library</a>
 <button class="mbn-item" id="mobileChecklistBtn" onclick="toggleChecklist()" aria-label="Open daily checklist" aria-expanded="false"><span class="mbn-item-icon">✅</span>Check</button>
 <a class="mbn-item" href="#updates"><span class="mbn-item-icon">📡</span>Updates</a>
-<button class="mbn-item" onclick="openAdmin()"><span class="mbn-item-icon">⚙️</span>Admin</button>
+<button class="mbn-item" onclick="openAdmin()" data-permission-required="admin"><span class="mbn-item-icon">⚙️</span>Admin</button>
 </div>
 </nav>
 <!-- ── AGENT DIRECTORY MODAL ── -->
@@ -9397,6 +9397,7 @@ function applyHubPermissionsNoop(profile) {
   try { sessionStorage.setItem('medi_hub_current_user', JSON.stringify(profile || null)); } catch(e) {}
   applyHubPermissionVisibility(profile || {});
   console.log('[Hub Permissions] Loaded profile:', profile ? { email: profile.email, role: profile.role, status: profile.status, permissions: profile.permissions } : null);
+  console.log('[Hub Permissions] Phase 9 visibility map active');
 }
 function finishLogin(session) {
   session = session || {};
