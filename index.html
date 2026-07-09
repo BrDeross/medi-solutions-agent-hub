@@ -19301,11 +19301,46 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 
   function escapeHtml(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
 
+  function bindPermissionManagerControls(){
+    try {
+      var refreshBtn = Array.from(document.querySelectorAll('#adminTabPermissions button')).find(function(b){ return String(b.textContent || '').trim().toLowerCase() === 'refresh'; });
+      var newBtn = Array.from(document.querySelectorAll('#adminTabPermissions button')).find(function(b){ return String(b.textContent || '').trim().toLowerCase().indexOf('new user') >= 0; });
+      if (refreshBtn && !refreshBtn.dataset.hubPermBound) {
+        refreshBtn.dataset.hubPermBound = '1';
+        refreshBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.loadHubUsersAdmin === 'function') window.loadHubUsersAdmin();
+        });
+      }
+      if (newBtn && !newBtn.dataset.hubPermBound) {
+        newBtn.dataset.hubPermBound = '1';
+        newBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.newHubUserAdmin === 'function') window.newHubUserAdmin();
+        });
+      }
+    } catch(e) { console.warn('[Hub Permissions] bind controls failed:', e); }
+  }
+
   var oldSwitch = window.switchAdminTab;
   window.switchAdminTab = function(name, btn){
     if (typeof oldSwitch === 'function') oldSwitch(name, btn);
-    if (name === 'permissions') setTimeout(function(){ window.loadHubUsersAdmin && window.loadHubUsersAdmin(); }, 80);
+    if (name === 'permissions') setTimeout(function(){ bindPermissionManagerControls(); window.loadHubUsersAdmin && window.loadHubUsersAdmin(); }, 80);
   };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindPermissionManagerControls();
+    var tries = 0;
+    var t = setInterval(function(){
+      tries++;
+      bindPermissionManagerControls();
+      var panel = document.getElementById('adminTabPermissions');
+      if (panel && panel.offsetParent !== null && typeof window.loadHubUsersAdmin === 'function') window.loadHubUsersAdmin();
+      if (tries >= 6) clearInterval(t);
+    }, 600);
+  });
 })();
 </script>
 
