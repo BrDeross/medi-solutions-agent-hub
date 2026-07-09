@@ -4380,13 +4380,36 @@ cursor: pointer; white-space: nowrap;
   font-size: 13px;
   line-height: 1.55;
   color: var(--muted);
-  margin-bottom: 18px;
+  margin-bottom: 12px;
+}
+.national-day-modal-detail-card {
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.055);
+  border-radius: 14px;
+  padding: 12px 13px;
+  margin: 10px 0;
+}
+.national-day-modal-detail-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.62);
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+.national-day-modal-detail-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(226,232,240,.95);
 }
 .national-day-modal-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 10px;
+  margin-top: 16px;
 }
+.national-day-modal-link,
 .national-day-modal-btn {
   border: none;
   border-radius: 999px;
@@ -4395,7 +4418,14 @@ cursor: pointer; white-space: nowrap;
   cursor: pointer;
   background: rgba(255,255,255,.10);
   color: #fff;
+  text-decoration: none;
+  font-size: 13px;
 }
+.national-day-modal-link {
+  background: rgba(56,189,248,.14);
+  border: 1px solid rgba(56,189,248,.22);
+}
+.national-day-modal-link[hidden] { display: none !important; }
 @media (max-width: 640px) {
   .national-day-value { max-width: 100%; }
 }
@@ -4557,8 +4587,17 @@ cursor: pointer; white-space: nowrap;
   <div class="national-day-modal-card" role="dialog" aria-modal="true" aria-labelledby="nationalDayModalTitle">
     <div class="national-day-modal-kicker">Today&apos;s National Day</div>
     <div class="national-day-modal-title" id="nationalDayModalTitle">Loading…</div>
-    <div class="national-day-modal-copy" id="nationalDayModalCopy">Today's National Day is shown here as a quick daily conversation starter.</div>
+    <div class="national-day-modal-copy" id="nationalDayModalCopy">A quick daily conversation starter for the team.</div>
+    <div class="national-day-modal-detail-card">
+      <div class="national-day-modal-detail-label">Quick meaning</div>
+      <div class="national-day-modal-detail-text" id="nationalDayModalMeaning">Loading details…</div>
+    </div>
+    <div class="national-day-modal-detail-card">
+      <div class="national-day-modal-detail-label">Conversation idea</div>
+      <div class="national-day-modal-detail-text" id="nationalDayModalIdea">Use it as a light way to start a client or team conversation.</div>
+    </div>
     <div class="national-day-modal-actions">
+      <a id="nationalDayModalLearnMore" class="national-day-modal-link" href="#" target="_blank" rel="noopener" hidden>Learn more</a>
       <button type="button" class="national-day-modal-btn" onclick="closeNationalDayModal()">Close</button>
     </div>
   </div>
@@ -7948,6 +7987,99 @@ const NATIONAL_DAYS = {
 "12/30": ["🎆","National Bacon Day"],
 "12/31": ["🥂","New Year's Eve"]
 };
+
+// Phase 5C: user-facing National Day details.
+// Details are intentionally stored locally so the Hub does not depend on another live website or API.
+const NATIONAL_DAY_DETAILS = {
+  "National Sugar Cookie Day": {
+    meaning: "A light food holiday celebrating the classic sugar cookie: simple, familiar, and easy to connect to family, bakeries, office treats, or summer memories.",
+    idea: "Try: 'Today is National Sugar Cookie Day — what is your go-to cookie or bakery treat?' It is an easy, low-pressure opener for a client touch or team chat.",
+    learnMore: "https://nationaltoday.com/national-sugar-cookie-day/"
+  },
+  "Independence Day": {
+    meaning: "A U.S. federal holiday recognizing the adoption of the Declaration of Independence and commonly associated with family gatherings, fireworks, and community events.",
+    idea: "Use it for a simple holiday greeting or a reminder about family, legacy, and planning ahead.",
+    learnMore: "https://www.history.com/topics/holidays/july-4th"
+  },
+  "Veterans Day": {
+    meaning: "A day to honor people who served in the U.S. armed forces.",
+    idea: "A respectful message works best: thank veterans and their families without turning it into a sales pitch.",
+    learnMore: "https://www.va.gov/opa/vetsday/"
+  },
+  "Earth Day": {
+    meaning: "A day focused on environmental awareness, conservation, and community action.",
+    idea: "Ask a light question: 'What is one small thing your household does to reduce waste or save energy?'",
+    learnMore: "https://www.earthday.org/earth-day-2026/"
+  },
+  "World Mental Health Day": {
+    meaning: "An awareness day focused on mental health education, support, and reducing stigma.",
+    idea: "Keep it supportive and non-salesy: share a reminder to check in on people and take care of yourself.",
+    learnMore: "https://www.who.int/campaigns/world-mental-health-day"
+  },
+  "National Coffee Day": {
+    meaning: "A popular food-and-beverage day celebrating coffee culture and daily routines.",
+    idea: "Try: 'Coffee question of the day — hot, iced, black, or loaded?' Great for quick social engagement.",
+    learnMore: "https://nationaltoday.com/national-coffee-day/"
+  },
+  "World Chocolate Day": {
+    meaning: "A lighthearted day recognizing chocolate and favorite desserts.",
+    idea: "Ask: 'Milk, dark, white, or no chocolate at all?' It is an easy engagement post.",
+    learnMore: "https://nationaltoday.com/world-chocolate-day/"
+  },
+  "National Dog Day": {
+    meaning: "A pet-focused day celebrating dogs and the role they play in families and communities.",
+    idea: "Invite people to share a dog photo. Pet posts usually create warm, natural engagement.",
+    learnMore: "https://nationaltoday.com/national-dog-day/"
+  },
+  "World Kindness Day": {
+    meaning: "A day focused on simple acts of kindness and positive human connection.",
+    idea: "Ask: 'What is one small act of kindness you saw recently?' This works well for a warm team or client post.",
+    learnMore: "https://nationaltoday.com/world-kindness-day/"
+  }
+};
+
+function nationalDaySlug(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/—.*$/g, '')
+    .replace(/\/.*$/g, '')
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function getNationalDayDetails(text) {
+  const name = String(text || '').trim();
+  if (NATIONAL_DAY_DETAILS[name]) return NATIONAL_DAY_DETAILS[name];
+
+  const lower = name.toLowerCase();
+  let meaning = `Today highlights ${name}. Use it as a quick, friendly way to add a little personality to the workday.`;
+  let idea = `Try opening with: "Quick fun fact — today is ${name}." Then ask a simple related question to start conversation.`;
+
+  if (/cookie|cake|pie|donut|doughnut|chocolate|ice cream|coffee|tea|pizza|hot dog|burger|taco|food|dessert|candy|cheese|bread|pasta|waffle|pancake|sandwich/i.test(name)) {
+    meaning = `${name} is a light food-themed day. It works well for simple engagement because most people have a favorite snack, restaurant, or memory tied to food.`;
+    idea = `Ask a quick preference question such as: "Today is ${name} — are you a fan, or what would you pick instead?"`;
+  } else if (/dog|cat|pet|animal|bird|wildlife|bee|turtle|elephant|penguin|tiger/i.test(name)) {
+    meaning = `${name} is an animal-themed awareness or appreciation day. These are useful for warm, non-salesy team or client engagement.`;
+    idea = `Invite people to share a photo, story, or favorite animal-related memory.`;
+  } else if (/kindness|friendship|compliment|hug|smile|laugh|parents|brother|sister|family/i.test(name)) {
+    meaning = `${name} is centered on connection and relationships. It is a good prompt for positive, people-first communication.`;
+    idea = `Ask: "Who is someone worth recognizing today?" or share a short appreciation message.`;
+  } else if (/health|mental|nurse|doctor|diabetes|water|environment|earth|conservation|recycle/i.test(name)) {
+    meaning = `${name} is an awareness day. Keep the tone helpful, respectful, and educational rather than promotional.`;
+    idea = `Share a simple reminder, resource, or question that encourages people to take one constructive step.`;
+  } else if (/veterans|memorial|patriot|flag|independence|constitution|juneteenth|thanksgiving|christmas|halloween|valentine/i.test(name)) {
+    meaning = `${name} is a recognized holiday or observance. A respectful, simple message is usually better than a sales-focused post.`;
+    idea = `Use a short greeting, appreciation note, or community-minded message.`;
+  }
+
+  return {
+    meaning,
+    idea,
+    learnMore: `https://www.google.com/search?q=${encodeURIComponent(name)}`
+  };
+}
+
 // ── WEATHER ICONS MAP ───────────────────────────────────────────────────
 function getWeatherIcon(code) {
 if (code <= 232) return '⛈️';
@@ -8000,12 +8132,27 @@ function setNationalDayText(text) {
   const copyEl = document.getElementById('liveHolidayTextCopy');
   const modalTitle = document.getElementById('nationalDayModalTitle');
   const modalCopy = document.getElementById('nationalDayModalCopy');
+  const modalMeaning = document.getElementById('nationalDayModalMeaning');
+  const modalIdea = document.getElementById('nationalDayModalIdea');
+  const modalLearnMore = document.getElementById('nationalDayModalLearnMore');
+  const details = getNationalDayDetails(text);
   if (textEl) textEl.textContent = text;
   if (copyEl) copyEl.textContent = text;
   if (valueEl) valueEl.title = text;
   if (!textEl && nameEl) nameEl.textContent = text;
   if (modalTitle) modalTitle.textContent = text;
-  if (modalCopy) modalCopy.textContent = 'Today is ' + text + '. This is just a quick daily conversation starter.';
+  if (modalCopy) modalCopy.textContent = 'A quick daily conversation starter you can use with the team, clients, or social posts.';
+  if (modalMeaning) modalMeaning.textContent = details.meaning;
+  if (modalIdea) modalIdea.textContent = details.idea;
+  if (modalLearnMore) {
+    if (details.learnMore) {
+      modalLearnMore.href = details.learnMore;
+      modalLearnMore.hidden = false;
+    } else {
+      modalLearnMore.hidden = true;
+      modalLearnMore.removeAttribute('href');
+    }
+  }
   setTimeout(function(){
     if (!valueEl || !textEl) return;
     valueEl.classList.remove('is-overflowing');
