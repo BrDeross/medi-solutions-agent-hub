@@ -9971,15 +9971,58 @@ if (overlay) overlay.style.display = 'none';
 };
 document.addEventListener('DOMContentLoaded', function(){
 var existingSession = readHubSession();
-if (existingSession) applyHubPermissionsNoop(existingSession);
-applyHubSessionUi();
-if (typeof initHubTracking === 'function') initHubTracking();
-if (typeof wrapTrackedOpen === 'function') {
-wrapTrackedOpen('openDir', 'open_modal', 'agent_directory');
-wrapTrackedOpen('openCarrier', 'open_modal', 'carrier_contacts');
-wrapTrackedOpen('openOnboard', 'open_modal', 'agent_onboarding');
-wrapTrackedOpen('openAdmin', 'open_modal', 'admin');
-wrapTrackedOpen('openTask', 'open_modal', 'daily_checklist');
+
+function finishExistingSessionBoot(session){
+  if (session) applyHubPermissionsNoop(session);
+  applyHubSessionUi();
+  if (typeof initHubTracking === 'function') initHubTracking();
+  if (typeof wrapTrackedOpen === 'function') {
+    wrapTrackedOpen('openDir', 'open_modal', 'agent_directory');
+    wrapTrackedOpen('openCarrier', 'open_modal', 'carrier_contacts');
+    wrapTrackedOpen('openOnboard', 'open_modal', 'agent_onboarding');
+    wrapTrackedOpen('openAdmin', 'open_modal', 'admin');
+    wrapTrackedOpen('openTask', 'open_modal', 'daily_checklist');
+  }
+}
+
+if (existingSession && existingSession.email) {
+  // Phase 18: re-check saved browser sessions against hub_users and trusted-device rules.
+  // This prevents old open tabs/sessionStorage from bypassing device approval.
+  loadHubUserProfile(existingSession.email).then(function(freshProfile){
+    if (!freshProfile || String(freshProfile.status || '').toLowerCase() !== 'active') {
+      try { sessionStorage.removeItem(HUB_SESSION_KEY); } catch(e) {}
+      try { sessionStorage.removeItem('medi_hub_current_user'); } catch(e) {}
+      applyHubSessionUi();
+      return;
+    }
+    var refreshedSession = Object.assign({}, existingSession, {
+      name: freshProfile.name || existingSession.name || niceNameFromEmail(existingSession.email),
+      email: freshProfile.email || existingSession.email,
+      role: freshProfile.role || existingSession.role || 'agent',
+      status: freshProfile.status || 'active',
+      permissions: freshProfile.permissions || {},
+      allowedDevices: freshProfile.allowedDevices || 1,
+      requireDeviceApproval: !!freshProfile.requireDeviceApproval,
+      permissionSource: 'hub_users',
+      offlineFallback: false
+    });
+    verifyHubDeviceBeforeLogin(refreshedSession, null).then(function(ok){
+      if (!ok) {
+        try { sessionStorage.removeItem(HUB_SESSION_KEY); } catch(e) {}
+        try { sessionStorage.removeItem('medi_hub_current_user'); } catch(e) {}
+        applyHubSessionUi();
+        return;
+      }
+      writeHubSession(refreshedSession);
+      finishExistingSessionBoot(refreshedSession);
+    });
+  }).catch(function(){
+    try { sessionStorage.removeItem(HUB_SESSION_KEY); } catch(e) {}
+    try { sessionStorage.removeItem('medi_hub_current_user'); } catch(e) {}
+    applyHubSessionUi();
+  });
+} else {
+  finishExistingSessionBoot(null);
 }
 });
 
