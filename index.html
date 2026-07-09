@@ -9203,6 +9203,152 @@ wrapTrackedOpen('openAdmin', 'open_modal', 'admin');
 wrapTrackedOpen('openTask', 'open_modal', 'daily_checklist');
 }
 });
+
+})();
+</script>
+<script id="hub-session-timeout-script">
+(function(){
+  if (window.__hubSessionTimeoutInstalled) return;
+  window.__hubSessionTimeoutInstalled = true;
+
+  var HUB_SESSION_KEY = 'medi_hub_session';
+  var HUB_CURRENT_USER_KEY = 'medi_hub_current_user';
+  var WARNING_MS = 30 * 60 * 1000;      // 30 minutes inactive: warning
+  var LOGOUT_MS = 35 * 60 * 1000;       // 35 minutes inactive: force logout
+  var MAX_SESSION_MS = 12 * 60 * 60 * 1000; // 12 hours total: force fresh login
+  var CHECK_MS = 30 * 1000;
+  var ACTIVE_CUTOFF_MS = 2 * 60 * 1000;
+  var HEARTBEAT_MS = 60 * 1000;
+  var lastActivity = Date.now();
+  var lastHeartbeat = 0;
+  var warned = false;
+
+  function readSession(){
+    try { return JSON.parse(sessionStorage.getItem(HUB_SESSION_KEY) || 'null'); } catch(e) { return null; }
+  }
+  function writeSession(s){
+    try { sessionStorage.setItem(HUB_SESSION_KEY, JSON.stringify(s || null)); } catch(e) {}
+  }
+  function getSessionAgeMs(s){
+    if (!s || !s.signedInAt) return 0;
+    var t = Date.parse(s.signedInAt);
+    return isNaN(t) ? 0 : Date.now() - t;
+  }
+  function ensureStyles(){
+    if (document.getElementById('hubSessionTimeoutStyles')) return;
+    var css = document.createElement('style');
+    css.id = 'hubSessionTimeoutStyles';
+    css.textContent = '\n.hub-timeout-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.62);display:none;align-items:center;justify-content:center;padding:18px;}\n.hub-timeout-card{width:min(460px,94vw);background:#fff;color:#0f172a;border-radius:18px;box-shadow:0 24px 80px rgba(15,23,42,.35);padding:24px;border:1px solid rgba(15,23,42,.12);}\n.hub-timeout-card h3{margin:0 0 8px;font-size:22px;line-height:1.2;}\n.hub-timeout-card p{margin:0 0 16px;color:#475569;line-height:1.45;}\n.hub-timeout-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}\n.hub-timeout-actions button{border:0;border-radius:999px;padding:11px 16px;font-weight:800;cursor:pointer;}\n#hubTimeoutContinue{background:#0f766e;color:#fff;}\n#hubTimeoutLogout{background:#e2e8f0;color:#0f172a;}\nbody.hub-login-pending .hub-timeout-overlay{display:none!important;}\n';
+    document.head.appendChild(css);
+  }
+  function ensureOverlay(){
+    ensureStyles();
+    var overlay = document.getElementById('hubSessionTimeoutOverlay');
+    if (overlay) return overlay;
+    overlay = document.createElement('div');
+    overlay.id = 'hubSessionTimeoutOverlay';
+    overlay.className = 'hub-timeout-overlay';
+    overlay.innerHTML = '<div class="hub-timeout-card" role="dialog" aria-modal="true" aria-labelledby="hubTimeoutTitle"><h3 id="hubTimeoutTitle">Still using the Hub?</h3><p>Your session has been inactive. Click continue to stay logged in, or the Hub will require a fresh login shortly.</p><div class="hub-timeout-actions"><button type="button" id="hubTimeoutLogout">Log out now</button><button type="button" id="hubTimeoutContinue">Continue session</button></div></div>';
+    document.body.appendChild(overlay);
+    var cont = document.getElementById('hubTimeoutContinue');
+    var out = document.getElementById('hubTimeoutLogout');
+    if (cont) cont.addEventListener('click', function(){ markActivity(true); hideWarning(); });
+    if (out) out.addEventListener('click', function(){ performLogout('manual_from_idle_warning'); });
+    return overlay;
+  }
+  function showWarning(){
+    if (!readSession()) return;
+    warned = true;
+    var overlay = ensureOverlay();
+    overlay.style.display = 'flex';
+  }
+  function hideWarning(){
+    var overlay = document.getElementById('hubSessionTimeoutOverlay');
+    if (overlay) overlay.style.display = 'none';
+    warned = false;
+  }
+  function applyLoggedOutUi(){
+    try { sessionStorage.removeItem(HUB_SESSION_KEY); } catch(e) {}
+    try { sessionStorage.removeItem(HUB_CURRENT_USER_KEY); } catch(e) {}
+    try { sessionStorage.removeItem('medi_tracking_session_id'); } catch(e) {}
+    try { sessionStorage.removeItem('medi_sid'); } catch(e) {}
+    try { window.HUB_CURRENT_USER = null; } catch(e) {}
+    hideWarning();
+    var gate = document.getElementById('hubLoginGate');
+    if (gate) gate.style.display = 'flex';
+    document.body.classList.add('hub-login-pending');
+    var badge = document.getElementById('agentLoginBadge');
+    var btn = document.getElementById('agentLoginBtn');
+    if (badge) badge.textContent = '';
+    if (btn) btn.textContent = '👤 Agent Login';
+  }
+  function performLogout(reason){
+    var s = readSession();
+    try {
+      if (typeof trackHubEvent === 'function') {
+        trackHubEvent('auto_logout', 'session_timeout', {
+          reason: reason || 'timeout',
+          prior_name: (s && s.name) || '',
+          prior_email: (s && s.email) || '',
+          idle_minutes: Math.round((Date.now() - lastActivity) / 60000),
+          session_age_minutes: Math.round(getSessionAgeMs(s) / 60000)
+        });
+      }
+    } catch(e) {}
+    applyLoggedOutUi();
+    var status = document.getElementById('hubGateStatus');
+    if (status) {
+      status.textContent = reason === 'max_session' ? 'Your Hub session expired. Please log in again.' : 'You were logged out due to inactivity. Please log in again.';
+      status.style.color = '#fb7185';
+    }
+  }
+  function markActivity(force){
+    var now = Date.now();
+    if (!force && now - lastActivity < 1500) return;
+    lastActivity = now;
+    if (warned) hideWarning();
+    var s = readSession();
+    if (s) {
+      s.lastClientActivityAt = new Date(now).toISOString();
+      writeSession(s);
+    }
+  }
+  function maybeHeartbeat(){
+    var now = Date.now();
+    if (now - lastActivity > ACTIVE_CUTOFF_MS) return;
+    if (now - lastHeartbeat < HEARTBEAT_MS) return;
+    lastHeartbeat = now;
+    try {
+      if (typeof trackHubEvent === 'function' && readSession()) {
+        trackHubEvent('active_heartbeat', 'session_timeout', { active_seconds: 60 });
+      }
+    } catch(e) {}
+  }
+  function checkTimeouts(){
+    var s = readSession();
+    if (!s) { hideWarning(); return; }
+    var now = Date.now();
+    var age = getSessionAgeMs(s);
+    var idle = now - lastActivity;
+    if (age && age >= MAX_SESSION_MS) { performLogout('max_session'); return; }
+    if (idle >= LOGOUT_MS) { performLogout('idle_timeout'); return; }
+    if (idle >= WARNING_MS && !warned) showWarning();
+    maybeHeartbeat();
+  }
+
+  ['click','keydown','scroll','mousemove','touchstart','pointerdown'].forEach(function(evt){
+    window.addEventListener(evt, function(){ markActivity(false); }, { passive: true });
+  });
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) checkTimeouts();
+  });
+  window.addEventListener('focus', checkTimeouts);
+  document.addEventListener('DOMContentLoaded', function(){
+    ensureOverlay();
+    markActivity(true);
+    checkTimeouts();
+  });
+  setInterval(checkTimeouts, CHECK_MS);
 })();
 </script>
 <script id="spotlight-script">
