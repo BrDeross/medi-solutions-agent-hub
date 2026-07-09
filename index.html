@@ -4566,6 +4566,123 @@ cursor: pointer; white-space: nowrap;
 }
 </style>
 
+
+
+<!-- Phase 10: Carrier Directory layout polish only -->
+<style>
+  #carrier-agent-numbers .carrier-number-panel.carrier-combined-panel {
+    padding: 22px;
+    border-radius: 22px;
+  }
+  #carrier-agent-numbers .carrier-number-topbar {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) auto auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  #carrier-agent-numbers .carrier-number-search {
+    width: 100%;
+    max-width: none;
+    min-height: 42px;
+    border-radius: 14px;
+  }
+  #carrier-agent-numbers .carrier-number-topbar .admin-btn {
+    border-radius: 999px;
+    min-height: 40px;
+    padding: 9px 14px;
+    font-weight: 800;
+  }
+  #carrier-agent-numbers #carrierAdminToolsToggle {
+    background: rgba(125,211,252,.13);
+    border-color: rgba(125,211,252,.35);
+    color: #dff7ff;
+  }
+  #carrier-agent-numbers .hub-permission-note {
+    margin: 10px 0 16px;
+    border-radius: 14px;
+  }
+  #carrier-agent-numbers .carrier-combined-grid {
+    grid-template-columns: minmax(300px, .78fr) minmax(520px, 1.22fr);
+    gap: 18px;
+  }
+  #carrier-agent-numbers .carrier-combined-card {
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(15,23,42,.28);
+  }
+  #carrier-agent-numbers .carrier-combined-card-head {
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  #carrier-agent-numbers .carrier-contact-list {
+    max-height: 560px;
+    padding-right: 8px;
+  }
+  #carrier-agent-numbers .carrier-contact-card {
+    border-radius: 16px;
+    padding: 14px;
+  }
+  #carrier-agent-numbers .carrier-contact-name {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  #carrier-agent-numbers .carrier-contact-row {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+  #carrier-agent-numbers .carrier-number-table-wrap {
+    border-radius: 16px;
+    max-height: 560px;
+    overflow: auto;
+  }
+  #carrier-agent-numbers .carrier-number-table {
+    min-width: 900px;
+  }
+  #carrier-agent-numbers .carrier-number-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #11233f;
+  }
+  #carrier-agent-numbers .carrier-number-table td,
+  #carrier-agent-numbers .carrier-number-table th {
+    padding: 12px 14px;
+    vertical-align: middle;
+  }
+  #carrier-agent-numbers .carrier-status-pill {
+    white-space: nowrap;
+  }
+  @media (max-width: 1100px) {
+    #carrier-agent-numbers .carrier-combined-grid {
+      grid-template-columns: 1fr;
+    }
+    #carrier-agent-numbers .carrier-contact-list,
+    #carrier-agent-numbers .carrier-number-table-wrap {
+      max-height: 520px;
+    }
+  }
+  @media (max-width: 720px) {
+    #carrier-agent-numbers .carrier-number-panel.carrier-combined-panel {
+      padding: 14px;
+    }
+    #carrier-agent-numbers .carrier-number-topbar {
+      grid-template-columns: 1fr;
+    }
+    #carrier-agent-numbers .carrier-number-topbar .admin-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    #carrier-agent-numbers .carrier-combined-card-head {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    #carrier-agent-numbers .carrier-contact-list,
+    #carrier-agent-numbers .carrier-number-table-wrap {
+      max-height: 480px;
+    }
+  }
+</style>
+
 </head>
 <body class="hub-login-pending">
 <div id="hubLoginGate" style="position:fixed;inset:0;z-index:12000;background:rgba(8,15,32,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
