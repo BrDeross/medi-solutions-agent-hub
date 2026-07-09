@@ -4718,19 +4718,6 @@ cursor: pointer; white-space: nowrap;
   }
 </style>
 
-
-<style id="phase16-device-approval-styles">
-.hub-device-request-list{display:grid;gap:10px;margin-top:10px;}
-.hub-device-request-card{border:1px solid rgba(148,163,184,.22);background:rgba(15,23,42,.52);border-radius:14px;padding:12px;display:grid;gap:8px;}
-.hub-device-request-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
-.hub-device-request-name{font-weight:900;color:#fff;font-size:13px;}
-.hub-device-request-meta{font-size:11px;color:var(--muted-2);line-height:1.45;word-break:break-word;}
-.hub-device-request-badge{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:999px;padding:4px 8px;background:rgba(250,204,21,.12);color:#fde68a;border:1px solid rgba(250,204,21,.25);white-space:nowrap;}
-.hub-device-request-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.hub-device-approve{border:0;border-radius:10px;background:#14b8a6;color:white;font-weight:900;padding:8px 12px;cursor:pointer;}
-.hub-device-deny{border:1px solid rgba(248,113,113,.45);border-radius:10px;background:rgba(248,113,113,.12);color:#fecaca;font-weight:900;padding:8px 12px;cursor:pointer;}
-@media(max-width:700px){.hub-device-request-head{display:grid}.hub-device-request-actions button{width:100%;}}
-</style>
 </head>
 <body class="hub-login-pending">
 <div id="hubLoginGate" style="position:fixed;inset:0;z-index:12000;background:rgba(8,15,32,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -5995,16 +5982,6 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
         <div id="hubPermBulkStatus" class="hub-perm-status" style="margin-top:8px;">Bulk upload is ready.</div>
 
         <div class="hub-perm-note" style="margin-top:14px;">
-          <strong>Device Approval Requests</strong><br>
-          Review new-device requests from agents whose accounts require device approval or have reached their allowed-device limit. Approving a device lets that browser log in for that email. Denying keeps the device blocked.
-        </div>
-        <div class="hub-perm-toolbar" style="margin-top:10px;flex-wrap:wrap;">
-          <button class="admin-save-btn" type="button" id="hubDeviceRefreshBtn">🔄 Refresh Device Requests</button>
-        </div>
-        <div id="hubDeviceStatus" class="hub-perm-status" style="margin-top:8px;">Device approvals are ready.</div>
-        <div id="hubDeviceRequestList" class="hub-device-request-list"></div>
-
-        <div class="hub-perm-note" style="margin-top:14px;">
           <strong>One-Time Directory Migration</strong><br>
           Use this to copy approved users from the existing Agent Directory into <strong>hub_users</strong>. It adds missing emails only and does not overwrite users already in this permission table.
         </div>
@@ -6012,6 +5989,16 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
           <button class="admin-save-btn" type="button" id="hubPermMigrateDirBtn">↪ Migrate Existing Directory Users</button>
         </div>
         <div id="hubPermMigrationStatus" class="hub-perm-status" style="margin-top:8px;">Migration tool is ready.</div>
+
+        <div class="hub-perm-note" style="margin-top:14px;">
+          <strong>Device Approval Requests</strong><br>
+          Use this to approve or deny new device requests for users who require device approval or exceed their allowed device limit.
+        </div>
+        <div class="hub-perm-toolbar" style="margin-top:10px;flex-wrap:wrap;">
+          <button class="admin-add-btn" type="button" id="hubPermRefreshDevicesBtn">Refresh Device Requests</button>
+        </div>
+        <div id="hubDeviceRequestStatus" class="hub-perm-status" style="margin-top:8px;">Device request queue is ready.</div>
+        <div id="hubDeviceRequestList" class="hub-perm-user-list" style="margin-top:10px;max-height:260px;"></div>
       </div>
     </div>
   </div>
@@ -9511,239 +9498,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
-<script id="phase16-device-approval-script">
-(function(){
-  'use strict';
-  var HD_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var HD_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
-  var HD_HUB = 'medi';
-  var SESSION_KEY = 'medi_hub_session';
-  var DEVICE_KEY = 'medi_hub_device_id_v1';
-  var APPROVED_CACHE_KEY = 'medi_hub_device_checked_v1';
-
-  function hdHeaders(extra){
-    return Object.assign({
-      'apikey': HD_KEY,
-      'Authorization': 'Bearer ' + HD_KEY,
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache'
-    }, extra || {});
-  }
-  function readSession(){ try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch(e){ return null; } }
-  function writeSession(s){ try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(s || null)); } catch(e){} }
-  function clearSession(){
-    try { sessionStorage.removeItem(SESSION_KEY); } catch(e){}
-    try { sessionStorage.removeItem('medi_hub_current_user'); } catch(e){}
-    try { sessionStorage.removeItem(APPROVED_CACHE_KEY); } catch(e){}
-    if (typeof applyHubSessionUi === 'function') { try { applyHubSessionUi(); } catch(e){} }
-    document.body.classList.add('hub-login-pending');
-    var gate = document.getElementById('hubLoginGate');
-    if (gate) gate.style.display = 'flex';
-  }
-  function deviceId(){
-    var id='';
-    try { id = localStorage.getItem(DEVICE_KEY) || ''; } catch(e){}
-    if (!id) {
-      id = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,10);
-      try { localStorage.setItem(DEVICE_KEY, id); } catch(e){}
-    }
-    return id;
-  }
-  function deviceLabel(){
-    var ua = navigator.userAgent || '';
-    var browser = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Browser';
-    var os = /iPhone|iPad/.test(ua) ? 'iPhone/iPad' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Macintosh|Mac OS/.test(ua) ? 'Mac' : 'Device';
-    return browser + ' on ' + os;
-  }
-  function sessionId(){
-    var id = '';
-    try { id = sessionStorage.getItem('medi_hub_device_session_id') || ''; } catch(e){}
-    if (!id) {
-      id = 'dsess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
-      try { sessionStorage.setItem('medi_hub_device_session_id', id); } catch(e){}
-    }
-    return id;
-  }
-  function isAdmin(s){
-    var role = String((s && s.role) || '').toLowerCase();
-    var p = (s && s.permissions) || {};
-    return role === 'admin' || p.admin === true || p.admin === 'true';
-  }
-  function getJson(url){ return fetch(url, { headers: hdHeaders() }).then(function(r){ if(!r.ok) throw new Error('GET '+r.status); return r.json(); }); }
-  function postJson(url, body, extra){ return fetch(url, { method:'POST', headers: hdHeaders(extra), body: JSON.stringify(body) }).then(function(r){ if(!r.ok) throw new Error('POST '+r.status); return r.text(); }); }
-  function patchJson(url, body){ return fetch(url, { method:'PATCH', headers: hdHeaders(), body: JSON.stringify(body) }).then(function(r){ if(!r.ok) throw new Error('PATCH '+r.status); return r.text(); }); }
-
-  function createPendingRequest(s, reason){
-    var email = String(s.email || '').toLowerCase();
-    var did = deviceId();
-    var check = HD_URL + '/rest/v1/hub_device_requests?hub=eq.' + encodeURIComponent(HD_HUB) + '&email=eq.' + encodeURIComponent(email) + '&device_id=eq.' + encodeURIComponent(did) + '&status=eq.pending&select=id&limit=1';
-    return getJson(check).then(function(rows){
-      if (rows && rows.length) return rows[0];
-      return postJson(HD_URL + '/rest/v1/hub_device_requests', {
-        hub: HD_HUB,
-        email: email,
-        name: s.name || '',
-        role: s.role || '',
-        device_id: did,
-        device_label: deviceLabel(),
-        user_agent: navigator.userAgent || '',
-        status: 'pending',
-        notes: reason || 'new_device'
-      }).then(function(){ return { created:true }; });
-    });
-  }
-  function approveCurrentDevice(s, autoApproved){
-    var email = String(s.email || '').toLowerCase();
-    var did = deviceId();
-    var body = {
-      hub: HD_HUB,
-      email: email,
-      session_id: sessionId(),
-      device_id: did,
-      device_label: deviceLabel(),
-      user_agent: navigator.userAgent || '',
-      status: 'active',
-      approved: true,
-      last_seen: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 14*24*60*60*1000).toISOString()
-    };
-    return fetch(HD_URL + '/rest/v1/hub_device_sessions?on_conflict=hub,email,device_id', {
-      method:'POST',
-      headers: hdHeaders({ 'Prefer':'resolution=merge-duplicates' }),
-      body: JSON.stringify(body)
-    }).then(function(r){ if(!r.ok) throw new Error('session upsert '+r.status); return r.text(); })
-    .then(function(){
-      try { sessionStorage.setItem(APPROVED_CACHE_KEY, email + '|' + did + '|' + Date.now()); } catch(e){}
-      if (autoApproved && typeof trackHubEvent === 'function') trackHubEvent('device_auto_approved','security',{ email: email });
-    });
-  }
-  function enforceDeviceForSession(s){
-    if (!s || !s.email) return Promise.resolve(true);
-    if (s.offlineFallback) return Promise.resolve(true);
-    var email = String(s.email || '').toLowerCase();
-    var did = deviceId();
-    var cache = '';
-    try { cache = sessionStorage.getItem(APPROVED_CACHE_KEY) || ''; } catch(e){}
-    if (cache.indexOf(email + '|' + did + '|') === 0) return Promise.resolve(true);
-
-    var allowed = Number(s.allowedDevices || s.allowed_devices || (isAdmin(s) ? 3 : 1));
-    var requireApproval = !!(s.requireDeviceApproval || s.require_device_approval);
-    if (isAdmin(s)) { allowed = Math.max(allowed || 0, 3); requireApproval = false; }
-
-    var existingUrl = HD_URL + '/rest/v1/hub_device_sessions?hub=eq.' + encodeURIComponent(HD_HUB) + '&email=eq.' + encodeURIComponent(email) + '&device_id=eq.' + encodeURIComponent(did) + '&status=eq.active&approved=eq.true&select=id&limit=1';
-    return getJson(existingUrl).then(function(rows){
-      if (rows && rows.length) {
-        return approveCurrentDevice(s, false).then(function(){ return true; });
-      }
-      var sessionsUrl = HD_URL + '/rest/v1/hub_device_sessions?hub=eq.' + encodeURIComponent(HD_HUB) + '&email=eq.' + encodeURIComponent(email) + '&status=eq.active&approved=eq.true&select=id,device_id';
-      return getJson(sessionsUrl).then(function(activeRows){
-        activeRows = activeRows || [];
-        if (!requireApproval && activeRows.length < allowed) {
-          return approveCurrentDevice(s, true).then(function(){ return true; });
-        }
-        var reason = requireApproval ? 'approval_required' : 'device_limit_reached';
-        return createPendingRequest(s, reason).then(function(){
-          if (typeof trackHubEvent === 'function') trackHubEvent('device_approval_requested','security',{ email: email, reason: reason });
-          clearSession();
-          var st = document.getElementById('hubGateStatus');
-          if (st) { st.textContent = 'This device needs admin approval before accessing the Hub. Your request has been sent.'; st.style.color = '#fde68a'; }
-          try { alert('This device needs admin approval before accessing the Hub. Your request has been sent.'); } catch(e){}
-          return false;
-        });
-      });
-    }).catch(function(err){
-      console.warn('[Device Approval] check unavailable:', err && err.message ? err.message : err);
-      return true; // do not lock users out if Supabase is unavailable
-    });
-  }
-
-  function watchSession(){
-    var last='';
-    setInterval(function(){
-      var s = readSession();
-      if (!s || !s.email) return;
-      var key = String(s.email || '') + '|' + String(s.signedInAt || '');
-      if (key === last) return;
-      last = key;
-      setTimeout(function(){ enforceDeviceForSession(readSession()); }, 800);
-    }, 1200);
-  }
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){ var s = readSession(); if (s && s.email) enforceDeviceForSession(s); }, 1200);
-    watchSession();
-  });
-
-  function setDeviceStatus(msg, bad){
-    var el = document.getElementById('hubDeviceStatus');
-    if (el) { el.textContent = msg; el.style.color = bad ? '#fecaca' : ''; }
-  }
-  function escapeHtml(v){ return String(v == null ? '' : v).replace(/[&<>'"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]); }); }
-  window.loadHubDeviceRequestsAdmin = function(){
-    var list = document.getElementById('hubDeviceRequestList');
-    if (list) list.innerHTML = '';
-    setDeviceStatus('Loading pending device requests...');
-    var url = HD_URL + '/rest/v1/hub_device_requests?hub=eq.' + encodeURIComponent(HD_HUB) + '&status=eq.pending&select=id,email,name,role,device_id,device_label,user_agent,requested_at,notes&order=requested_at.desc';
-    return getJson(url).then(function(rows){
-      rows = rows || [];
-      if (!list) return;
-      if (!rows.length) { list.innerHTML = '<div class="hub-perm-status">No pending device requests.</div>'; setDeviceStatus('No pending requests.'); return; }
-      setDeviceStatus(rows.length + ' pending device request' + (rows.length === 1 ? '' : 's') + '.');
-      list.innerHTML = rows.map(function(r){
-        return '<div class="hub-device-request-card">' +
-          '<div class="hub-device-request-head"><div><div class="hub-device-request-name">' + escapeHtml(r.name || r.email) + '</div>' +
-          '<div class="hub-device-request-meta">' + escapeHtml(r.email) + ' · role: ' + escapeHtml(r.role || '') + '<br>' +
-          escapeHtml(r.device_label || 'Unknown device') + '<br>Requested: ' + escapeHtml(r.requested_at || '') + '<br>Reason: ' + escapeHtml(r.notes || '') + '</div></div>' +
-          '<div class="hub-device-request-badge">Pending</div></div>' +
-          '<div class="hub-device-request-actions"><button class="hub-device-approve" type="button" onclick="approveHubDeviceRequest(' + Number(r.id) + ', ' + JSON.stringify(r.email||'') + ', ' + JSON.stringify(r.device_id||'') + ', ' + JSON.stringify(r.device_label||'') + ')">Approve Device</button>' +
-          '<button class="hub-device-deny" type="button" onclick="denyHubDeviceRequest(' + Number(r.id) + ')">Deny</button></div>' +
-          '</div>';
-      }).join('');
-    }).catch(function(err){ console.warn('[Device Approval] load failed:', err); setDeviceStatus('Could not load device requests: ' + (err && err.message ? err.message : err), true); });
-  };
-  window.approveHubDeviceRequest = function(id, email, did, label){
-    if (!id || !email || !did) return;
-    setDeviceStatus('Approving device...');
-    var sess = {
-      hub: HD_HUB,
-      email: String(email).toLowerCase(),
-      session_id: 'approved_by_admin_' + Date.now().toString(36),
-      device_id: did,
-      device_label: label || 'Approved device',
-      user_agent: '',
-      status: 'active',
-      approved: true,
-      last_seen: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 14*24*60*60*1000).toISOString()
-    };
-    postJson(HD_URL + '/rest/v1/hub_device_sessions?on_conflict=hub,email,device_id', sess, { 'Prefer':'resolution=merge-duplicates' })
-    .then(function(){ return patchJson(HD_URL + '/rest/v1/hub_device_requests?id=eq.' + encodeURIComponent(id), { status:'approved', reviewed_at:new Date().toISOString(), reviewed_by:(readSession()||{}).email || '' }); })
-    .then(function(){ setDeviceStatus('Device approved.'); return window.loadHubDeviceRequestsAdmin(); })
-    .catch(function(err){ console.warn('[Device Approval] approve failed:', err); setDeviceStatus('Approve failed: ' + (err && err.message ? err.message : err), true); });
-  };
-  window.denyHubDeviceRequest = function(id){
-    if (!id) return;
-    if (!confirm('Deny this device request?')) return;
-    setDeviceStatus('Denying request...');
-    patchJson(HD_URL + '/rest/v1/hub_device_requests?id=eq.' + encodeURIComponent(id), { status:'denied', reviewed_at:new Date().toISOString(), reviewed_by:(readSession()||{}).email || '' })
-    .then(function(){ setDeviceStatus('Request denied.'); return window.loadHubDeviceRequestsAdmin(); })
-    .catch(function(err){ console.warn('[Device Approval] deny failed:', err); setDeviceStatus('Deny failed: ' + (err && err.message ? err.message : err), true); });
-  };
-  function bindDeviceButtons(){
-    var btn = document.getElementById('hubDeviceRefreshBtn');
-    if (btn && !btn.dataset.boundDeviceRefresh) { btn.dataset.boundDeviceRefresh='1'; btn.addEventListener('click', window.loadHubDeviceRequestsAdmin); }
-  }
-  document.addEventListener('DOMContentLoaded', function(){ bindDeviceButtons(); });
-  var oldSwitch = window.switchAdminTab;
-  if (typeof oldSwitch === 'function') {
-    window.switchAdminTab = function(tab, btn){
-      var result = oldSwitch.apply(this, arguments);
-      if (tab === 'permissions') setTimeout(function(){ bindDeviceButtons(); if (typeof window.loadHubDeviceRequestsAdmin === 'function') window.loadHubDeviceRequestsAdmin(); }, 250);
-      return result;
-    };
-  }
-})();
-</script>
-
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -9912,7 +9666,7 @@ function loadHubUserProfile(userEmail) {
   .catch(function(err){
     clearTimeout(timer2);
     console.warn('[Hub Permissions] hub_users lookup unavailable:', err?.message || err);
-    return null;
+    return { __lookupError: true, message: (err && err.message ? err.message : String(err || 'lookup failed')) };
   });
 }
 function hubUserIsAdmin(profile) {
@@ -9964,6 +9718,105 @@ function finishLogin(session) {
   if (typeof trackHubEvent === 'function') trackHubEvent('login', 'hub_gate', { signed_in_at: session.signedInAt, offline_fallback: !!session.offlineFallback, role: session.role || '', permission_source: session.permissionSource || session.source || '' });
   if (typeof trackEvent === 'function') trackEvent('agent_login', session.name + ' (' + session.email + ')');
 }
+function getHubDeviceId(){
+  var key = 'medi_hub_device_id';
+  try {
+    var id = localStorage.getItem(key);
+    if (!id) {
+      id = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,10);
+      localStorage.setItem(key, id);
+    }
+    return id;
+  } catch(e) {
+    return 'dev_session_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+  }
+}
+function getHubDeviceLabel(){
+  var ua = navigator.userAgent || '';
+  var browser = /Edg/i.test(ua) ? 'Edge' : /Chrome/i.test(ua) ? 'Chrome' : /Safari/i.test(ua) ? 'Safari' : /Firefox/i.test(ua) ? 'Firefox' : 'Browser';
+  var os = /iPhone|iPad/i.test(ua) ? 'iOS' : /Android/i.test(ua) ? 'Android' : /Windows/i.test(ua) ? 'Windows' : /Mac/i.test(ua) ? 'Mac' : 'Device';
+  return browser + ' on ' + os;
+}
+function hubRestHeaders(extra){
+  return Object.assign({
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache'
+  }, extra || {});
+}
+function createHubDeviceRequest(session, deviceId, reason){
+  var payload = {
+    hub: 'medi',
+    email: String(session.email || '').toLowerCase(),
+    name: session.name || '',
+    role: session.role || '',
+    device_id: deviceId,
+    device_label: getHubDeviceLabel(),
+    user_agent: navigator.userAgent || '',
+    status: 'pending',
+    notes: reason || 'Device approval required'
+  };
+  return fetch(SUPA_URL + '/rest/v1/hub_device_requests', {
+    method: 'POST',
+    headers: hubRestHeaders({ 'Prefer':'return=minimal' }),
+    body: JSON.stringify(payload)
+  }).catch(function(e){ console.warn('[Hub Device Approval] request create failed:', e && e.message ? e.message : e); });
+}
+function approveCurrentHubDevice(session, deviceId){
+  var payload = {
+    hub: 'medi',
+    email: String(session.email || '').toLowerCase(),
+    session_id: 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8),
+    device_id: deviceId,
+    device_label: getHubDeviceLabel(),
+    user_agent: navigator.userAgent || '',
+    status: 'active',
+    approved: true,
+    last_seen: new Date().toISOString()
+  };
+  return fetch(SUPA_URL + '/rest/v1/hub_device_sessions?on_conflict=hub,email,device_id', {
+    method: 'POST',
+    headers: hubRestHeaders({ 'Prefer':'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify(payload)
+  });
+}
+function verifyHubDeviceBeforeLogin(session, statusEl){
+  var deviceId = getHubDeviceId();
+  var allowed = Math.max(0, Number(session.allowedDevices || 1));
+  var requireApproval = !!session.requireDeviceApproval;
+  var role = String(session.role || '').toLowerCase();
+  if (role === 'admin') { allowed = Math.max(allowed, 3); requireApproval = false; }
+  var emailQ = encodeURIComponent(String(session.email || '').toLowerCase());
+  var url = SUPA_URL + '/rest/v1/hub_device_sessions?hub=eq.medi&email=eq.' + emailQ + '&status=eq.active&approved=eq.true&select=id,device_id,last_seen';
+  return fetch(url, { headers: hubRestHeaders() })
+    .then(function(r){ if (!r.ok) throw new Error('Device session lookup failed: ' + r.status); return r.json(); })
+    .then(function(rows){
+      rows = rows || [];
+      var alreadyApproved = rows.some(function(x){ return String(x.device_id || '') === String(deviceId); });
+      if (alreadyApproved) {
+        return approveCurrentHubDevice(session, deviceId).then(function(){ return true; });
+      }
+      if (requireApproval) {
+        return createHubDeviceRequest(session, deviceId, 'New device requires admin approval').then(function(){
+          if (statusEl) { statusEl.textContent = 'This device needs admin approval before accessing the Hub. A request was sent.'; statusEl.style.color = '#fbbf24'; }
+          return false;
+        });
+      }
+      if (allowed > 0 && rows.length >= allowed) {
+        return createHubDeviceRequest(session, deviceId, 'Allowed device limit reached').then(function(){
+          if (statusEl) { statusEl.textContent = 'Device limit reached. A new-device request was sent to admin.'; statusEl.style.color = '#fbbf24'; }
+          return false;
+        });
+      }
+      return approveCurrentHubDevice(session, deviceId).then(function(){ return true; });
+    })
+    .catch(function(err){
+      console.warn('[Hub Device Approval] check unavailable:', err && err.message ? err.message : err);
+      if (statusEl) { statusEl.textContent = 'Device approval check failed. Please try again or contact admin.'; statusEl.style.color = '#fb7185'; }
+      return false;
+    });
+}
 function fallbackLogin(reason) {
   var local = (HUB_CLOUD_CONFIG.LOCAL_ALLOWED_EMAILS || []).map(function(x){ return String(x).toLowerCase().trim(); });
   var strictListHasOnlyAdmin = local.length === 1 && local[0] === 'brdeross@fjins.net';
@@ -9986,65 +9839,37 @@ if (status) { status.textContent = 'Verifying...'; status.style.color = 'var(--m
 var ctrl = new AbortController();
 var timer = setTimeout(function(){ try { ctrl.abort(); } catch(e) {} }, HUB_CLOUD_CONFIG.CLOUD_TIMEOUT_MS || 4500);
 loadHubUserProfile(email).then(function(hubUser) {
-  if (hubUser) {
-    if (String(hubUser.status || '').toLowerCase() !== 'active') {
-      if (status) { status.textContent = 'This Hub account is inactive. Contact your administrator.'; status.style.color = '#fb7185'; }
-      return;
-    }
-    var session = {
-      name: hubUser.name || niceNameFromEmail(email),
-      email: hubUser.email || email,
-      role: hubUser.role || 'agent',
-      status: hubUser.status || 'active',
-      permissions: hubUser.permissions || {},
-      allowedDevices: hubUser.allowedDevices || 1,
-      requireDeviceApproval: !!hubUser.requireDeviceApproval,
-      permissionSource: 'hub_users',
-      signedInAt: new Date().toISOString(),
-      offlineFallback: false
-    };
-    if (status) { status.textContent = 'Verified.'; status.style.color = '#22c55e'; }
-    finishLogin(session);
+  if (hubUser && hubUser.__lookupError) {
+    if (status) { status.textContent = 'Permission directory unavailable. Please try again in a moment.'; status.style.color = '#fb7185'; }
     return;
   }
-
-  // Phase 1 fallback: if the new hub_users table has no row yet, keep existing agent_directory login behavior.
-  try { clearTimeout(timer); } catch(e) {}
-  ctrl = new AbortController();
-  timer = setTimeout(function(){ try { ctrl.abort(); } catch(e) {} }, HUB_CLOUD_CONFIG.CLOUD_TIMEOUT_MS || 4500);
-  fetch(SUPA_URL + '/rest/v1/agent_directory?hub=eq.medi&select=data', {
-  headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Cache-Control': 'no-cache' },
-  signal: ctrl.signal
-  })
-  .then(function(r) {
-    if (!r.ok) throw new Error('Directory request failed: ' + r.status);
-    return r.json();
-  })
-  .then(function(rows) {
-  clearTimeout(timer);
-  var agents = [];
-  if (rows && rows.length && rows[0].data) {
-  var raw = rows[0].data;
-  agents = Array.isArray(raw) ? raw : (typeof raw === 'string' ? JSON.parse(raw) : []);
+  if (!hubUser) {
+    if (status) { status.textContent = 'This email is not approved for Hub access. Contact your administrator.'; status.style.color = '#fb7185'; }
+    return;
   }
-  var match = agents.find(function(a) {
-  return a.email && a.email.trim().toLowerCase() === email;
-  });
-  if (match) {
-  var session = { name: match.name || 'Agent', email: match.email, role: match.tag || match.role || 'agent', status: 'active', permissions: {}, permissionSource: 'agent_directory', signedInAt: new Date().toISOString(), offlineFallback: false };
-  finishLogin(session);
-  } else if (!agents.length) {
-  // Treat an empty cloud directory as unavailable, not as a hard denial.
-  fallbackLogin('empty_directory');
-  } else {
-  if (status) { status.textContent = 'This email is not in the agent directory. Contact your administrator.'; status.style.color = '#fb7185'; }
+  if (String(hubUser.status || '').toLowerCase() !== 'active') {
+    if (status) { status.textContent = 'This Hub account is inactive. Contact your administrator.'; status.style.color = '#fb7185'; }
+    return;
   }
-  })
-  .catch(function(err) {
-  clearTimeout(timer);
-  console.warn('[Hub Login] Directory check unavailable:', err?.message || err);
-  fallbackLogin(err?.name === 'AbortError' ? 'directory_timeout' : 'directory_unavailable');
+  var session = {
+    name: hubUser.name || niceNameFromEmail(email),
+    email: hubUser.email || email,
+    role: hubUser.role || 'agent',
+    status: hubUser.status || 'active',
+    permissions: hubUser.permissions || {},
+    allowedDevices: hubUser.allowedDevices || 1,
+    requireDeviceApproval: !!hubUser.requireDeviceApproval,
+    permissionSource: 'hub_users',
+    signedInAt: new Date().toISOString(),
+    offlineFallback: false
+  };
+  if (status) { status.textContent = 'Checking device access...'; status.style.color = 'var(--muted)'; }
+  verifyHubDeviceBeforeLogin(session, status).then(function(allowedDevice){
+    if (!allowedDevice) return;
+    if (status) { status.textContent = 'Verified.'; status.style.color = '#22c55e'; }
+    finishLogin(session);
   });
+});
 });
 };
 const prevOpenAgentLogin = window.openAgentLogin;
@@ -19949,6 +19774,59 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     });
   }
 
+  function setDeviceReqStatus(msg, good){
+    var el = document.getElementById('hubDeviceRequestStatus');
+    if (el) { el.textContent = msg || ''; el.style.color = good ? '#86efac' : 'var(--muted-2)'; }
+  }
+  function renderDeviceRequests(rows){
+    var box = document.getElementById('hubDeviceRequestList');
+    if (!box) return;
+    rows = rows || [];
+    if (!rows.length) {
+      box.innerHTML = '<div class="hub-perm-status">No pending device requests.</div>';
+      return;
+    }
+    box.innerHTML = rows.map(function(r){
+      var name = r.name || r.email || 'Unknown';
+      var email = r.email || '';
+      var device = r.device_label || 'New device';
+      var role = r.role || '';
+      var when = r.requested_at ? new Date(r.requested_at).toLocaleString() : '';
+      return '<div class="hub-perm-user-row" style="align-items:flex-start;gap:10px;">' +
+        '<div style="flex:1;min-width:0;"><strong>' + escapeHtml(name) + '</strong><br><span>' + escapeHtml(email) + ' · ' + escapeHtml(role) + '</span><br><span>' + escapeHtml(device) + (when ? ' · ' + escapeHtml(when) : '') + '</span></div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;"><button class="admin-save-btn" type="button" onclick="approveHubDeviceRequest(' + Number(r.id) + ')">Approve</button><button class="hub-perm-delete-btn" type="button" onclick="denyHubDeviceRequest(' + Number(r.id) + ')">Deny</button></div>' +
+      '</div>';
+    }).join('');
+  }
+  window.loadHubDeviceRequests = function(){
+    setDeviceReqStatus('Loading device requests...', false);
+    fetch(HP_URL + '/rest/v1/hub_device_requests?hub=eq.' + encodeURIComponent(HP_HUB) + '&status=eq.pending&select=id,email,name,role,device_id,device_label,user_agent,requested_at,notes&order=requested_at.desc', {
+      headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY, 'Cache-Control': 'no-cache' }
+    }).then(function(r){ if (!r.ok) throw new Error('Device request load failed: ' + r.status); return r.json(); })
+    .then(function(rows){ renderDeviceRequests(rows || []); setDeviceReqStatus('Loaded ' + ((rows || []).length) + ' pending request(s).', true); })
+    .catch(function(err){ setDeviceReqStatus('Device requests failed to load: ' + (err && err.message ? err.message : err), false); });
+  };
+  window.approveHubDeviceRequest = function(id){
+    id = Number(id || 0); if (!id) return;
+    fetch(HP_URL + '/rest/v1/hub_device_requests?id=eq.' + id + '&select=*', { headers: { 'apikey': HP_KEY, 'Authorization': 'Bearer ' + HP_KEY } })
+    .then(function(r){ if (!r.ok) throw new Error('Request lookup failed: ' + r.status); return r.json(); })
+    .then(function(rows){
+      var req = rows && rows[0]; if (!req) throw new Error('Request not found.');
+      var payload = { hub: HP_HUB, email: String(req.email || '').toLowerCase(), session_id: 'approved_' + Date.now().toString(36), device_id: req.device_id, device_label: req.device_label || '', user_agent: req.user_agent || '', status:'active', approved:true, last_seen:new Date().toISOString() };
+      return fetch(HP_URL + '/rest/v1/hub_device_sessions?on_conflict=hub,email,device_id', { method:'POST', headers: hpHeaders({ 'Prefer':'resolution=merge-duplicates,return=minimal' }), body: JSON.stringify(payload) })
+        .then(function(r){ if (!r.ok) throw new Error('Session approval failed: ' + r.status); })
+        .then(function(){ return fetch(HP_URL + '/rest/v1/hub_device_requests?id=eq.' + id, { method:'PATCH', headers: hpHeaders({ 'Prefer':'return=minimal' }), body: JSON.stringify({ status:'approved', reviewed_at:new Date().toISOString(), reviewed_by:(window.HUB_CURRENT_USER && window.HUB_CURRENT_USER.email) || '' }) }); });
+    }).then(function(){ setDeviceReqStatus('Device approved.', true); window.loadHubDeviceRequests(); })
+    .catch(function(err){ setDeviceReqStatus('Approve failed: ' + (err && err.message ? err.message : err), false); });
+  };
+  window.denyHubDeviceRequest = function(id){
+    id = Number(id || 0); if (!id) return;
+    if (!confirm('Deny this device request?')) return;
+    fetch(HP_URL + '/rest/v1/hub_device_requests?id=eq.' + id, { method:'PATCH', headers: hpHeaders({ 'Prefer':'return=minimal' }), body: JSON.stringify({ status:'denied', reviewed_at:new Date().toISOString(), reviewed_by:(window.HUB_CURRENT_USER && window.HUB_CURRENT_USER.email) || '' }) })
+    .then(function(r){ if (!r.ok) throw new Error('Deny failed: ' + r.status); setDeviceReqStatus('Device request denied.', true); window.loadHubDeviceRequests(); })
+    .catch(function(err){ setDeviceReqStatus('Deny failed: ' + (err && err.message ? err.message : err), false); });
+  };
+
   function bindPermissionManagerControls(){
     try {
       var refreshBtn = Array.from(document.querySelectorAll('#adminTabPermissions button')).find(function(b){ return String(b.textContent || '').trim().toLowerCase() === 'refresh'; });
@@ -19991,13 +19869,18 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
         migrateBtn.dataset.hubPermBound = '1';
         migrateBtn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); migrateDirectoryUsersToHubUsers(); });
       }
+      var devReqBtn = document.getElementById('hubPermRefreshDevicesBtn');
+      if (devReqBtn && !devReqBtn.dataset.hubPermBound) {
+        devReqBtn.dataset.hubPermBound = '1';
+        devReqBtn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); if (typeof window.loadHubDeviceRequests === 'function') window.loadHubDeviceRequests(); });
+      }
     } catch(e) { console.warn('[Hub Permissions] bind controls failed:', e); }
   }
 
   var oldSwitch = window.switchAdminTab;
   window.switchAdminTab = function(name, btn){
     if (typeof oldSwitch === 'function') oldSwitch(name, btn);
-    if (name === 'permissions') setTimeout(function(){ bindPermissionManagerControls(); window.loadHubUsersAdmin && window.loadHubUsersAdmin(); }, 80);
+    if (name === 'permissions') setTimeout(function(){ bindPermissionManagerControls(); window.loadHubUsersAdmin && window.loadHubUsersAdmin(); window.loadHubDeviceRequests && window.loadHubDeviceRequests(); }, 80);
   };
 
   document.addEventListener('DOMContentLoaded', function(){
@@ -20007,7 +19890,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       tries++;
       bindPermissionManagerControls();
       var panel = document.getElementById('adminTabPermissions');
-      if (panel && panel.offsetParent !== null && typeof window.loadHubUsersAdmin === 'function') window.loadHubUsersAdmin();
+      if (panel && panel.offsetParent !== null && typeof window.loadHubUsersAdmin === 'function') { window.loadHubUsersAdmin(); if (typeof window.loadHubDeviceRequests === 'function') window.loadHubDeviceRequests(); }
       if (tries >= 6) clearInterval(t);
     }, 600);
   });
