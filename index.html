@@ -4308,7 +4308,8 @@ cursor: pointer; white-space: nowrap;
 }
 .national-day-value {
   display: block;
-  max-width: clamp(130px, 18vw, 250px);
+  width: clamp(125px, 12vw, 190px);
+  max-width: clamp(125px, 12vw, 190px);
   overflow: hidden;
   position: relative;
   white-space: nowrap;
@@ -4556,7 +4557,7 @@ cursor: pointer; white-space: nowrap;
   <div class="national-day-modal-card" role="dialog" aria-modal="true" aria-labelledby="nationalDayModalTitle">
     <div class="national-day-modal-kicker">Today&apos;s National Day</div>
     <div class="national-day-modal-title" id="nationalDayModalTitle">Loading…</div>
-    <div class="national-day-modal-copy" id="nationalDayModalCopy">Click the National Day banner anytime to see the full name when the top bar is too short.</div>
+    <div class="national-day-modal-copy" id="nationalDayModalCopy">Today's National Day is shown here as a quick daily conversation starter.</div>
     <div class="national-day-modal-actions">
       <button type="button" class="national-day-modal-btn" onclick="closeNationalDayModal()">Close</button>
     </div>
@@ -8004,11 +8005,11 @@ function setNationalDayText(text) {
   if (valueEl) valueEl.title = text;
   if (!textEl && nameEl) nameEl.textContent = text;
   if (modalTitle) modalTitle.textContent = text;
-  if (modalCopy) modalCopy.textContent = 'Full National Day display for ' + (dateEl ? dateEl.textContent : 'today') + '. Use this as a light touchpoint for team conversation, content ideas, or client-friendly social posts.';
+  if (modalCopy) modalCopy.textContent = 'Today is ' + text + '. This is just a quick daily conversation starter.';
   setTimeout(function(){
     if (!valueEl || !textEl) return;
     valueEl.classList.remove('is-overflowing');
-    if (textEl.scrollWidth > valueEl.clientWidth + 8) valueEl.classList.add('is-overflowing');
+    if (text.length > 18 || textEl.scrollWidth > valueEl.clientWidth + 8) valueEl.classList.add('is-overflowing');
   }, 80);
 }
 if (holiday && iconEl) {
@@ -8023,7 +8024,7 @@ window.addEventListener('resize', function(){
   const textEl = document.getElementById('liveHolidayText');
   if (!valueEl || !textEl) return;
   valueEl.classList.remove('is-overflowing');
-  if (textEl.scrollWidth > valueEl.clientWidth + 8) valueEl.classList.add('is-overflowing');
+  if ((textEl.textContent || '').length > 18 || textEl.scrollWidth > valueEl.clientWidth + 8) valueEl.classList.add('is-overflowing');
 });
 })();
 function openNationalDayModal(){
