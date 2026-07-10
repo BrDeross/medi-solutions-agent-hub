@@ -5336,23 +5336,60 @@ Agent Command Center
       <span class="count-chip">GA access</span>
     </div>
 
-    <div style="background:rgba(255,255,255,.045);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 16px 44px rgba(0,0,0,.12);">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;">
-        <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <div style="font-weight:800;color:#fff;margin-bottom:6px;">GA Onboarding</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.55;">Setup checklist, launch timeline, required forms, staff contacts, and first 30/60/90-day expectations.</div>
-        </div>
-        <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <div style="font-weight:800;color:#fff;margin-bottom:6px;">Contracting Process</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.55;">Step-by-step appointment guidance, common contracting issues, and when to contact the internal support team. Carrier phone numbers, portals, and writing numbers stay in the Carrier Directory.</div>
-        </div>
-        <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <div style="font-weight:800;color:#fff;margin-bottom:6px;">Marketing & Field Support</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.55;">Approved marketing materials, seminar support, referral guidance, recruiting resources, and field-ready downloads.</div>
-        </div>
+    <style>
+      .ga-resource-shell{background:rgba(255,255,255,.045);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 16px 44px rgba(0,0,0,.12)}
+      .ga-resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+      .ga-resource-card{appearance:none;width:100%;text-align:left;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;color:inherit;transition:transform .16s ease,border-color .16s ease,background .16s ease;min-height:126px}
+      .ga-resource-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.075);border-color:rgba(125,211,252,.45)}
+      .ga-resource-title{font-weight:800;color:#fff;margin-bottom:6px;font-size:16px}
+      .ga-resource-copy{font-size:13px;color:var(--muted);line-height:1.55}
+      .ga-resource-action{margin-top:12px;display:inline-flex;align-items:center;gap:6px;color:#93c5fd;font-size:12px;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
+      .ga-resource-note{margin-top:14px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.28);border-radius:12px;padding:12px 14px;color:#c7d2fe;font-size:13px;line-height:1.55}
+      .ga-modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.72);z-index:100000;display:none;align-items:center;justify-content:center;padding:18px}
+      .ga-modal-backdrop.show{display:flex}
+      .ga-modal{width:min(760px,100%);max-height:86vh;overflow:auto;background:#10234a;border:1px solid rgba(148,163,184,.25);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:24px;color:#dbeafe}
+      .ga-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+      .ga-modal h3{margin:0;color:#fff;font-size:24px;line-height:1.2}
+      .ga-modal-sub{color:#bfdbfe;font-size:13px;margin-top:4px;line-height:1.45}
+      .ga-modal-close{border:0;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font-weight:800;padding:10px 14px;cursor:pointer;flex-shrink:0}
+      .ga-modal-section{margin-top:16px;padding:14px;border:1px solid rgba(148,163,184,.22);background:rgba(255,255,255,.045);border-radius:14px}
+      .ga-modal-section h4{margin:0 0 8px;color:#fff;font-size:15px}
+      .ga-modal-section ul{margin:0;padding-left:20px;color:#dbeafe;line-height:1.6;font-size:13px}
+      .ga-modal-callout{margin-top:16px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.28);border-radius:14px;padding:12px 14px;color:#c7d2fe;font-size:13px;line-height:1.55}
+    </style>
+    <div class="ga-resource-shell">
+      <div class="ga-resource-grid">
+        <button type="button" class="ga-resource-card" data-ga-panel="onboarding" onclick="openGaResourcePanel('onboarding')">
+          <div class="ga-resource-title">GA Onboarding</div>
+          <div class="ga-resource-copy">Setup checklist, launch timeline, required forms, staff contacts, and first 30/60/90-day expectations.</div>
+          <div class="ga-resource-action">Open guide →</div>
+        </button>
+        <button type="button" class="ga-resource-card" data-ga-panel="contracting" onclick="openGaResourcePanel('contracting')">
+          <div class="ga-resource-title">Contracting Process</div>
+          <div class="ga-resource-copy">Step-by-step appointment guidance, common contracting issues, and when to contact the internal support team.</div>
+          <div class="ga-resource-action">Open process →</div>
+        </button>
+        <button type="button" class="ga-resource-card" data-ga-panel="marketing" onclick="openGaResourcePanel('marketing')">
+          <div class="ga-resource-title">Marketing & Field Support</div>
+          <div class="ga-resource-copy">Approved marketing materials, seminar support, referral guidance, recruiting resources, and field-ready downloads.</div>
+          <div class="ga-resource-action">Open support →</div>
+        </button>
       </div>
-      <div style="margin-top:14px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.28);border-radius:12px;padding:12px 14px;color:#c7d2fe;font-size:13px;line-height:1.55;">
+      <div class="ga-resource-note">
         <strong style="color:#fff;">Carrier info stays centralized:</strong> use the Carrier Directory for carrier contact details, websites, contracting links, and agent writing numbers. This GA Resources section is for instructions, process, onboarding, and support materials.
+      </div>
+    </div>
+
+    <div id="gaResourceModal" class="ga-modal-backdrop" aria-hidden="true">
+      <div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle">
+        <div class="ga-modal-head">
+          <div>
+            <h3 id="gaResourceModalTitle">GA Resource</h3>
+            <div id="gaResourceModalSub" class="ga-modal-sub"></div>
+          </div>
+          <button type="button" class="ga-modal-close" onclick="closeGaResourcePanel()">Close</button>
+        </div>
+        <div id="gaResourceModalBody"></div>
       </div>
     </div>
   </div>
@@ -9503,6 +9540,77 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
+
+
+<script>
+(function(){
+  var gaPanels = {
+    onboarding: {
+      title: 'GA Onboarding',
+      sub: 'Use this as the launch path for outside GA partners and new partner-agent relationships.',
+      sections: [
+        ['Start here', ['Confirm the agent is active in the Hub permission list.', 'Confirm the agent has access to the Carrier Directory.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to their relationship.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm agent writing numbers are available in the Carrier Directory once issued.', 'Schedule initial check-in with the internal support contact.']],
+        ['First 60 to 90 days', ['Review production goals and referral flow.', 'Confirm training completion and any carrier-specific next steps.', 'Identify common questions or bottlenecks that need support.', 'Revisit Hub permissions if their role or access needs change.']]
+      ],
+      callout: 'Keep this section process-focused. Carrier phone numbers, portal links, and writing numbers should stay in the Carrier Directory.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Step-by-step guidance for appointment support without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm the agent profile and required licensing information.', 'Submit or complete carrier appointment requirements.', 'Track pending carrier items and communicate missing requirements clearly.', 'Add writing numbers to the Carrier Directory once available.']],
+        ['When to contact internal support', ['Carrier appointment is delayed or rejected.', 'Agent cannot locate a required form or portal step.', 'Writing number does not match carrier records.', 'Carrier status, license state, or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, and notes.', 'Use this GA Resources area for process guidance and expectations only.']]
+      ],
+      callout: 'This prevents duplicated carrier links and keeps one source of truth for carrier contact information.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for approved marketing, referrals, seminars, and partner development.',
+      sections: [
+        ['Approved support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New GA needs a launch path.', 'Existing GA needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Do not duplicate', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should eventually hold approved downloads and field guidance, not one-off files scattered across email.'
+    }
+  };
+
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    panel.sections.forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + sec[0] + '</h4><ul>' + sec[1].map(function(item){ return '<li>' + item + '</li>'; }).join('') + '</ul></div>';
+    });
+    html += '<div class="ga-modal-callout">' + panel.callout + '</div>';
+    body.innerHTML = html;
+  }
+
+  window.openGaResourcePanel = function(key){
+    var panel = gaPanels[key] || gaPanels.onboarding;
+    var modal = document.getElementById('gaResourceModal');
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    if (modal) { modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') window.closeGaResourcePanel();
+  });
+})();
+</script>
 
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
