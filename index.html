@@ -9955,6 +9955,212 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 })();
 </script>
 
+
+<script>
+/* Phase 26: hardened onboarding notice storage/rendering.
+   Fixes duplicate/malformed onboarding_status rows and keeps the flashing notice visible to every user who can see onboarding. */
+(function(){
+  if (window.__phase26OnboardingNoticeFix) return;
+  window.__phase26OnboardingNoticeFix = true;
+
+  var OB_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var OB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var OB_HUB = 'medi';
+  var OB_KEY = 'onboarding_status';
+  var defaultStatus = {
+    active: true,
+    message: 'We are currently updating the Agent Onboarding & Resources section. If you do not see the form, link, video, or instruction you need, please reach out before assuming it is unavailable.',
+    zoom_url: 'https://zoom.us/launch/chat/v2/eyJzaWQiOiJkZTI0NWE0M2VlNDI0ZDJlODA5ZmQwYzA5NjNjMzU1OEBjb25mZXJlbmNlLnhtcHAuem9vbS51cyJ9',
+    zoom_label: 'Open Live Support Chat',
+    recent_changes: [
+      'Onboarding resources are being refined for both LOA/internal agents and GA partners.',
+      'Carrier contacts and writing numbers now live in the Carrier Directory.',
+      'If something appears missing, use the update notice instructions and contact support before assuming it is unavailable.'
+    ]
+  };
+  function h(extra){
+    return Object.assign({
+      'apikey': OB_SUPA_KEY,
+      'Authorization': 'Bearer ' + OB_SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    }, extra || {});
+  }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function rebuildNumericObject(obj){
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
+    var nums = Object.keys(obj).filter(function(k){ return /^\d+$/.test(k); }).sort(function(a,b){ return Number(a)-Number(b); });
+    if (!nums.length) return obj;
+    var parsed = null;
+    try { parsed = JSON.parse(nums.map(function(k){ return obj[k]; }).join('')); } catch(e) { parsed = {}; }
+    var clean = Object.assign({}, parsed || {});
+    Object.keys(obj).forEach(function(k){ if (!/^\d+$/.test(k)) clean[k] = obj[k]; });
+    return clean;
+  }
+  function normalize(raw){
+    var data = raw;
+    if (typeof data === 'string') {
+      try { data = JSON.parse(data); } catch(e) { data = {}; }
+    }
+    data = rebuildNumericObject(data || {});
+    var out = Object.assign({}, defaultStatus, data || {});
+    out.active = out.active === true || out.active === 'true' || out.active === 1 || out.active === '1';
+    out.message = String(out.message || defaultStatus.message).trim();
+    out.zoom_url = String(out.zoom_url || '').trim();
+    out.zoom_label = String(out.zoom_label || defaultStatus.zoom_label).trim();
+    if (!Array.isArray(out.recent_changes)) {
+      if (typeof out.recent_changes === 'string' && out.recent_changes.trim()) {
+        out.recent_changes = out.recent_changes.split(/\n|;/).map(function(x){ return x.trim(); }).filter(Boolean);
+      } else {
+        out.recent_changes = defaultStatus.recent_changes.slice();
+      }
+    }
+    return out;
+  }
+  function score(s){
+    s = normalize(s);
+    return (s.active ? 1000 : 0) + (s.zoom_url ? 100 : 0) + (Array.isArray(s.recent_changes) && s.recent_changes.length ? 25 : 0) + (s.message ? 10 : 0);
+  }
+  function currentUser(){
+    try { if (window.HUB_CURRENT_USER) return window.HUB_CURRENT_USER; } catch(e) {}
+    try { var p = JSON.parse(sessionStorage.getItem('medi_hub_current_user') || 'null'); if (p) return p; } catch(e) {}
+    try { var s = JSON.parse(sessionStorage.getItem('medi_hub_session') || 'null'); if (s) return s; } catch(e) {}
+    return {};
+  }
+  function isAdmin(profile){
+    profile = profile || currentUser() || {};
+    var role = String(profile.role || '').toLowerCase();
+    var perms = profile.permissions || {};
+    return role === 'admin' || perms.admin === true || perms.admin === 'true';
+  }
+  function allowLoaSupport(profile){
+    profile = profile || currentUser() || {};
+    if (isAdmin(profile)) return true;
+    var role = String(profile.role || '').toLowerCase();
+    var perms = profile.permissions || {};
+    if (role === 'ga' || role === 'outside' || role === 'broker') return false;
+    return role === 'internal' || role === 'loa' || role === 'manager' || perms.loa_resources === true || perms.loa_resources === 'true' || perms.agent_tools === true || perms.agent_tools === 'true';
+  }
+  function render(){
+    var settings = normalize(window.__onboardingStatusSettings || defaultStatus);
+    window.__onboardingStatusSettings = settings;
+    var banner = document.getElementById('onboardingUpdateBanner');
+    if (banner) {
+      banner.classList.toggle('show', !!settings.active);
+      banner.style.display = settings.active ? 'block' : 'none';
+      banner.removeAttribute('data-permission-required');
+      banner.classList.remove('hub-permission-hidden');
+    }
+    var recentWrap = document.getElementById('onboardingRecentChanges');
+    var recentList = document.getElementById('onboardingRecentChangesList');
+    var recent = Array.isArray(settings.recent_changes) ? settings.recent_changes.filter(Boolean) : [];
+    if (recentWrap) {
+      recentWrap.style.display = recent.length ? 'block' : 'none';
+      recentWrap.removeAttribute('data-permission-required');
+      recentWrap.classList.remove('hub-permission-hidden');
+    }
+    if (recentList) recentList.innerHTML = recent.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('');
+    var allow = allowLoaSupport();
+    var row = document.getElementById('onboardingZoomSupportRow');
+    if (row) row.style.display = allow ? 'flex' : 'none';
+    var btn = document.getElementById('onboardingZoomSupportBtn');
+    if (btn) {
+      btn.textContent = '💬 ' + (settings.zoom_label || defaultStatus.zoom_label);
+      if (allow && settings.zoom_url) {
+        btn.href = settings.zoom_url;
+        btn.classList.remove('disabled');
+        btn.onclick = null;
+      } else {
+        btn.href = '#';
+        btn.classList.add('disabled');
+        btn.onclick = function(e){ e.preventDefault(); alert(allow ? 'Live Support Chat is not configured yet.' : 'Live Support Chat is for LOA/internal users only.'); };
+      }
+    }
+    var adminText = document.getElementById('onboardingAdminStatusText');
+    if (adminText) {
+      adminText.innerHTML = 'Update notice: <strong>' + (settings.active ? 'ON' : 'OFF') + '</strong><br>Live support chat link: <strong>' + (settings.zoom_url ? 'Configured' : 'Not configured') + '</strong><br>Chat visible to: <strong>LOA/internal users and admins only</strong><br>Notice/Recent Changes visible to: <strong>everyone with onboarding access</strong>';
+    }
+  }
+  function readStatus(){
+    return fetch(OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY) + '&select=data', { headers: h() })
+      .then(function(r){ if (!r.ok) throw new Error('read ' + r.status); return r.json(); })
+      .then(function(rows){
+        var best = null;
+        (rows || []).forEach(function(row){
+          var cand = normalize(row && row.data);
+          if (!best || score(cand) >= score(best)) best = cand;
+        });
+        window.__onboardingStatusSettings = normalize(best || defaultStatus);
+        try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(window.__onboardingStatusSettings)); } catch(e) {}
+        render();
+        return window.__onboardingStatusSettings;
+      }).catch(function(err){
+        try { window.__onboardingStatusSettings = normalize(JSON.parse(localStorage.getItem('medi_onboarding_status_cache') || 'null') || defaultStatus); } catch(e) { window.__onboardingStatusSettings = normalize(defaultStatus); }
+        console.warn('[Phase 26 Onboarding] read fallback:', err && err.message ? err.message : err);
+        render();
+        return window.__onboardingStatusSettings;
+      });
+  }
+  function saveStatus(settings){
+    settings = normalize(settings);
+    window.__onboardingStatusSettings = settings;
+    render();
+    try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(settings)); } catch(e) {}
+    var deleteUrl = OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY);
+    return fetch(deleteUrl, { method:'DELETE', headers:h({'Prefer':'return=minimal'}) })
+      .catch(function(){ return true; })
+      .then(function(){
+        return fetch(OB_SUPA_URL + '/rest/v1/tile_content', {
+          method:'POST', headers:h({'Prefer':'return=minimal'}), body:JSON.stringify({ hub:OB_HUB, key:OB_KEY, data:settings })
+        });
+      }).then(function(r){
+        if (!r.ok && r.status !== 201 && r.status !== 204) throw new Error('save ' + r.status);
+        return true;
+      }).catch(function(err){
+        alert('The onboarding setting changed on this browser, but Supabase did not save it. Error: ' + (err && err.message ? err.message : err));
+        return false;
+      });
+  }
+  window.loadOnboardingStatusSettings = function(showToast){
+    return readStatus().then(function(){ if (showToast && typeof showSnuToast === 'function') showSnuToast('Onboarding status refreshed.'); });
+  };
+  window.toggleOnboardingUpdateStatus = function(){
+    var s = normalize(window.__onboardingStatusSettings || defaultStatus);
+    s.active = !s.active;
+    return saveStatus(s).then(function(){ if (typeof showSnuToast === 'function') showSnuToast('Onboarding update notice is now ' + (s.active ? 'ON' : 'OFF') + '.'); });
+  };
+  window.setOnboardingZoomLink = function(){
+    var s = normalize(window.__onboardingStatusSettings || defaultStatus);
+    var url = prompt('Paste the live support chat link. This is visible to LOA/internal users only. Leave blank to remove it.', s.zoom_url || '');
+    if (url === null) return;
+    url = String(url || '').trim();
+    if (url && !/^https:\/\//i.test(url)) { alert('Please use a full link beginning with https://'); return; }
+    s.zoom_url = url;
+    return saveStatus(s).then(function(){ if (typeof showSnuToast === 'function') showSnuToast(url ? 'Live support chat link saved.' : 'Live support chat link removed.'); });
+  };
+  window.showOnboardingUpdateInfo = function(){
+    var s = normalize(window.__onboardingStatusSettings || defaultStatus);
+    alert('Onboarding Section Being Updated\n\n' + s.message + '\n\nIf something appears missing, please contact Brian or the admin team before assuming it is unavailable.');
+  };
+  window.showOnboardingZoomInfo = function(){
+    alert('Live Support Chat\n\nThis opens the live support chat link in a new browser window or app. This option is available for LOA/internal users only. GA users should use the normal GA support process.');
+  };
+  function boot(){
+    if (!document.getElementById('onboardingUpdateBanner')) return false;
+    render();
+    readStatus();
+    [300,900,1800,3200,5200,8000].forEach(function(ms){ setTimeout(function(){ readStatus(); render(); }, ms); });
+    return true;
+  }
+  if (!boot()) document.addEventListener('DOMContentLoaded', boot);
+  window.addEventListener('focus', function(){ setTimeout(function(){ readStatus(); }, 200); });
+})();
+</script>
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
