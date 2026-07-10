@@ -5981,14 +5981,20 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
         </div>
         <div id="hubPermBulkStatus" class="hub-perm-status" style="margin-top:8px;">Bulk upload is ready.</div>
 
-        <div class="hub-perm-note" style="margin-top:14px;">
-          <strong>One-Time Directory Migration</strong><br>
-          Use this to copy approved users from the existing Agent Directory into <strong>hub_users</strong>. It adds missing emails only and does not overwrite users already in this permission table.
-        </div>
-        <div class="hub-perm-toolbar" style="margin-top:10px;flex-wrap:wrap;">
-          <button class="admin-save-btn" type="button" id="hubPermMigrateDirBtn">↪ Migrate Existing Directory Users</button>
-        </div>
-        <div id="hubPermMigrationStatus" class="hub-perm-status" style="margin-top:8px;">Migration tool is ready.</div>
+        <details class="hub-perm-advanced-tools" style="margin-top:14px;border:1px solid rgba(125,211,252,.28);border-radius:14px;padding:10px 12px;background:rgba(2,6,23,.18);">
+          <summary style="cursor:pointer;font-weight:800;color:#93c5fd;list-style:none;display:flex;align-items:center;gap:8px;">
+            <span>Advanced Tools</span>
+            <span style="font-size:11px;font-weight:700;color:#cbd5e1;opacity:.85;">Migration / recovery only</span>
+          </summary>
+          <div class="hub-perm-note" style="margin-top:12px;">
+            <strong>One-Time Directory Migration</strong><br>
+            This has already been run. Keep this hidden unless you need to recover or rebuild the permission list from the existing Agent Directory. It adds missing emails only and does not overwrite users already in this permission table.
+          </div>
+          <div class="hub-perm-toolbar" style="margin-top:10px;flex-wrap:wrap;">
+            <button class="admin-save-btn" type="button" id="hubPermMigrateDirBtn">↪ Migrate Existing Directory Users</button>
+          </div>
+          <div id="hubPermMigrationStatus" class="hub-perm-status" style="margin-top:8px;">Migration tool is hidden under Advanced Tools.</div>
+        </details>
 
         <div class="hub-perm-note" style="margin-top:14px;">
           <strong>Device Approval Requests</strong><br>
