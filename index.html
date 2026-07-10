@@ -5397,10 +5397,7 @@ Agent Command Center
           <div class="ga-resource-action">Open partner guide →</div>
         </button>
       </div>
-      <div class="ga-resource-note">
-        <strong style="color:#fff;">One onboarding area, permission-based:</strong> shared onboarding is available to both GA and internal LOA agents. Internal-only LOA cards and GA/partner-only cards appear based on each email's permissions. Carrier phone numbers, websites, contracting links, and writing numbers stay centralized in the Carrier Directory.
-      </div>
-    </div>
+</div>
 
     <div id="gaResourceModal" class="ga-modal-backdrop" aria-hidden="true">
       <div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle">
@@ -9599,6 +9596,127 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 })();
 </script>
 
+
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -12061,7 +12179,128 @@ const img = body.querySelector('img');
 const ifr = body.querySelector('iframe');
 if (img) {
 const w = window.open('');
-w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${img.src}" style="max-width:100%;"></body></html>`);
+w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;"><img src="${img.src}" style="max-width:100%;">
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>`);
 w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
 } else if (ifr) {
 // base64 PDFs can't be printed via contentWindow.print() — open in new tab instead
@@ -12221,13 +12460,255 @@ const SEP_FULL_DATA = 'data:application/pdf;base64,JVBERi0xLjUNJeLjz9MNCjQxNTggM
 function openCheatSheet() {
 const w = window.open('', '_blank', 'width=960,height=720');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups to open PDFs.'); return; }
-w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_CHEAT_DATA + '" type="application/pdf" width="100%" height="100%"></body></html>');
+w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_CHEAT_DATA + '" type="application/pdf" width="100%" height="100%">
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>');
 w.document.close();
 }
 function openFullBooklet() {
 const w = window.open('', '_blank', 'width=960,height=720');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups to open PDFs.'); return; }
-w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_FULL_DATA + '" type="application/pdf" width="100%" height="100%"></body></html>');
+w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></head><body style="margin:0;height:100vh;"><embed src="' + SEP_FULL_DATA + '" type="application/pdf" width="100%" height="100%">
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>');
 w.document.close();
 }
 function openSepModal() {
@@ -13697,7 +14178,128 @@ window.printAncillaryCompare = function(){
   const content = document.getElementById('ancillaryCompareContent'); if (!content) return;
   const w = window.open('', '_blank', 'width=1180,height=820');
   if (!w) { if (typeof showSnuToast === 'function') showSnuToast('⚠ Allow pop-ups to print the compare view.'); return; }
-  w.document.write('<html><head><title>Ancillary Compare</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d1d5db;padding:10px;vertical-align:top;text-align:left}th{background:#f3f4f6}button{display:none}</style></head><body><h2>Ancillary Compare</h2>' + content.innerHTML + '</body></html>');
+  w.document.write('<html><head><title>Ancillary Compare</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d1d5db;padding:10px;vertical-align:top;text-align:left}th{background:#f3f4f6}button{display:none}</style></head><body><h2>Ancillary Compare</h2>' + content.innerHTML + '
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>');
   w.document.close();
   w.focus();
   setTimeout(()=>w.print(), 400);
@@ -14137,7 +14739,128 @@ h1{font-size:24px;margin:0 0 6px 0;} .sub{font-size:13px;color:#475569;margin:0;
 .progress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:10px 0 18px 0;}
 .fill{height:100%;background:linear-gradient(90deg,#dc143c,#00c2b8);width:${pct}%;}
 table{width:100%;border-collapse:collapse;border:1px solid #cbd5e1;} th{background:#00a8a3;color:#fff;text-align:left;padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;} td{padding:9px 10px;border-bottom:1px solid #e2e8f0;font-size:13px;} tr:nth-child(even) td{background:#f8fafc;} .yes{color:#047857;font-weight:900;} .no{color:#64748b;font-weight:700;} .footer{margin-top:16px;font-size:11px;color:#64748b;} @media print{body{margin:18px}.no-print{display:none!important}}
-</style></head><body><div class="print-head"><h1>${certEscapeHtml(agent.name)}</h1><p class="sub">Carrier Certification Tracker${year ? ' - ' + certEscapeHtml(year) : ''}</p></div><div class="summary"><span class="pill">${certCount}/${total} certified</span><span class="pill">${pct}% complete</span><span class="pill">Updated ${certEscapeHtml(updated)}</span></div><div class="progress"><div class="fill"></div></div><table><thead><tr><th>Carrier</th><th>Status</th></tr></thead><tbody>${carrierRows}</tbody></table><div class="footer">Printed from My Medi Hub. Use this as a personal certification tracking snapshot.</div><script>setTimeout(function(){ window.focus(); window.print(); }, 350);<\/script></body></html>`;
+</style></head><body><div class="print-head"><h1>${certEscapeHtml(agent.name)}</h1><p class="sub">Carrier Certification Tracker${year ? ' - ' + certEscapeHtml(year) : ''}</p></div><div class="summary"><span class="pill">${certCount}/${total} certified</span><span class="pill">${pct}% complete</span><span class="pill">Updated ${certEscapeHtml(updated)}</span></div><div class="progress"><div class="fill"></div></div><table><thead><tr><th>Carrier</th><th>Status</th></tr></thead><tbody>${carrierRows}</tbody></table><div class="footer">Printed from My Medi Hub. Use this as a personal certification tracking snapshot.</div><script>setTimeout(function(){ window.focus(); window.print(); }, 350);<\/script>
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>`;
 const w = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
 if (!w) { alert('Allow pop-ups for this site to print this certification row.'); return; }
 w.document.open();
@@ -14511,7 +15234,128 @@ h1{font-size:18px;font-weight:800;margin-bottom:20px;}
 .title{font-weight:700;font-size:14px;margin-bottom:4px;}
 .tag{display:inline-block;background:#e8f0fe;color:#1a2340;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-bottom:6px;}
 @page{margin:.75in}</style></head>
-<body><h1>📰 Medicare Updates</h1>${el.innerHTML}</body></html>`);
+<body><h1>📰 Medicare Updates</h1>${el.innerHTML}
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>`);
 w.document.close(); w.focus(); setTimeout(()=>w.print(),400);
 }
 function loadMedUpdates() {
@@ -15196,7 +16040,128 @@ w.document.write(`<!DOCTYPE html><html><head><title>Office Alliance Program</tit
 body { font-family: Georgia, serif; color: #1a1a2e; margin: 0; padding: 0; font-size: 13px; }
 * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </style>
-</head><body>${body.innerHTML}</body></html>`);
+</head><body>${body.innerHTML}
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>`);
 w.document.close();
 w.focus();
 setTimeout(() => { w.print(); }, 400);
@@ -15531,7 +16496,128 @@ border-radius: 16px 16px 0 0 !important;
 #countdownStrip { flex-wrap: wrap !important; }
 .admin-modal { width: 95vw !important; }
 }</style>
-</head><body>${body.innerHTML}</body></html>`);
+</head><body>${body.innerHTML}
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body></html>`);
 w.document.close();
 w.focus();
 setTimeout(() => { w.print(); }, 400);
@@ -15745,7 +16831,128 @@ function printVacationSummary() {
         <h1>Vacation / Days of Absence Form</h1>
         <div class="note">Completed copy for agent records.</div>
         <pre>${escapeVacationHtml(box.value)}</pre>
-      </body>
+      
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+</body>
     </html>
   `);
   printWindow.document.close();
@@ -20127,6 +21334,127 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       if (tries >= 6) clearInterval(t);
     }, 600);
   });
+})();
+</script>
+
+
+<script id="phase23-onboarding-resource-panels">
+(function(){
+  if (window.__phase23OnboardingPanelsReady) return;
+  window.__phase23OnboardingPanelsReady = true;
+  var panels = {
+    onboarding: {
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
+      sections: [
+        ['Start here', ['Confirm Hub access and required permissions.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to the agent role.', 'Use the Carrier Directory for phone numbers, portals, contracting links, and writing numbers.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule the appropriate initial check-in.']],
+        ['First 60 to 90 days', ['Review activity, referrals, appointments, and production goals.', 'Confirm training completion and carrier-specific next steps.', 'Identify recurring questions or bottlenecks.', 'Adjust Hub permissions if the agent role changes.']]
+      ],
+      callout: 'Shared onboarding is for both GA and internal LOA agents. Role-specific cards appear only when that email has the right permission.'
+    },
+    contracting: {
+      title: 'Contracting Process',
+      sub: 'Appointment and setup guidance without duplicating carrier links.',
+      sections: [
+        ['General process', ['Confirm agent profile and license information.', 'Complete carrier appointment requirements.', 'Track pending carrier items and missing requirements.', 'Add writing numbers to the Carrier Directory once issued.']],
+        ['When to contact support', ['Carrier appointment is delayed or rejected.', 'A required carrier form or portal step is unclear.', 'Writing number does not match carrier records.', 'License state or appointment status appears incorrect.']],
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this area for process guidance and expectations only.']]
+      ],
+      callout: 'Carrier contact information stays centralized in the Carrier Directory so agents do not use outdated links.'
+    },
+    marketing: {
+      title: 'Marketing & Field Support',
+      sub: 'Field-ready support guidance for referrals, seminars, and approved materials.',
+      sections: [
+        ['Support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Keep clean', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
+      ],
+      callout: 'This area should hold approved field guidance, not scattered one-off files.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting, and referral handling.', 'Confirm carrier numbers and credentials are visible in Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'Visible to internal LOA agents and admins, not outside GA users unless specifically granted.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This keeps internal employee-agent guidance out of the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'For GA/outside partner resources and hidden from internal LOA agents unless specifically granted.'
+    }
+  };
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function ensureModal(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'gaResourceModal';
+    modal.className = 'ga-modal-backdrop';
+    modal.setAttribute('aria-hidden','true');
+    modal.innerHTML = '<div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle"><div class="ga-modal-head"><div><h3 id="gaResourceModalTitle">Agent Resource</h3><div id="gaResourceModalSub" class="ga-modal-sub"></div></div><button type="button" class="ga-modal-close" data-ga-close="1">Close</button></div><div id="gaResourceModalBody"></div></div>';
+    document.body.appendChild(modal);
+    return modal;
+  }
+  function renderPanel(panel){
+    var body = document.getElementById('gaResourceModalBody');
+    if (!body || !panel) return;
+    var html = '';
+    (panel.sections || []).forEach(function(sec){
+      html += '<div class="ga-modal-section"><h4>' + escapeHtml(sec[0]) + '</h4><ul>' + (sec[1] || []).map(function(item){ return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul></div>';
+    });
+    if (panel.callout) html += '<div class="ga-modal-callout">' + escapeHtml(panel.callout) + '</div>';
+    body.innerHTML = html;
+  }
+  window.openGaResourcePanel = function(key){
+    var modal = ensureModal();
+    var panel = panels[key] || panels.onboarding;
+    var title = document.getElementById('gaResourceModalTitle');
+    var sub = document.getElementById('gaResourceModalSub');
+    if (title) title.textContent = panel.title;
+    if (sub) sub.textContent = panel.sub;
+    renderPanel(panel);
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  };
+  window.closeGaResourcePanel = function(){
+    var modal = document.getElementById('gaResourceModal');
+    if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  };
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest ? e.target.closest('.ga-resource-card[data-ga-panel]') : null;
+    if (card) {
+      e.preventDefault();
+      window.openGaResourcePanel(card.getAttribute('data-ga-panel'));
+      return;
+    }
+    if (e.target && e.target.matches && e.target.matches('[data-ga-close]')) window.closeGaResourcePanel();
+    var modal = document.getElementById('gaResourceModal');
+    if (modal && e.target === modal) window.closeGaResourcePanel();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
 })();
 </script>
 
