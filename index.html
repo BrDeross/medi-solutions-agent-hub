@@ -9570,17 +9570,23 @@ const overlay = document.getElementById('agentLoginOverlay');
 if (overlay) overlay.style.display = 'none';
 };
 window.saveAgentLogin = function() {
-const name = (document.getElementById('agentLoginName')?.value || '').trim();
-const email = (document.getElementById('agentLoginEmail')?.value || '').trim();
+const email = (document.getElementById('agentLoginEmail')?.value || '').trim().toLowerCase();
 const statusEl = document.getElementById('agentLoginStatus');
-if (!name || !email) {
-if (statusEl) statusEl.textContent = 'Name and email are required.';
-return;
+if (!email || !email.includes('@')) {
+  if (statusEl) statusEl.textContent = 'Email is required.';
+  return;
 }
-writeAgentLogin({ name, email, savedAt: new Date().toISOString() });
-renderAgentLogin();
-if (statusEl) statusEl.textContent = 'Saved for this open page only.';
-setTimeout(window.closeAgentLogin, 450);
+// Phase 19: do not allow this profile modal to bypass hub_users/device approval. Route through the main login gate.
+try { sessionStorage.removeItem(HUB_SESSION_KEY); sessionStorage.removeItem('medi_hub_current_user'); } catch(e) {}
+const gateEmail = document.getElementById('hubGateEmail');
+if (gateEmail) gateEmail.value = email;
+const overlay = document.getElementById('agentLoginOverlay');
+if (overlay) overlay.style.display = 'none';
+if (typeof window.submitHubGateLogin === 'function') {
+  window.submitHubGateLogin();
+} else if (statusEl) {
+  statusEl.textContent = 'Login verifier is not ready. Please refresh and try again.';
+}
 };
 window.clearAgentLogin = function() {
 writeAgentLogin(null);
@@ -9805,10 +9811,16 @@ function approveCurrentHubDevice(session, deviceId){
 }
 function verifyHubDeviceBeforeLogin(session, statusEl){
   var deviceId = getHubDeviceId();
+  console.log('[Hub Device Approval] checking', { email: session && session.email, role: session && session.role, allowedDevices: session && session.allowedDevices, requireDeviceApproval: session && session.requireDeviceApproval, deviceId: deviceId });
   var allowed = Math.max(0, Number(session.allowedDevices || 1));
   var requireApproval = !!session.requireDeviceApproval;
   var role = String(session.role || '').toLowerCase();
   if (role === 'admin') { allowed = Math.max(allowed, 3); requireApproval = false; }
+  // Phase 19: GA/outside users must use approved devices even if their record was migrated with the flag off.
+  if (role === 'ga' || role === 'outside' || role === 'broker' || (session.permissions && session.permissions.ga_tools === true && role !== 'admin')) {
+    requireApproval = true;
+    allowed = Math.max(1, allowed || 1);
+  }
   var email = String(session.email || '').toLowerCase();
   var url = SUPA_URL + '/rest/v1/hub_device_sessions?hub=eq.medi&email=eq.' + encodeURIComponent(email) + '&status=eq.active&approved=eq.true&select=id,device_id,last_seen';
   return fetch(url, { headers: hubDeviceHeaders() })
@@ -9888,6 +9900,13 @@ loadHubUserProfile(email).then(function(hubUser) {
       if (status) { status.textContent = 'Verified.'; status.style.color = '#22c55e'; }
       finishLogin(session);
     });
+    return;
+  }
+
+  // Phase 19: strict permission login. Users must exist in hub_users so device approval and section permissions cannot be bypassed.
+  if (!hubUser) {
+    try { sessionStorage.removeItem(HUB_SESSION_KEY); sessionStorage.removeItem('medi_hub_current_user'); } catch(e) {}
+    if (status) { status.textContent = 'This email is not active in the Hub permission list. Contact your administrator.'; status.style.color = '#fb7185'; }
     return;
   }
 
