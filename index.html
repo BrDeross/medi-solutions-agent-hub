@@ -5322,28 +5322,29 @@ Agent Command Center
 
 
 
-<!-- GA RESOURCES - Phase 7 structure; carrier links stay centralized in Carrier Directory -->
-<section class="section hub-permission-hidden" id="ga-resources" data-permission-required="ga_tools">
+<!-- AGENT ONBOARDING & RESOURCES - shared onboarding with GA/LOA extras -->
+<section class="section hub-permission-hidden" id="ga-resources" data-permission-required="onboarding_resources">
   <div class="wrap">
     <div class="section-head">
       <div class="sh-left">
-        <div class="sh-icon gold">🤝</div>
+        <div class="sh-icon gold">🧭</div>
         <div>
-          <h2>GA <span style="color:var(--accent-2)">Resources</span></h2>
-          <p>Partner onboarding, process guidance, training resources, and field support.</p>
+          <h2>Agent <span style="color:var(--accent-2)">Onboarding & Resources</span></h2>
+          <p>Shared onboarding, process guidance, training, and role-specific support for GA and internal LOA agents.</p>
         </div>
       </div>
-      <span class="count-chip">GA access</span>
+      <span class="count-chip">permission based</span>
     </div>
 
     <style>
       .ga-resource-shell{background:rgba(255,255,255,.045);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 16px 44px rgba(0,0,0,.12)}
       .ga-resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-      .ga-resource-card{appearance:none;width:100%;text-align:left;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;color:inherit;transition:transform .16s ease,border-color .16s ease,background .16s ease;min-height:126px}
+      .ga-resource-card{appearance:none;width:100%;text-align:left;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;color:inherit;transition:transform .16s ease,border-color .16s ease,background .16s ease;min-height:132px}
       .ga-resource-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.075);border-color:rgba(125,211,252,.45)}
       .ga-resource-title{font-weight:800;color:#fff;margin-bottom:6px;font-size:16px}
       .ga-resource-copy{font-size:13px;color:var(--muted);line-height:1.55}
       .ga-resource-action{margin-top:12px;display:inline-flex;align-items:center;gap:6px;color:#93c5fd;font-size:12px;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
+      .ga-resource-tag{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(148,163,184,.25);background:rgba(15,23,42,.28);border-radius:999px;padding:4px 8px;margin-bottom:10px;color:#cbd5e1;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
       .ga-resource-note{margin-top:14px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.28);border-radius:12px;padding:12px 14px;color:#c7d2fe;font-size:13px;line-height:1.55}
       .ga-modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.72);z-index:100000;display:none;align-items:center;justify-content:center;padding:18px}
       .ga-modal-backdrop.show{display:flex}
@@ -5360,23 +5361,44 @@ Agent Command Center
     <div class="ga-resource-shell">
       <div class="ga-resource-grid">
         <button type="button" class="ga-resource-card" data-ga-panel="onboarding" onclick="openGaResourcePanel('onboarding')">
-          <div class="ga-resource-title">GA Onboarding</div>
-          <div class="ga-resource-copy">Setup checklist, launch timeline, required forms, staff contacts, and first 30/60/90-day expectations.</div>
+          <div class="ga-resource-tag">Shared</div>
+          <div class="ga-resource-title">Agent Onboarding</div>
+          <div class="ga-resource-copy">Shared launch checklist, first 30/60/90-day path, required setup items, and staff support expectations.</div>
           <div class="ga-resource-action">Open guide →</div>
         </button>
         <button type="button" class="ga-resource-card" data-ga-panel="contracting" onclick="openGaResourcePanel('contracting')">
+          <div class="ga-resource-tag">Shared</div>
           <div class="ga-resource-title">Contracting Process</div>
-          <div class="ga-resource-copy">Step-by-step appointment guidance, common contracting issues, and when to contact the internal support team.</div>
+          <div class="ga-resource-copy">Step-by-step appointment guidance, common contracting issues, and when to use the Carrier Directory.</div>
           <div class="ga-resource-action">Open process →</div>
         </button>
         <button type="button" class="ga-resource-card" data-ga-panel="marketing" onclick="openGaResourcePanel('marketing')">
+          <div class="ga-resource-tag">Shared</div>
           <div class="ga-resource-title">Marketing & Field Support</div>
-          <div class="ga-resource-copy">Approved marketing materials, seminar support, referral guidance, recruiting resources, and field-ready downloads.</div>
+          <div class="ga-resource-copy">Approved marketing materials, seminar support, referral guidance, and field-ready support resources.</div>
           <div class="ga-resource-action">Open support →</div>
+        </button>
+        <button type="button" class="ga-resource-card hub-permission-hidden" data-permission-required="loa_resources" data-ga-panel="loaTimeline" onclick="openGaResourcePanel('loaTimeline')">
+          <div class="ga-resource-tag">Internal LOA</div>
+          <div class="ga-resource-title">LOA New Agent Timeline</div>
+          <div class="ga-resource-copy">Internal employee-agent launch path, team training expectations, workflow checkpoints, and first production milestones.</div>
+          <div class="ga-resource-action">Open timeline →</div>
+        </button>
+        <button type="button" class="ga-resource-card hub-permission-hidden" data-permission-required="loa_resources" data-ga-panel="internalWorkflow" onclick="openGaResourcePanel('internalWorkflow')">
+          <div class="ga-resource-tag">Internal LOA</div>
+          <div class="ga-resource-title">Internal Workflow & Team Support</div>
+          <div class="ga-resource-copy">Who handles what, how to request support, internal communication standards, and handoff expectations.</div>
+          <div class="ga-resource-action">Open workflow →</div>
+        </button>
+        <button type="button" class="ga-resource-card hub-permission-hidden" data-permission-required="ga_resources" data-ga-panel="gaPartner" onclick="openGaResourcePanel('gaPartner')">
+          <div class="ga-resource-tag">GA / Partner</div>
+          <div class="ga-resource-title">GA Partner Growth</div>
+          <div class="ga-resource-copy">Partner expectations, field activity support, recruiting/referral guidance, and how to engage the agency team.</div>
+          <div class="ga-resource-action">Open partner guide →</div>
         </button>
       </div>
       <div class="ga-resource-note">
-        <strong style="color:#fff;">Carrier info stays centralized:</strong> use the Carrier Directory for carrier contact details, websites, contracting links, and agent writing numbers. This GA Resources section is for instructions, process, onboarding, and support materials.
+        <strong style="color:#fff;">One onboarding area, permission-based:</strong> shared onboarding is available to both GA and internal LOA agents. Internal-only LOA cards and GA/partner-only cards appear based on each email's permissions. Carrier phone numbers, websites, contracting links, and writing numbers stay centralized in the Carrier Directory.
       </div>
     </div>
 
@@ -5384,7 +5406,7 @@ Agent Command Center
       <div class="ga-modal" role="dialog" aria-modal="true" aria-labelledby="gaResourceModalTitle">
         <div class="ga-modal-head">
           <div>
-            <h3 id="gaResourceModalTitle">GA Resource</h3>
+            <h3 id="gaResourceModalTitle">Agent Resource</h3>
             <div id="gaResourceModalSub" class="ga-modal-sub"></div>
           </div>
           <button type="button" class="ga-modal-close" onclick="closeGaResourcePanel()">Close</button>
@@ -5395,76 +5417,8 @@ Agent Command Center
   </div>
 </section>
 
-<!-- WEEKLY PRACTICE CLIENT -->
-<section class="section" id="practice-client">
-<div class="wrap">
-<div class="section-head">
-<div class="sh-left">
-<div class="sh-icon rose" style="background:rgba(251,113,133,.15);color:#fb7185;">🎯</div>
-<div>
-<h2>Sales Roleplay Practice</h2>
-<p>Sharpen your skills with AI-powered client roleplay</p>
-</div>
-</div>
-</div>
-<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-<div>
-<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:6px;">🤖 AI Consumer Roleplay</div>
-<div style="font-size:13.5px;color:var(--muted);margin-bottom:10px;">Practice live client scenarios with an AI-powered Medicare consumer. Available via ChatGPT.</div>
-<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:6px 14px;">
-<span style="font-size:16px;">📱</span>
-<span style="font-size:12px;font-weight:700;color:var(--gold);">Only use the Roleplay tool from a mobile phone.</span>
-</div>
-</div>
-<a href="https://chatgpt.com/g/g-69bbfe5f216c8191b29ee1b3b3f98d97-consumer-roleplay-simulator" target="_blank" rel="noopener"
-style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--accent);border-radius:14px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 4px 20px rgba(59,130,246,.4);white-space:nowrap;flex-shrink:0;">
-🚀 Launch GPT Roleplay
-</a>
-</div>
-</div>
-</section>
-<!-- UPDATES -->
-<section class="section" id="updates">
-<div class="wrap">
-<div class="section-head">
-<div class="sh-left">
-<div class="sh-icon gold">📡</div>
-<div>
-<h2>Updates Feed</h2>
-<p>Announcements, carrier updates, training reminders, and weekly priorities</p>
-</div>
-</div>
-<span class="count-chip" id="feed-count">Loading…</span>
-</div>
-<!-- Pinned: Note from the President — always first -->
-<div id="presidentNoteCard" style="display:none;margin-bottom:18px;background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.35);border-left:4px solid var(--gold);border-radius:14px;padding:18px 20px;">
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-<span style="font-size:18px;">📌</span>
-<span style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.8px;text-transform:uppercase;">Note from the President</span>
-</div>
-<h4 id="presidentNoteTitle" style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;"></h4>
-<p id="presidentNoteMsg" style="font-size:13px;color:var(--muted);line-height:1.6;margin:0;white-space:pre-wrap;"></p>
-<div id="presidentNoteMeta" style="font-size:11px;color:var(--muted-2);margin-top:10px;"></div>
-</div>
-<!-- Medicare Updates tile -->
-<div onclick="openMedUpdatesModal()" class="feed-card" style="cursor:pointer;flex-direction:row;align-items:center;gap:14px;padding:16px 20px;margin-bottom:14px;">
-<div style="font-size:26px;flex-shrink:0;">📰</div>
-<div style="flex:1;">
-<span class="feed-type">Medicare</span>
-<h4 style="margin-top:6px;">Medicare Updates</h4>
-<p style="margin:0;">Latest CMS bulletins, carrier changes &amp; policy updates</p>
-</div>
-<span id="medUpdCount2" style="font-size:11px;color:var(--muted-2);font-weight:700;flex-shrink:0;white-space:nowrap;">View →</span>
-</div>
-<div style="margin-bottom:16px;">
-<input id="feedSearch" class="admin-input" placeholder="🔍 Search updates…" oninput="filterFeed(this.value)" style="max-width:340px;">
-</div>
-<div id="feed-list" class="feed-grid">
-<div class="empty">Loading updates…</div>
-</div>
-</div>
-</section>
-<!-- CARRIER CERT TRACKER -->
+
+
 <section class="section hub-permission-hidden" id="cert-tracker" data-permission-required="cert_tracker">
 <div class="wrap">
 <div class="section-head">
@@ -5990,7 +5944,10 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 
         <div class="hub-perm-checks">
           <label><input type="checkbox" data-hub-perm="agent_tools"> Agent/Internal Tools</label>
-          <label><input type="checkbox" data-hub-perm="ga_tools"> GA Resources</label>
+          <label><input type="checkbox" data-hub-perm="onboarding_resources"> Shared Onboarding</label>
+          <label><input type="checkbox" data-hub-perm="loa_resources"> LOA/Internal Resources</label>
+          <label><input type="checkbox" data-hub-perm="ga_tools"> GA Tools</label>
+          <label><input type="checkbox" data-hub-perm="ga_resources"> GA-Specific Resources</label>
           <label><input type="checkbox" data-hub-perm="forms"> Forms</label>
           <label><input type="checkbox" data-hub-perm="videos"> Videos</label>
           <label><input type="checkbox" data-hub-perm="cert_tracker"> Cert Tracker</label>
@@ -6003,7 +5960,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
           <label><input type="checkbox" data-hub-perm="admin"> Admin Tools</label>
         </div>
         <div class="hub-perm-note">
-          Best default: internal agents get internal tools but not GA Resources. GAs get GA Resources but not internal production boards. Only admin should receive Admin Tools and all carrier numbers. Delete User removes Hub access only; use Inactive instead when you want to preserve the user in the permission list.
+          Best default: both GA and internal LOA agents can use shared onboarding. Internal agents get LOA/internal resources but not GA-specific resources. GAs get GA-specific resources but not internal production boards. Only admin should receive Admin Tools and all carrier numbers. Delete User removes Hub access only; use Inactive instead when you want to preserve the user in the permission list.
         </div>
 
         <div class="hub-perm-note" style="margin-top:12px;">
@@ -9546,22 +9503,22 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 (function(){
   var gaPanels = {
     onboarding: {
-      title: 'GA Onboarding',
-      sub: 'Use this as the launch path for outside GA partners and new partner-agent relationships.',
+      title: 'Agent Onboarding',
+      sub: 'Shared launch path for both outside GA partners and internal LOA agents.',
       sections: [
-        ['Start here', ['Confirm the agent is active in the Hub permission list.', 'Confirm the agent has access to the Carrier Directory.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to their relationship.']],
-        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm agent writing numbers are available in the Carrier Directory once issued.', 'Schedule initial check-in with the internal support contact.']],
-        ['First 60 to 90 days', ['Review production goals and referral flow.', 'Confirm training completion and any carrier-specific next steps.', 'Identify common questions or bottlenecks that need support.', 'Revisit Hub permissions if their role or access needs change.']]
+        ['Start here', ['Confirm the agent is active in the Hub permission list.', 'Confirm the agent has access to the Carrier Directory.', 'Review agency expectations, communication process, and support contacts.', 'Confirm which forms, downloads, and videos apply to their role.']],
+        ['First 30 days', ['Complete required onboarding documents.', 'Review contracting workflow and carrier appointment status.', 'Confirm writing numbers are available in the Carrier Directory once issued.', 'Schedule initial check-in with the appropriate internal support contact.']],
+        ['First 60 to 90 days', ['Review production goals and referral flow.', 'Confirm training completion and carrier-specific next steps.', 'Identify common questions or bottlenecks that need support.', 'Revisit Hub permissions if their role or access needs change.']]
       ],
-      callout: 'Keep this section process-focused. Carrier phone numbers, portal links, and writing numbers should stay in the Carrier Directory.'
+      callout: 'This shared guide is intentionally broad. Internal-only LOA expectations and GA/partner-only guidance appear in separate permission-based cards.'
     },
     contracting: {
       title: 'Contracting Process',
-      sub: 'Step-by-step guidance for appointment support without duplicating carrier links.',
+      sub: 'Step-by-step appointment support without duplicating carrier links.',
       sections: [
         ['General process', ['Confirm the agent profile and required licensing information.', 'Submit or complete carrier appointment requirements.', 'Track pending carrier items and communicate missing requirements clearly.', 'Add writing numbers to the Carrier Directory once available.']],
         ['When to contact internal support', ['Carrier appointment is delayed or rejected.', 'Agent cannot locate a required form or portal step.', 'Writing number does not match carrier records.', 'Carrier status, license state, or appointment status appears incorrect.']],
-        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, and notes.', 'Use this GA Resources area for process guidance and expectations only.']]
+        ['Where carrier info lives', ['Use Carrier Directory for phone numbers, websites, support contacts, contracting links, notes, and writing numbers.', 'Use this onboarding area for process guidance and expectations only.']]
       ],
       callout: 'This prevents duplicated carrier links and keeps one source of truth for carrier contact information.'
     },
@@ -9570,10 +9527,40 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       sub: 'Field-ready support guidance for approved marketing, referrals, seminars, and partner development.',
       sections: [
         ['Approved support areas', ['Referral process and warm introduction guidance.', 'Seminar or event support expectations.', 'Approved downloads and partner-facing materials.', 'Training resources and field coaching requests.']],
-        ['Best use cases', ['New GA needs a launch path.', 'Existing GA needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
+        ['Best use cases', ['New agent needs a launch path.', 'Existing agent needs help with field activity or referrals.', 'Partner needs approved materials for an event or outreach.', 'Agent needs a clear next step without contacting multiple people.']],
         ['Do not duplicate', ['Do not store carrier phone numbers or writing numbers here.', 'Do not store outdated marketing files here if a newer approved library exists.', 'Point users to the correct centralized Hub section whenever possible.']]
       ],
       callout: 'This area should eventually hold approved downloads and field guidance, not one-off files scattered across email.'
+    },
+    loaTimeline: {
+      title: 'LOA New Agent Timeline',
+      sub: 'Internal employee-agent onboarding path and production ramp expectations.',
+      sections: [
+        ['Week 1 to 2', ['Confirm system access, Hub login, carrier resources, and staff contacts.', 'Review internal communication standards and where to find common forms.', 'Complete required training assignments and shadowing schedule.', 'Confirm who handles contracting, client service, marketing support, and escalations.']],
+        ['First 30 days', ['Complete internal workflow training.', 'Review call expectations, appointment setting process, and referral handling.', 'Confirm carrier numbers and needed credentials are visible in the Carrier Directory.', 'Begin tracked activity and coaching cadence.']],
+        ['First 60 to 90 days', ['Review production activity, appointment conversion, and call consistency.', 'Identify gaps in training or carrier access.', 'Confirm the agent can navigate the Hub without needing staff to resend links.', 'Set next-quarter activity and production goals.']]
+      ],
+      callout: 'This card should be visible to internal LOA agents and admins, not outside GA users.'
+    },
+    internalWorkflow: {
+      title: 'Internal Workflow & Team Support',
+      sub: 'Internal-only guidance on staff responsibilities, handoffs, and team operating standards.',
+      sections: [
+        ['Staff workflow', ['Use the Hub first before asking staff to resend forms, links, or carrier information.', 'Send contracting and carrier-number questions through the designated internal process.', 'Use the referral tool carefully and confirm the email is actually sent.', 'Escalate client-sensitive issues through the correct manager or support contact.']],
+        ['Team expectations', ['Maintain consistent call activity and follow-up discipline.', 'Use shared tracking tools so leadership can spot bottlenecks.', 'Keep notes and client handoffs clear enough for support staff to act on.', 'Follow current internal process even when old habits or old links still exist.']],
+        ['When to ask for help', ['A carrier appointment or credential issue blocks production.', 'A client request needs service escalation.', 'A Hub resource appears outdated or missing.', 'A workflow creates repeated staff interruptions and should be improved.']]
+      ],
+      callout: 'This is where we can continue adding internal employee-agent guidance without cluttering the GA view.'
+    },
+    gaPartner: {
+      title: 'GA Partner Growth',
+      sub: 'GA/partner-only guidance for field activity, referrals, recruiting, and agency support.',
+      sections: [
+        ['Partner expectations', ['Understand which support is provided by the agency and which actions remain the GA partner\'s responsibility.', 'Use the Hub to access current forms, carrier resources, training links, and field guidance.', 'Keep carrier and writing-number questions tied back to the Carrier Directory.', 'Communicate growth needs early so support can be planned, not reactive.']],
+        ['Growth support', ['Referral strategy and warm introduction support.', 'Seminar or community event preparation.', 'Recruiting resource guidance when appropriate.', 'Field coaching and marketing support requests.']],
+        ['Good use of agency support', ['Bring specific questions, not vague requests.', 'Use current approved materials.', 'Report friction points so onboarding and field support can improve.', 'Keep production and follow-up activity consistent.']]
+      ],
+      callout: 'This card is for GA/outside partner resources and should not show to internal LOA agents unless specifically granted.'
     }
   };
 
@@ -9798,6 +9785,15 @@ function hubHasPermission(profile, key) {
   if (!key) return true;
   if (hubUserIsAdmin(profile)) return true;
   var perms = (profile && profile.permissions) || {};
+  if (key === 'onboarding_resources') {
+    return perms.onboarding_resources === true || perms.onboarding_resources === 'true' || perms.agent_tools === true || perms.agent_tools === 'true' || perms.ga_tools === true || perms.ga_tools === 'true' || perms.loa_resources === true || perms.loa_resources === 'true' || perms.ga_resources === true || perms.ga_resources === 'true';
+  }
+  if (key === 'loa_resources') {
+    return perms.loa_resources === true || perms.loa_resources === 'true' || perms.agent_tools === true || perms.agent_tools === 'true';
+  }
+  if (key === 'ga_resources') {
+    return perms.ga_resources === true || perms.ga_resources === 'true' || perms.ga_tools === true || perms.ga_tools === 'true';
+  }
   return perms[key] === true || perms[key] === 'true' || perms[key] === 'all';
 }
 function applyHubPermissionVisibility(profile) {
@@ -12716,7 +12712,7 @@ const LAYOUT_SECTIONS = [
 { id: 'libraries', label: '📚 Agent Libraries' },
 { id: 'video-library', label: '🎬 Video Library' },
 { id: 'carrier-agent-numbers', label: '📇 Carrier Directory' },
-{ id: 'ga-resources', label: '🤝 GA Resources' },
+{ id: 'ga-resources', label: '🧭 Onboarding & Resources' },
 { id: 'practice-client', label: '🎯 Practice Client' },
 { id: 'updates', label: '📡 Updates Feed' },
 { id: 'cert-tracker', label: '🎓 Cert Tracker' },
@@ -19426,19 +19422,19 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     role = String(role || 'agent').toLowerCase();
     if (role === 'admin') return {
       role:'admin', status:'active', allowed_devices:3, require_device_approval:false,
-      permissions:{ agent_tools:true, ga_tools:true, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:true, carrier_directory_view:true, carrier_directory_scope:'all', carrier_directory_upload:true, carrier_directory_edit:true, device_approvals:true }
+      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:true, ga_resources:true, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:true, carrier_directory_view:true, carrier_directory_scope:'all', carrier_directory_upload:true, carrier_directory_edit:true, device_approvals:true }
     };
     if (role === 'ga') return {
       role:'ga', status:'active', allowed_devices:1, require_device_approval:true,
-      permissions:{ agent_tools:false, ga_tools:true, forms:true, videos:true, cert_tracker:false, trip_tracker:false, leaderboard:false, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+      permissions:{ agent_tools:false, onboarding_resources:true, loa_resources:false, ga_tools:true, ga_resources:true, forms:true, videos:true, cert_tracker:false, trip_tracker:false, leaderboard:false, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
     };
     if (role === 'manager') return {
       role:'manager', status:'active', allowed_devices:2, require_device_approval:false,
-      permissions:{ agent_tools:true, ga_tools:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:false, ga_resources:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
     };
     return {
       role:'internal', status:'active', allowed_devices:2, require_device_approval:false,
-      permissions:{ agent_tools:true, ga_tools:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:false, ga_resources:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
     };
   }
 
