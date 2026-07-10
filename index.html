@@ -5357,8 +5357,41 @@ Agent Command Center
       .ga-modal-section h4{margin:0 0 8px;color:#fff;font-size:15px}
       .ga-modal-section ul{margin:0;padding-left:20px;color:#dbeafe;line-height:1.6;font-size:13px}
       .ga-modal-callout{margin-top:16px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.28);border-radius:14px;padding:12px 14px;color:#c7d2fe;font-size:13px;line-height:1.55}
+      .onboarding-update-banner{display:none;margin:0 0 14px;background:rgba(245,158,11,.14);border:1px solid rgba(251,191,36,.45);border-radius:14px;padding:12px;box-shadow:0 10px 28px rgba(245,158,11,.12)}
+      .onboarding-update-banner.show{display:block}
+      .onboarding-update-btn{width:100%;border:0;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-weight:900;padding:12px 14px;cursor:pointer;box-shadow:0 0 0 rgba(245,158,11,.55);animation:onboardingPulse 1.35s infinite;letter-spacing:.01em;text-align:center}
+      @keyframes onboardingPulse{0%{box-shadow:0 0 0 0 rgba(245,158,11,.58);transform:scale(1)}70%{box-shadow:0 0 0 10px rgba(245,158,11,0);transform:scale(1.01)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0);transform:scale(1)}}
+      .onboarding-action-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
+      .onboarding-zoom-btn,.onboarding-small-btn{border:1px solid rgba(148,163,184,.26);border-radius:999px;padding:10px 14px;font-size:13px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+      .onboarding-zoom-btn{background:linear-gradient(135deg,#2563eb,#0284c7);color:#fff;border-color:rgba(125,211,252,.35)}
+      .onboarding-small-btn{background:rgba(255,255,255,.06);color:#dbeafe}
+      .onboarding-zoom-btn.disabled{opacity:.6;filter:grayscale(.25)}
+      .onboarding-admin-controls{margin:0 0 16px;border:1px dashed rgba(148,163,184,.38);border-radius:14px;padding:12px;background:rgba(15,23,42,.28);color:#dbeafe;font-size:13px}
+      .onboarding-admin-controls strong{color:#fff}
+      .onboarding-admin-controls .admin-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+      .onboarding-admin-controls button{border:0;border-radius:999px;padding:9px 12px;font-weight:900;cursor:pointer;background:rgba(255,255,255,.1);color:#fff}
+      .onboarding-admin-controls button.primary{background:#2563eb}
+      .onboarding-admin-controls button.warn{background:#d97706}
+      .onboarding-admin-status{color:#bfdbfe;margin-top:8px;line-height:1.45}
     </style>
     <div class="ga-resource-shell">
+      <div id="onboardingUpdateBanner" class="onboarding-update-banner" aria-live="polite">
+        <button type="button" class="onboarding-update-btn" onclick="showOnboardingUpdateInfo()">⚠️ Onboarding Section Being Updated — Click for Details</button>
+      </div>
+      <div class="onboarding-action-row">
+        <a id="onboardingZoomSupportBtn" class="onboarding-zoom-btn disabled" href="#" target="_blank" rel="noopener">🎥 Join Live Zoom Support</a>
+        <button type="button" class="onboarding-small-btn" onclick="showOnboardingZoomInfo()">How live support works</button>
+      </div>
+      <div id="onboardingAdminStatusControls" class="onboarding-admin-controls hub-permission-hidden" data-permission-required="admin">
+        <strong>Admin Onboarding Controls</strong><br>
+        Toggle the flashing update notice when this section is being edited or incomplete. Set the Zoom link once, then agents can open it from this section.
+        <div class="admin-row">
+          <button type="button" class="warn" onclick="toggleOnboardingUpdateStatus()">Toggle Update Notice</button>
+          <button type="button" class="primary" onclick="setOnboardingZoomLink()">Set Zoom Link</button>
+          <button type="button" onclick="loadOnboardingStatusSettings(true)">Refresh Status</button>
+        </div>
+        <div id="onboardingAdminStatusText" class="onboarding-admin-status">Loading onboarding status…</div>
+      </div>
       <div class="ga-resource-grid">
         <button type="button" class="ga-resource-card" data-ga-panel="onboarding" onclick="openGaResourcePanel('onboarding')">
           <div class="ga-resource-tag">Shared</div>
@@ -9714,6 +9747,160 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (modal && e.target === modal) window.closeGaResourcePanel();
   });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+
+<script>
+/* Phase 24: Onboarding update toggle + live Zoom support link */
+(function(){
+  if (window.__phase24OnboardingStatusReady) return;
+  window.__phase24OnboardingStatusReady = true;
+
+  var OB_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var OB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var OB_HUB = 'medi';
+  var OB_KEY = 'onboarding_status';
+  var defaultStatus = {
+    active: false,
+    message: 'We are currently updating the Agent Onboarding & Resources section. If you do not see the form, link, video, or instruction you need, please reach out before assuming it is unavailable.',
+    zoom_url: '',
+    zoom_label: 'Join Live Zoom Support'
+  };
+  window.__onboardingStatusSettings = Object.assign({}, defaultStatus);
+
+  function headers(extra){
+    return Object.assign({
+      'apikey': OB_SUPA_KEY,
+      'Authorization': 'Bearer ' + OB_SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    }, extra || {});
+  }
+  function normSettings(data){
+    var out = Object.assign({}, defaultStatus, data || {});
+    out.active = out.active === true || out.active === 'true';
+    out.zoom_url = String(out.zoom_url || '').trim();
+    out.message = String(out.message || defaultStatus.message).trim();
+    return out;
+  }
+  function renderOnboardingStatus(){
+    var settings = normSettings(window.__onboardingStatusSettings || {});
+    var banner = document.getElementById('onboardingUpdateBanner');
+    if (banner) banner.classList.toggle('show', !!settings.active);
+    var zoomBtn = document.getElementById('onboardingZoomSupportBtn');
+    if (zoomBtn) {
+      zoomBtn.textContent = '🎥 ' + (settings.zoom_label || 'Join Live Zoom Support');
+      if (settings.zoom_url) {
+        zoomBtn.href = settings.zoom_url;
+        zoomBtn.classList.remove('disabled');
+        zoomBtn.onclick = null;
+      } else {
+        zoomBtn.href = '#';
+        zoomBtn.classList.add('disabled');
+        zoomBtn.onclick = function(e){
+          e.preventDefault();
+          alert('Live Zoom Support is not configured yet. Please contact Brian or the admin team for help.');
+        };
+      }
+    }
+    var adminText = document.getElementById('onboardingAdminStatusText');
+    if (adminText) {
+      adminText.innerHTML = 'Update notice: <strong>' + (settings.active ? 'ON' : 'OFF') + '</strong><br>Zoom link: <strong>' + (settings.zoom_url ? 'Configured' : 'Not configured') + '</strong>';
+    }
+  }
+  function fetchOnboardingStatus(){
+    return fetch(OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY) + '&select=data&limit=1', {
+      headers: headers({ 'Content-Type': 'application/json' })
+    }).then(function(r){
+      if (!r.ok) throw new Error('Status read failed: ' + r.status);
+      return r.json();
+    }).then(function(rows){
+      var data = rows && rows[0] && rows[0].data ? rows[0].data : null;
+      window.__onboardingStatusSettings = normSettings(data);
+      try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(window.__onboardingStatusSettings)); } catch(e) {}
+      renderOnboardingStatus();
+      return window.__onboardingStatusSettings;
+    }).catch(function(err){
+      try {
+        var cached = JSON.parse(localStorage.getItem('medi_onboarding_status_cache') || 'null');
+        if (cached) window.__onboardingStatusSettings = normSettings(cached);
+      } catch(e) {}
+      console.warn('[Onboarding Status] read unavailable:', err && err.message ? err.message : err);
+      renderOnboardingStatus();
+      return window.__onboardingStatusSettings;
+    });
+  }
+  function saveOnboardingStatus(settings){
+    settings = normSettings(settings);
+    window.__onboardingStatusSettings = settings;
+    renderOnboardingStatus();
+    try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(settings)); } catch(e) {}
+    var payload = { hub: OB_HUB, key: OB_KEY, data: settings };
+    return fetch(OB_SUPA_URL + '/rest/v1/tile_content', {
+      method: 'POST',
+      headers: headers({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      if (r.ok || r.status === 201 || r.status === 204) return true;
+      return fetch(OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY), {
+        method: 'PATCH',
+        headers: headers({ 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ data: settings })
+      }).then(function(pr){
+        if (!pr.ok) throw new Error('Status save failed: ' + pr.status);
+        return true;
+      });
+    }).catch(function(err){
+      alert('Onboarding setting could not save to Supabase. It was updated on this browser only. Error: ' + (err && err.message ? err.message : err));
+      return false;
+    });
+  }
+  window.loadOnboardingStatusSettings = function(showToast){
+    return fetchOnboardingStatus().then(function(){
+      if (showToast && typeof showSnuToast === 'function') showSnuToast('Onboarding status refreshed.');
+    });
+  };
+  window.toggleOnboardingUpdateStatus = function(){
+    var settings = normSettings(window.__onboardingStatusSettings || {});
+    settings.active = !settings.active;
+    saveOnboardingStatus(settings).then(function(){
+      if (typeof showSnuToast === 'function') showSnuToast('Onboarding update notice is now ' + (settings.active ? 'ON' : 'OFF') + '.');
+    });
+  };
+  window.setOnboardingZoomLink = function(){
+    var settings = normSettings(window.__onboardingStatusSettings || {});
+    var url = prompt('Paste the Zoom join link for Live Support. Leave blank to remove it.', settings.zoom_url || '');
+    if (url === null) return;
+    url = String(url || '').trim();
+    if (url && !/^https:\/\//i.test(url)) {
+      alert('Please use the full Zoom link beginning with https://');
+      return;
+    }
+    settings.zoom_url = url;
+    saveOnboardingStatus(settings).then(function(){
+      if (typeof showSnuToast === 'function') showSnuToast(url ? 'Zoom link saved.' : 'Zoom link removed.');
+    });
+  };
+  window.showOnboardingUpdateInfo = function(){
+    var settings = normSettings(window.__onboardingStatusSettings || {});
+    alert('Onboarding Section Being Updated\n\n' + settings.message + '\n\nIf something appears missing, please contact Brian or the admin team before assuming it is unavailable.');
+  };
+  window.showOnboardingZoomInfo = function(){
+    alert('Live Zoom Support\n\nThis opens Zoom in a new browser window or the Zoom app. If no one is available live, please follow your normal support process or contact the admin team.');
+  };
+
+  function initWhenReady(){
+    if (!document.getElementById('onboardingUpdateBanner')) return false;
+    renderOnboardingStatus();
+    fetchOnboardingStatus();
+    return true;
+  }
+  if (!initWhenReady()) {
+    document.addEventListener('DOMContentLoaded', initWhenReady);
+    setTimeout(initWhenReady, 800);
+    setTimeout(initWhenReady, 2500);
+  }
 })();
 </script>
 
