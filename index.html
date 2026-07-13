@@ -9757,6 +9757,90 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 })();
 </script>
 
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
+})();
+</script>
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -12340,6 +12424,90 @@ w.document.write(`<html><body style="margin:0;display:flex;justify-content:cente
 })();
 </script>
 
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
+})();
+</script>
+
 </body></html>`);
 w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
 } else if (ifr) {
@@ -12621,6 +12789,90 @@ w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><
 })();
 </script>
 
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
+})();
+</script>
+
 </body></html>');
 w.document.close();
 }
@@ -12745,6 +12997,90 @@ w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></
     if (modal && e.target === modal) window.closeGaResourcePanel();
   });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
 })();
 </script>
 
@@ -14339,6 +14675,90 @@ window.printAncillaryCompare = function(){
 })();
 </script>
 
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
+})();
+</script>
+
 </body></html>');
   w.document.close();
   w.focus();
@@ -14900,6 +15320,90 @@ table{width:100%;border-collapse:collapse;border:1px solid #cbd5e1;} th{backgrou
 })();
 </script>
 
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
+})();
+</script>
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
 if (!w) { alert('Allow pop-ups for this site to print this certification row.'); return; }
@@ -15392,6 +15896,90 @@ h1{font-size:18px;font-weight:800;margin-bottom:20px;}
     if (modal && e.target === modal) window.closeGaResourcePanel();
   });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
 })();
 </script>
 
@@ -16201,6 +16789,90 @@ body { font-family: Georgia, serif; color: #1a1a2e; margin: 0; padding: 0; font-
 })();
 </script>
 
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
+})();
+</script>
+
 </body></html>`);
 w.document.close();
 w.focus();
@@ -16657,6 +17329,90 @@ border-radius: 16px 16px 0 0 !important;
 })();
 </script>
 
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
+})();
+</script>
+
 </body></html>`);
 w.document.close();
 w.focus();
@@ -16989,6 +17745,90 @@ function printVacationSummary() {
     if (modal && e.target === modal) window.closeGaResourcePanel();
   });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
+})();
+</script>
+
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
 })();
 </script>
 
@@ -21550,6 +22390,90 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function boot(){load().then(render); setTimeout(render,500); setTimeout(render,1500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
   setInterval(render,3000);
+})();
+</script>
+
+
+
+<script id="phase29-core-data-rescue">
+(function(){
+  const SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  const HUB = 'medi';
+  function headers(){ return { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }; }
+  async function readRows(table){
+    const url = SUPA_URL + '/rest/v1/' + table + '?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    const r = await fetch(url, { cache:'no-store', headers: headers() });
+    const text = await r.text();
+    if (!r.ok) throw new Error(table + ' read failed ' + r.status + ': ' + text.slice(0,200));
+    return text ? JSON.parse(text) : [];
+  }
+  function parseMaybeJson(raw){
+    if (raw == null) return null;
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (!t) return null;
+      try { return JSON.parse(t); } catch(e) { return raw; }
+    }
+    return raw;
+  }
+  function bestPayload(rows){
+    let best = null, bestLen = -1;
+    (Array.isArray(rows) ? rows : []).forEach(function(row){
+      const parsed = parseMaybeJson(row && row.data);
+      const len = JSON.stringify(parsed || '').length;
+      if (len > bestLen) { best = parsed; bestLen = len; }
+    });
+    return best;
+  }
+  async function rescueFridayMeetings(){
+    try {
+      const payload = bestPayload(await readRows('friday_meetings'));
+      const meetings = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.meetings) ? payload.meetings : []);
+      if (!meetings.length) return console.warn('[Phase29 Rescue] friday_meetings returned no meeting records');
+      if (typeof _fridayMeetings !== 'undefined') _fridayMeetings = meetings;
+      try { localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); } catch(e) {}
+      if (typeof renderFridayMeetings === 'function') renderFridayMeetings();
+      if (typeof renderFridayAdminList === 'function') renderFridayAdminList();
+      if (typeof renderFridayAllCalendarFlow === 'function') renderFridayAllCalendarFlow();
+      console.log('[Phase29 Rescue] Friday meetings restored:', meetings.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Friday meetings rescue failed:', err); }
+  }
+  async function rescueCertTracker(){
+    try {
+      const payload = bestPayload(await readRows('cert_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] cert_tracker returned no agent records');
+      if (typeof _certAgents !== 'undefined') _certAgents = (typeof normalizeCertAgents === 'function') ? normalizeCertAgents(agents) : agents;
+      if (typeof _certMeta !== 'undefined') _certMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('cert_tracker_v1', JSON.stringify({agents: (typeof _certAgents !== 'undefined' ? _certAgents : agents), meta: (typeof _certMeta !== 'undefined' ? _certMeta : {})})); } catch(e) {}
+      if (typeof renderCertTracker === 'function') renderCertTracker();
+      if (typeof renderCertAdminPreview === 'function') renderCertAdminPreview(false);
+      console.log('[Phase29 Rescue] Cert tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Cert tracker rescue failed:', err); }
+  }
+  async function rescueTripTracker(){
+    try {
+      const payload = bestPayload(await readRows('trip_tracker'));
+      const agents = payload && Array.isArray(payload.agents) ? payload.agents : [];
+      if (!agents.length) return console.warn('[Phase29 Rescue] trip_tracker returned no agent records');
+      if (typeof _tripAgents !== 'undefined') _tripAgents = agents;
+      if (typeof _tripMeta !== 'undefined') _tripMeta = (payload && payload.meta) ? payload.meta : {};
+      try { localStorage.setItem('snu_trip_data_v1', JSON.stringify({agents: agents, meta: (payload && payload.meta) || {}})); } catch(e) {}
+      if (typeof renderTripTracker === 'function') renderTripTracker();
+      if (typeof renderTripAdminEditor === 'function') renderTripAdminEditor();
+      console.log('[Phase29 Rescue] Trip tracker restored:', agents.length);
+    } catch(err){ console.warn('[Phase29 Rescue] Trip tracker rescue failed:', err); }
+  }
+  function runCoreDataRescue(){
+    rescueFridayMeetings();
+    rescueCertTracker();
+    rescueTripTracker();
+  }
+  window.runCoreDataRescue = runCoreDataRescue;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCoreDataRescue, 800); setTimeout(runCoreDataRescue, 2500); });
+  window.addEventListener('hashchange', function(){ setTimeout(runCoreDataRescue, 500); });
+  window.addEventListener('focus', function(){ setTimeout(runCoreDataRescue, 500); });
 })();
 </script>
 
