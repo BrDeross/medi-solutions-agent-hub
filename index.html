@@ -5356,52 +5356,49 @@ Agent Command Center
       .ga-modal-section{margin-top:16px;padding:14px;border:1px solid rgba(148,163,184,.22);background:rgba(255,255,255,.045);border-radius:14px}
       .ga-modal-section h4{margin:0 0 8px;color:#fff;font-size:15px}
       .ga-modal-section ul{margin:0;padding-left:20px;color:#dbeafe;line-height:1.6;font-size:13px}
-      .ga-modal-callout{margin-top:16px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.28);border-radius:14px;padding:12px 14px;color:#c7d2fe;font-size:13px;line-height:1.55}
       .onboarding-update-banner{display:none;margin:0 0 14px;background:rgba(245,158,11,.14);border:1px solid rgba(251,191,36,.45);border-radius:14px;padding:12px;box-shadow:0 10px 28px rgba(245,158,11,.12)}
       .onboarding-update-banner.show{display:block}
       .onboarding-update-btn{width:100%;border:0;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-weight:900;padding:12px 14px;cursor:pointer;box-shadow:0 0 0 rgba(245,158,11,.55);animation:onboardingPulse 1.35s infinite;letter-spacing:.01em;text-align:center}
       @keyframes onboardingPulse{0%{box-shadow:0 0 0 0 rgba(245,158,11,.58);transform:scale(1)}70%{box-shadow:0 0 0 10px rgba(245,158,11,0);transform:scale(1.01)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0);transform:scale(1)}}
-      .onboarding-action-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
       .onboarding-recent-changes{display:block;margin:0 0 16px;border:1px solid rgba(125,211,252,.26);border-radius:14px;padding:12px 14px;background:rgba(14,165,233,.08);color:#dbeafe}
       .onboarding-recent-changes-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#93c5fd;margin-bottom:7px}
       .onboarding-recent-changes ul{margin:0;padding-left:19px;font-size:13px;line-height:1.55;color:#dbeafe}
-      .onboarding-recent-changes li{margin:2px 0}
-      .onboarding-support-note{font-size:12px;color:#bfdbfe;line-height:1.4;margin-left:2px}
+      .onboarding-action-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
       .onboarding-zoom-btn,.onboarding-small-btn{border:1px solid rgba(148,163,184,.26);border-radius:999px;padding:10px 14px;font-size:13px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
       .onboarding-zoom-btn{background:linear-gradient(135deg,#2563eb,#0284c7);color:#fff;border-color:rgba(125,211,252,.35)}
       .onboarding-small-btn{background:rgba(255,255,255,.06);color:#dbeafe}
-      .onboarding-zoom-btn.disabled{opacity:.6;filter:grayscale(.25)}
-      .onboarding-admin-controls{margin:0 0 16px;border:1px dashed rgba(148,163,184,.38);border-radius:14px;padding:12px;background:rgba(15,23,42,.28);color:#dbeafe;font-size:13px}
-      .onboarding-admin-controls strong{color:#fff}
+      .onboarding-support-note{font-size:12px;color:#bfdbfe;line-height:1.4;margin-left:2px}
+      .onboarding-admin-controls{display:none;margin:0 0 16px;border:1px dashed rgba(148,163,184,.38);border-radius:14px;padding:12px;background:rgba(15,23,42,.28);color:#dbeafe;font-size:13px}
+      .onboarding-admin-controls.show{display:block}
       .onboarding-admin-controls .admin-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
       .onboarding-admin-controls button{border:0;border-radius:999px;padding:9px 12px;font-weight:900;cursor:pointer;background:rgba(255,255,255,.1);color:#fff}
       .onboarding-admin-controls button.primary{background:#2563eb}
       .onboarding-admin-controls button.warn{background:#d97706}
       .onboarding-admin-status{color:#bfdbfe;margin-top:8px;line-height:1.45}
+      .ga-modal-callout{margin-top:16px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.28);border-radius:14px;padding:12px 14px;color:#c7d2fe;font-size:13px;line-height:1.55}
     </style>
+    <div id="onboardingUpdateBanner" class="onboarding-update-banner" aria-live="polite">
+      <button type="button" class="onboarding-update-btn" onclick="window.showOnboardingUpdateInfo && window.showOnboardingUpdateInfo()">⚠️ Onboarding Section Being Updated — Click for Details</button>
+    </div>
+    <div id="onboardingRecentChanges" class="onboarding-recent-changes" aria-live="polite">
+      <div class="onboarding-recent-changes-title">Recent Changes</div>
+      <ul id="onboardingRecentChangesList"><li>Onboarding resources are being refined and expanded.</li></ul>
+    </div>
+    <div id="onboardingZoomSupportRow" class="onboarding-action-row" style="display:none;">
+      <a id="onboardingZoomSupportBtn" class="onboarding-zoom-btn" href="https://zoom.us/launch/chat/v2/eyJzaWQiOiJkZTI0NWE0M2VlNDI0ZDJlODA5ZmQwYzA5NjNjMzU1OEBjb25mZXJlbmNlLnhtcHAuem9vbS51cyJ9" target="_blank" rel="noopener">💬 Open Live Support Chat</a>
+      <button type="button" class="onboarding-small-btn" onclick="window.showOnboardingZoomInfo && window.showOnboardingZoomInfo()">How live support works</button>
+      <span class="onboarding-support-note">LOA/internal support only. GA users will not see this option.</span>
+    </div>
+    <div id="onboardingAdminStatusControls" class="onboarding-admin-controls">
+      <strong>Admin: Onboarding Status</strong>
+      <div class="admin-row">
+        <button type="button" class="warn" onclick="window.toggleOnboardingUpdateNotice && window.toggleOnboardingUpdateNotice()">Toggle Update Notice</button>
+        <button type="button" class="primary" onclick="window.setOnboardingZoomLink && window.setOnboardingZoomLink()">Set Chat Link</button>
+        <button type="button" onclick="window.refreshOnboardingStatus && window.refreshOnboardingStatus()">Refresh Status</button>
+      </div>
+      <div id="onboardingAdminStatusText" class="onboarding-admin-status">Loading onboarding status...</div>
+    </div>
     <div class="ga-resource-shell">
-      <div id="onboardingUpdateBanner" class="onboarding-update-banner" aria-live="polite">
-        <button type="button" class="onboarding-update-btn" onclick="showOnboardingUpdateInfo()">⚠️ Onboarding Section Being Updated — Click for Details</button>
-      </div>
-      <div id="onboardingRecentChanges" class="onboarding-recent-changes" aria-live="polite">
-        <div class="onboarding-recent-changes-title">Recent Changes</div>
-        <ul id="onboardingRecentChangesList"><li>Onboarding resources are being refined and expanded.</li></ul>
-      </div>
-      <div id="onboardingZoomSupportRow" class="onboarding-action-row" data-loa-support-only="true">
-        <a id="onboardingZoomSupportBtn" class="onboarding-zoom-btn disabled" href="#" target="_blank" rel="noopener">💬 Open Live Support Chat</a>
-        <button type="button" class="onboarding-small-btn" onclick="showOnboardingZoomInfo()">How live support works</button>
-        <span class="onboarding-support-note">LOA/internal support only. GA users will not see this option.</span>
-      </div>
-      <div id="onboardingAdminStatusControls" class="onboarding-admin-controls hub-permission-hidden" data-permission-required="admin">
-        <strong>Admin Onboarding Controls</strong><br>
-        Toggle the flashing update notice when this section is being edited or incomplete. Set the live support chat link once. The chat button is shown only to LOA/internal users and admins.
-        <div class="admin-row">
-          <button type="button" class="warn" onclick="toggleOnboardingUpdateStatus()">Toggle Update Notice</button>
-          <button type="button" class="primary" onclick="setOnboardingZoomLink()">Set Live Support Link</button>
-          <button type="button" onclick="loadOnboardingStatusSettings(true)">Refresh Status</button>
-        </div>
-        <div id="onboardingAdminStatusText" class="onboarding-admin-status">Loading onboarding status…</div>
-      </div>
       <div class="ga-resource-grid">
         <button type="button" class="ga-resource-card" data-ga-panel="onboarding" onclick="openGaResourcePanel('onboarding')">
           <div class="ga-resource-tag">Shared</div>
@@ -9757,201 +9754,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if (modal && e.target === modal) window.closeGaResourcePanel();
   });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') window.closeGaResourcePanel(); });
-})();
-</script>
-
-
-<script>
-/* Phase 24: Onboarding update toggle + live Zoom support link */
-(function(){
-  if (window.__phase24OnboardingStatusReady) return;
-  window.__phase24OnboardingStatusReady = true;
-
-  var OB_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var OB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
-  var OB_HUB = 'medi';
-  var OB_KEY = 'onboarding_status';
-  var defaultStatus = {
-    active: false,
-    message: 'We are currently updating the Agent Onboarding & Resources section. If you do not see the form, link, video, or instruction you need, please reach out before assuming it is unavailable.',
-    zoom_url: 'https://zoom.us/launch/chat/v2/eyJzaWQiOiJkZTI0NWE0M2VlNDI0ZDJlODA5ZmQwYzA5NjNjMzU1OEBjb25mZXJlbmNlLnhtcHAuem9vbS51cyJ9',
-    zoom_label: 'Open Live Support Chat',
-    recent_changes: [
-      'Onboarding resources are being refined for both LOA/internal agents and GA partners.',
-      'Carrier contacts and writing numbers now live in the Carrier Directory.',
-      'If something appears missing, use the update notice instructions and contact support before assuming it is unavailable.'
-    ]
-  };
-  window.__onboardingStatusSettings = Object.assign({}, defaultStatus);
-
-  function headers(extra){
-    return Object.assign({
-      'apikey': OB_SUPA_KEY,
-      'Authorization': 'Bearer ' + OB_SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache'
-    }, extra || {});
-  }
-  function normSettings(data){
-    var out = Object.assign({}, defaultStatus, data || {});
-    out.active = out.active === true || out.active === 'true';
-    out.zoom_url = String(out.zoom_url || '').trim();
-    out.message = String(out.message || defaultStatus.message).trim();
-    if (!Array.isArray(out.recent_changes)) {
-      if (typeof out.recent_changes === 'string' && out.recent_changes.trim()) out.recent_changes = out.recent_changes.split(/\n|;/).map(function(x){ return x.trim(); }).filter(Boolean);
-      else out.recent_changes = defaultStatus.recent_changes.slice();
-    }
-    return out;
-  }
-  function currentOnboardingUser(){
-    try { if (window.HUB_CURRENT_USER) return window.HUB_CURRENT_USER; } catch(e) {}
-    try { var p = JSON.parse(sessionStorage.getItem('medi_hub_current_user') || 'null'); if (p) return p; } catch(e) {}
-    try { var s = JSON.parse(sessionStorage.getItem('medi_hub_session') || 'null'); if (s) return s; } catch(e) {}
-    return null;
-  }
-  function userIsAdmin(profile){
-    profile = profile || currentOnboardingUser() || {};
-    var role = String(profile.role || '').toLowerCase();
-    var perms = profile.permissions || {};
-    return role === 'admin' || perms.admin === true || perms.admin === 'true';
-  }
-  function userHasLoaSupport(profile){
-    profile = profile || currentOnboardingUser() || {};
-    var role = String(profile.role || '').toLowerCase();
-    var perms = profile.permissions || {};
-    if (userIsAdmin(profile)) return true;
-    if (role === 'ga' || role === 'outside' || role === 'broker') return false;
-    return role === 'internal' || role === 'loa' || role === 'manager' || perms.loa_resources === true || perms.loa_resources === 'true' || perms.agent_tools === true || perms.agent_tools === 'true';
-  }
-  function renderOnboardingStatus(){
-    var settings = normSettings(window.__onboardingStatusSettings || {});
-    var banner = document.getElementById('onboardingUpdateBanner');
-    if (banner) banner.classList.toggle('show', !!settings.active);
-    var recentWrap = document.getElementById('onboardingRecentChanges');
-    var recentList = document.getElementById('onboardingRecentChangesList');
-    var recent = Array.isArray(settings.recent_changes) ? settings.recent_changes.filter(Boolean) : [];
-    if (recentWrap) recentWrap.style.display = recent.length ? 'block' : 'none';
-    if (recentList) recentList.innerHTML = recent.map(function(item){ return '<li>' + String(item).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }) + '</li>'; }).join('');
-
-    var zoomRow = document.getElementById('onboardingZoomSupportRow');
-    var allowSupport = userHasLoaSupport();
-    if (zoomRow) zoomRow.style.display = allowSupport ? 'flex' : 'none';
-    var zoomBtn = document.getElementById('onboardingZoomSupportBtn');
-    if (zoomBtn) {
-      zoomBtn.textContent = '💬 ' + (settings.zoom_label || 'Open Live Support Chat');
-      if (allowSupport && settings.zoom_url) {
-        zoomBtn.href = settings.zoom_url;
-        zoomBtn.classList.remove('disabled');
-        zoomBtn.onclick = null;
-      } else {
-        zoomBtn.href = '#';
-        zoomBtn.classList.add('disabled');
-        zoomBtn.onclick = function(e){
-          e.preventDefault();
-          alert(allowSupport ? 'Live Support Chat is not configured yet. Please contact Brian or the admin team for help.' : 'Live Support Chat is available for LOA/internal users only. Please use your normal GA support process.');
-        };
-      }
-    }
-    var adminText = document.getElementById('onboardingAdminStatusText');
-    if (adminText) {
-      adminText.innerHTML = 'Update notice: <strong>' + (settings.active ? 'ON' : 'OFF') + '</strong><br>Live support chat link: <strong>' + (settings.zoom_url ? 'Configured' : 'Not configured') + '</strong><br>Visible to: <strong>LOA/internal users and admins only</strong>';
-    }
-  }
-  function fetchOnboardingStatus(){
-    return fetch(OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY) + '&select=data&limit=1', {
-      headers: headers({ 'Content-Type': 'application/json' })
-    }).then(function(r){
-      if (!r.ok) throw new Error('Status read failed: ' + r.status);
-      return r.json();
-    }).then(function(rows){
-      var data = rows && rows[0] && rows[0].data ? rows[0].data : null;
-      window.__onboardingStatusSettings = normSettings(data);
-      try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(window.__onboardingStatusSettings)); } catch(e) {}
-      renderOnboardingStatus();
-      return window.__onboardingStatusSettings;
-    }).catch(function(err){
-      try {
-        var cached = JSON.parse(localStorage.getItem('medi_onboarding_status_cache') || 'null');
-        if (cached) window.__onboardingStatusSettings = normSettings(cached);
-      } catch(e) {}
-      console.warn('[Onboarding Status] read unavailable:', err && err.message ? err.message : err);
-      renderOnboardingStatus();
-      return window.__onboardingStatusSettings;
-    });
-  }
-  function saveOnboardingStatus(settings){
-    settings = normSettings(settings);
-    window.__onboardingStatusSettings = settings;
-    renderOnboardingStatus();
-    try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(settings)); } catch(e) {}
-    var payload = { hub: OB_HUB, key: OB_KEY, data: settings };
-    return fetch(OB_SUPA_URL + '/rest/v1/tile_content', {
-      method: 'POST',
-      headers: headers({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
-      body: JSON.stringify(payload)
-    }).then(function(r){
-      if (r.ok || r.status === 201 || r.status === 204) return true;
-      return fetch(OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY), {
-        method: 'PATCH',
-        headers: headers({ 'Prefer': 'return=minimal' }),
-        body: JSON.stringify({ data: settings })
-      }).then(function(pr){
-        if (!pr.ok) throw new Error('Status save failed: ' + pr.status);
-        return true;
-      });
-    }).catch(function(err){
-      alert('Onboarding setting could not save to Supabase. It was updated on this browser only. Error: ' + (err && err.message ? err.message : err));
-      return false;
-    });
-  }
-  window.loadOnboardingStatusSettings = function(showToast){
-    return fetchOnboardingStatus().then(function(){
-      if (showToast && typeof showSnuToast === 'function') showSnuToast('Onboarding status refreshed.');
-    });
-  };
-  window.toggleOnboardingUpdateStatus = function(){
-    var settings = normSettings(window.__onboardingStatusSettings || {});
-    settings.active = !settings.active;
-    saveOnboardingStatus(settings).then(function(){
-      if (typeof showSnuToast === 'function') showSnuToast('Onboarding update notice is now ' + (settings.active ? 'ON' : 'OFF') + '.');
-    });
-  };
-  window.setOnboardingZoomLink = function(){
-    var settings = normSettings(window.__onboardingStatusSettings || {});
-    var url = prompt('Paste the live support chat link. This is visible to LOA/internal users only. Leave blank to remove it.', settings.zoom_url || '');
-    if (url === null) return;
-    url = String(url || '').trim();
-    if (url && !/^https:\/\//i.test(url)) {
-      alert('Please use the full Zoom link beginning with https://');
-      return;
-    }
-    settings.zoom_url = url;
-    saveOnboardingStatus(settings).then(function(){
-      if (typeof showSnuToast === 'function') showSnuToast(url ? 'Live support chat link saved.' : 'Live support chat link removed.');
-    });
-  };
-  window.showOnboardingUpdateInfo = function(){
-    var settings = normSettings(window.__onboardingStatusSettings || {});
-    alert('Onboarding Section Being Updated\n\n' + settings.message + '\n\nIf something appears missing, please contact Brian or the admin team before assuming it is unavailable.');
-  };
-  window.showOnboardingZoomInfo = function(){
-    alert('Live Support Chat\n\nThis opens the live support chat link in a new browser window or app. This option is available for LOA/internal users only. GA users should use the normal GA support process.');
-  };
-
-  function initWhenReady(){
-    if (!document.getElementById('onboardingUpdateBanner')) return false;
-    renderOnboardingStatus();
-    fetchOnboardingStatus();
-    setTimeout(renderOnboardingStatus, 600);
-    setTimeout(renderOnboardingStatus, 1800);
-    setTimeout(renderOnboardingStatus, 3500);
-    return true;
-  }
-  if (!initWhenReady()) {
-    document.addEventListener('DOMContentLoaded', initWhenReady);
-    setTimeout(initWhenReady, 800);
-    setTimeout(initWhenReady, 2500);
-  }
 })();
 </script>
 
@@ -21697,242 +21499,57 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 </script>
 
 
-<script>
-/* Phase 25 safety refresh: keep onboarding notices visible and LOA chat hidden from GA users after login permissions load. */
+<script id="phase28-safe-onboarding-status-only">
 (function(){
-  if (window.__phase25OnboardingVisibilityRefresh) return;
-  window.__phase25OnboardingVisibilityRefresh = true;
-  function refresh(){
-    try { if (typeof window.loadOnboardingStatusSettings === 'function') { window.loadOnboardingStatusSettings(false); return; } } catch(e) {}
-    try { if (window.__onboardingStatusSettings && typeof window.__onboardingStatusSettings === 'object') { /* render handled by phase 24 if loaded */ } } catch(e) {}
+  var URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'.replace('eyJpc3MiOiJIUzI1NiIsInJlZiI6','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6');
+  var HUB='medi';
+  var STORE_KEY='onboarding_status';
+  var DEFAULT_CHAT='https://zoom.us/launch/chat/v2/eyJzaWQiOiJkZTI0NWE0M2VlNDI0ZDJlODA5ZmQwYzA5NjNjMzU1OEBjb25mZXJlbmNlLnhtcHAuem9vbS51cyJ9';
+  var settings={active:true, zoomUrl:DEFAULT_CHAT, recentChanges:['Onboarding resources are being refined and expanded. If something is missing, please contact the support team before assuming it is unavailable.']};
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function profile(){try{if(window.HUB_CURRENT_USER&&window.HUB_CURRENT_USER.email)return window.HUB_CURRENT_USER;}catch(e){} try{var raw=sessionStorage.getItem('medi_hub_current_user'); if(raw)return JSON.parse(raw);}catch(e){} return {};}
+  function role(){return String((profile().role||'')).toLowerCase();}
+  function perms(){return (profile().permissions||{});}
+  function isAdmin(){var p=perms(), r=role(); return r==='admin'||p.admin===true||p.admin==='true';}
+  function isLoa(){var p=perms(), r=role(); if(isAdmin())return true; if(r.indexOf('ga')>=0||r.indexOf('broker')>=0||r.indexOf('outside')>=0)return false; return r.indexOf('loa')>=0||r.indexOf('internal')>=0||r.indexOf('employee')>=0||p.loa_resources===true||p.loa_resources==='true';}
+  function norm(raw){var d=raw||{}; if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){d={};}} return {active:(d.active!==false&&d.active!=='false'), zoomUrl:String(d.zoomUrl||d.chatUrl||d.supportUrl||DEFAULT_CHAT||'').trim(), recentChanges:Array.isArray(d.recentChanges)?d.recentChanges:(Array.isArray(d.changes)?d.changes:settings.recentChanges)};}
+  function headers(extra){var h={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; for(var k in (extra||{}))h[k]=extra[k]; return h;}
+  function load(){
+    return fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(STORE_KEY)+'&select=data',{headers:headers()})
+      .then(function(r){return r.ok?r.json():[];})
+      .then(function(rows){ if(rows&&rows.length){settings=norm(rows[rows.length-1].data);} else {settings=norm(settings);} return settings; })
+      .catch(function(){return settings;});
   }
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(refresh, 500); setTimeout(refresh, 2000); setTimeout(refresh, 5000); });
-  window.addEventListener('focus', function(){ setTimeout(refresh, 250); });
-})();
-</script>
-
-<script>
-/* Phase 27: live-page onboarding status fix. This script is intentionally placed at the real page end, not inside a print template. It does not touch Meetings, Cert Tracker, Trip Tracker, or Friday Meetings data. */
-(function(){
-  if (window.__phase27OnboardingLiveFix) return;
-  window.__phase27OnboardingLiveFix = true;
-
-  var OB_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var OB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
-  var OB_HUB = 'medi';
-  var OB_KEY = 'onboarding_status';
-  var defaultStatus = {
-    active: true,
-    message: 'We are currently updating the Agent Onboarding & Resources section. If you do not see the form, link, video, or instruction you need, please reach out before assuming it is unavailable.',
-    zoom_url: 'https://zoom.us/launch/chat/v2/eyJzaWQiOiJkZTI0NWE0M2VlNDI0ZDJlODA5ZmQwYzA5NjNjMzU1OEBjb25mZXJlbmNlLnhtcHAuem9vbS51cyJ9',
-    zoom_label: 'Open Live Support Chat',
-    recent_changes: [
-      'Onboarding resources are being refined for both LOA/internal agents and GA partners.',
-      'Carrier contacts and writing numbers now live in the Carrier Directory.',
-      'If something appears missing, use the update notice instructions and contact support before assuming it is unavailable.'
-    ]
-  };
-
-  function headers(extra){
-    return Object.assign({
-      'apikey': OB_SUPA_KEY,
-      'Authorization': 'Bearer ' + OB_SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache'
-    }, extra || {});
+  function save(){
+    var payload={hub:HUB,key:STORE_KEY,data:settings};
+    return fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(STORE_KEY),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})})
+      .then(function(){return fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});});
   }
-  function esc(value){
-    return String(value == null ? '' : value).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+  function render(){
+    var banner=document.getElementById('onboardingUpdateBanner');
+    var recent=document.getElementById('onboardingRecentChanges');
+    var list=document.getElementById('onboardingRecentChangesList');
+    var chatRow=document.getElementById('onboardingZoomSupportRow');
+    var chatBtn=document.getElementById('onboardingZoomSupportBtn');
+    var admin=document.getElementById('onboardingAdminStatusControls');
+    var text=document.getElementById('onboardingAdminStatusText');
+    if(banner){banner.classList.toggle('show', !!settings.active);}
+    if(recent){recent.style.display='block';}
+    if(list){list.innerHTML=(settings.recentChanges&&settings.recentChanges.length?settings.recentChanges:['Onboarding resources are being refined and expanded.']).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');}
+    if(chatBtn){chatBtn.href=settings.zoomUrl||DEFAULT_CHAT;}
+    if(chatRow){chatRow.style.display=isLoa()?'flex':'none';}
+    if(admin){admin.classList.toggle('show', isAdmin());}
+    if(text){text.textContent='Update notice: '+(settings.active?'ON':'OFF')+' | Chat link: '+(settings.zoomUrl?'set':'not set')+' | Visible chat users: LOA/internal only';}
   }
-  function rebuildNumericObject(obj){
-    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
-    var nums = Object.keys(obj).filter(function(k){ return /^\d+$/.test(k); }).sort(function(a,b){ return Number(a)-Number(b); });
-    if (!nums.length) return obj;
-    var parsed = {};
-    try { parsed = JSON.parse(nums.map(function(k){ return obj[k]; }).join('')); } catch(e) { parsed = {}; }
-    Object.keys(obj).forEach(function(k){ if (!/^\d+$/.test(k)) parsed[k] = obj[k]; });
-    return parsed;
-  }
-  function normalize(raw){
-    var data = raw;
-    if (typeof data === 'string') {
-      try { data = JSON.parse(data); } catch(e) { data = {}; }
-    }
-    data = rebuildNumericObject(data || {});
-    var out = Object.assign({}, defaultStatus, data || {});
-    out.active = out.active === true || out.active === 'true' || out.active === 1 || out.active === '1';
-    out.message = String(out.message || defaultStatus.message).trim();
-    out.zoom_url = String(out.zoom_url || '').trim();
-    out.zoom_label = String(out.zoom_label || defaultStatus.zoom_label).trim();
-    if (!Array.isArray(out.recent_changes)) {
-      if (typeof out.recent_changes === 'string' && out.recent_changes.trim()) {
-        out.recent_changes = out.recent_changes.split(/\n|;/).map(function(x){ return x.trim(); }).filter(Boolean);
-      } else {
-        out.recent_changes = defaultStatus.recent_changes.slice();
-      }
-    }
-    return out;
-  }
-  function getProfile(){
-    try { if (window.HUB_CURRENT_USER) return window.HUB_CURRENT_USER; } catch(e) {}
-    try { var p = JSON.parse(sessionStorage.getItem('medi_hub_current_user') || 'null'); if (p) return p; } catch(e) {}
-    try { var s = JSON.parse(sessionStorage.getItem('medi_hub_session') || 'null'); if (s) return s; } catch(e) {}
-    return {};
-  }
-  function isAdmin(profile){
-    profile = profile || getProfile();
-    var role = String(profile.role || '').toLowerCase();
-    var perms = profile.permissions || {};
-    return role === 'admin' || perms.admin === true || perms.admin === 'true';
-  }
-  function allowLoaChat(profile){
-    profile = profile || getProfile();
-    if (isAdmin(profile)) return true;
-    var role = String(profile.role || '').toLowerCase();
-    var perms = profile.permissions || {};
-    if (role === 'ga' || role === 'outside' || role === 'broker') return false;
-    return role === 'internal' || role === 'loa' || role === 'manager' || perms.loa_resources === true || perms.loa_resources === 'true' || perms.agent_tools === true || perms.agent_tools === 'true';
-  }
-  function score(settings){
-    settings = normalize(settings || {});
-    return (settings.active ? 1000 : 0) + (settings.zoom_url ? 100 : 0) + (settings.recent_changes && settings.recent_changes.length ? 25 : 0) + (settings.message ? 10 : 0);
-  }
-  function renderOnboardingStatus(){
-    var settings = normalize(window.__onboardingStatusSettings || defaultStatus);
-    window.__onboardingStatusSettings = settings;
-
-    var banner = document.getElementById('onboardingUpdateBanner');
-    if (banner) {
-      banner.classList.toggle('show', !!settings.active);
-      banner.style.display = settings.active ? 'block' : 'none';
-      banner.classList.remove('hub-permission-hidden');
-      banner.removeAttribute('data-permission-required');
-    }
-
-    var recentWrap = document.getElementById('onboardingRecentChanges');
-    var recentList = document.getElementById('onboardingRecentChangesList');
-    var recent = Array.isArray(settings.recent_changes) ? settings.recent_changes.filter(Boolean) : [];
-    if (recentWrap) {
-      recentWrap.style.display = recent.length ? 'block' : 'none';
-      recentWrap.classList.remove('hub-permission-hidden');
-      recentWrap.removeAttribute('data-permission-required');
-    }
-    if (recentList) recentList.innerHTML = recent.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('');
-
-    var supportAllowed = allowLoaChat();
-    var zoomRow = document.getElementById('onboardingZoomSupportRow');
-    if (zoomRow) zoomRow.style.display = supportAllowed ? 'flex' : 'none';
-    var zoomBtn = document.getElementById('onboardingZoomSupportBtn');
-    if (zoomBtn) {
-      zoomBtn.textContent = '💬 ' + (settings.zoom_label || defaultStatus.zoom_label);
-      if (supportAllowed && settings.zoom_url) {
-        zoomBtn.href = settings.zoom_url;
-        zoomBtn.classList.remove('disabled');
-        zoomBtn.onclick = null;
-      } else {
-        zoomBtn.href = '#';
-        zoomBtn.classList.add('disabled');
-        zoomBtn.onclick = function(e){
-          e.preventDefault();
-          alert(supportAllowed ? 'Live Support Chat is not configured yet.' : 'Live Support Chat is available for LOA/internal users only. GA users should use the normal GA support process.');
-        };
-      }
-    }
-
-    var adminControls = document.getElementById('onboardingAdminStatusControls');
-    if (adminControls) {
-      if (isAdmin()) {
-        adminControls.style.display = 'block';
-        adminControls.classList.remove('hub-permission-hidden');
-      }
-    }
-    var adminText = document.getElementById('onboardingAdminStatusText');
-    if (adminText) {
-      adminText.innerHTML = 'Update notice: <strong>' + (settings.active ? 'ON' : 'OFF') + '</strong><br>Live support chat link: <strong>' + (settings.zoom_url ? 'Configured' : 'Not configured') + '</strong><br>Chat visible to: <strong>LOA/internal users and admins only</strong><br>Notice and Recent Changes visible to: <strong>everyone with onboarding access</strong>';
-    }
-  }
-
-  function readStatus(){
-    return fetch(OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY) + '&select=data', { headers: headers() })
-      .then(function(r){ if (!r.ok) throw new Error('Onboarding status read failed: ' + r.status); return r.json(); })
-      .then(function(rows){
-        var best = null;
-        (rows || []).forEach(function(row){ var candidate = normalize(row && row.data); if (!best || score(candidate) >= score(best)) best = candidate; });
-        window.__onboardingStatusSettings = normalize(best || defaultStatus);
-        try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(window.__onboardingStatusSettings)); } catch(e) {}
-        renderOnboardingStatus();
-        return window.__onboardingStatusSettings;
-      })
-      .catch(function(err){
-        try { window.__onboardingStatusSettings = normalize(JSON.parse(localStorage.getItem('medi_onboarding_status_cache') || 'null') || defaultStatus); }
-        catch(e) { window.__onboardingStatusSettings = normalize(defaultStatus); }
-        console.warn('[Phase 27 Onboarding] using fallback status:', err && err.message ? err.message : err);
-        renderOnboardingStatus();
-        return window.__onboardingStatusSettings;
-      });
-  }
-  function saveStatus(settings){
-    settings = normalize(settings);
-    window.__onboardingStatusSettings = settings;
-    renderOnboardingStatus();
-    try { localStorage.setItem('medi_onboarding_status_cache', JSON.stringify(settings)); } catch(e) {}
-
-    var patchUrl = OB_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(OB_HUB) + '&key=eq.' + encodeURIComponent(OB_KEY);
-    return fetch(patchUrl, {
-      method: 'PATCH',
-      headers: headers({'Prefer':'return=minimal'}),
-      body: JSON.stringify({ data: settings })
-    }).then(function(r){
-      if (r.ok || r.status === 204) return true;
-      return fetch(OB_SUPA_URL + '/rest/v1/tile_content', {
-        method: 'POST',
-        headers: headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),
-        body: JSON.stringify({ hub: OB_HUB, key: OB_KEY, data: settings })
-      }).then(function(pr){ if (!pr.ok && pr.status !== 201 && pr.status !== 204) throw new Error('Onboarding status save failed: ' + pr.status); return true; });
-    }).catch(function(err){
-      alert('The onboarding notice changed on this browser, but Supabase did not save it. Error: ' + (err && err.message ? err.message : err));
-      return false;
-    });
-  }
-
-  window.loadOnboardingStatusSettings = function(showToast){
-    return readStatus().then(function(){ if (showToast && typeof showSnuToast === 'function') showSnuToast('Onboarding status refreshed.'); });
-  };
-  window.toggleOnboardingUpdateStatus = function(){
-    var settings = normalize(window.__onboardingStatusSettings || defaultStatus);
-    settings.active = !settings.active;
-    return saveStatus(settings).then(function(){ if (typeof showSnuToast === 'function') showSnuToast('Onboarding update notice is now ' + (settings.active ? 'ON' : 'OFF') + '.'); });
-  };
-  window.setOnboardingZoomLink = function(){
-    var settings = normalize(window.__onboardingStatusSettings || defaultStatus);
-    var url = prompt('Paste the live support chat link. This is visible to LOA/internal users only. Leave blank to remove it.', settings.zoom_url || '');
-    if (url === null) return;
-    url = String(url || '').trim();
-    if (url && !/^https:\/\//i.test(url)) { alert('Please use the full link beginning with https://'); return; }
-    settings.zoom_url = url;
-    return saveStatus(settings).then(function(){ if (typeof showSnuToast === 'function') showSnuToast(url ? 'Live support chat link saved.' : 'Live support chat link removed.'); });
-  };
-  window.showOnboardingUpdateInfo = function(){
-    var settings = normalize(window.__onboardingStatusSettings || defaultStatus);
-    alert('Onboarding Section Being Updated\n\n' + settings.message + '\n\nIf something appears missing, please contact Brian or the admin team before assuming it is unavailable.');
-  };
-  window.showOnboardingZoomInfo = function(){
-    alert('Live Support Chat\n\nThis opens the live support chat link in a new browser window or app. This option is available for LOA/internal users only. GA users should use the normal GA support process.');
-  };
-
-  function boot(){
-    if (!document.getElementById('onboardingUpdateBanner')) return false;
-    renderOnboardingStatus();
-    readStatus();
-    [400, 1000, 2200, 4000, 7000].forEach(function(ms){ setTimeout(function(){ renderOnboardingStatus(); }, ms); });
-    return true;
-  }
-  if (!boot()) {
-    document.addEventListener('DOMContentLoaded', boot);
-    setTimeout(boot, 800);
-    setTimeout(boot, 2500);
-  }
-  window.addEventListener('focus', function(){ setTimeout(readStatus, 200); });
+  window.refreshOnboardingStatus=function(){load().then(render);};
+  window.toggleOnboardingUpdateNotice=function(){settings.active=!settings.active; save().then(function(){render(); alert('Onboarding update notice is now '+(settings.active?'ON':'OFF')+'.');}).catch(function(){render(); alert('Saved locally on this page, but Supabase save failed.');});};
+  window.setOnboardingZoomLink=function(){var v=prompt('Paste the live support chat link:', settings.zoomUrl||DEFAULT_CHAT); if(v===null)return; settings.zoomUrl=String(v||'').trim()||DEFAULT_CHAT; save().then(render).catch(render);};
+  window.showOnboardingUpdateInfo=function(){alert('This onboarding/resource section is currently being updated. If you do not see the form, link, video, or instruction you need, please contact the support team before assuming it is unavailable.');};
+  window.showOnboardingZoomInfo=function(){alert('Live Support Chat is available to internal/LOA agents only. It opens the configured support chat in a new window. GA users do not see this option.');};
+  function boot(){load().then(render); setTimeout(render,500); setTimeout(render,1500);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  setInterval(render,3000);
 })();
 </script>
 
