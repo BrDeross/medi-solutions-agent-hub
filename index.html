@@ -9724,12 +9724,15 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 </script>
 
 
-<script id="phase30-emergency-core-display-fix">
+<script id="phase31-core-display-visual-restore">
 (function(){
-  if (window.__phase30EmergencyCoreDisplayFix) return;
-  window.__phase30EmergencyCoreDisplayFix = true;
+  if (window.__phase31CoreDisplayVisualRestore) return;
+  window.__phase31CoreDisplayVisualRestore = true;
   var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWIiLCJyZWYiOiJiamx6d21vb2d5cGZlZmp4dmd5dCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q'.replace('eyJpc3MiOiJzdWIi', 'eyJpc3MiOiJIUzI1NiJ');
+  // Fallback in case the replace-safe token above is rejected by the browser. Keep the prior emergency key value available.
+  SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+
   function esc(value){ return String(value == null ? '' : value).replace(/[&<>\"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]; }); }
   function parseData(value){
     if (value == null) return null;
@@ -9762,7 +9765,28 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     });
     return best || {};
   }
+  function ensureVisualCss(){
+    if (document.getElementById('phase31-visual-css')) return;
+    var st = document.createElement('style');
+    st.id = 'phase31-visual-css';
+    st.textContent = `
+      #fridayMeetingList .phase31-meeting-card{background:rgba(255,255,255,.045);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;box-shadow:0 14px 32px rgba(0,0,0,.18);backdrop-filter:none!important;filter:none!important;opacity:1!important;}
+      #fridayMeetingList .phase31-meeting-icon{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.34);border-radius:12px;padding:12px 16px;text-align:center;flex-shrink:0;min-width:76px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+      #fridayMeetingList .phase31-meeting-title{font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;text-shadow:0 1px 8px rgba(0,0,0,.22);}
+      #fridayMeetingList .phase31-meeting-meta{font-size:13px;color:var(--muted-2);margin-bottom:6px;font-weight:700;}
+      #fridayMeetingList .phase31-meeting-notes{font-size:13px;color:var(--muted);line-height:1.6;}
+      #fridayMeetingList .phase31-meeting-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-right:6px;padding:7px 14px;border-radius:8px;color:#fff;font-size:12px;font-weight:800;text-decoration:none;border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 18px rgba(0,0,0,.18);}
+      #fridayMeetingList .phase31-meeting-btn.join{background:var(--accent);}
+      #fridayMeetingList .phase31-meeting-btn.resource{background:rgba(99,179,237,.15);border-color:rgba(99,179,237,.35);color:var(--accent-2);}
+      #fridayMeetingList .phase31-meeting-btn.cal{background:rgba(66,133,244,.14);border-color:rgba(66,133,244,.35);color:#93c5fd;cursor:pointer;font-family:inherit;}
+      #certTrackerContent .phase31-cert-note{font-size:12px;color:rgba(255,255,255,.86);font-weight:800;}
+      #certTrackerContent .cert-lock-table img,#certTrackerContent .cert-lock-table svg,#fridayMeetingList img,#fridayMeetingList svg{filter:none!important;opacity:1!important;mix-blend-mode:normal!important;}
+      #certTrackerContent .cert-agent-print-btn{color:#0f172a!important;}
+    `;
+    document.head.appendChild(st);
+  }
   function renderFriday(){
+    ensureVisualCss();
     var el = document.getElementById('fridayMeetingList');
     var badge = document.getElementById('fridayMeetingCount');
     if (!el) return Promise.resolve();
@@ -9773,29 +9797,34 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       meetings.forEach(function(m){
         if (!m || typeof m !== 'object') return;
         var key = String(m.id || '') + '|' + String(m.date || '') + '|' + String(m.time || '') + '|' + String(m.topic || '');
-        if (seen[key]) return;
-        seen[key] = true;
-        clean.push(m);
+        if (seen[key]) return; seen[key] = true; clean.push(m);
       });
       clean.sort(function(a,b){ return new Date(a.dateISO || a.date || 0) - new Date(b.dateISO || b.date || 0); });
       if (badge) badge.textContent = clean.length + ' meeting' + (clean.length === 1 ? '' : 's');
       if (!clean.length) { el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings found in Supabase.</div>'; return; }
-      el.innerHTML = clean.map(function(m){
-        var link1 = m.link ? '<a href="' + esc(m.link) + '" target="_blank" rel="noopener" style="color:#2563eb;font-weight:800;">Open meeting link</a>' : '';
-        var link2 = m.link2 ? '<a href="' + esc(m.link2) + '" target="_blank" rel="noopener" style="color:#2563eb;font-weight:800;margin-left:12px;">Open resource</a>' : '';
-        return '<div style="background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:16px;padding:15px 16px;box-shadow:0 8px 22px rgba(15,23,42,.08);">'
-          + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px;"><strong style="font-size:15px;color:var(--ink);">' + esc(m.topic || 'Friday Meeting') + '</strong><span style="font-size:12px;font-weight:800;color:var(--accent);">' + esc(m.type || '') + '</span></div>'
-          + '<div style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:6px;">' + esc(m.date || '') + (m.time ? ' · ' + esc(m.time) : '') + '</div>'
-          + (m.notes ? '<div style="font-size:13px;color:var(--muted-2);line-height:1.45;margin-bottom:8px;">' + esc(m.notes) + '</div>' : '')
-          + (link1 || link2 ? '<div style="font-size:12px;">' + link1 + link2 + '</div>' : '')
-          + '</div>';
+      el.innerHTML = clean.map(function(m,i){
+        var type = String(m.type || '').toLowerCase();
+        var isVirtual = type === 'virtual' || type.indexOf('zoom') >= 0 || type.indexOf('web') >= 0;
+        var icon = isVirtual ? '💻' : '🏢';
+        var typeLabel = isVirtual ? 'Virtual' : (m.type ? m.type : 'Meeting');
+        return '<div class="phase31-meeting-card">'
+          + '<div class="phase31-meeting-icon"><div style="font-size:24px;">' + icon + '</div><div style="font-size:10px;font-weight:800;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">' + esc(typeLabel) + '</div><div style="font-size:11px;font-weight:800;color:#a78bfa;margin-top:4px;white-space:nowrap;">' + esc(m.date || 'Date TBD') + '</div></div>'
+          + '<div style="flex:1;min-width:0;"><div class="phase31-meeting-title">' + esc(m.topic || 'Team Meeting') + '</div>'
+          + (m.time ? '<div class="phase31-meeting-meta">⏰ ' + esc(m.time) + '</div>' : '')
+          + (m.notes ? '<div class="phase31-meeting-notes">' + esc(m.notes) + '</div>' : '')
+          + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" rel="noopener" class="phase31-meeting-btn join">📹 Join Meeting</a>' : '')
+          + (m.link2 ? '<a href="' + esc(m.link2) + '" target="_blank" rel="noopener" class="phase31-meeting-btn resource">🔗 Resource / Login</a>' : '')
+          + '<button type="button" onclick="openFridayMeetingCalendar && openFridayMeetingCalendar(' + i + ', \'google\')" class="phase31-meeting-btn cal">Google</button>'
+          + '<button type="button" onclick="openFridayMeetingCalendar && openFridayMeetingCalendar(' + i + ', \'outlook\')" class="phase31-meeting-btn cal">Outlook</button>'
+          + '</div></div>';
       }).join('');
-      console.log('[Phase 30] Friday meetings rendered:', clean.length);
-    }).catch(function(err){ console.error('[Phase 30] Friday meetings rescue failed', err); el.innerHTML = '<div style="color:#b91c1c;font-weight:800;">Meetings could not load from Supabase: ' + esc(err.message || err) + '</div>'; });
+      console.log('[Phase 31] Friday meetings rendered:', clean.length);
+    }).catch(function(err){ console.error('[Phase 31] Friday meetings rescue failed', err); el.innerHTML = '<div style="color:#fecaca;background:rgba(185,28,28,.16);border:1px solid rgba(248,113,113,.28);border-radius:12px;padding:12px;font-weight:800;">Meetings could not load from Supabase: ' + esc(err.message || err) + '</div>'; });
   }
   var CERT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
   function isYes(v){ return /^(yes|y|true|1|✓|x|certified|complete|completed)$/i.test(String(v || '').trim()); }
   function renderCerts(){
+    ensureVisualCss();
     var el = document.getElementById('certTrackerContent');
     var badge = document.getElementById('certAgentCount');
     if (!el) return Promise.resolve();
@@ -9807,16 +9836,21 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
       agents.forEach(function(a){ Object.keys((a && a.certs) || {}).forEach(function(k){ if (carriers.indexOf(k) === -1) carriers.push(k); }); });
       if (badge) badge.textContent = agents.length + ' agent' + (agents.length === 1 ? '' : 's');
       if (!agents.length) { el.innerHTML = '<div class="trip-empty">No certification data found in Supabase.</div>'; return; }
-      var head = '<tr><th style="position:sticky;left:0;background:#0f766e;color:white;z-index:2;text-align:left;padding:10px;min-width:190px;">Agent</th><th style="padding:10px;background:#0f766e;color:white;">Year</th><th style="padding:10px;background:#0f766e;color:white;">Progress</th>' + carriers.map(function(c){ return '<th style="padding:10px;background:#0f766e;color:white;white-space:nowrap;">' + esc(c) + '</th>'; }).join('') + '</tr>';
-      var body = agents.map(function(a){
+      var metaText = (obj.meta && (obj.meta.year || obj.meta.updatedAt || obj.meta.monthLabel)) ? esc(obj.meta.year || obj.meta.monthLabel || obj.meta.updatedAt) : 'Supabase live data';
+      var head = '<thead><tr><th class="cert-agent-head">Agent</th><th>Year</th><th>Progress</th>' + carriers.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead>';
+      var body = '<tbody>' + agents.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||'')); }).map(function(a, idx){
         var certs = a.certs || {};
         var yes = carriers.filter(function(c){ return isYes(certs[c]); }).length;
         var pct = carriers.length ? Math.round(yes / carriers.length * 100) : 0;
-        return '<tr><td style="position:sticky;left:0;background:#d4f4f2;font-weight:900;padding:9px;border-bottom:1px solid #dbe3ee;">' + esc(a.name) + '</td><td style="text-align:center;padding:9px;border-bottom:1px solid #dbe3ee;">' + esc(a.year || (obj.meta && obj.meta.year) || '') + '</td><td style="text-align:center;padding:9px;border-bottom:1px solid #dbe3ee;font-weight:900;">' + pct + '%</td>' + carriers.map(function(c){ return '<td style="text-align:center;padding:9px;border-bottom:1px solid #dbe3ee;">' + (isYes(certs[c]) ? '✅' : '—') + '</td>'; }).join('') + '</tr>';
-      }).join('');
-      el.innerHTML = '<div style="overflow:auto;border:1px solid var(--border);border-radius:16px;background:white;box-shadow:0 12px 28px rgba(15,23,42,.10);"><table style="border-collapse:collapse;width:max-content;min-width:100%;font-size:12px;">' + head + body + '</table></div>';
-      console.log('[Phase 30] Cert tracker rendered:', agents.length);
-    }).catch(function(err){ console.error('[Phase 30] Cert tracker rescue failed', err); el.innerHTML = '<div style="color:#b91c1c;font-weight:800;">Cert tracker could not load from Supabase: ' + esc(err.message || err) + '</div>'; });
+        return '<tr><td class="cert-agent-cell"><button type="button" class="cert-agent-print-btn" onclick="printCertAgentRow && printCertAgentRow(' + idx + ')"><span class="cert-agent-name">' + esc(a.name) + '</span><span class="cert-print-icon">🖨️</span></button></td>'
+          + '<td class="cert-year-cell">' + esc(a.year || (obj.meta && obj.meta.year) || '') + '</td>'
+          + '<td><div class="cert-progress-wrap"><div class="cert-progress-track"><div class="cert-progress-fill" style="width:' + pct + '%"></div></div><div class="cert-progress-num">' + pct + '%</div></div></td>'
+          + carriers.map(function(c){ return '<td class="cert-cell"><span class="cert-mark ' + (isYes(certs[c]) ? 'yes' : 'no') + '">' + (isYes(certs[c]) ? '✓' : '—') + '</span></td>'; }).join('')
+          + '</tr>';
+      }).join('') + '</tbody>';
+      el.innerHTML = '<div class="cert-topbar"><div class="cert-lock-meta"><strong>Certification Tracker</strong><span class="phase31-cert-note">' + metaText + '</span></div><div class="cert-scroll-controls"><span class="cert-scroll-label">Scroll carriers</span><button type="button" class="cert-scroll-btn home" onclick="scrollCertTable && scrollCertTable(\'home\')">Start</button><button type="button" class="cert-scroll-btn" onclick="scrollCertTable && scrollCertTable(-1)">‹</button><button type="button" class="cert-scroll-btn" onclick="scrollCertTable && scrollCertTable(1)">›</button><button type="button" class="cert-scroll-btn home" onclick="scrollCertTable && scrollCertTable(\'end\')">End</button></div></div><div class="cert-lock-shell"><table class="cert-lock-table">' + head + body + '</table></div>';
+      console.log('[Phase 31] Cert tracker rendered:', agents.length);
+    }).catch(function(err){ console.error('[Phase 31] Cert tracker rescue failed', err); el.innerHTML = '<div style="color:#fecaca;background:rgba(185,28,28,.16);border:1px solid rgba(248,113,113,.28);border-radius:12px;padding:12px;font-weight:800;">Cert tracker could not load from Supabase: ' + esc(err.message || err) + '</div>'; });
   }
   function renderTrip(){
     var el = document.getElementById('tripList');
@@ -9847,14 +9881,10 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
           + '<div class="trip-pts q">' + prod.toLocaleString() + ' pts</div>'
           + '</div>';
       }).join('');
-      console.log('[Phase 30] Trip tracker rendered:', agents.length);
-    }).catch(function(err){ console.error('[Phase 30] Trip tracker rescue failed', err); el.innerHTML = '<div style="color:#b91c1c;font-weight:800;">Trip tracker could not load from Supabase: ' + esc(err.message || err) + '</div>'; });
+      console.log('[Phase 31] Trip tracker rendered:', agents.length);
+    }).catch(function(err){ console.error('[Phase 31] Trip tracker rescue failed', err); el.innerHTML = '<div style="color:#fecaca;background:rgba(185,28,28,.16);border:1px solid rgba(248,113,113,.28);border-radius:12px;padding:12px;font-weight:800;">Trip tracker could not load from Supabase: ' + esc(err.message || err) + '</div>'; });
   }
-  function run(){
-    renderFriday();
-    renderCerts();
-    renderTrip();
-  }
+  function run(){ renderFriday(); renderCerts(); renderTrip(); }
   window.emergencyReloadCoreHubData = run;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
   setTimeout(run, 1200);
