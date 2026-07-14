@@ -25109,5 +25109,307 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 
+
+
+<script id="phase38-friday-admin-update-sort-fix">
+(function(){
+  'use strict';
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWIiLCJyZWYiOiJiamx6d21vb2d5cGZlZmp4dmd5dCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  var HUB = 'medi';
+  var meetings = [];
+  var editIndex = null;
+  var fridayType = 'in-person';
+
+  function byId(id){ return document.getElementById(id); }
+  function esc(v){ return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function toast(msg){ if(typeof window.showSnuToast === 'function') window.showSnuToast(msg); else console.log(msg); }
+  function headers(json){ var h={ apikey:SUPA_KEY, Authorization:'Bearer '+SUPA_KEY, 'Cache-Control':'no-cache' }; if(json){ h['Content-Type']='application/json'; h.Prefer='return=minimal'; } return h; }
+  function parseMaybe(v){
+    var out = v;
+    for(var i=0;i<3;i++){
+      if(typeof out === 'string'){ try{ out = JSON.parse(out); }catch(e){ return out; } }
+    }
+    return out;
+  }
+  function isMeetingObject(o){
+    return o && typeof o === 'object' && !Array.isArray(o) && (o.topic || o.date || o.dateISO || o.time || o.notes || o.link || o.link2 || o.type);
+  }
+  function normalize(m){
+    m = m || {};
+    return {
+      id: m.id || ('mtg_' + Date.now() + '_' + Math.floor(Math.random()*100000)),
+      date: m.date || '',
+      dateISO: m.dateISO || '',
+      time: m.time || '',
+      topic: m.topic || 'Team Meeting',
+      notes: m.notes || '',
+      link: m.link || '',
+      link2: m.link2 || '',
+      type: /virtual/i.test(m.type || '') ? 'virtual' : 'in-person'
+    };
+  }
+  function isoFromAny(m){
+    if(m && /^\d{4}-\d{2}-\d{2}$/.test(m.dateISO || '')) return m.dateISO;
+    var date = (m && m.date) || '';
+    var d = Date.parse(date);
+    if(!d) return '';
+    var dt = new Date(d);
+    return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+  }
+  function sortMeetings(list){
+    return (Array.isArray(list) ? list : []).map(normalize).sort(function(a,b){
+      var ai = isoFromAny(a), bi = isoFromAny(b);
+      var at = ai ? Date.parse(ai + 'T12:00:00') : (Date.parse(a.date || '') || 9999999999999);
+      var bt = bi ? Date.parse(bi + 'T12:00:00') : (Date.parse(b.date || '') || 9999999999999);
+      if(at !== bt) return at - bt;
+      return String(a.time || '').localeCompare(String(b.time || ''));
+    });
+  }
+  function extractMeetings(rows){
+    var raw = [];
+    (rows || []).forEach(function(row){
+      var d = parseMaybe(row && row.data);
+      if(Array.isArray(d)) raw = raw.concat(d);
+      else if(d && typeof d === 'object'){
+        ['meetings','items','data','rows','list','records'].forEach(function(k){ if(Array.isArray(d[k])) raw = raw.concat(d[k]); });
+        if(isMeetingObject(d)) raw.push(d);
+      }
+    });
+    var seen = {};
+    var out = [];
+    raw.forEach(function(item){
+      if(!isMeetingObject(item)) return;
+      var m = normalize(item);
+      if(!m.dateISO) m.dateISO = isoFromAny(m);
+      var key = [m.id,m.dateISO,m.date,m.time,m.topic,m.notes,m.link,m.link2,m.type].join('|');
+      if(seen[key]) return;
+      seen[key] = true;
+      out.push(m);
+    });
+    return sortMeetings(out);
+  }
+  async function readMeetings(){
+    var url = SUPA_URL + '/rest/v1/friday_meetings?hub=eq.' + encodeURIComponent(HUB) + '&select=data';
+    var r = await fetch(url, { cache:'no-store', headers:headers(false) });
+    if(!r.ok) throw new Error('Supabase read failed: ' + r.status);
+    return extractMeetings(await r.json());
+  }
+  async function writeMeetings(list){
+    meetings = sortMeetings(list);
+    window._fridayMeetings = meetings.slice();
+    window.__phase38FridayMeetings = meetings.slice();
+    try{ localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); }catch(e){}
+
+    var del = await fetch(SUPA_URL + '/rest/v1/friday_meetings?hub=eq.' + encodeURIComponent(HUB), { method:'DELETE', headers:headers(false) });
+    if(!del.ok) throw new Error('Supabase delete old Friday rows failed: ' + del.status);
+
+    if(meetings.length){
+      var rows = meetings.map(function(m){ return { hub:HUB, data: JSON.stringify(m) }; });
+      var ins = await fetch(SUPA_URL + '/rest/v1/friday_meetings', { method:'POST', headers:headers(true), body:JSON.stringify(rows) });
+      if(!ins.ok) throw new Error('Supabase insert Friday rows failed: ' + ins.status);
+    }
+    renderPublic();
+    renderAdmin();
+  }
+  function setStatus(msg,bad){
+    var el = byId('phase38FridayAdminStatus') || byId('phase37FridayAdminStatus') || byId('phase36FridayAdminStatus');
+    if(el){ el.textContent = msg || ''; el.style.color = bad ? '#fecaca' : '#93c5fd'; }
+  }
+  function ensureAdminControls(){
+    var panel = byId('adminTabFriday');
+    if(!panel) return false;
+    if(!byId('phase38FridayAdminTools')){
+      var title = panel.querySelector('.admin-section-title');
+      var box = document.createElement('div');
+      box.id = 'phase38FridayAdminTools';
+      box.style.cssText = 'margin:0 0 16px 0;padding:13px 14px;border:1px solid rgba(0,214,202,.45);background:linear-gradient(135deg,rgba(0,214,202,.16),rgba(255,39,86,.08));border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 12px 30px rgba(0,0,0,.18);';
+      box.innerHTML = '<div><div style="font-size:13px;font-weight:950;color:#e5f2ff;">Friday Meetings Edit Controls</div><div style="font-size:11px;color:var(--muted-2);margin-top:3px;line-height:1.45;">Edit now updates the selected meeting instead of duplicating it. Saved meetings are sorted by date.</div><div id="phase38FridayAdminStatus" style="font-size:11px;color:#93c5fd;margin-top:5px;font-weight:850;"></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" id="phase38ReloadFridayAdmin" style="padding:9px 15px;border-radius:999px;border:1px solid rgba(99,179,237,.55);background:rgba(99,179,237,.20);color:#dbeafe;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;">↻ Reload Existing Meetings</button><button type="button" id="phase38CancelFridayEdit" style="display:none;padding:9px 15px;border-radius:999px;border:1px solid rgba(248,113,113,.38);background:rgba(248,113,113,.12);color:#fecaca;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;">Cancel Edit</button></div>';
+      if(title && title.nextSibling) panel.insertBefore(box, title.nextSibling); else panel.insertBefore(box, panel.firstChild);
+    }
+    var reload = byId('phase38ReloadFridayAdmin');
+    if(reload) reload.onclick = function(e){ if(e) e.preventDefault(); window.phase38LoadFridayAdmin(true); return false; };
+    var cancel = byId('phase38CancelFridayEdit');
+    if(cancel) cancel.onclick = function(e){ if(e) e.preventDefault(); clearForm(); return false; };
+
+    var save = byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn') || Array.from(panel.querySelectorAll('button')).find(function(b){ return /Add Meeting|Save Meeting|Update Meeting/i.test(b.textContent || '') && !/Reload|Cancel/i.test(b.textContent || ''); });
+    if(save){
+      save.type = 'button';
+      save.id = 'phase38FridaySaveBtn';
+      save.onclick = function(e){ if(e) e.preventDefault(); window.phase38SaveFridayMeeting(); return false; };
+    }
+    var ip = byId('fridayTypeInPerson'), vt = byId('fridayTypeVirtual');
+    if(ip){ ip.type='button'; ip.onclick=function(e){ if(e) e.preventDefault(); window.setFridayType('in-person'); return false; }; }
+    if(vt){ vt.type='button'; vt.onclick=function(e){ if(e) e.preventDefault(); window.setFridayType('virtual'); return false; }; }
+    updateSaveButton();
+    window.setFridayType(fridayType);
+    return true;
+  }
+  function updateSaveButton(){
+    var b = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(b) b.textContent = editIndex === null ? '➕ Add Meeting' : '💾 Update Meeting';
+    var cancel = byId('phase38CancelFridayEdit');
+    if(cancel) cancel.style.display = editIndex === null ? 'none' : 'inline-flex';
+  }
+  window.setFridayType = function(type){
+    fridayType = /virtual/i.test(type || '') ? 'virtual' : 'in-person';
+    window.__phase38FridayType = fridayType;
+    var ip = byId('fridayTypeInPerson'), vt = byId('fridayTypeVirtual');
+    function style(btn,on){
+      if(!btn) return;
+      btn.style.background = on ? 'var(--accent)' : 'transparent';
+      btn.style.color = on ? '#fff' : 'var(--muted)';
+      btn.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+      btn.classList.toggle('active', !!on);
+    }
+    style(ip, fridayType === 'in-person');
+    style(vt, fridayType === 'virtual');
+  };
+  function val(id){ var e = byId(id); return e && e.value ? e.value.trim() : ''; }
+  function displayDate(iso){
+    if(!iso) return '';
+    var d = new Date(iso + 'T12:00:00');
+    if(isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+  }
+  function dateInputFor(m){ return isoFromAny(m); }
+  function clearForm(){
+    editIndex = null;
+    ['fridayDatePicker','fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e){ e.value=''; e.placeholder=''; e.title=''; if(e.dataset) e.dataset.originalDate=''; } });
+    window.setFridayType('in-person');
+    updateSaveButton();
+    setStatus('Ready to add a new meeting.', false);
+  }
+  function renderAdmin(){
+    ensureAdminControls();
+    var el = byId('fridayAdminList');
+    var count = byId('fridayAdminCount');
+    if(count) count.textContent = '(' + meetings.length + ')';
+    if(!el) return;
+    if(!meetings.length){
+      el.innerHTML = '<div style="color:#fecaca;background:rgba(185,28,28,.14);border:1px solid rgba(248,113,113,.25);border-radius:10px;padding:12px;font-size:12px;font-weight:850;">No Friday meetings loaded. Click Reload Existing Meetings.</div>';
+      return;
+    }
+    el.innerHTML = meetings.map(function(m,i){
+      var active = editIndex === i;
+      var isV = /virtual/i.test(m.type || '');
+      return '<div style="display:grid;grid-template-columns:112px 1fr auto;gap:12px;align-items:center;padding:11px 12px;margin-bottom:8px;border:1px solid '+(active?'rgba(0,214,202,.65)':'rgba(255,255,255,.12)')+';border-radius:12px;background:'+(active?'rgba(0,214,202,.10)':'rgba(255,255,255,.045)')+';box-shadow:'+(active?'0 0 18px rgba(0,214,202,.10)':'none')+';">'
+        + '<div style="font-size:11px;font-weight:950;color:#bfdbfe;line-height:1.45;">' + esc(m.date || 'Date TBD') + '<br><span style="color:#93c5fd;font-weight:850;">' + esc(m.time || '') + '</span></div>'
+        + '<div style="min-width:0;"><div style="font-size:13px;font-weight:950;color:#fff;">' + (isV?'💻 ':'🏢 ') + esc(m.topic || 'Team Meeting') + (active?' <span style="color:#7ffdf3;font-size:10px;">EDITING</span>':'') + '</div><div style="font-size:11px;color:var(--muted-2);margin-top:3px;white-space:normal;">' + esc(m.notes || 'No notes') + '</div></div>'
+        + '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;"><button type="button" onclick="phase38EditFridayMeeting('+i+');return false;" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(99,179,237,.34);background:rgba(99,179,237,.13);color:#bfdbfe;font-size:11px;font-weight:900;cursor:pointer;">Edit</button><button type="button" onclick="phase38DeleteFridayMeeting('+i+');return false;" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(248,113,113,.35);background:rgba(248,113,113,.12);color:#fecaca;font-size:11px;font-weight:900;cursor:pointer;">Delete</button></div></div>';
+    }).join('');
+  }
+  function renderPublic(){
+    try{ if(typeof window.renderFridayMeetings === 'function'){ window._fridayMeetings = meetings.slice(); window.renderFridayMeetings(); return; } }catch(e){}
+    var el = byId('fridayMeetingList');
+    var badge = byId('fridayMeetingCount');
+    if(badge) badge.textContent = meetings.length + ' meeting' + (meetings.length === 1 ? '' : 's');
+    if(!el) return;
+    if(!meetings.length){ el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:13px;">No meetings scheduled yet.</div>'; return; }
+    el.innerHTML = meetings.map(function(m){
+      var isV = /virtual/i.test(m.type || '');
+      return '<div class="phase31-meeting-card"><div class="phase31-meeting-icon"><div style="font-size:24px;">'+(isV?'💻':'🏢')+'</div><div style="font-size:10px;font-weight:800;color:#a78bfa;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">'+(isV?'Virtual':'In Person')+'</div><div style="font-size:11px;font-weight:800;color:#a78bfa;margin-top:4px;white-space:nowrap;">'+esc(m.date||'Date TBD')+'</div></div><div style="flex:1;min-width:0;"><div class="phase31-meeting-title">'+esc(m.topic||'Team Meeting')+'</div>'+(m.time?'<div class="phase31-meeting-meta">⏰ '+esc(m.time)+'</div>':'')+(m.notes?'<div class="phase31-meeting-notes">'+esc(m.notes)+'</div>':'')+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener" class="phase31-meeting-btn join">📹 Join Meeting</a>':'')+(m.link2?'<a href="'+esc(m.link2)+'" target="_blank" rel="noopener" class="phase31-meeting-btn resource">🔗 Resource / Login</a>':'')+'</div></div>';
+    }).join('');
+  }
+  window.phase38LoadFridayAdmin = async function(show){
+    try{
+      ensureAdminControls();
+      setStatus('Loading current meetings from Supabase...', false);
+      meetings = await readMeetings();
+      window._fridayMeetings = meetings.slice();
+      window.__phase38FridayMeetings = meetings.slice();
+      editIndex = null;
+      renderPublic();
+      renderAdmin();
+      updateSaveButton();
+      setStatus('Loaded ' + meetings.length + ' existing meeting' + (meetings.length === 1 ? '' : 's') + ' in date order.', false);
+      if(show) toast('✓ Existing Friday meetings loaded: ' + meetings.length);
+      console.log('[Phase 38] Friday meetings loaded for admin/update:', meetings.length);
+    }catch(err){
+      console.error('[Phase 38] Friday load failed', err);
+      setStatus('Load failed: ' + (err.message || err), true);
+    }
+  };
+  window.phase38EditFridayMeeting = function(i){
+    var m = meetings[i];
+    if(!m) return false;
+    editIndex = i;
+    var dp = byId('fridayDatePicker');
+    if(dp){ dp.value = dateInputFor(m); dp.dataset.originalDate = m.date || ''; dp.placeholder = m.date || ''; dp.title = m.date ? 'Current: ' + m.date : ''; }
+    var t = byId('fridayTime'); if(t) t.value = m.time || '';
+    var topic = byId('fridayTopic'); if(topic) topic.value = m.topic || '';
+    var notes = byId('fridayNotes'); if(notes) notes.value = m.notes || '';
+    var link = byId('fridayLink'); if(link) link.value = m.link || '';
+    var link2 = byId('fridayLink2'); if(link2) link2.value = m.link2 || '';
+    window.setFridayType(m.type || 'in-person');
+    updateSaveButton();
+    renderAdmin();
+    setStatus('Editing selected meeting. Click Update Meeting to save changes.', false);
+    if(topic){ topic.scrollIntoView({behavior:'smooth', block:'center'}); topic.focus(); }
+    return false;
+  };
+  window.phase38DeleteFridayMeeting = async function(i){
+    if(!meetings[i]) return false;
+    if(!confirm('Remove this Friday meeting?')) return false;
+    meetings.splice(i,1);
+    editIndex = null;
+    try{ await writeMeetings(meetings); clearForm(); toast('✓ Meeting deleted.'); }catch(e){ console.error('[Phase 38] Delete failed', e); toast('⚠ Delete failed to save.'); }
+    return false;
+  };
+  window.phase38SaveFridayMeeting = async function(){
+    var topic = val('fridayTopic');
+    if(!topic){ toast('⚠ Please enter a meeting topic.'); return false; }
+    var dp = byId('fridayDatePicker');
+    var iso = dp && dp.value ? dp.value : '';
+    var original = dp && dp.dataset ? (dp.dataset.originalDate || '') : '';
+    var m = normalize({
+      id: editIndex !== null && meetings[editIndex] ? meetings[editIndex].id : ('mtg_' + Date.now()),
+      date: iso ? displayDate(iso) : original,
+      dateISO: iso || '',
+      time: val('fridayTime'),
+      topic: topic,
+      notes: val('fridayNotes'),
+      link: val('fridayLink'),
+      link2: val('fridayLink2'),
+      type: fridayType
+    });
+    if(editIndex !== null && meetings[editIndex]) meetings[editIndex] = m;
+    else meetings.push(m);
+    try{
+      await writeMeetings(meetings);
+      var wasUpdate = editIndex !== null;
+      clearForm();
+      toast(wasUpdate ? '✓ Meeting updated and sorted by date.' : '✓ Meeting added and sorted by date.');
+    }catch(e){
+      console.error('[Phase 38] Save failed', e);
+      toast('⚠ Meeting save failed.');
+    }
+    return false;
+  };
+  window.addFridayMeeting = window.phase38SaveFridayMeeting;
+  window.renderFridayAdminList = renderAdmin;
+  function boot(){
+    ensureAdminControls();
+    window.setFridayType('in-person');
+    setTimeout(function(){ window.phase38LoadFridayAdmin(false); }, 300);
+    setTimeout(function(){ ensureAdminControls(); renderAdmin(); updateSaveButton(); }, 1400);
+  }
+  var oldSwitch = window.switchAdminTab;
+  if(typeof oldSwitch === 'function'){
+    window.switchAdminTab = function(tab, el){
+      var out = oldSwitch.apply(this, arguments);
+      if(String(tab || '').toLowerCase().indexOf('friday') >= 0) setTimeout(function(){ window.phase38LoadFridayAdmin(false); }, 180);
+      return out;
+    };
+  }
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    var tab = t && t.closest ? t.closest('.admin-tab') : null;
+    if(tab && /Meeting|Friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase38LoadFridayAdmin(false); }, 220);
+  }, true);
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
 </body>
 </html>
