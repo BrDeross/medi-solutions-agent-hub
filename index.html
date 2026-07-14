@@ -21614,5 +21614,104 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 
+
+
+<!-- Phase 55: Onboarding fullscreen title/scroll fix - isolated to onboarding overlay only -->
+<style id="phase55-onboarding-fullscreen-scroll-fix-style">
+  /* Keep the onboarding/checklist modal usable at every browser size, including fullscreen. */
+  #onboardOverlay.feature-overlay {
+    z-index: 9800 !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: clamp(10px, 2vh, 22px) 14px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+  }
+  #onboardOverlay .feature-modal {
+    width: min(760px, calc(100vw - 28px)) !important;
+    max-width: 760px !important;
+    max-height: calc(100vh - 24px) !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+  }
+  #onboardOverlay .feature-modal-header {
+    flex: 0 0 auto !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2 !important;
+    min-height: 58px !important;
+    padding: 12px 18px !important;
+    gap: 10px !important;
+  }
+  #onboardOverlay .feature-modal-title {
+    min-width: 0 !important;
+  }
+  #onboardOverlay .feature-modal-title h3,
+  #onboardOverlay .feature-modal-title p {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.22 !important;
+  }
+  #onboardOverlay .feature-modal-title h3 { font-size: 15px !important; }
+  #onboardOverlay .feature-modal-title p { font-size: 11px !important; }
+  #onboardOverlay .feature-modal-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 16px 18px 20px !important;
+    scrollbar-width: thin;
+  }
+  #onboardBody {
+    min-height: 40px !important;
+  }
+  #onboardOverlay .onboard-progress {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1 !important;
+    background: rgba(30,58,110,.96) !important;
+    border: 1px solid rgba(255,255,255,.08) !important;
+    border-radius: 12px !important;
+    padding: 10px 12px !important;
+    margin: 0 0 14px !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  #onboardOverlay .task-reset-btn {
+    margin-top: 12px !important;
+  }
+  @media (max-height: 620px) {
+    #onboardOverlay.feature-overlay { padding-top: 6px !important; padding-bottom: 6px !important; }
+    #onboardOverlay .feature-modal { max-height: calc(100vh - 12px) !important; }
+    #onboardOverlay .feature-modal-header { min-height: 50px !important; padding: 9px 14px !important; }
+    #onboardOverlay .feature-modal-title-icon { width: 28px !important; height: 28px !important; font-size: 14px !important; }
+    #onboardOverlay .feature-modal-body { padding: 12px 14px 16px !important; }
+  }
+</style>
+<script id="phase55-onboarding-fullscreen-scroll-fix-script">
+(function(){
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  ready(function(){
+    var overlay = document.getElementById('onboardOverlay');
+    if(!overlay) return;
+    var body = overlay.querySelector('.feature-modal-body');
+    var originalOpen = window.openOnboard;
+    window.openOnboard = function(){
+      try { if(typeof originalOpen === 'function') originalOpen.apply(this, arguments); else { overlay.classList.add('open'); document.body.style.overflow='hidden'; } } catch(e) { overlay.classList.add('open'); document.body.style.overflow='hidden'; console.warn('[Phase 55] openOnboard fallback', e); }
+      setTimeout(function(){
+        try { overlay.classList.add('open'); document.body.style.overflow='hidden'; if(body) body.scrollTop = 0; overlay.scrollTop = 0; } catch(e){}
+      }, 30);
+    };
+    var originalClose = window.closeOnboard;
+    window.closeOnboard = function(){
+      try { if(typeof originalClose === 'function') originalClose.apply(this, arguments); else { overlay.classList.remove('open'); document.body.style.overflow=''; } } catch(e) { overlay.classList.remove('open'); document.body.style.overflow=''; }
+    };
+  });
+})();
+</script>
 </body>
 </html>
