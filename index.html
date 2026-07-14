@@ -6267,7 +6267,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div class="csv-drop-zone" id="onboardCsvDropZone" onclick="document.getElementById('onboardCsvFileInput').click()" style="margin-bottom:16px;">
 <div class="csv-drop-icon">📂</div>
 <div class="csv-drop-text">Drop onboarding CSV or Excel here, or <span>click to browse</span></div>
-<div class="csv-drop-hint">Columns: <code>Phase</code>, <code>Label</code>, optional <code>Description</code>, <code>Link</code></div>
+<div class="csv-drop-hint">Columns: <code>Phase</code>, <code>Label</code>, optional <code>Description</code>, <code>Link</code>, <code>Notes</code></div>
 <input type="file" id="onboardCsvFileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleOnboardCsvFile(this.files[0])">
 </div>
 <div class="csv-status" id="onboardCsvStatus"></div>
@@ -6280,6 +6280,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Description</label><input id="onboardAdminDesc" type="text" placeholder="Short explanation…" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;"></div>
 <div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Link URL</label><input id="onboardAdminLink" type="text" placeholder="https://…" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;"></div>
 </div>
+<div><label style="font-size:10px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Notes</label><textarea id="onboardAdminNotes" rows="2" placeholder="Internal notes, exceptions, special instructions…" style="width:100%;margin-top:4px;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;resize:vertical;"></textarea></div>
 </div>
 <div style="display:flex;gap:8px;margin-bottom:16px;">
 <button onclick="submitOnboardEntry()" style="padding:7px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">➕ Add Step</button>
@@ -9624,6 +9625,112 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
+
+
+
+<!-- Phase 52: Onboarding Admin Polish - isolated onboarding admin tools only -->
+<style id="phase52-onboarding-admin-polish-style">
+  #phase52OnboardingAdmin{margin:12px 0 18px!important;}
+  .p52-shell{background:linear-gradient(135deg,rgba(15,33,67,.96),rgba(24,58,105,.92))!important;border:1px solid rgba(125,211,252,.28)!important;border-radius:18px!important;padding:16px!important;box-shadow:0 16px 40px rgba(0,0,0,.22)!important;color:#eaf6ff!important;}
+  .p52-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:14px!important;flex-wrap:wrap!important;margin-bottom:14px!important;}
+  .p52-head h3{margin:0!important;font-size:18px!important;color:#fff!important;}
+  .p52-head p{margin:4px 0 0!important;color:#b9d6f7!important;font-size:12.5px!important;line-height:1.45!important;max-width:840px!important;}
+  .p52-pill{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:6px 10px!important;border-radius:999px!important;background:rgba(0,214,202,.12)!important;border:1px solid rgba(0,214,202,.35)!important;color:#9ffbf6!important;font-weight:900!important;font-size:11px!important;text-transform:uppercase!important;letter-spacing:.04em!important;}
+  .p52-tabs{display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin:8px 0 14px!important;}
+  .p52-tab{border:1px solid rgba(255,255,255,.15)!important;background:rgba(255,255,255,.06)!important;color:#dbeafe!important;border-radius:12px!important;padding:8px 11px!important;font-weight:900!important;cursor:pointer!important;}
+  .p52-tab.active{background:linear-gradient(90deg,#00d6ca,#2f80ff)!important;color:#06182a!important;border-color:rgba(0,214,202,.5)!important;}
+  .p52-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;}
+  .p52-card{background:rgba(5,18,42,.58)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:14px!important;padding:13px!important;}
+  .p52-card h4{margin:0 0 10px!important;font-size:14px!important;color:#fff!important;}
+  .p52-field{margin-bottom:9px!important;}
+  .p52-field label{display:block!important;margin:0 0 4px!important;font-size:11px!important;font-weight:900!important;color:#a9c9ec!important;text-transform:uppercase!important;letter-spacing:.04em!important;}
+  .p52-field input,.p52-field select,.p52-field textarea{width:100%!important;box-sizing:border-box!important;border:1px solid rgba(125,211,252,.25)!important;background:rgba(255,255,255,.08)!important;color:#fff!important;border-radius:10px!important;padding:9px!important;font-size:13px!important;outline:none!important;}
+  .p52-field textarea{min-height:74px!important;resize:vertical!important;}
+  .p52-field option{color:#0f172a!important;background:#fff!important;}
+  .p52-checks{display:flex!important;gap:10px!important;flex-wrap:wrap!important;color:#dbeafe!important;font-size:12px!important;margin:8px 0 10px!important;}
+  .p52-btn{border:0!important;border-radius:12px!important;padding:9px 12px!important;background:linear-gradient(90deg,#00d6ca,#2f80ff)!important;color:#06182a!important;font-weight:950!important;cursor:pointer!important;box-shadow:0 8px 18px rgba(0,0,0,.18)!important;}
+  .p52-btn.alt{background:rgba(255,255,255,.10)!important;color:#eaf6ff!important;border:1px solid rgba(255,255,255,.18)!important;box-shadow:none!important;}
+  .p52-btn.danger{background:linear-gradient(90deg,#ff2d55,#ff7a18)!important;color:#fff!important;}
+  .p52-actions{display:flex!important;gap:8px!important;flex-wrap:wrap!important;align-items:center!important;}
+  .p52-list{display:grid!important;gap:8px!important;max-height:420px!important;overflow:auto!important;padding-right:3px!important;}
+  .p52-row{display:grid!important;grid-template-columns:1fr auto!important;gap:10px!important;align-items:center!important;background:rgba(255,255,255,.055)!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:12px!important;padding:10px!important;}
+  .p52-row-title{font-weight:950!important;color:#fff!important;font-size:13px!important;}
+  .p52-row-meta{font-size:11.5px!important;color:#b9d6f7!important;line-height:1.35!important;margin-top:3px!important;}
+  .p52-mini-btn{border:1px solid rgba(255,255,255,.16)!important;background:rgba(255,255,255,.08)!important;color:#eaf6ff!important;border-radius:10px!important;padding:6px 8px!important;font-weight:850!important;cursor:pointer!important;font-size:11.5px!important;}
+  .p52-mini-btn.danger{background:rgba(255,45,85,.16)!important;border-color:rgba(255,45,85,.35)!important;color:#ffdbe4!important;}
+  .p52-empty{padding:12px!important;border:1px dashed rgba(255,255,255,.20)!important;border-radius:12px!important;color:#b9d6f7!important;background:rgba(255,255,255,.04)!important;font-size:12.5px!important;}
+  .p52-progress-table{width:100%!important;border-collapse:separate!important;border-spacing:0 7px!important;}
+  .p52-progress-table th{font-size:11px!important;text-align:left!important;color:#a9c9ec!important;text-transform:uppercase!important;letter-spacing:.04em!important;padding:4px 8px!important;}
+  .p52-progress-table td{background:rgba(255,255,255,.055)!important;border-top:1px solid rgba(255,255,255,.10)!important;border-bottom:1px solid rgba(255,255,255,.10)!important;padding:9px 8px!important;color:#eaf6ff!important;font-size:12.5px!important;}
+  .p52-progress-table td:first-child{border-left:1px solid rgba(255,255,255,.10)!important;border-radius:12px 0 0 12px!important;}
+  .p52-progress-table td:last-child{border-right:1px solid rgba(255,255,255,.10)!important;border-radius:0 12px 12px 0!important;}
+  .p52-bar{height:8px!important;border-radius:999px!important;background:rgba(255,255,255,.13)!important;overflow:hidden!important;min-width:90px!important;}
+  .p52-bar-fill{height:100%!important;background:linear-gradient(90deg,#ff2d55,#00d6ca)!important;border-radius:999px!important;}
+  .p52-subpanel{display:none!important;}
+  .p52-subpanel.active{display:block!important;}
+  @media(max-width:1000px){.p52-grid{grid-template-columns:1fr!important}.p52-row{grid-template-columns:1fr!important}.p52-progress-table{display:block!important;overflow:auto!important;}}
+</style>
+<script id="phase52-onboarding-admin-polish-script">
+(function(){
+  if(window.__phase52OnboardingAdminPolishReady) return;
+  window.__phase52OnboardingAdminPolishReady = true;
+  var SUPA_URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.C6srw1X5m_FOUBvjGPAoGB4KCEb47L4mxxnLr3TqBUU';
+  var HUB='medi';
+  var state={stages:[],tasks:[],resources:[],statuses:[],users:[],tab:'tasks',editStage:null,editTask:null,editRes:null};
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function qs(id){return document.getElementById(id);}
+  function getVal(id){var e=qs(id); return e?e.value:'';}
+  function checked(id){var e=qs(id); return !!(e&&e.checked);}
+  function headers(extra){var h={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; if(extra){Object.keys(extra).forEach(function(k){h[k]=extra[k];});} return h;}
+  async function api(path,opt){var r=await fetch(SUPA_URL+'/rest/v1/'+path,Object.assign({headers:headers()},opt||{})); if(!r.ok){var txt=''; try{txt=await r.text();}catch(e){} throw new Error('Supabase '+r.status+' '+txt);} if(r.status===204) return null; var t=await r.text(); return t?JSON.parse(t):null;}
+  function toast(msg){if(window.showToast) window.showToast(msg); else alert(msg);}
+  function roleForUser(u){var p=u&&u.permissions||{}; var role=String((u&&u.role)||'').toLowerCase(); if(role.indexOf('ga')>=0||p.ga_resources) return 'ga'; if(role.indexOf('loa')>=0||role.indexOf('internal')>=0||p.loa_resources) return 'loa'; return role||'agent';}
+  function visibleForAudience(item,aud){aud=aud||'both'; if(aud==='both') return true; return String(item.audience||'both')==='both'||String(item.audience||'both')===aud;}
+  function sortByOrder(a,b){return (Number(a.sort_order)||0)-(Number(b.sort_order)||0)||(Number(a.id)||0)-(Number(b.id)||0);}
+  async function load(){
+    var reqs=[
+      api('onboarding_stages?hub=eq.'+HUB+'&select=*').catch(function(){return [];}),
+      api('onboarding_tasks?hub=eq.'+HUB+'&select=*').catch(function(){return [];}),
+      api('onboarding_resources?hub=eq.'+HUB+'&select=*').catch(function(){return [];}),
+      api('onboarding_agent_task_status?hub=eq.'+HUB+'&select=*').catch(function(){return [];}),
+      api('hub_users?hub=eq.'+HUB+'&select=name,email,role,status,permissions').catch(function(){return [];})
+    ];
+    var out=await Promise.all(reqs);
+    state.stages=(out[0]||[]).sort(sortByOrder); state.tasks=(out[1]||[]).sort(sortByOrder); state.resources=(out[2]||[]).sort(sortByOrder); state.statuses=out[3]||[]; state.users=(out[4]||[]).sort(function(a,b){return String(a.name||a.email||'').localeCompare(String(b.name||b.email||''));});
+  }
+  function adminPanel(){return document.querySelector('#adminTabOnboarding .admin-body') || document.getElementById('adminTabOnboarding');}
+  function ensure(){var panel=adminPanel(); if(!panel) return null; var old=qs('phase48OnboardingAdmin'); if(old) old.style.display='none'; var box=qs('phase52OnboardingAdmin'); if(box) return box; box=document.createElement('div'); box.id='phase52OnboardingAdmin'; panel.insertBefore(box,panel.firstChild); return box;}
+  function stageOpts(selected){return state.stages.map(function(s){return '<option value="'+Number(s.id)+'" '+(String(selected)===String(s.id)?'selected':'')+'>'+esc(s.title)+' ('+esc(s.audience||'both')+')</option>';}).join('');}
+  function audienceOpts(v){v=v||'both'; return ['both','loa','ga'].map(function(a){return '<option value="'+a+'" '+(v===a?'selected':'')+'>'+(a==='both'?'Both':a==='loa'?'LOA/Internal':'GA')+'</option>';}).join('');}
+  function typeOpts(v){v=v||'link'; return ['document','form','link','video','download','contact'].map(function(a){return '<option value="'+a+'" '+(v===a?'selected':'')+'>'+a.charAt(0).toUpperCase()+a.slice(1)+'</option>';}).join('');}
+  function activeTabs(){return '<div class="p52-tabs"><button class="p52-tab '+(state.tab==='tasks'?'active':'')+'" onclick="phase52SetTab(\'tasks\')">Checklist Tasks</button><button class="p52-tab '+(state.tab==='resources'?'active':'')+'" onclick="phase52SetTab(\'resources\')">Resources / Forms</button><button class="p52-tab '+(state.tab==='progress'?'active':'')+'" onclick="phase52SetTab(\'progress\')">Agent Progress</button><button class="p52-tab '+(state.tab==='review'?'active':'')+'" onclick="phase52SetTab(\'review\')">Pending Review</button></div>';}
+  function render(){var box=ensure(); if(!box) return; box.innerHTML='<div class="p52-shell"><div class="p52-head"><div><h3>🚀 Onboarding Admin Center</h3><p>Manage timeline stages, checklist tasks, documents, fillable forms, links, videos, and approvals. Agent percentages calculate automatically from completed required tasks.</p></div><span class="p52-pill">Phase 52</span></div>'+activeTabs()+panels()+'</div>';}
+  function panels(){return '<div id="p52PanelTasks" class="p52-subpanel '+(state.tab==='tasks'?'active':'')+'">'+tasksPanel()+'</div><div id="p52PanelResources" class="p52-subpanel '+(state.tab==='resources'?'active':'')+'">'+resourcesPanel()+'</div><div id="p52PanelProgress" class="p52-subpanel '+(state.tab==='progress'?'active':'')+'">'+progressPanel()+'</div><div id="p52PanelReview" class="p52-subpanel '+(state.tab==='review'?'active':'')+'">'+reviewPanel()+'</div>';}
+  function tasksPanel(){return '<div class="p52-grid"><div class="p52-card"><h4>'+(state.editStage?'Edit Timeline Stage':'Add Timeline Stage')+'</h4><div class="p52-field"><label>Title</label><input id="p52StageTitle" value="'+esc(state.editStage?state.editStage.title:'')+'" placeholder="Week 1"></div><div class="p52-field"><label>Description</label><textarea id="p52StageDesc" placeholder="What happens in this stage">'+esc(state.editStage?state.editStage.description:'')+'</textarea></div><div class="p52-field"><label>Audience</label><select id="p52StageAudience">'+audienceOpts(state.editStage?state.editStage.audience:'both')+'</select></div><div class="p52-field"><label>Sort Order</label><input id="p52StageSort" type="number" value="'+esc(state.editStage?state.editStage.sort_order:100)+'"></div><div class="p52-checks"><label><input id="p52StageActive" type="checkbox" '+(!state.editStage||state.editStage.active?'checked':'')+'> Active</label></div><div class="p52-actions"><button class="p52-btn" onclick="phase52SaveStage()">'+(state.editStage?'Update Stage':'Add Stage')+'</button>'+(state.editStage?'<button class="p52-btn alt" onclick="phase52CancelEdit()">Cancel</button>':'')+'</div></div><div class="p52-card"><h4>'+(state.editTask?'Edit Task':'Add Task')+'</h4><div class="p52-field"><label>Stage</label><select id="p52TaskStage">'+stageOpts(state.editTask?state.editTask.stage_id:null)+'</select></div><div class="p52-field"><label>Task Title</label><input id="p52TaskTitle" value="'+esc(state.editTask?state.editTask.title:'')+'" placeholder="Submit E&O"></div><div class="p52-field"><label>Description</label><textarea id="p52TaskDesc" placeholder="Short instruction">'+esc(state.editTask?state.editTask.description:'')+'</textarea></div><div class="p52-field"><label>Audience</label><select id="p52TaskAudience">'+audienceOpts(state.editTask?state.editTask.audience:'both')+'</select></div><div class="p52-field"><label>Resource URL</label><input id="p52TaskUrl" value="'+esc(state.editTask?state.editTask.resource_url:'')+'" placeholder="https://..."></div><div class="p52-field"><label>Resource Button Label</label><input id="p52TaskResourceLabel" value="'+esc(state.editTask?state.editTask.resource_label:'')+'" placeholder="Open form"></div><div class="p52-field"><label>Notes</label><textarea id="p52TaskNotes" placeholder="Notes carried from CSV, exceptions, or extra instructions">'+esc(state.editTask?state.editTask.notes:'')+'</textarea></div><div class="p52-field"><label>Sort Order</label><input id="p52TaskSort" type="number" value="'+esc(state.editTask?state.editTask.sort_order:100)+'"></div><div class="p52-checks"><label><input id="p52TaskRequired" type="checkbox" '+(!state.editTask||state.editTask.required?'checked':'')+'> Counts toward progress</label><label><input id="p52TaskReview" type="checkbox" '+(state.editTask&&state.editTask.requires_review?'checked':'')+'> Requires admin review</label><label><input id="p52TaskActive" type="checkbox" '+(!state.editTask||state.editTask.active?'checked':'')+'> Active</label></div><div class="p52-actions"><button class="p52-btn" onclick="phase52SaveTask()">'+(state.editTask?'Update Task':'Add Task')+'</button>'+(state.editTask?'<button class="p52-btn alt" onclick="phase52CancelEdit()">Cancel</button>':'')+'</div></div><div class="p52-card"><h4>Existing Stages & Tasks</h4><div class="p52-list">'+stageTaskList()+'</div></div></div>';}
+  function stageTaskList(){var rows=[]; state.stages.forEach(function(s){rows.push('<div class="p52-row"><div><div class="p52-row-title">Stage: '+esc(s.title)+'</div><div class="p52-row-meta">'+esc(s.audience||'both')+' • order '+esc(s.sort_order)+' • '+(s.active?'active':'inactive')+'</div></div><div class="p52-actions"><button class="p52-mini-btn" onclick="phase52EditStage('+Number(s.id)+')">Edit</button><button class="p52-mini-btn danger" onclick="phase52Delete(\'onboarding_stages\','+Number(s.id)+')">Delete</button></div></div>'); state.tasks.filter(function(t){return Number(t.stage_id)===Number(s.id);}).forEach(function(t){rows.push('<div class="p52-row" style="margin-left:14px;"><div><div class="p52-row-title">Task: '+esc(t.title)+'</div><div class="p52-row-meta">'+esc(t.audience||'both')+' • '+(t.required?'counts toward progress':'optional')+' • '+(t.requires_review?'admin review':'agent complete')+' • '+(t.active?'active':'inactive')+(t.updated_at?' • Updated '+esc(new Date(t.updated_at).toLocaleDateString()):'')+(t.notes?'<br>Notes: '+esc(t.notes):'')+'</div></div><div class="p52-actions"><button class="p52-mini-btn" onclick="phase52EditTask('+Number(t.id)+')">Edit</button><button class="p52-mini-btn danger" onclick="phase52Delete(\'onboarding_tasks\','+Number(t.id)+')">Delete</button></div></div>');});}); return rows.join('')||'<div class="p52-empty">No stages or tasks yet.</div>';}
+  function resourcesPanel(){return '<div class="p52-grid"><div class="p52-card"><h4>'+(state.editRes?'Edit Resource':'Add Resource / Link / Form')+'</h4><div class="p52-field"><label>Stage</label><select id="p52ResStage"><option value="">No stage</option>'+stageOpts(state.editRes?state.editRes.stage_id:null)+'</select></div><div class="p52-field"><label>Title</label><input id="p52ResTitle" value="'+esc(state.editRes?state.editRes.title:'')+'" placeholder="Contracting Packet"></div><div class="p52-field"><label>Type</label><select id="p52ResType">'+typeOpts(state.editRes?state.editRes.resource_type:'link')+'</select></div><div class="p52-field"><label>URL / File Link</label><input id="p52ResUrl" value="'+esc(state.editRes?state.editRes.url:'')+'" placeholder="https://..."></div><div class="p52-field"><label>Audience</label><select id="p52ResAudience">'+audienceOpts(state.editRes?state.editRes.audience:'both')+'</select></div><div class="p52-field"><label>Description</label><textarea id="p52ResDesc" placeholder="What this is used for">'+esc(state.editRes?state.editRes.description:'')+'</textarea></div><div class="p52-field"><label>Notes</label><textarea id="p52ResNotes" placeholder="Notes carried from CSV or internal instructions">'+esc(state.editRes?state.editRes.notes:'')+'</textarea></div><div class="p52-field"><label>Sort Order</label><input id="p52ResSort" type="number" value="'+esc(state.editRes?state.editRes.sort_order:100)+'"></div><div class="p52-checks"><label><input id="p52ResActive" type="checkbox" '+(!state.editRes||state.editRes.active?'checked':'')+'> Active</label></div><div class="p52-actions"><button class="p52-btn" onclick="phase52SaveResource()">'+(state.editRes?'Update Resource':'Add Resource')+'</button>'+(state.editRes?'<button class="p52-btn alt" onclick="phase52CancelEdit()">Cancel</button>':'')+'</div></div><div class="p52-card" style="grid-column:span 2;"><h4>Existing Resources</h4><div class="p52-list">'+resourceList()+'</div></div></div>';}
+  function resourceList(){return state.resources.map(function(r){var st=state.stages.find(function(s){return Number(s.id)===Number(r.stage_id);}); return '<div class="p52-row"><div><div class="p52-row-title">'+esc(r.title)+'</div><div class="p52-row-meta">'+esc(r.resource_type||'link')+' • '+esc(r.audience||'both')+' • '+esc(st?st.title:'No stage')+' • '+(r.active?'active':'inactive')+'<br>'+esc(r.url||'')+(r.updated_at?' • Updated '+esc(new Date(r.updated_at).toLocaleDateString()):'')+(r.notes?'<br>Notes: '+esc(r.notes):'')+'</div></div><div class="p52-actions"><button class="p52-mini-btn" onclick="phase52EditResource('+Number(r.id)+')">Edit</button><button class="p52-mini-btn danger" onclick="phase52Delete(\'onboarding_resources\','+Number(r.id)+')">Delete</button></div></div>';}).join('')||'<div class="p52-empty">No resources yet.</div>';}
+  function userMetrics(u){var role=roleForUser(u); var tasks=state.tasks.filter(function(t){return t.active!==false && visibleForAudience(t,role) && t.required!==false;}); var total=tasks.length; var complete=tasks.filter(function(t){return state.statuses.some(function(s){return Number(s.task_id)===Number(t.id)&&String(s.email||'').toLowerCase()===String(u.email||'').toLowerCase()&&s.status==='complete';});}).length; var pending=tasks.filter(function(t){return state.statuses.some(function(s){return Number(s.task_id)===Number(t.id)&&String(s.email||'').toLowerCase()===String(u.email||'').toLowerCase()&&s.status==='pending_review';});}).length; return {total:total,complete:complete,pending:pending,pct:total?Math.round((complete/total)*100):0,role:role};}
+  function progressPanel(){var rows=state.users.filter(function(u){return String(u.status||'active').toLowerCase()!=='inactive';}).map(function(u){var m=userMetrics(u); return '<tr><td><strong>'+esc(u.name||u.email)+'</strong><br><span style="color:#a9c9ec;font-size:11px;">'+esc(u.email||'')+'</span></td><td>'+esc(m.role)+'</td><td><div class="p52-bar"><div class="p52-bar-fill" style="width:'+m.pct+'%"></div></div><strong>'+m.pct+'%</strong></td><td>'+m.complete+' / '+m.total+'</td><td>'+m.pending+'</td></tr>';}).join(''); return '<div class="p52-card"><h4>Agent Progress Review</h4><p style="margin:0 0 10px;color:#b9d6f7;font-size:12px;">Read-only progress view. Percentages are calculated from completed required tasks for each agent role.</p><table class="p52-progress-table"><thead><tr><th>Agent</th><th>Role</th><th>Progress</th><th>Complete</th><th>Pending</th></tr></thead><tbody>'+rows+'</tbody></table></div>';}
+  function reviewPanel(){var pending=state.statuses.filter(function(s){return s.status==='pending_review';}); var rows=pending.map(function(s){var task=state.tasks.find(function(t){return Number(t.id)===Number(s.task_id);}); var user=state.users.find(function(u){return String(u.email||'').toLowerCase()===String(s.email||'').toLowerCase();}); return '<div class="p52-row"><div><div class="p52-row-title">'+esc(task?task.title:'Task #'+s.task_id)+'</div><div class="p52-row-meta">Agent: '+esc((user&&user.name)||s.email)+' • '+esc(s.email)+'<br>Submitted: '+esc(s.submitted_at||s.updated_at||'')+'</div></div><div class="p52-actions"><button class="p52-mini-btn" onclick="phase52ApproveTask('+Number(s.task_id)+',\''+esc(String(s.email||'')).replace(/&#39;/g,"\\'")+'\')">Approve</button><button class="p52-mini-btn danger" onclick="phase52RejectTask('+Number(s.task_id)+',\''+esc(String(s.email||'')).replace(/&#39;/g,"\\'")+'\')">Reset</button></div></div>';}).join(''); return '<div class="p52-card"><h4>Pending Review Approvals</h4><p style="margin:0 0 10px;color:#b9d6f7;font-size:12px;">Approve submitted tasks that require admin verification. Approved tasks count toward progress.</p><div class="p52-list">'+(rows||'<div class="p52-empty">No pending review tasks.</div>')+'</div></div>';}
+  window.phase52SetTab=function(t){state.tab=t; render();};
+  window.phase52CancelEdit=function(){state.editStage=state.editTask=state.editRes=null; render();};
+  window.phase52EditStage=function(id){state.editStage=state.stages.find(function(s){return Number(s.id)===Number(id);})||null; state.editTask=null; state.tab='tasks'; render();};
+  window.phase52EditTask=function(id){state.editTask=state.tasks.find(function(t){return Number(t.id)===Number(id);})||null; state.editStage=null; state.tab='tasks'; render();};
+  window.phase52EditResource=function(id){state.editRes=state.resources.find(function(r){return Number(r.id)===Number(id);})||null; state.tab='resources'; render();};
+  async function reload(){await load(); render(); try{if(window.phase48Refresh) window.phase48Refresh();}catch(e){}}
+  window.phase52Refresh=reload;
+  window.phase52SaveStage=async function(){var title=getVal('p52StageTitle').trim(); if(!title) return toast('Stage title required.'); var payload={title:title,description:getVal('p52StageDesc'),audience:getVal('p52StageAudience')||'both',sort_order:Number(getVal('p52StageSort')||100),active:checked('p52StageActive'),updated_at:new Date().toISOString()}; try{if(state.editStage){await api('onboarding_stages?id=eq.'+Number(state.editStage.id),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});} else {payload.hub=HUB; payload.stage_key=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36).slice(-4); await api('onboarding_stages',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});} state.editStage=null; await reload(); toast('Stage saved.');}catch(e){console.warn(e); toast('Stage save failed.');}};
+  window.phase52SaveTask=async function(){var title=getVal('p52TaskTitle').trim(); var stage=getVal('p52TaskStage'); if(!title||!stage) return toast('Task title and stage required.'); var payload={stage_id:Number(stage),title:title,description:getVal('p52TaskDesc'),audience:getVal('p52TaskAudience')||'both',required:checked('p52TaskRequired'),requires_review:checked('p52TaskReview'),resource_url:getVal('p52TaskUrl'),resource_label:getVal('p52TaskResourceLabel'),notes:getVal('p52TaskNotes'),sort_order:Number(getVal('p52TaskSort')||100),active:checked('p52TaskActive'),updated_at:new Date().toISOString()}; try{if(state.editTask){await api('onboarding_tasks?id=eq.'+Number(state.editTask.id),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});} else {payload.hub=HUB; await api('onboarding_tasks',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});} state.editTask=null; await reload(); toast('Task saved.');}catch(e){console.warn(e); toast('Task save failed.');}};
+  window.phase52SaveResource=async function(){var title=getVal('p52ResTitle').trim(); if(!title) return toast('Resource title required.'); var st=getVal('p52ResStage'); var payload={stage_id:st?Number(st):null,title:title,resource_type:getVal('p52ResType')||'link',url:getVal('p52ResUrl'),audience:getVal('p52ResAudience')||'both',description:getVal('p52ResDesc'),notes:getVal('p52ResNotes'),sort_order:Number(getVal('p52ResSort')||100),active:checked('p52ResActive'),updated_at:new Date().toISOString()}; try{if(state.editRes){await api('onboarding_resources?id=eq.'+Number(state.editRes.id),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});} else {payload.hub=HUB; await api('onboarding_resources',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});} state.editRes=null; await reload(); toast('Resource saved.');}catch(e){console.warn(e); toast('Resource save failed.');}};
+  window.phase52Delete=async function(table,id){if(!confirm('Delete this onboarding item?')) return; try{await api(table+'?id=eq.'+Number(id),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})}); await reload(); toast('Deleted.');}catch(e){console.warn(e); toast('Delete failed.');}};
+  window.phase52ApproveTask=async function(taskId,email){var now=new Date().toISOString(); try{await api('onboarding_agent_task_status?hub=eq.'+HUB+'&task_id=eq.'+Number(taskId)+'&email=eq.'+encodeURIComponent(email),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({status:'complete',completed_at:now,approved_at:now,approved_by:(window.currentUserEmail||localStorage.getItem('medi_hub_current_email')||''),updated_at:now})}); await reload(); toast('Task approved.');}catch(e){console.warn(e); toast('Approve failed.');}};
+  window.phase52RejectTask=async function(taskId,email){try{await api('onboarding_agent_task_status?hub=eq.'+HUB+'&task_id=eq.'+Number(taskId)+'&email=eq.'+encodeURIComponent(email),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})}); await reload(); toast('Task reset.');}catch(e){console.warn(e); toast('Reset failed.');}};
+  async function init(){var tries=0; var timer=setInterval(async function(){tries++; if(ensure()){clearInterval(timer); try{await reload();}catch(e){console.warn('[Phase 52 onboarding admin] load failed',e); var box=ensure(); if(box) box.innerHTML='<div class="p52-shell"><div class="p52-empty">Onboarding admin could not load: '+esc(e.message||e)+'</div></div>';}} if(tries>20) clearInterval(timer);},600);}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+</script>
 
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
@@ -17092,6 +17199,7 @@ ${steps.map(s=>{const done=_onboardDone.includes(s.id);return `<div class="onboa
 <div class="onboard-step-content">
 <div class="onboard-step-label">${pesc(s.label)}</div>
 ${s.desc?`<div class="onboard-step-desc">${pesc(s.desc)}</div>`:''}
+${s.notes?`<div class="onboard-step-desc"><strong>Notes:</strong> ${pesc(s.notes)}</div>`:''}
 ${s.link?`<a class="onboard-step-link" href="${pesc(s.link)}" target="_blank" rel="noopener">Open resource ↗</a>`:''}
 </div>
 </div>`;}).join('')}
@@ -17118,18 +17226,18 @@ document.getElementById('onboardOverlay').addEventListener('click',e=>{if(e.targ
 window.submitOnboardEntry=function(){
 const g=id=>(document.getElementById(id)?.value?.trim()||'');
 const label=g('onboardAdminLabel');if(!label){toast('⚠ Label required.');return;}
-const entry={id:_onboardEditId||Date.now(),phase:g('onboardAdminPhase')||'General',label,desc:g('onboardAdminDesc'),link:g('onboardAdminLink')};
+const entry={id:_onboardEditId||Date.now(),phase:g('onboardAdminPhase')||'General',label,desc:g('onboardAdminDesc'),link:g('onboardAdminLink'),notes:g('onboardAdminNotes'),updatedAt:new Date().toISOString()};
 if(_onboardEditId){const i=_onboard.findIndex(x=>x.id===_onboardEditId);if(i>=0)_onboard[i]=entry;else _onboard.push(entry);}else _onboard.push(entry);
 cancelOnboardEdit();refreshOnboardAdminList();toast('⏳ Saving…');supaUpsert('onboarding_steps',_onboard).then(()=>toast('✓ Saved!')).catch(()=>toast('⚠ Save failed.'));
 };
-window.editOnboardEntry=function(id){const s=_onboard.find(x=>x.id===id);if(!s)return;_onboardEditId=id;const sv=(eid,v)=>{const e=document.getElementById(eid);if(e)e.value=v||'';};sv('onboardAdminPhase',s.phase);sv('onboardAdminLabel',s.label);sv('onboardAdminDesc',s.desc);sv('onboardAdminLink',s.link);const cb=document.getElementById('onboardCancelBtn');if(cb)cb.style.display='';document.getElementById('onboardAdminLabel')?.focus();};
+window.editOnboardEntry=function(id){const s=_onboard.find(x=>x.id===id);if(!s)return;_onboardEditId=id;const sv=(eid,v)=>{const e=document.getElementById(eid);if(e)e.value=v||'';};sv('onboardAdminPhase',s.phase);sv('onboardAdminLabel',s.label);sv('onboardAdminDesc',s.desc);sv('onboardAdminLink',s.link);sv('onboardAdminNotes',s.notes);const cb=document.getElementById('onboardCancelBtn');if(cb)cb.style.display='';document.getElementById('onboardAdminLabel')?.focus();};
 window.deleteOnboardEntry=function(id){_onboard=_onboard.filter(x=>x.id!==id);refreshOnboardAdminList();toast('⏳ Removing…');supaUpsert('onboarding_steps',_onboard).then(()=>{ initOnboard(); toast('🗑 Removed.'); });};
-window.cancelOnboardEdit=function(){_onboardEditId=null;['onboardAdminPhase','onboardAdminLabel','onboardAdminDesc','onboardAdminLink'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});const cb=document.getElementById('onboardCancelBtn');if(cb)cb.style.display='none';};
+window.cancelOnboardEdit=function(){_onboardEditId=null;['onboardAdminPhase','onboardAdminLabel','onboardAdminDesc','onboardAdminLink','onboardAdminNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});const cb=document.getElementById('onboardCancelBtn');if(cb)cb.style.display='none';};
 function refreshOnboardAdminList(){
 const el=document.getElementById('onboardAdminList'),ct=document.getElementById('onboardAdminCount');if(!el)return;
 if(ct)ct.textContent=`(${_onboard.length})`;
 if(!_onboard.length){el.innerHTML='<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:8px 0;">No steps yet.</div>';return;}
-el.innerHTML=_onboard.map(s=>`<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;"><div style="flex:1;min-width:0;"><div class="admin-update-title">${pesc(s.label)}</div><div class="admin-update-meta"><span class="admin-update-type">${pesc(s.phase)}</span></div></div><div style="display:flex;gap:6px;flex-shrink:0;"><button onclick="editOnboardEntry(${s.id})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️</button><button onclick="deleteOnboardEntry(${s.id})" class="admin-update-del">🗑</button></div></div>`).join('');
+el.innerHTML=_onboard.map(s=>`<div class="admin-update-item" style="display:flex;align-items:center;gap:8px;"><div style="flex:1;min-width:0;"><div class="admin-update-title">${pesc(s.label)}</div><div class="admin-update-meta"><span class="admin-update-type">${pesc(s.phase)}</span>${s.updatedAt?` • Updated ${pesc(new Date(s.updatedAt).toLocaleDateString())}`:''}${s.notes?`<br>Notes: ${pesc(s.notes)}`:''}</div></div><div style="display:flex;gap:6px;flex-shrink:0;"><button onclick="editOnboardEntry(${s.id})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✏️</button><button onclick="deleteOnboardEntry(${s.id})" class="admin-update-del">🗑</button></div></div>`).join('');
 }
 window.handleOnboardCsvFile=function(file){
 if(!file) return;
@@ -17150,7 +17258,9 @@ id: Date.now() + idx + Math.floor(Math.random()*1000),
 phase: String(r.phase||r.group||r.section||'General').trim() || 'General',
 label,
 desc: String(r.description||r.desc||'').trim(),
-link: String(r.link||r.url||'').trim()
+link: String(r.link||r.url||'').trim(),
+notes: String(r.notes||r.note||r.admin_notes||r.comments||'').trim(),
+updatedAt: new Date().toISOString()
 });
 });
 if(!items.length){ setErr('✗ Could not find a Label or Step column with values.'); return; }
@@ -21233,6 +21343,9 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   .p48-progress-row{display:grid;grid-template-columns:minmax(240px,360px) 1fr;gap:14px;align-items:stretch;margin-bottom:16px}.p48-progress-card{background:rgba(255,255,255,.055);border:1px solid rgba(148,163,184,.18);border-radius:18px;padding:16px}.p48-progress-num{font-size:42px;line-height:1;font-weight:950;color:#fff;letter-spacing:-.05em}.p48-progress-label{font-size:12px;color:#94a3b8;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}.p48-progress-track{height:12px;border-radius:999px;background:rgba(15,23,42,.75);border:1px solid rgba(148,163,184,.18);overflow:hidden;margin-top:13px}.p48-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#f97316,#fb7185,#22d3ee);width:0%;transition:width .35s ease}.p48-current-stage{margin-top:12px;font-size:13px;color:#dbeafe;line-height:1.4}.p48-current-stage strong{color:#fff}.p48-stage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.p48-stage-card{border:1px solid rgba(148,163,184,.18);background:rgba(15,23,42,.45);border-radius:16px;padding:12px;min-height:96px;position:relative;overflow:hidden}.p48-stage-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#64748b}.p48-stage-card.complete:before{background:#22c55e}.p48-stage-card.current:before{background:#f97316}.p48-stage-card.upcoming:before{background:#64748b}.p48-stage-status{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px}.p48-stage-card.complete .p48-stage-status{color:#86efac}.p48-stage-card.current .p48-stage-status{color:#fed7aa}.p48-stage-title{font-size:13px;font-weight:900;color:#fff;margin-bottom:5px}.p48-stage-copy{font-size:11px;color:#cbd5e1;line-height:1.35}.p48-stage-mini{font-size:11px;color:#93c5fd;margin-top:8px;font-weight:800}
   .p48-dashboard-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.p48-panel{background:rgba(255,255,255,.045);border:1px solid rgba(148,163,184,.16);border-radius:18px;padding:14px}.p48-panel h3{margin:0 0 10px;color:#fff;font-size:15px}.p48-task-list,.p48-resource-list{display:grid;gap:9px}.p48-task{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:flex-start;border:1px solid rgba(148,163,184,.15);background:rgba(15,23,42,.38);border-radius:14px;padding:11px}.p48-task-check{width:28px;height:28px;border-radius:9px;border:1px solid rgba(148,163,184,.28);background:rgba(255,255,255,.06);display:grid;place-items:center;color:#fff;font-weight:900;cursor:pointer}.p48-task-check.complete{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.55);color:#bbf7d0}.p48-task-check.pending{background:rgba(249,115,22,.16);border-color:rgba(249,115,22,.50);color:#fed7aa}.p48-task-title{font-size:13px;font-weight:900;color:#fff;line-height:1.25}.p48-task-desc{font-size:11px;color:#cbd5e1;line-height:1.4;margin-top:3px}.p48-task-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.p48-badge{font-size:10px;font-weight:900;padding:4px 7px;border-radius:999px;border:1px solid rgba(148,163,184,.22);background:rgba(255,255,255,.06);color:#cbd5e1;text-transform:uppercase;letter-spacing:.05em}.p48-badge.required{border-color:rgba(251,113,133,.42);color:#fecdd3}.p48-badge.review{border-color:rgba(249,115,22,.44);color:#fed7aa}.p48-task-action{border:0;border-radius:10px;background:#2563eb;color:#fff;font-size:11px;font-weight:900;padding:8px 10px;cursor:pointer;white-space:nowrap}.p48-task-action.secondary{background:rgba(255,255,255,.10);border:1px solid rgba(148,163,184,.22);color:#e2e8f0}.p48-resource{border:1px solid rgba(148,163,184,.15);background:rgba(15,23,42,.38);border-radius:14px;padding:11px}.p48-resource-title{font-size:13px;font-weight:900;color:#fff}.p48-resource-desc{font-size:11px;color:#cbd5e1;line-height:1.4;margin-top:4px}.p48-resource a{display:inline-flex;margin-top:8px;color:#93c5fd;font-weight:900;font-size:12px;text-decoration:none}.p48-empty{font-size:12px;color:#94a3b8;border:1px dashed rgba(148,163,184,.26);border-radius:14px;padding:14px;text-align:center}
   .p48-admin-box{margin:0 0 16px;padding:14px;border:1px solid rgba(125,211,252,.22);background:rgba(14,165,233,.06);border-radius:14px}.p48-admin-box h3{margin:0 0 8px;color:#fff;font-size:15px}.p48-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.p48-admin-field label{display:block;font-size:10px;color:#cbd5e1;font-weight:900;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}.p48-admin-field input,.p48-admin-field select,.p48-admin-field textarea{width:100%;box-sizing:border-box;background:rgba(15,23,42,.65);border:1px solid rgba(148,163,184,.26);border-radius:10px;padding:9px 10px;color:#fff;font-family:inherit;font-size:12px;outline:none}.p48-admin-field textarea{min-height:64px;resize:vertical}.p48-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.p48-admin-btn{border:0;border-radius:10px;background:#2563eb;color:#fff;font-size:12px;font-weight:900;padding:9px 12px;cursor:pointer}.p48-admin-btn.alt{background:rgba(255,255,255,.10);border:1px solid rgba(148,163,184,.22);color:#e2e8f0}.p48-admin-mini-list{display:grid;gap:7px;margin-top:10px;max-height:280px;overflow:auto}.p48-admin-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(148,163,184,.14);background:rgba(15,23,42,.35);border-radius:10px;padding:8px 10px;color:#dbeafe;font-size:12px}.p48-admin-row button{border:0;border-radius:8px;background:rgba(239,68,68,.16);color:#fecaca;font-size:11px;font-weight:900;padding:6px 8px;cursor:pointer}.p48-pending-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;border:1px solid rgba(249,115,22,.25);background:rgba(249,115,22,.08);border-radius:12px;padding:10px;font-size:12px;color:#dbeafe}.p48-pending-row button{border:0;border-radius:8px;font-weight:900;padding:7px 9px;cursor:pointer}.p48-pending-row .approve{background:#16a34a;color:#fff}.p48-pending-row .reject{background:rgba(255,255,255,.12);color:#e2e8f0}
+  .p48-last-updated{display:inline-flex;align-items:center;gap:7px;margin-top:8px;color:#fef3c7;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.28);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900;letter-spacing:.02em}
+  .p48-note-box{margin-top:8px;border-left:3px solid #f59e0b;background:rgba(245,158,11,.09);border-radius:10px;padding:8px 10px;color:#fde68a;font-size:12px;line-height:1.35}
+  .p48-note-box strong{color:#fff7ed}
   @media(max-width:900px){.p48-progress-row,.p48-dashboard-grid{grid-template-columns:1fr}.p48-task{grid-template-columns:auto 1fr}.p48-task-action{grid-column:1 / -1}.p48-pending-row{grid-template-columns:1fr}.p48-pending-row button{width:100%}}
 </style>
 <script id="phase48-onboarding-dashboard-script">
@@ -21263,15 +21376,17 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function stageResources(stageId){ return state.resources.filter(function(r){ return Number(r.stage_id)===Number(stageId) && visibleForAudience(r); }).sort(function(a,b){return (a.sort_order||0)-(b.sort_order||0);}); }
   function calc(){ var tasks=state.tasks.filter(function(t){ return visibleForAudience(t) && t.required!==false; }); var total=tasks.length; var complete=tasks.filter(function(t){ var st=statusForTask(t.id); return st && String(st.status).toLowerCase()==='complete'; }).length; return {total:total, complete:complete, pct: total ? Math.round((complete/total)*100) : 0}; }
   function currentStage(){ var stages=state.stages.filter(visibleForAudience); for(var i=0;i<stages.length;i++){ var req=stageTasks(stages[i].id).filter(function(t){return t.required!==false;}); var done=req.filter(function(t){ var st=statusForTask(t.id); return st && String(st.status).toLowerCase()==='complete';}).length; if(req.length && done<req.length) return stages[i]; } return stages[stages.length-1] || null; }
+  function fmtDate(v){ if(!v) return ''; var d=new Date(v); if(isNaN(d.getTime())) return ''; return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
+  function onboardingLastUpdated(){ var vals=[]; ['stages','tasks','resources','statuses'].forEach(function(k){ (state[k]||[]).forEach(function(x){ var v=x.updated_at||x.updatedAt||x.savedAt||x.created_at; if(v){ var d=new Date(v); if(!isNaN(d.getTime())) vals.push(d); } }); }); if(!vals.length) return 'Last updated date not stored'; vals.sort(function(a,b){return b-a;}); return 'Last updated ' + fmtDate(vals[0]); }
   function ensureMount(){ var section=document.getElementById('ga-resources'); if(!section) return null; var wrap=section.querySelector('.wrap')||section; var existing=document.getElementById('phase48OnboardingDashboard'); if(existing) return existing; var mount=document.createElement('div'); mount.id='phase48OnboardingDashboard'; var resourceShell=wrap.querySelector('.ga-resource-shell'); if(resourceShell) wrap.insertBefore(mount, resourceShell); else wrap.appendChild(mount); return mount; }
   function showSetupMessage(e){ var m=ensureMount(); if(!m) return; m.innerHTML='<div class="p48-onboard-shell"><div class="p48-onboard-head"><div><h3 class="p48-onboard-title">Agent Onboarding Dashboard</h3><p class="p48-onboard-sub">The onboarding database tables are not ready yet. Run the Phase 48 Supabase SQL file, then refresh this page.</p></div><span class="p48-pill">Setup Required</span></div><div class="p48-empty">'+esc(e && e.message ? e.message : 'Onboarding tables unavailable')+'</div></div>'; }
-  function renderDashboard(){ var m=ensureMount(); if(!m) return; var stages=state.stages.filter(visibleForAudience); var metrics=calc(); var cur=currentStage(); var stageCards=stages.map(function(s){ var req=stageTasks(s.id).filter(function(t){return t.required!==false;}); var done=req.filter(function(t){ var st=statusForTask(t.id); return st && String(st.status).toLowerCase()==='complete';}).length; var cls=req.length && done===req.length?'complete':(cur && Number(cur.id)===Number(s.id)?'current':'upcoming'); var label=cls==='complete'?'Complete':(cls==='current'?'Current Stage':'Upcoming'); return '<div class="p48-stage-card '+cls+'"><div class="p48-stage-status">'+label+'</div><div class="p48-stage-title">'+esc(s.title)+'</div><div class="p48-stage-copy">'+esc(s.description||'')+'</div><div class="p48-stage-mini">'+done+' / '+req.length+' required</div></div>'; }).join('') || '<div class="p48-empty">No onboarding stages are set up for this role yet.</div>';
+  function renderDashboard(){ var m=ensureMount(); if(!m) return; var stages=state.stages.filter(visibleForAudience); var metrics=calc(); var cur=currentStage(); var lastUpdated=onboardingLastUpdated(); var stageCards=stages.map(function(s){ var req=stageTasks(s.id).filter(function(t){return t.required!==false;}); var done=req.filter(function(t){ var st=statusForTask(t.id); return st && String(st.status).toLowerCase()==='complete';}).length; var cls=req.length && done===req.length?'complete':(cur && Number(cur.id)===Number(s.id)?'current':'upcoming'); var label=cls==='complete'?'Complete':(cls==='current'?'Current Stage':'Upcoming'); return '<div class="p48-stage-card '+cls+'"><div class="p48-stage-status">'+label+'</div><div class="p48-stage-title">'+esc(s.title)+'</div><div class="p48-stage-copy">'+esc(s.description||'')+'</div><div class="p48-stage-mini">'+done+' / '+req.length+' required</div></div>'; }).join('') || '<div class="p48-empty">No onboarding stages are set up for this role yet.</div>';
     var allTasks=state.tasks.filter(visibleForAudience).sort(function(a,b){ var sa=(state.stages.find(function(s){return Number(s.id)===Number(a.stage_id);})||{}).sort_order||0; var sb=(state.stages.find(function(s){return Number(s.id)===Number(b.stage_id);})||{}).sort_order||0; return sa-sb || (a.sort_order||0)-(b.sort_order||0); });
     var taskHtml=allTasks.map(renderTask).join('') || '<div class="p48-empty">No checklist tasks are assigned yet.</div>';
     var resHtml=state.resources.filter(visibleForAudience).sort(function(a,b){return (a.sort_order||0)-(b.sort_order||0);}).map(renderResource).join('') || '<div class="p48-empty">No documents, links, or forms are assigned yet.</div>';
-    m.innerHTML='<div class="p48-onboard-shell"><div class="p48-onboard-head"><div><h3 class="p48-onboard-title">Agent Onboarding Dashboard</h3><p class="p48-onboard-sub">Your progress updates automatically from the completed checklist items below. Required tasks count toward the percentage; pending review items count after approval.</p></div><span class="p48-pill">Automatic Progress</span></div><div class="p48-progress-row"><div class="p48-progress-card"><div class="p48-progress-num">'+metrics.pct+'%</div><div class="p48-progress-label">Onboarding Progress</div><div class="p48-progress-track"><div class="p48-progress-fill" style="width:'+metrics.pct+'%"></div></div><div class="p48-current-stage"><strong>Current stage:</strong> '+esc(cur ? cur.title : 'Not started')+'<br><strong>Completed:</strong> '+metrics.complete+' of '+metrics.total+' required task(s)</div></div><div class="p48-stage-grid">'+stageCards+'</div></div><div class="p48-dashboard-grid"><div class="p48-panel"><h3>Checklist</h3><div class="p48-task-list">'+taskHtml+'</div></div><div class="p48-panel"><h3>Documents, Links & Forms</h3><div class="p48-resource-list">'+resHtml+'</div></div></div></div>'; }
-  function renderTask(t){ var st=statusForTask(t.id); var status=st ? String(st.status||'not_started') : 'not_started'; var complete=status==='complete'; var pending=status==='pending_review'; var btn=complete?'Undo':(pending?'Pending Review':(t.requires_review?'Submit for Review':'Mark Complete')); var check=complete?'✓':(pending?'…':''); var actionClass=complete?'secondary':(pending?'secondary':''); var stage=state.stages.find(function(s){return Number(s.id)===Number(t.stage_id);})||{}; var resource=t.resource_url?'<a href="'+esc(t.resource_url)+'" target="_blank" rel="noopener" style="color:#93c5fd;font-weight:900;text-decoration:none;">'+esc(t.resource_label||'Open resource')+'</a>':''; return '<div class="p48-task"><button class="p48-task-check '+(complete?'complete':pending?'pending':'')+'" onclick="phase48ToggleTask('+Number(t.id)+')">'+check+'</button><div><div class="p48-task-title">'+esc(t.title)+'</div><div class="p48-task-desc">'+esc(t.description||'')+'</div>'+resource+'<div class="p48-task-meta"><span class="p48-badge">'+esc(stage.title||'Stage')+'</span>'+(t.required!==false?'<span class="p48-badge required">Required</span>':'<span class="p48-badge">Optional</span>')+(t.requires_review?'<span class="p48-badge review">Admin Review</span>':'')+'</div></div><button class="p48-task-action '+actionClass+'" '+(pending?'disabled':'')+' onclick="phase48ToggleTask('+Number(t.id)+')">'+btn+'</button></div>'; }
-  function renderResource(r){ var stage=state.stages.find(function(s){return Number(s.id)===Number(r.stage_id);})||{}; var link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Open '+esc(r.resource_type||'link')+' →</a>':'<span style="display:inline-flex;margin-top:8px;color:#94a3b8;font-size:12px;font-weight:800;">No link attached yet</span>'; return '<div class="p48-resource"><div class="p48-resource-title">'+esc(r.title)+'</div><div class="p48-resource-desc">'+esc(r.description||'')+'</div><div class="p48-task-meta"><span class="p48-badge">'+esc(r.resource_type||'link')+'</span><span class="p48-badge">'+esc(stage.title||'General')+'</span></div>'+link+'</div>'; }
+    m.innerHTML='<div class="p48-onboard-shell"><div class="p48-onboard-head"><div><h3 class="p48-onboard-title">Agent Onboarding Dashboard</h3><p class="p48-onboard-sub">Your progress updates automatically from the completed checklist items below. Required tasks count toward the percentage; pending review items count after approval.</p><div class="p48-last-updated">🕒 '+esc(lastUpdated)+'</div></div><span class="p48-pill">Automatic Progress</span></div><div class="p48-progress-row"><div class="p48-progress-card"><div class="p48-progress-num">'+metrics.pct+'%</div><div class="p48-progress-label">Onboarding Progress</div><div class="p48-progress-track"><div class="p48-progress-fill" style="width:'+metrics.pct+'%"></div></div><div class="p48-current-stage"><strong>Current stage:</strong> '+esc(cur ? cur.title : 'Not started')+'<br><strong>Completed:</strong> '+metrics.complete+' of '+metrics.total+' required task(s)</div></div><div class="p48-stage-grid">'+stageCards+'</div></div><div class="p48-dashboard-grid"><div class="p48-panel"><h3>Checklist</h3><div class="p48-task-list">'+taskHtml+'</div></div><div class="p48-panel"><h3>Documents, Links & Forms</h3><div class="p48-resource-list">'+resHtml+'</div></div></div></div>'; }
+  function renderTask(t){ var st=statusForTask(t.id); var status=st ? String(st.status||'not_started') : 'not_started'; var complete=status==='complete'; var pending=status==='pending_review'; var btn=complete?'Undo':(pending?'Pending Review':(t.requires_review?'Submit for Review':'Mark Complete')); var check=complete?'✓':(pending?'…':''); var actionClass=complete?'secondary':(pending?'secondary':''); var stage=state.stages.find(function(s){return Number(s.id)===Number(t.stage_id);})||{}; var resource=t.resource_url?'<a href="'+esc(t.resource_url)+'" target="_blank" rel="noopener" style="color:#93c5fd;font-weight:900;text-decoration:none;">'+esc(t.resource_label||'Open resource')+'</a>':''; return '<div class="p48-task"><button class="p48-task-check '+(complete?'complete':pending?'pending':'')+'" onclick="phase48ToggleTask('+Number(t.id)+')">'+check+'</button><div><div class="p48-task-title">'+esc(t.title)+'</div><div class="p48-task-desc">'+esc(t.description||'')+'</div>'+((t.notes)?'<div class="p48-note-box"><strong>Notes:</strong> '+esc(t.notes)+'</div>':'')+resource+'<div class="p48-task-meta"><span class="p48-badge">'+esc(stage.title||'Stage')+'</span>'+(t.required!==false?'<span class="p48-badge required">Required</span>':'<span class="p48-badge">Optional</span>')+(t.requires_review?'<span class="p48-badge review">Admin Review</span>':'')+'</div></div><button class="p48-task-action '+actionClass+'" '+(pending?'disabled':'')+' onclick="phase48ToggleTask('+Number(t.id)+')">'+btn+'</button></div>'; }
+  function renderResource(r){ var stage=state.stages.find(function(s){return Number(s.id)===Number(r.stage_id);})||{}; var link=r.url?'<a href="'+esc(r.url)+'" target="_blank" rel="noopener">Open '+esc(r.resource_type||'link')+' →</a>':'<span style="display:inline-flex;margin-top:8px;color:#94a3b8;font-size:12px;font-weight:800;">No link attached yet</span>'; return '<div class="p48-resource"><div class="p48-resource-title">'+esc(r.title)+'</div><div class="p48-resource-desc">'+esc(r.description||'')+'</div>'+((r.notes)?'<div class="p48-note-box"><strong>Notes:</strong> '+esc(r.notes)+'</div>':'')+'<div class="p48-task-meta"><span class="p48-badge">'+esc(r.resource_type||'link')+'</span><span class="p48-badge">'+esc(stage.title||'General')+'</span></div>'+link+'</div>'; }
   window.phase48ToggleTask=function(taskId){ var email=userEmail(); if(!email){ toast('Please log in first.'); return; } var task=state.tasks.find(function(t){return Number(t.id)===Number(taskId);}); if(!task) return; var st=statusForTask(taskId); if(st && String(st.status)==='complete'){ return api('onboarding_agent_task_status?hub=eq.'+HUB+'&task_id=eq.'+taskId+'&email=eq.'+encodeURIComponent(email), {method:'DELETE',headers:h({'Prefer':'return=minimal'})}).then(loadAll).then(function(){toast('Task reset.');}).catch(function(){toast('Could not reset task.');}); }
     var newStatus=task.requires_review?'pending_review':'complete'; var now=new Date().toISOString(); var payload={hub:HUB,task_id:taskId,email:email,status:newStatus,updated_at:now}; if(newStatus==='complete') payload.completed_at=now; else payload.submitted_at=now; api('onboarding_agent_task_status?on_conflict=hub,task_id,email', {method:'POST',headers:h({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(payload)}).then(loadAll).then(function(){toast(task.requires_review?'Submitted for admin review.':'Task completed.');}).catch(function(e){console.warn(e);toast('Task save failed.');}); };
   function adminStageOptions(){ return state.stages.map(function(s){ return '<option value="'+Number(s.id)+'">'+esc(s.title)+' ('+esc(s.audience)+')</option>'; }).join(''); }
@@ -21291,5 +21406,213 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 <!-- END PHASE 48 -->
+
+
+<!-- Phase 53: Cert carrier release dates compact top-bar module -->
+<style id="phase53-cert-release-dates-style">
+  #certTrackerContent .cert-topbar{
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:8px 12px!important;
+    min-height:72px!important;
+    padding-bottom:10px!important;
+  }
+  #certTrackerContent .phase53-cert-release-strip{
+    flex:1 1 100%!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    overflow-x:auto!important;
+    padding:6px 2px 0!important;
+    scrollbar-width:thin!important;
+  }
+  #certTrackerContent .phase53-release-label{
+    flex:0 0 auto!important;
+    font-size:11px!important;
+    font-weight:950!important;
+    letter-spacing:.05em!important;
+    text-transform:uppercase!important;
+    color:#eaf6ff!important;
+    opacity:.92!important;
+    margin-right:2px!important;
+  }
+  #certTrackerContent .phase53-release-chip{
+    flex:0 0 auto!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    gap:5px!important;
+    border-radius:999px!important;
+    padding:5px 8px!important;
+    border:1px solid rgba(0,214,202,.32)!important;
+    background:rgba(0,214,202,.10)!important;
+    color:#eaffff!important;
+    font-size:11px!important;
+    font-weight:850!important;
+    white-space:nowrap!important;
+    line-height:1!important;
+  }
+  #certTrackerContent .phase53-release-chip.empty{
+    border-color:rgba(255,255,255,.16)!important;
+    background:rgba(255,255,255,.06)!important;
+    color:#cbd5e1!important;
+  }
+  #certTrackerContent .phase53-release-chip strong{color:#7dfcf0!important;font-weight:950!important;}
+  #certTrackerContent .phase53-release-date{color:#fff!important;font-weight:950!important;}
+  #certTrackerContent .phase53-release-admin{
+    flex:1 1 100%!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    flex-wrap:wrap!important;
+    padding:7px 8px!important;
+    border-radius:12px!important;
+    border:1px solid rgba(255,255,255,.14)!important;
+    background:rgba(6,18,38,.38)!important;
+    max-width:780px!important;
+  }
+  #certTrackerContent .phase53-release-admin span{
+    color:#aeefff!important;
+    font-size:11px!important;
+    font-weight:900!important;
+    text-transform:uppercase!important;
+    letter-spacing:.04em!important;
+  }
+  #certTrackerContent .phase53-release-admin select,
+  #certTrackerContent .phase53-release-admin input{
+    height:28px!important;
+    border-radius:9px!important;
+    border:1px solid rgba(255,255,255,.18)!important;
+    background:#091a32!important;
+    color:#ffffff!important;
+    font-size:12px!important;
+    font-weight:800!important;
+    padding:0 8px!important;
+    outline:none!important;
+    color-scheme:dark!important;
+  }
+  #certTrackerContent .phase53-release-admin select{max-width:190px!important;}
+  #certTrackerContent .phase53-release-admin button{
+    height:28px!important;
+    border:0!important;
+    border-radius:999px!important;
+    padding:0 11px!important;
+    background:linear-gradient(90deg,#00d6ca,#2f80ff)!important;
+    color:#06182a!important;
+    font-size:11px!important;
+    font-weight:950!important;
+    cursor:pointer!important;
+  }
+  #certTrackerContent .phase53-release-admin button.clear{
+    background:rgba(255,255,255,.08)!important;
+    border:1px solid rgba(255,255,255,.18)!important;
+    color:#dbeafe!important;
+  }
+</style>
+<script id="phase53-cert-release-dates-script">
+(function(){
+  if(window.__phase53CertReleaseDatesReady) return;
+  window.__phase53CertReleaseDatesReady = true;
+  var URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var KEY='';
+  try { if (typeof CERT_SUPA_KEY !== 'undefined' && CERT_SUPA_KEY) KEY = CERT_SUPA_KEY; } catch(e) {}
+  if(!KEY){ KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'; }
+  var HUB='medi';
+  var TILE_KEY='cert_release_dates';
+  var fallbackCarriers=['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
+  var state={dates:{},loaded:false};
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function h(extra){var o={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; if(extra){Object.keys(extra).forEach(function(k){o[k]=extra[k];});} return o;}
+  function parseData(x){ if(!x) return {}; if(typeof x==='string'){ try{return JSON.parse(x);}catch(e){return {};}} return x; }
+  function toast(msg){ if(window.showSnuToast) window.showSnuToast(msg); else if(window.showToast) window.showToast(msg); else console.log('[Phase53]',msg); }
+  function currentUser(){ return window.HUB_CURRENT_USER || window.currentHubUser || window.__hubUserProfile || null; }
+  function isAdmin(){ var u=currentUser()||{}; var p=u.permissions||{}; var role=String(u.role||'').toLowerCase(); return role==='admin' || p.admin===true || p.admin==='true' || p.cert_tracker===true && p.admin===true; }
+  function getCarriers(){
+    var table=document.querySelector('#certTrackerContent .cert-lock-table');
+    var headers=table?Array.from(table.querySelectorAll('thead th')).slice(3).map(function(th){return th.textContent.trim();}).filter(Boolean):[];
+    if(headers.length) return headers;
+    try { if (typeof CERT_CARRIERS !== 'undefined' && CERT_CARRIERS && CERT_CARRIERS.length) return CERT_CARRIERS.slice(); } catch(e) {}
+    return fallbackCarriers.slice();
+  }
+  function displayDate(val){
+    if(!val) return '';
+    var d=new Date(String(val)+'T00:00:00');
+    if(isNaN(d.getTime())) return String(val);
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  }
+  async function readDates(){
+    try{
+      var r=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY)+'&select=data&limit=1',{headers:h()});
+      if(!r.ok) throw new Error('read '+r.status);
+      var rows=await r.json();
+      var data=parseData(rows&&rows[0]?rows[0].data:null);
+      state.dates=parseData(data.dates)||{};
+    }catch(e){ console.warn('[Phase53 cert release dates] read failed',e); state.dates={}; }
+    state.loaded=true;
+    render();
+  }
+  async function saveDates(){
+    var payload={dates:state.dates,updatedAt:new Date().toISOString()};
+    var delUrl=URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY);
+    var body={hub:HUB,key:TILE_KEY,data:JSON.stringify(payload)};
+    var r=await fetch(delUrl,{method:'DELETE',headers:h({'Prefer':'return=minimal'})});
+    if(!r.ok && r.status!==404) throw new Error('delete '+r.status);
+    r=await fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:h({'Prefer':'return=minimal'}),body:JSON.stringify(body)});
+    if(!r.ok){ var txt=''; try{txt=await r.text();}catch(e){} throw new Error('save '+r.status+' '+txt.slice(0,180)); }
+  }
+  function chipHtml(carriers){
+    var posted=carriers.filter(function(c){return state.dates && state.dates[c];});
+    if(!posted.length) return '<span class="phase53-release-chip empty">No carrier release dates posted yet</span>';
+    return posted.map(function(c){return '<span class="phase53-release-chip"><strong>'+esc(c)+'</strong><span class="phase53-release-date">'+esc(displayDate(state.dates[c]))+'</span></span>';}).join('');
+  }
+  function adminHtml(carriers){
+    if(!isAdmin()) return '';
+    return '<div class="phase53-release-admin"><span>Admin release date</span><select id="phase53CarrierSelect">'+carriers.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select><input id="phase53CarrierDate" type="date"><button type="button" onclick="phase53SaveCarrierReleaseDate()">Save</button><button type="button" class="clear" onclick="phase53ClearCarrierReleaseDate()">Clear</button></div>';
+  }
+  function render(){
+    var top=document.querySelector('#certTrackerContent .cert-topbar');
+    if(!top) return;
+    top.querySelectorAll('.phase53-cert-release-strip,.phase53-release-admin').forEach(function(n){n.remove();});
+    var carriers=getCarriers();
+    var strip=document.createElement('div');
+    strip.className='phase53-cert-release-strip';
+    strip.innerHTML='<span class="phase53-release-label">Release dates</span>'+chipHtml(carriers);
+    top.appendChild(strip);
+    if(isAdmin()){
+      var admin=document.createElement('div');
+      admin.innerHTML=adminHtml(carriers);
+      top.appendChild(admin.firstChild);
+    }
+  }
+  window.phase53SaveCarrierReleaseDate=async function(){
+    var carrier=(document.getElementById('phase53CarrierSelect')||{}).value||'';
+    var date=(document.getElementById('phase53CarrierDate')||{}).value||'';
+    if(!carrier) return toast('Choose a carrier.');
+    if(!date) return toast('Choose a release date.');
+    state.dates[carrier]=date;
+    render();
+    try{ await saveDates(); toast('Release date saved.'); }
+    catch(e){ console.warn('[Phase53 cert release dates] save failed',e); toast('Release date save failed: '+(e.message||e)); }
+  };
+  window.phase53ClearCarrierReleaseDate=async function(){
+    var carrier=(document.getElementById('phase53CarrierSelect')||{}).value||'';
+    if(!carrier) return;
+    delete state.dates[carrier];
+    render();
+    try{ await saveDates(); toast('Release date cleared.'); }
+    catch(e){ console.warn('[Phase53 cert release dates] clear failed',e); toast('Clear failed: '+(e.message||e)); }
+  };
+  function schedule(){ setTimeout(function(){ if(!state.loaded) readDates(); else render(); },200); setTimeout(render,1200); setTimeout(render,3200); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',schedule); else schedule();
+  var oldRender=window.renderCertTracker;
+  if(typeof oldRender==='function'){
+    window.renderCertTracker=function(){ var out=oldRender.apply(this,arguments); setTimeout(function(){ if(state.loaded) render(); else readDates();},80); return out; };
+  }
+  var oldEmergency=window.emergencyReloadCoreHubData;
+  if(typeof oldEmergency==='function'){
+    window.emergencyReloadCoreHubData=function(){ var out=oldEmergency.apply(this,arguments); setTimeout(function(){ if(state.loaded) render(); else readDates();},450); return out; };
+  }
+})();
+</script>
+
 </body>
 </html>
