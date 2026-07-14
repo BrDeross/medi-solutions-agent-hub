@@ -4765,6 +4765,47 @@ cursor: pointer; white-space: nowrap;
 #certTrackerContent .cert-mark.no{background:rgba(255,255,255,.06)!important;color:#d4dfec!important;border:1px solid rgba(255,255,255,.10)!important;}
 @media(max-width:760px){#certTrackerContent .cert-topbar{border-radius:16px 16px 0 0!important;}#certTrackerContent .cert-lock-meta{padding:12px!important;flex-basis:100%!important;}#certTrackerContent .cert-scroll-controls{width:100%!important;justify-content:flex-start!important;border-left:0!important;border-top:1px solid rgba(255,255,255,.12)!important;}#certTrackerContent .cert-scroll-label{display:none!important;}#certTrackerContent .cert-lock-table{min-width:1450px!important;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px!important;max-width:190px!important;}}
 </style>
+
+<!-- Phase 40: Login restore + clean Friday Meetings admin view -->
+<style id="phase40-login-restore-clean-meetings-style">
+  /* Hide emergency loader/recovery boxes that cluttered the Friday Meetings admin tab.
+     The underlying edit/update functions remain active. */
+  #phase36FridayAdminTools,
+  #phase37FridayAdminTools,
+  #phase38FridayAdminTools {
+    display: none !important;
+  }
+  #adminTabFriday .phase40-edit-note {
+    margin: 0 0 12px 0;
+    color: rgba(219,234,254,.82);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+</style>
+<script id="phase40-clean-meeting-admin-note">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function clean(){
+    var panel = byId('adminTabFriday');
+    if(!panel) return;
+    ['phase36FridayAdminTools','phase37FridayAdminTools','phase38FridayAdminTools'].forEach(function(id){
+      var el = byId(id);
+      if(el) el.style.display = 'none';
+    });
+    if(!byId('phase40MeetingEditNote')){
+      var p = document.createElement('div');
+      p.id = 'phase40MeetingEditNote';
+      p.className = 'phase40-edit-note';
+      p.textContent = 'Use Edit on an existing meeting, make changes above, then click Update Meeting. New meetings use Add Meeting.';
+      var title = panel.querySelector('.admin-section-title');
+      if(title && title.parentNode) title.parentNode.insertBefore(p, title.nextSibling);
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', clean); else clean();
+  setInterval(clean, 1200);
+})();
+</script>
+
 </head>
 <body class="hub-login-pending">
 <div id="hubLoginGate" style="position:fixed;inset:0;z-index:12000;background:rgba(8,15,32,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -10373,280 +10414,6 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     var tab = e.target && e.target.closest ? e.target.closest('.admin-tab') : null;
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-})();
-</script>
-
-
-
-<!-- Phase 39: Clean Friday Meetings Admin Update Mode -->
-<style id="phase39-friday-clean-admin-style">
-  /* Remove emergency/recovery helper panels from the Meetings admin screen. */
-  #phase36FridayAdminTools,
-  #phase37FridayAdminTools,
-  #phase38FridayAdminTools {
-    display: none !important;
-  }
-  #phase39FridayCancelEdit {
-    margin-left: 10px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: 1px solid rgba(248,113,113,.35);
-    background: rgba(248,113,113,.10);
-    color: #fecaca;
-    font-size: 13px;
-    font-weight: 900;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  #phase39FridayEditHint {
-    display: none;
-    margin: 10px 0 0 0;
-    padding: 9px 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(0,214,202,.28);
-    background: rgba(0,214,202,.08);
-    color: #bffefa;
-    font-size: 12px;
-    font-weight: 800;
-  }
-</style>
-<script id="phase39-friday-admin-clean-update-mode">
-(function(){
-  'use strict';
-  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-  var HUB = 'medi';
-  var meetings = [];
-  var editIndex = null;
-  var fridayType = 'in-person';
-
-  function byId(id){ return document.getElementById(id); }
-  function qsa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-  function esc(v){ return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
-  function toast(msg){ if(typeof window.showSnuToast === 'function') window.showSnuToast(msg); else console.log(msg); }
-  function headers(json){ var h = { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, 'Cache-Control': 'no-cache' }; if(json){ h['Content-Type'] = 'application/json'; h.Prefer = 'return=minimal'; } return h; }
-  function parseMaybe(v){ var out = v; for(var i=0;i<3;i++){ if(typeof out === 'string'){ try{ out = JSON.parse(out); } catch(e){ return out; } } } return out; }
-  function looksLikeMeeting(o){ return o && typeof o === 'object' && !Array.isArray(o) && (o.topic || o.date || o.dateISO || o.time || o.notes || o.link || o.link2 || o.type); }
-  function normalize(m){ m = m || {}; return { id: m.id || ('mtg_' + Date.now() + '_' + Math.floor(Math.random()*100000)), date: m.date || '', dateISO: m.dateISO || '', time: m.time || '', topic: m.topic || 'Team Meeting', notes: m.notes || '', link: m.link || '', link2: m.link2 || '', type: /virtual/i.test(m.type || '') ? 'virtual' : 'in-person' }; }
-  function isoFromAny(m){
-    if(m && /^\d{4}-\d{2}-\d{2}$/.test(m.dateISO || '')) return m.dateISO;
-    var date = (m && m.date) || '';
-    var d = Date.parse(date);
-    if(!d) return '';
-    var dt = new Date(d);
-    return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
-  }
-  function sortMeetings(list){
-    return (Array.isArray(list) ? list : []).map(normalize).sort(function(a,b){
-      var ai = isoFromAny(a), bi = isoFromAny(b);
-      var at = ai ? Date.parse(ai + 'T12:00:00') : (Date.parse(a.date || '') || 9999999999999);
-      var bt = bi ? Date.parse(bi + 'T12:00:00') : (Date.parse(b.date || '') || 9999999999999);
-      if(at !== bt) return at - bt;
-      return String(a.time || '').localeCompare(String(b.time || ''));
-    });
-  }
-  function extract(rows){
-    var raw = [];
-    (rows || []).forEach(function(row){
-      var d = parseMaybe(row && row.data);
-      if(Array.isArray(d)) raw = raw.concat(d);
-      else if(d && typeof d === 'object'){
-        ['meetings','items','data','rows','list','records'].forEach(function(k){ if(Array.isArray(d[k])) raw = raw.concat(d[k]); });
-        if(looksLikeMeeting(d)) raw.push(d);
-      }
-    });
-    var seen = {}, out = [];
-    raw.forEach(function(item){
-      if(!looksLikeMeeting(item)) return;
-      var m = normalize(item);
-      if(!m.dateISO) m.dateISO = isoFromAny(m);
-      var key = [m.dateISO,m.date,m.time,m.topic,m.notes,m.link,m.link2,m.type].join('|');
-      if(seen[key]) return;
-      seen[key] = 1;
-      out.push(m);
-    });
-    return sortMeetings(out);
-  }
-  async function readMeetings(){
-    var r = await fetch(SUPA_URL + '/rest/v1/friday_meetings?hub=eq.' + encodeURIComponent(HUB) + '&select=data', { cache:'no-store', headers: headers(false) });
-    if(!r.ok) throw new Error('Friday meetings read failed: ' + r.status);
-    return extract(await r.json());
-  }
-  async function writeMeetings(list){
-    meetings = sortMeetings(list);
-    window._fridayMeetings = meetings.slice();
-    try{ localStorage.setItem('friday_meetings_v1', JSON.stringify(meetings)); }catch(e){}
-    var del = await fetch(SUPA_URL + '/rest/v1/friday_meetings?hub=eq.' + encodeURIComponent(HUB), { method:'DELETE', headers: headers(false) });
-    if(!del.ok) throw new Error('Delete old Friday rows failed: ' + del.status);
-    if(meetings.length){
-      var rows = meetings.map(function(m){ return { hub:HUB, data: JSON.stringify(m) }; });
-      var ins = await fetch(SUPA_URL + '/rest/v1/friday_meetings', { method:'POST', headers:headers(true), body: JSON.stringify(rows) });
-      if(!ins.ok) throw new Error('Insert Friday rows failed: ' + ins.status);
-    }
-    renderPublic();
-    renderAdminList();
-  }
-  function displayDate(iso){
-    if(!iso) return '';
-    var d = new Date(iso + 'T12:00:00');
-    if(isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
-  }
-  function val(id){ var e = byId(id); return e && e.value ? e.value.trim() : ''; }
-  function hideOldBoxes(){
-    ['phase36FridayAdminTools','phase37FridayAdminTools','phase38FridayAdminTools'].forEach(function(id){ var el = byId(id); if(el) el.style.display = 'none'; });
-  }
-  function ensureButtons(){
-    hideOldBoxes();
-    var panel = byId('adminTabFriday'); if(!panel) return;
-    var save = byId('phase39FridaySaveBtn') || byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn') || qsa('button', panel).filter(function(b){ return /Add Meeting|Update Meeting|Save Meeting/i.test(b.textContent || '') && !/Reload|Cancel/i.test(b.textContent || ''); })[0];
-    if(save){
-      save.id = 'phase39FridaySaveBtn';
-      save.type = 'button';
-      save.onclick = function(e){ if(e) e.preventDefault(); window.phase39SaveFridayMeeting(); return false; };
-      save.textContent = editIndex === null ? '➕ Add Meeting' : '💾 Update Meeting';
-    }
-    var cancel = byId('phase39FridayCancelEdit');
-    if(save && !cancel){
-      cancel = document.createElement('button');
-      cancel.id = 'phase39FridayCancelEdit';
-      cancel.type = 'button';
-      cancel.textContent = 'Cancel Edit';
-      cancel.onclick = function(e){ if(e) e.preventDefault(); clearForm(); return false; };
-      save.insertAdjacentElement('afterend', cancel);
-    }
-    if(cancel) cancel.style.display = editIndex === null ? 'none' : 'inline-flex';
-    var hint = byId('phase39FridayEditHint');
-    if(save && !hint){
-      hint = document.createElement('div');
-      hint.id = 'phase39FridayEditHint';
-      save.parentNode.insertBefore(hint, save.nextSibling ? save.nextSibling.nextSibling : null);
-    }
-    if(hint){
-      hint.textContent = 'Editing selected meeting. Make your changes, then click Update Meeting.';
-      hint.style.display = editIndex === null ? 'none' : 'block';
-    }
-    var ip = byId('fridayTypeInPerson'), vt = byId('fridayTypeVirtual');
-    if(ip){ ip.type='button'; ip.onclick = function(e){ if(e) e.preventDefault(); window.setFridayType('in-person'); return false; }; }
-    if(vt){ vt.type='button'; vt.onclick = function(e){ if(e) e.preventDefault(); window.setFridayType('virtual'); return false; }; }
-  }
-  window.setFridayType = function(type){
-    fridayType = /virtual/i.test(type || '') ? 'virtual' : 'in-person';
-    var ip = byId('fridayTypeInPerson'), vt = byId('fridayTypeVirtual');
-    function style(btn,on){ if(!btn) return; btn.style.background = on ? 'var(--accent)' : 'transparent'; btn.style.color = on ? '#fff' : 'var(--muted)'; btn.style.borderColor = on ? 'var(--accent)' : 'var(--border)'; }
-    style(ip, fridayType === 'in-person');
-    style(vt, fridayType === 'virtual');
-  };
-  function clearForm(){
-    editIndex = null;
-    ['fridayDatePicker','fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e){ e.value=''; e.placeholder=''; e.title=''; if(e.dataset) e.dataset.originalDate=''; } });
-    window.setFridayType('in-person');
-    ensureButtons();
-    renderAdminList();
-  }
-  window.phase39EditFridayMeeting = function(i){
-    var m = meetings[i]; if(!m) return false;
-    editIndex = i;
-    var dp = byId('fridayDatePicker');
-    if(dp){ dp.value = isoFromAny(m); dp.dataset.originalDate = m.date || ''; dp.placeholder = m.date || ''; dp.title = m.date ? 'Current: ' + m.date : ''; }
-    var time = byId('fridayTime'); if(time) time.value = m.time || '';
-    var topic = byId('fridayTopic'); if(topic) topic.value = m.topic || '';
-    var notes = byId('fridayNotes'); if(notes) notes.value = m.notes || '';
-    var link = byId('fridayLink'); if(link) link.value = m.link || '';
-    var link2 = byId('fridayLink2'); if(link2) link2.value = m.link2 || '';
-    window.setFridayType(m.type || 'in-person');
-    ensureButtons();
-    renderAdminList();
-    if(topic){ topic.scrollIntoView({behavior:'smooth', block:'center'}); topic.focus(); }
-    toast('✏️ Edit mode on. Click Update Meeting when finished.');
-    return false;
-  };
-  window.phase39DeleteFridayMeeting = async function(i){
-    if(!meetings[i]) return false;
-    if(!confirm('Remove this Friday meeting?')) return false;
-    meetings.splice(i,1);
-    editIndex = null;
-    try{ await writeMeetings(meetings); clearForm(); toast('🗑 Meeting removed.'); }catch(e){ console.error('[Phase 39] delete failed', e); toast('⚠ Delete failed.'); }
-    return false;
-  };
-  window.phase39SaveFridayMeeting = async function(){
-    var topic = val('fridayTopic');
-    if(!topic){ toast('⚠ Please enter a meeting topic.'); return false; }
-    var dp = byId('fridayDatePicker');
-    var iso = dp && dp.value ? dp.value : '';
-    var original = dp && dp.dataset ? (dp.dataset.originalDate || '') : '';
-    var existing = editIndex !== null && meetings[editIndex] ? meetings[editIndex] : null;
-    var m = normalize({
-      id: existing ? existing.id : ('mtg_' + Date.now()),
-      date: iso ? displayDate(iso) : (original || (existing && existing.date) || ''),
-      dateISO: iso || (existing && existing.dateISO) || '',
-      time: val('fridayTime'),
-      topic: topic,
-      notes: val('fridayNotes'),
-      link: val('fridayLink'),
-      link2: val('fridayLink2'),
-      type: fridayType
-    });
-    var updating = existing !== null;
-    if(updating) meetings[editIndex] = m; else meetings.push(m);
-    try{
-      await writeMeetings(meetings);
-      clearForm();
-      toast(updating ? '✓ Meeting updated and sorted by date.' : '✓ Meeting added and sorted by date.');
-    }catch(e){ console.error('[Phase 39] save failed', e); toast('⚠ Meeting save failed.'); }
-    return false;
-  };
-  function renderAdminList(){
-    hideOldBoxes();
-    var el = byId('fridayAdminList');
-    var count = byId('fridayAdminCount');
-    if(count) count.textContent = '(' + meetings.length + ')';
-    if(!el) return;
-    if(!meetings.length){ el.innerHTML = '<div style="color:var(--muted-2);font-style:italic;font-size:12px;padding:12px 0;">No meetings yet.</div>'; return; }
-    el.innerHTML = meetings.map(function(m,i){
-      var active = editIndex === i;
-      var isV = /virtual/i.test(m.type || '');
-      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;margin-bottom:6px;background:'+(active?'rgba(0,214,202,.10)':'rgba(255,255,255,.04)')+';border:1px solid '+(active?'rgba(0,214,202,.55)':'var(--border)')+';border-radius:10px;">'
-      + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;color:var(--text);">'+(isV?'💻':'🏢')+' '+esc(m.topic || 'Meeting')+(active?' <span style="color:#7ffdf3;font-size:10px;font-weight:900;">EDITING</span>':'')+'</div>'
-      + '<div style="font-size:11px;color:var(--muted-2);margin-top:3px;">'+(m.date ? '📅 '+esc(m.date) : '<span style="color:var(--muted-2);font-style:italic;">No date set</span>')+(m.time ? ' &nbsp;·&nbsp; ⏰ '+esc(m.time) : '')+(m.notes ? '<br><span style="color:var(--muted);">'+esc(m.notes)+'</span>' : '')+(m.link ? '<br><a href="'+esc(m.link)+'" target="_blank" style="color:var(--accent-2);font-size:10px;">📹 Join Link</a>' : '')+(m.link2 ? '&nbsp;<a href="'+esc(m.link2)+'" target="_blank" style="color:var(--accent-2);font-size:10px;">🔗 Resource Link</a>' : '')+'</div></div>'
-      + '<div style="display:flex;gap:6px;flex-shrink:0;"><button type="button" onclick="phase39EditFridayMeeting('+i+');return false;" style="padding:5px 12px;border-radius:6px;border:1px solid rgba(99,179,237,.3);background:rgba(99,179,237,.1);color:var(--accent-2);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;">✏️ Edit</button><button type="button" class="admin-remove-btn" onclick="phase39DeleteFridayMeeting('+i+');return false;" title="Remove">✕</button></div></div>';
-    }).join('');
-  }
-  function renderPublic(){
-    try{ if(typeof window.renderFridayMeetings === 'function'){ window._fridayMeetings = meetings.slice(); window.renderFridayMeetings(); return; } }catch(e){ console.warn('[Phase 39] original renderFridayMeetings failed', e); }
-  }
-  async function load(showToast){
-    try{
-      hideOldBoxes();
-      meetings = await readMeetings();
-      window._fridayMeetings = meetings.slice();
-      editIndex = null;
-      ensureButtons();
-      renderPublic();
-      renderAdminList();
-      if(showToast) toast('✓ Loaded ' + meetings.length + ' Friday meetings.');
-      console.log('[Phase 39] Friday meetings loaded:', meetings.length);
-    }catch(e){
-      console.error('[Phase 39] Friday meetings load failed', e);
-      if(showToast) toast('⚠ Friday meetings load failed: ' + (e.message || e));
-    }
-  }
-  window.addFridayMeeting = window.phase39SaveFridayMeeting;
-  window.editFridayMeeting = window.phase39EditFridayMeeting;
-  window.deleteFridayMeeting = window.phase39DeleteFridayMeeting;
-  window.renderFridayAdminList = renderAdminList;
-  window.phase39LoadFridayAdmin = load;
-  function boot(){
-    hideOldBoxes();
-    ensureButtons();
-    window.setFridayType('in-person');
-    load(false);
-    setTimeout(function(){ hideOldBoxes(); ensureButtons(); renderAdminList(); }, 1200);
-    setTimeout(function(){ hideOldBoxes(); ensureButtons(); renderAdminList(); }, 3000);
-  }
-  var obs = new MutationObserver(function(){ hideOldBoxes(); ensureButtons(); });
-  try{ obs.observe(document.documentElement, { childList:true, subtree:true }); }catch(e){}
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
