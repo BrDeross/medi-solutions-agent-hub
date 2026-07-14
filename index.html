@@ -9954,6 +9954,232 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 })();
 </script>
 
+
+
+<!-- Phase 57: Cert Release Dates Admin Mount - isolated Certs admin + visible cert page only -->
+<style id="phase57-cert-release-admin-style">
+  #adminTabCerts .phase57-cert-release-box{
+    margin:14px 0 16px 0;
+    padding:12px 14px;
+    border:1px solid rgba(0,214,202,.34);
+    border-radius:14px;
+    background:linear-gradient(135deg,rgba(0,214,202,.12),rgba(220,20,60,.08));
+    box-shadow:0 10px 24px rgba(0,0,0,.14);
+  }
+  #adminTabCerts .phase57-cert-release-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:9px;
+    color:#e5f2ff;
+    font-size:13px;
+    font-weight:950;
+  }
+  #adminTabCerts .phase57-cert-release-title span{color:#7dfcf0;font-size:11px;font-weight:850;}
+  #adminTabCerts .phase57-cert-release-form{
+    display:grid;
+    grid-template-columns:minmax(150px,1.1fr) minmax(135px,.85fr) auto auto;
+    gap:8px;
+    align-items:end;
+  }
+  #adminTabCerts .phase57-cert-release-form label{
+    display:block;
+    font-size:10px;
+    color:var(--muted-2,#a8c7df);
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin-bottom:4px;
+  }
+  #adminTabCerts .phase57-cert-release-form select,
+  #adminTabCerts .phase57-cert-release-form input{
+    width:100%;
+    height:34px;
+    box-sizing:border-box;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#0b1d38;
+    color:#fff;
+    padding:0 10px;
+    font-size:12px;
+    font-weight:800;
+    color-scheme:dark;
+  }
+  #adminTabCerts .phase57-cert-release-form button{
+    height:34px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.16);
+    padding:0 14px;
+    font-size:11px;
+    font-weight:950;
+    cursor:pointer;
+    white-space:nowrap;
+    color:#06182a;
+    background:linear-gradient(90deg,#00d6ca,#63b3ed);
+  }
+  #adminTabCerts .phase57-cert-release-form button.clear{
+    background:rgba(255,255,255,.08);
+    color:#dbeafe;
+  }
+  #adminTabCerts .phase57-cert-release-list{
+    margin-top:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  #adminTabCerts .phase57-cert-release-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 8px;
+    border-radius:999px;
+    border:1px solid rgba(0,214,202,.28);
+    background:rgba(0,214,202,.10);
+    color:#ecfeff;
+    font-size:11px;
+    font-weight:850;
+  }
+  #adminTabCerts .phase57-cert-release-chip.empty{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dbeafe;}
+  #adminTabCerts .phase57-cert-release-status{margin-top:7px;font-size:11px;color:#93c5fd;font-weight:850;}
+  #certTrackerContent .phase57-cert-release-visible{
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    flex-wrap:wrap!important;
+    width:100%!important;
+    padding:7px 10px!important;
+    border-top:1px solid rgba(255,255,255,.12)!important;
+    background:linear-gradient(90deg,rgba(0,214,202,.12),rgba(220,20,60,.09))!important;
+  }
+  #certTrackerContent .phase57-cert-release-visible-title{
+    font-size:11px!important;
+    font-weight:950!important;
+    text-transform:uppercase!important;
+    color:#fff!important;
+    padding:4px 8px!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.10)!important;
+  }
+  #certTrackerContent .phase57-cert-release-visible-chip{
+    display:inline-flex!important;
+    gap:6px!important;
+    align-items:center!important;
+    padding:4px 8px!important;
+    border-radius:999px!important;
+    border:1px solid rgba(0,214,202,.28)!important;
+    background:rgba(0,214,202,.12)!important;
+    color:#ecfeff!important;
+    font-size:11px!important;
+    font-weight:850!important;
+  }
+  #certTrackerContent .phase57-cert-release-visible-chip.empty{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.18)!important;color:#dbeafe!important;}
+  @media(max-width:760px){#adminTabCerts .phase57-cert-release-form{grid-template-columns:1fr 1fr;}#adminTabCerts .phase57-cert-release-form button{width:100%;}}
+</style>
+<script id="phase57-cert-release-admin-script">
+(function(){
+  if(window.__phase57CertReleaseAdminReady) return;
+  window.__phase57CertReleaseAdminReady=true;
+  var URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var KEY='';
+  try{ if(typeof CERT_SUPA_KEY!=='undefined' && CERT_SUPA_KEY) KEY=CERT_SUPA_KEY; }catch(e){}
+  if(!KEY){ KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'; }
+  var HUB='medi';
+  var TILE_KEY='cert_release_dates';
+  var state={dates:{},loaded:false};
+  var carriers=['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function headers(extra){var h={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; if(extra){Object.keys(extra).forEach(function(k){h[k]=extra[k];});} return h;}
+  function parseData(x){ if(!x) return {}; if(typeof x==='string'){try{return JSON.parse(x);}catch(e){return {};}} return x; }
+  function toast(msg){ if(window.showSnuToast) window.showSnuToast(msg); else if(window.showToast) window.showToast(msg); else console.log('[Phase57]',msg); }
+  function displayDate(v){ if(!v) return ''; var d=new Date(String(v)+'T00:00:00'); if(isNaN(d.getTime())) d=new Date(String(v)); if(isNaN(d.getTime())) return String(v); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+  function currentCarrierList(){
+    var list=[];
+    try{ if(typeof CERT_CARRIERS!=='undefined' && CERT_CARRIERS && CERT_CARRIERS.length) list=CERT_CARRIERS.slice(); }catch(e){}
+    if(!list.length){
+      var ths=[].slice.call(document.querySelectorAll('#certTrackerContent .cert-lock-table thead th'));
+      list=ths.map(function(th){return String(th.textContent||'').trim();}).filter(function(n){return n && !/^(agent|year|progress)$/i.test(n);});
+    }
+    if(!list.length) list=carriers.slice();
+    return list.filter(function(c,i,a){return c && a.indexOf(c)===i;});
+  }
+  async function readDates(){
+    try{
+      var r=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY)+'&select=data&limit=20',{headers:headers()});
+      if(!r.ok) throw new Error('read '+r.status);
+      var rows=await r.json();
+      var merged={};
+      (rows||[]).forEach(function(row){ var d=parseData(row.data); var dates=parseData(d.dates); Object.keys(dates||{}).forEach(function(k){ if(dates[k]) merged[k]=dates[k]; }); });
+      state.dates=merged; state.loaded=true;
+    }catch(e){ console.warn('[Phase57 release dates] read failed',e); state.loaded=true; }
+    renderAll();
+  }
+  async function saveDates(){
+    var payload={dates:state.dates,updatedAt:new Date().toISOString()};
+    var del=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
+    if(!del.ok && del.status!==404) throw new Error('delete '+del.status);
+    var r=await fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({hub:HUB,key:TILE_KEY,data:JSON.stringify(payload)})});
+    if(!r.ok){var t='';try{t=await r.text();}catch(e){} throw new Error('save '+r.status+' '+t.slice(0,160));}
+  }
+  function chips(cls){
+    var list=currentCarrierList().filter(function(c){return state.dates[c];});
+    if(!list.length) return '<span class="'+cls+' empty">No carrier release dates posted yet</span>';
+    return list.map(function(c){return '<span class="'+cls+'"><strong>'+esc(c)+'</strong><span>'+esc(displayDate(state.dates[c]))+'</span></span>';}).join('');
+  }
+  function ensureAdminBox(){
+    var tab=document.getElementById('adminTabCerts'); if(!tab) return null;
+    var box=document.getElementById('phase57CertReleaseAdminBox');
+    if(!box){
+      box=document.createElement('div'); box.id='phase57CertReleaseAdminBox'; box.className='phase57-cert-release-box';
+      var drop=tab.querySelector('#certCsvDrop') || tab.querySelector('.csv-drop-zone');
+      if(drop && drop.parentNode) drop.parentNode.insertBefore(box, drop); else tab.insertBefore(box, tab.firstChild);
+    }
+    return box;
+  }
+  function renderAdmin(){
+    var box=ensureAdminBox(); if(!box) return;
+    var opts=currentCarrierList().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
+    box.innerHTML='<div class="phase57-cert-release-title">📅 Carrier Release Dates <span>Admin date posts for cert page</span></div>'+
+      '<div class="phase57-cert-release-form"><div><label>Carrier</label><select id="phase57CarrierSelect">'+opts+'</select></div><div><label>Release date</label><input id="phase57CarrierDate" type="date"></div><button type="button" onclick="phase57SaveCarrierReleaseDate()">Save Date</button><button type="button" class="clear" onclick="phase57ClearCarrierReleaseDate()">Clear</button></div>'+
+      '<div class="phase57-cert-release-list">'+chips('phase57-cert-release-chip')+'</div><div id="phase57CertReleaseStatus" class="phase57-cert-release-status"></div>';
+  }
+  function renderVisible(){
+    var content=document.getElementById('certTrackerContent'); if(!content) return;
+    var top=content.querySelector('.cert-topbar'); if(!top) return;
+    [].slice.call(top.querySelectorAll('.phase57-cert-release-visible')).forEach(function(n){n.remove();});
+    var panel=document.createElement('div'); panel.className='phase57-cert-release-visible';
+    panel.innerHTML='<span class="phase57-cert-release-visible-title">Release Dates</span>'+chips('phase57-cert-release-visible-chip');
+    top.appendChild(panel);
+  }
+  function renderAll(){ renderAdmin(); renderVisible(); }
+  window.phase57SaveCarrierReleaseDate=async function(){
+    var c=(document.getElementById('phase57CarrierSelect')||{}).value||''; var d=(document.getElementById('phase57CarrierDate')||{}).value||'';
+    if(!c) return toast('Choose a carrier.'); if(!d) return toast('Choose a release date.');
+    state.dates[c]=d; renderAll();
+    try{ await saveDates(); toast('Carrier release date saved.'); var s=document.getElementById('phase57CertReleaseStatus'); if(s) s.textContent='Saved '+c+' release date.'; if(window.phase56RenderReleaseDates) window.phase56RenderReleaseDates(); }
+    catch(e){ toast('Release date save failed: '+(e.message||e)); }
+  };
+  window.phase57ClearCarrierReleaseDate=async function(){
+    var c=(document.getElementById('phase57CarrierSelect')||{}).value||''; if(!c) return toast('Choose a carrier.');
+    delete state.dates[c]; renderAll();
+    try{ await saveDates(); toast('Carrier release date cleared.'); var s=document.getElementById('phase57CertReleaseStatus'); if(s) s.textContent='Cleared '+c+' release date.'; if(window.phase56RenderReleaseDates) window.phase56RenderReleaseDates(); }
+    catch(e){ toast('Clear failed: '+(e.message||e)); }
+  };
+  window.phase57RefreshCertReleaseDates=function(){ readDates(); };
+  function schedule(){ setTimeout(renderAll,80); setTimeout(renderAll,600); setTimeout(renderAll,1600); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){readDates(); schedule();}); else {readDates(); schedule();}
+  document.addEventListener('click',function(e){ if(e.target && e.target.closest && e.target.closest('[onclick*="adminTabCerts"], .admin-tab')) setTimeout(renderAll,250); });
+  var oldSwitch=window.switchAdminTab;
+  if(typeof oldSwitch==='function'){
+    window.switchAdminTab=function(){ var r=oldSwitch.apply(this,arguments); setTimeout(renderAll,180); return r; };
+  }
+  var oldRender=window.renderCertTracker;
+  if(typeof oldRender==='function'){
+    window.renderCertTracker=function(){ var r=oldRender.apply(this,arguments); setTimeout(renderVisible,180); return r; };
+  }
+})();
+</script>
+
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
