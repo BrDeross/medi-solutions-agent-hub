@@ -20930,17 +20930,24 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 <style id="phase44-isolated-style">
   #phase44OnboardingNotice{
     display:none;
-    margin: 0 0 18px 0;
-    border: 2px solid rgba(255,138,0,.75);
-    background: linear-gradient(135deg, rgba(255,138,0,.28), rgba(255,193,7,.14), rgba(15,23,42,.88));
-    box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 0 24px rgba(255,138,0,.28);
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2147483000;
+    width: min(760px, calc(100vw - 28px));
+    border: 2px solid rgba(255,138,0,.92);
+    background: linear-gradient(135deg, rgba(255,138,0,.95), rgba(255,193,7,.82), rgba(15,23,42,.95));
+    box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 0 30px rgba(255,138,0,.46);
     border-radius: 16px;
-    padding: 14px 16px;
-    color: #fff7ed;
+    padding: 12px 16px;
+    color: #111827;
     animation: phase44Pulse 1.25s ease-in-out infinite;
+    pointer-events: none;
+    text-align: center;
   }
-  #phase44OnboardingNotice .p44-title{font-weight:900;letter-spacing:.2px;margin-bottom:4px;color:#ffedd5;}
-  #phase44OnboardingNotice .p44-body{font-size:13px;line-height:1.45;color:#fff7ed;opacity:.96;}
+  #phase44OnboardingNotice .p44-title{font-weight:950;letter-spacing:.2px;margin-bottom:2px;color:#111827;text-transform:uppercase;}
+  #phase44OnboardingNotice .p44-body{font-size:13px;line-height:1.35;color:#111827;font-weight:700;opacity:.98;}
   @keyframes phase44Pulse{
     0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px rgba(255,138,0,.22);transform:translateY(0);}
     50%{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 0 34px rgba(255,138,0,.55);transform:translateY(-1px);}
@@ -20963,7 +20970,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   var P44_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
   var P44_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'.replace('eyJpc3MiOiJIUzI1NiIsInJlZiI6','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6');
   var P44_HUB = 'medi';
-  var NOTICE_KEY = 'onboarding_status';
+  var NOTICE_KEY = 'global_hub_construction_status';
   var numberRowsCache = [];
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function headers(extra){ var h = {'apikey': P44_KEY, 'Authorization':'Bearer '+P44_KEY, 'Content-Type':'application/json'}; if(extra){ Object.keys(extra).forEach(function(k){h[k]=extra[k];}); } return h; }
@@ -20989,16 +20996,18 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     }).then(function(r){ if(!r.ok) throw new Error('status save '+r.status); });
   }
   function ensureNoticeNode(){
-    var sec = document.getElementById('ga-resources');
-    if(!sec) return null;
-    var wrap = sec.querySelector('.wrap') || sec;
     var node = document.getElementById('phase44OnboardingNotice');
     if(!node){
       node = document.createElement('div');
       node.id = 'phase44OnboardingNotice';
-      node.innerHTML = '<div class="p44-title">⚠️ Agent Onboarding Section Under Construction</div><div class="p44-body">This section is currently being updated. If a form, link, video, or instruction appears to be missing, please contact the support team before assuming it is unavailable.</div>';
-      var head = wrap.querySelector('.section-head');
-      if(head && head.nextSibling) wrap.insertBefore(node, head.nextSibling); else wrap.insertBefore(node, wrap.firstChild);
+      node.setAttribute('role','status');
+      node.setAttribute('aria-live','polite');
+      node.innerHTML = '<div class="p44-title">⚠️ Hub Page Under Construction</div><div class="p44-body">We are actively updating the Hub. If something looks missing or unfinished, please contact the support team before assuming it is unavailable.</div>';
+      document.body.appendChild(node);
+    } else {
+      // If an older version inserted the notice inside a section, move it to the body so it works globally.
+      if(node.parentElement !== document.body) document.body.appendChild(node);
+      node.innerHTML = '<div class="p44-title">⚠️ Hub Page Under Construction</div><div class="p44-body">We are actively updating the Hub. If something looks missing or unfinished, please contact the support team before assuming it is unavailable.</div>';
     }
     return node;
   }
@@ -21006,7 +21015,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     var node = ensureNoticeNode();
     if(node) node.style.display = active ? 'block' : 'none';
     var status = document.getElementById('phase44NoticeStatus');
-    if(status) status.textContent = active ? 'Currently ON - agents can see the warning.' : 'Currently OFF - agents do not see the warning.';
+    if(status) status.textContent = active ? 'Currently ON - all Hub users can see the global page warning.' : 'Currently OFF - users do not see the global page warning.';
     var btn = document.getElementById('phase44ToggleNoticeBtn');
     if(btn) btn.textContent = active ? 'Turn Notice Off' : 'Turn Notice On';
   }
@@ -21017,10 +21026,10 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     var box = document.createElement('div');
     box.id = 'phase44OnboardingAdminBox';
     box.className = 'phase44-admin-box';
-    box.innerHTML = '<h3>⚠️ Page Under Construction Notice</h3><p>Toggle the flashing orange Agent Onboarding warning for all users who can see the Agent Onboarding & Resources section.</p><div class="phase44-admin-row"><button type="button" class="admin-btn" id="phase44ToggleNoticeBtn">Loading...</button><button type="button" class="admin-btn" id="phase44RefreshNoticeBtn">Refresh Notice</button></div><div class="phase44-small-note" id="phase44NoticeStatus">Checking status...</div>';
+    box.innerHTML = '<h3>⚠️ Global Hub Under Construction Notice</h3><p>Toggle the flashing orange page-wide warning for all Hub users while you are actively updating or repairing the Hub.</p><div class="phase44-admin-row"><button type="button" class="admin-btn" id="phase44ToggleNoticeBtn">Loading...</button><button type="button" class="admin-btn" id="phase44RefreshNoticeBtn">Refresh Notice</button></div><div class="phase44-small-note" id="phase44NoticeStatus">Checking status...</div>';
     panel.insertBefore(box, panel.firstChild);
     document.getElementById('phase44ToggleNoticeBtn').addEventListener('click', function(){
-      readStatus().then(function(active){ return saveStatus(!active).then(function(){ applyNotice(!active); toast('Onboarding notice ' + (!active ? 'turned on.' : 'turned off.')); }); }).catch(function(err){ alert('Notice update failed: ' + (err && err.message ? err.message : err)); });
+      readStatus().then(function(active){ return saveStatus(!active).then(function(){ applyNotice(!active); toast('Global Hub notice ' + (!active ? 'turned on.' : 'turned off.')); }); }).catch(function(err){ alert('Notice update failed: ' + (err && err.message ? err.message : err)); });
     });
     document.getElementById('phase44RefreshNoticeBtn').addEventListener('click', refreshNotice);
     refreshNotice();
