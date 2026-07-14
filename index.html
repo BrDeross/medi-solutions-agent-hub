@@ -14171,6 +14171,23 @@ w.document.open();
 w.document.write(html);
 w.document.close();
 }
+function getCertUpdatedStatusText(year, activeColCount) {
+const meta = _certMeta || {};
+const parts = [];
+if (year) parts.push('Plan Year ' + year);
+const rawUpdated = meta.updatedAt || meta.updated_at || meta.lastUpdated || meta.savedAt || meta.timestamp || '';
+if (rawUpdated) {
+  const d = new Date(rawUpdated);
+  if (isNaN(d.getTime())) parts.push('Last updated ' + String(rawUpdated));
+  else parts.push('Last updated ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}));
+} else if (meta.monthLabel) {
+  parts.push('Last updated ' + meta.monthLabel);
+} else {
+  parts.push('Last updated date not stored');
+}
+if (activeColCount) parts.push(activeColCount + ' carrier columns');
+return parts.join(' • ');
+}
 function renderCertTracker() {
 ensureCertTrackerDisplayStyles();
 const el = document.getElementById('certTrackerContent');
@@ -14209,11 +14226,11 @@ return `<tr>
 ${cells}
 </tr>`;
 }).join('');
-const metaLeft = year ? `Certification Year: <strong>${pesc(year)}</strong>` : 'Certification Year';
-const metaRight = _certMeta.updatedAt ? `Updated: ${new Date(_certMeta.updatedAt).toLocaleDateString()}` : `${activeCols.length} carrier columns`;
+const metaLeft = 'Certification Tracker';
+const metaRight = getCertUpdatedStatusText(year, activeCols.length);
 el.innerHTML = `
 <div class="cert-topbar">
-<div class="cert-lock-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>
+<div class="cert-lock-meta"><span>${metaLeft}</span><span class="phase31-cert-note">${pesc(metaRight)}</span></div>
 <div class="cert-scroll-controls" aria-label="Certification table scroll controls">
 <span class="cert-scroll-label">Carrier columns</span>
 <button type="button" class="cert-scroll-btn home" onclick="scrollCertTable('home')" title="Back to agent names">Start</button>
@@ -14332,14 +14349,29 @@ function loadCertDataFromSupabase() {
 fetch(`${CERT_SUPA_URL}/rest/v1/cert_tracker?hub=eq.${CERT_HUB}&select=data`, {
 headers: { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Cache-Control': 'no-cache' }
 }).then(r => r.json()).then(rows => {
-if (rows && rows.length && rows[0].data) {
-const raw = rows[0].data;
+if (rows && rows.length) {
+let best = null;
+let bestScore = -1;
+rows.forEach(row => {
+try {
+const raw = row && row.data;
+if (!raw) return;
 const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
-_certAgents = normalizeCertAgents(d.agents);
-_certMeta = d.meta || {};
+if (!d || typeof d !== 'object') return;
+const agents = normalizeCertAgents(d.agents);
+const meta = d.meta || {};
+const upd = meta.updatedAt || meta.updated_at || meta.lastUpdated || meta.savedAt || meta.timestamp || '';
+const score = (agents.length * 1000) + (upd ? Date.parse(upd) || 1 : 0);
+if (score > bestScore) { bestScore = score; best = { agents, meta }; }
+} catch(e) {}
+});
+if (best) {
+_certAgents = best.agents;
+_certMeta = best.meta || {};
 try { localStorage.setItem(CERT_KEY, JSON.stringify({agents: _certAgents, meta: _certMeta})); } catch(e) {}
 renderCertTracker();
 renderCertAdminPreview(false);
+}
 }
 }).catch(() => {});
 }
