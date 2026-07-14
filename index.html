@@ -20968,7 +20968,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 (function(){
   'use strict';
   var P44_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var P44_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'.replace('eyJpc3MiOiJIUzI1NiIsInJlZiI6','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6');
+  var P44_KEY = (typeof SUPA_KEY !== 'undefined' && SUPA_KEY) ? SUPA_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
   var P44_HUB = 'medi';
   var NOTICE_KEY = 'global_hub_construction_status';
   var numberRowsCache = [];
@@ -20990,10 +20990,17 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   }
   function saveStatus(active){
     localStorage.setItem('phase44_onboarding_notice_active', active ? 'true' : 'false');
-    var body = {hub:P44_HUB, key:NOTICE_KEY, data:{active:!!active, updatedAt:new Date().toISOString(), source:'phase44'}};
-    return fetch(P44_URL + '/rest/v1/tile_content?on_conflict=hub,key', {
-      method:'POST', headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}), body:JSON.stringify(body)
-    }).then(function(r){ if(!r.ok) throw new Error('status save '+r.status); });
+    var payload = {active:!!active, updatedAt:new Date().toISOString(), source:'phase46'};
+    var body = {hub:P44_HUB, key:NOTICE_KEY, data:payload};
+    var patchUrl = P44_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(P44_HUB) + '&key=eq.' + encodeURIComponent(NOTICE_KEY);
+    return fetch(patchUrl, {
+      method:'PATCH', headers:headers({'Prefer':'return=minimal'}), body:JSON.stringify({data:payload})
+    }).then(function(r){
+      if(r.ok) return true;
+      return fetch(P44_URL + '/rest/v1/tile_content', {
+        method:'POST', headers:headers({'Prefer':'return=minimal'}), body:JSON.stringify(body)
+      }).then(function(r2){ if(!r2.ok) throw new Error('status save '+r2.status); return true; });
+    });
   }
   function ensureNoticeNode(){
     var node = document.getElementById('phase44OnboardingNotice');
