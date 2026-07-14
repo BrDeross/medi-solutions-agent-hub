@@ -20926,119 +20926,179 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 
 
 
-<!-- Phase 44: isolated restore - onboarding notice + admin agent number tools only -->
-<style id="phase44-isolated-style">
-  #phase44OnboardingNotice{
+<!-- Phase 47: global Hub construction notice + agent number admin tools only -->
+<style id="phase47-global-notice-agentnumbers-style">
+  #phase47GlobalHubNotice{
     display:none;
     position: fixed;
-    top: 12px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2147483000;
-    width: min(760px, calc(100vw - 28px));
-    border: 2px solid rgba(255,138,0,.92);
-    background: linear-gradient(135deg, rgba(255,138,0,.95), rgba(255,193,7,.82), rgba(15,23,42,.95));
+    width: min(780px, calc(100vw - 28px));
+    border: 2px solid rgba(255,138,0,.95);
+    background: linear-gradient(135deg, rgba(255,138,0,.96), rgba(255,193,7,.88), rgba(15,23,42,.96));
     box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 0 30px rgba(255,138,0,.46);
     border-radius: 16px;
-    padding: 12px 16px;
+    padding: 12px 46px 12px 16px;
     color: #111827;
-    animation: phase44Pulse 1.25s ease-in-out infinite;
-    pointer-events: none;
+    animation: phase47Pulse 1.25s ease-in-out infinite;
     text-align: center;
+    cursor: move;
+    user-select: none;
   }
-  #phase44OnboardingNotice .p44-title{font-weight:950;letter-spacing:.2px;margin-bottom:2px;color:#111827;text-transform:uppercase;}
-  #phase44OnboardingNotice .p44-body{font-size:13px;line-height:1.35;color:#111827;font-weight:700;opacity:.98;}
-  @keyframes phase44Pulse{
-    0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px rgba(255,138,0,.22);transform:translateY(0);}
-    50%{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 0 34px rgba(255,138,0,.55);transform:translateY(-1px);}
+  #phase47GlobalHubNotice .p47-title{font-weight:950;letter-spacing:.2px;margin-bottom:2px;color:#111827;text-transform:uppercase;}
+  #phase47GlobalHubNotice .p47-body{font-size:13px;line-height:1.35;color:#111827;font-weight:700;opacity:.98;}
+  #phase47GlobalHubNotice .p47-close{
+    position:absolute;
+    right:10px;
+    top:8px;
+    width:28px;
+    height:28px;
+    border-radius:999px;
+    border:1px solid rgba(15,23,42,.28);
+    background:rgba(255,255,255,.38);
+    color:#111827;
+    font-size:18px;
+    font-weight:900;
+    line-height:1;
+    cursor:pointer;
   }
-  .phase44-admin-box{
+  #phase47GlobalHubNotice .p47-close:hover{background:rgba(255,255,255,.7);}
+  @keyframes phase47Pulse{
+    0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px rgba(255,138,0,.22);}
+    50%{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 0 34px rgba(255,138,0,.55);}
+  }
+  .phase47-admin-box{
     margin: 0 0 16px 0;
     padding: 14px;
     border: 1px solid rgba(45,212,191,.25);
     border-radius: 14px;
     background: rgba(15, 23, 42, .35);
   }
-  .phase44-admin-box h3{margin:0 0 6px 0;font-size:15px;color:#e5f9ff;}
-  .phase44-admin-box p{margin:0 0 10px 0;font-size:12px;color:var(--muted-2);line-height:1.45;}
-  .phase44-admin-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-  .phase44-small-note{margin-top:8px;font-size:11px;color:var(--muted-2);line-height:1.45;}
+  .phase47-admin-box h3{margin:0 0 6px 0;font-size:15px;color:#e5f9ff;}
+  .phase47-admin-box p{margin:0 0 10px 0;font-size:12px;color:var(--muted-2);line-height:1.45;}
+  .phase47-admin-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .phase47-small-note{margin-top:8px;font-size:11px;color:var(--muted-2);line-height:1.45;}
 </style>
-<script id="phase44-isolated-onboarding-agentnumbers">
+<script id="phase47-global-notice-agentnumbers">
 (function(){
   'use strict';
-  var P44_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var P44_KEY = (typeof SUPA_KEY !== 'undefined' && SUPA_KEY) ? SUPA_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
-  var P44_HUB = 'medi';
+  var P47_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var P47_KEY = (typeof SUPA_KEY !== 'undefined' && SUPA_KEY) ? SUPA_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  // Correct anon fallback in case the above project key variable is not loaded yet.
+  if (!P47_KEY || P47_KEY.indexOf('eyJpc3MiOiJIUzI1NiI') > -1) {
+    P47_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  }
+  var P47_HUB = 'medi';
   var NOTICE_KEY = 'global_hub_construction_status';
+  var DISMISS_KEY = 'phase47_global_notice_dismissed_version';
+  var POSITION_KEY = 'phase47_global_notice_position';
   var numberRowsCache = [];
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function headers(extra){ var h = {'apikey': P44_KEY, 'Authorization':'Bearer '+P44_KEY, 'Content-Type':'application/json'}; if(extra){ Object.keys(extra).forEach(function(k){h[k]=extra[k];}); } return h; }
-  function toast(msg){ if (typeof window.showSnuToast === 'function') window.showSnuToast(msg); else console.log('[Phase44]', msg); }
+  function headers(extra){ var h = {'apikey': P47_KEY, 'Authorization':'Bearer '+P47_KEY, 'Content-Type':'application/json'}; if(extra){ Object.keys(extra).forEach(function(k){h[k]=extra[k];}); } return h; }
+  function toast(msg){ if (typeof window.showSnuToast === 'function') window.showSnuToast(msg); else console.log('[Phase47]', msg); }
   function currentUser(){ return window.currentHubUser || window.HUB_CURRENT_USER || window.__hubUserProfile || null; }
   function isAdmin(){ var u=currentUser()||{}; var role=String(u.role||'').toLowerCase(); var p=u.permissions||{}; return role==='admin' || p.admin===true || p.carrier_directory_upload===true || p.carrier_directory_edit===true; }
+  function normalizeStatusData(data){
+    if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { data = {}; } }
+    data = data || {};
+    return {
+      active: !!(data.active === true || data.active === 'true' || data.on === true || data.enabled === true),
+      updatedAt: data.updatedAt || data.updated_at || data.timestamp || ''
+    };
+  }
   function readStatus(){
-    return fetch(P44_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(P44_HUB) + '&key=eq.' + encodeURIComponent(NOTICE_KEY) + '&select=data&limit=1', {headers: headers({'Cache-Control':'no-cache'})})
+    var url = P47_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(P47_HUB) + '&key=eq.' + encodeURIComponent(NOTICE_KEY) + '&select=data&limit=1';
+    return fetch(url, {headers: headers({'Cache-Control':'no-cache'})})
       .then(function(r){ if(!r.ok) throw new Error('status read '+r.status); return r.json(); })
-      .then(function(rows){
-        var data = rows && rows[0] ? rows[0].data : null;
-        if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e){} }
-        return !!(data && (data.active === true || data.active === 'true' || data.on === true || data.enabled === true));
-      }).catch(function(){
-        return localStorage.getItem('phase44_onboarding_notice_active') === 'true';
-      });
+      .then(function(rows){ return normalizeStatusData(rows && rows[0] ? rows[0].data : null); })
+      .catch(function(err){ console.warn('[Phase47 notice] global read failed', err); return {active:false, updatedAt:''}; });
+  }
+  function postStatus(payload){
+    var bodyObject = {hub:P47_HUB, key:NOTICE_KEY, data:payload};
+    var bodyString = {hub:P47_HUB, key:NOTICE_KEY, data:JSON.stringify(payload)};
+    return fetch(P47_URL + '/rest/v1/tile_content', {method:'POST', headers:headers({'Prefer':'return=minimal'}), body:JSON.stringify(bodyObject)})
+      .then(function(r){ if(r.ok) return true; return fetch(P47_URL + '/rest/v1/tile_content', {method:'POST', headers:headers({'Prefer':'return=minimal'}), body:JSON.stringify(bodyString)}).then(function(r2){ if(!r2.ok) throw new Error('status save '+r.status+'/'+r2.status); return true; }); });
   }
   function saveStatus(active){
-    localStorage.setItem('phase44_onboarding_notice_active', active ? 'true' : 'false');
-    var payload = {active:!!active, updatedAt:new Date().toISOString(), source:'phase46'};
-    var body = {hub:P44_HUB, key:NOTICE_KEY, data:payload};
-    var patchUrl = P44_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(P44_HUB) + '&key=eq.' + encodeURIComponent(NOTICE_KEY);
-    return fetch(patchUrl, {
-      method:'PATCH', headers:headers({'Prefer':'return=minimal'}), body:JSON.stringify({data:payload})
-    }).then(function(r){
-      if(r.ok) return true;
-      return fetch(P44_URL + '/rest/v1/tile_content', {
-        method:'POST', headers:headers({'Prefer':'return=minimal'}), body:JSON.stringify(body)
-      }).then(function(r2){ if(!r2.ok) throw new Error('status save '+r2.status); return true; });
-    });
+    var payload = {active:!!active, updatedAt:new Date().toISOString(), source:'phase47'};
+    var delUrl = P47_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(P47_HUB) + '&key=eq.' + encodeURIComponent(NOTICE_KEY);
+    return fetch(delUrl, {method:'DELETE', headers:headers({'Prefer':'return=minimal'})})
+      .then(function(r){ if(!r.ok) console.warn('[Phase47 notice] delete before save returned', r.status); return postStatus(payload); })
+      .then(function(){ localStorage.removeItem(DISMISS_KEY); return payload; });
   }
   function ensureNoticeNode(){
-    var node = document.getElementById('phase44OnboardingNotice');
-    if(!node){
-      node = document.createElement('div');
-      node.id = 'phase44OnboardingNotice';
-      node.setAttribute('role','status');
-      node.setAttribute('aria-live','polite');
-      node.innerHTML = '<div class="p44-title">⚠️ Hub Page Under Construction</div><div class="p44-body">We are actively updating the Hub. If something looks missing or unfinished, please contact the support team before assuming it is unavailable.</div>';
-      document.body.appendChild(node);
-    } else {
-      // If an older version inserted the notice inside a section, move it to the body so it works globally.
-      if(node.parentElement !== document.body) document.body.appendChild(node);
-      node.innerHTML = '<div class="p44-title">⚠️ Hub Page Under Construction</div><div class="p44-body">We are actively updating the Hub. If something looks missing or unfinished, please contact the support team before assuming it is unavailable.</div>';
+    var node = document.getElementById('phase47GlobalHubNotice') || document.getElementById('phase44OnboardingNotice');
+    if(!node){ node = document.createElement('div'); document.body.appendChild(node); }
+    node.id = 'phase47GlobalHubNotice';
+    node.setAttribute('role','status');
+    node.setAttribute('aria-live','polite');
+    if(node.parentElement !== document.body) document.body.appendChild(node);
+    node.innerHTML = '<button type="button" class="p47-close" title="Hide this notice">×</button><div class="p47-title">⚠️ Hub Page Under Construction</div><div class="p47-body">We are actively updating the Hub. If something looks missing or unfinished, please contact the support team before assuming it is unavailable.</div>';
+    var pos = null;
+    try { pos = JSON.parse(localStorage.getItem(POSITION_KEY) || 'null'); } catch(e) { pos = null; }
+    if(pos && typeof pos.left === 'number' && typeof pos.top === 'number'){
+      node.style.left = Math.max(8, Math.min(window.innerWidth - 80, pos.left)) + 'px';
+      node.style.top = Math.max(8, Math.min(window.innerHeight - 60, pos.top)) + 'px';
+      node.style.transform = 'none';
     }
+    var close = node.querySelector('.p47-close');
+    if(close){ close.onclick = function(e){ e.stopPropagation(); var version = node.getAttribute('data-version') || ''; localStorage.setItem(DISMISS_KEY, version || 'dismissed'); node.style.display='none'; }; }
+    enableDrag(node);
     return node;
   }
-  function applyNotice(active){
+  function enableDrag(node){
+    if(node.getAttribute('data-drag-ready') === '1') return;
+    node.setAttribute('data-drag-ready','1');
+    var dragging=false, startX=0, startY=0, startLeft=0, startTop=0;
+    node.addEventListener('mousedown', function(e){
+      if(e.target && e.target.classList && e.target.classList.contains('p47-close')) return;
+      dragging=true; startX=e.clientX; startY=e.clientY; var rect=node.getBoundingClientRect(); startLeft=rect.left; startTop=rect.top; node.style.transform='none'; node.style.left=startLeft+'px'; node.style.top=startTop+'px'; e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e){
+      if(!dragging) return;
+      var left=Math.max(8, Math.min(window.innerWidth - node.offsetWidth - 8, startLeft + e.clientX - startX));
+      var top=Math.max(8, Math.min(window.innerHeight - node.offsetHeight - 8, startTop + e.clientY - startY));
+      node.style.left=left+'px'; node.style.top=top+'px';
+    });
+    document.addEventListener('mouseup', function(){
+      if(!dragging) return;
+      dragging=false;
+      var rect=node.getBoundingClientRect();
+      localStorage.setItem(POSITION_KEY, JSON.stringify({left:rect.left, top:rect.top}));
+    });
+  }
+  function applyNotice(status){
+    status = status || {active:false, updatedAt:''};
     var node = ensureNoticeNode();
-    if(node) node.style.display = active ? 'block' : 'none';
-    var status = document.getElementById('phase44NoticeStatus');
-    if(status) status.textContent = active ? 'Currently ON - all Hub users can see the global page warning.' : 'Currently OFF - users do not see the global page warning.';
-    var btn = document.getElementById('phase44ToggleNoticeBtn');
-    if(btn) btn.textContent = active ? 'Turn Notice Off' : 'Turn Notice On';
+    var version = status.updatedAt || (status.active ? 'active' : 'off');
+    node.setAttribute('data-version', version);
+    var dismissed = localStorage.getItem(DISMISS_KEY);
+    node.style.display = (status.active && dismissed !== version) ? 'block' : 'none';
+    var statusEl = document.getElementById('phase47NoticeStatus') || document.getElementById('phase44NoticeStatus');
+    if(statusEl) statusEl.textContent = status.active ? 'Currently ON globally. Users can close it on their own screen, and turning it off/on again will show it again.' : 'Currently OFF globally.';
+    var btn = document.getElementById('phase47ToggleNoticeBtn') || document.getElementById('phase44ToggleNoticeBtn');
+    if(btn) btn.textContent = status.active ? 'Turn Global Notice Off' : 'Turn Global Notice On';
   }
   function refreshNotice(){ readStatus().then(applyNotice); }
+  function resetLocalNotice(){ localStorage.removeItem(DISMISS_KEY); localStorage.removeItem(POSITION_KEY); var node=ensureNoticeNode(); node.style.left='50%'; node.style.top='14px'; node.style.transform='translateX(-50%)'; refreshNotice(); }
   function injectOnboardingAdmin(){
     var panel = document.querySelector('#adminTabOnboarding .admin-body');
-    if(!panel || document.getElementById('phase44OnboardingAdminBox')) return;
+    if(!panel) return;
+    var old = document.getElementById('phase44OnboardingAdminBox');
+    if(old && !document.getElementById('phase47OnboardingAdminBox')) old.remove();
+    if(document.getElementById('phase47OnboardingAdminBox')) return;
     var box = document.createElement('div');
-    box.id = 'phase44OnboardingAdminBox';
-    box.className = 'phase44-admin-box';
-    box.innerHTML = '<h3>⚠️ Global Hub Under Construction Notice</h3><p>Toggle the flashing orange page-wide warning for all Hub users while you are actively updating or repairing the Hub.</p><div class="phase44-admin-row"><button type="button" class="admin-btn" id="phase44ToggleNoticeBtn">Loading...</button><button type="button" class="admin-btn" id="phase44RefreshNoticeBtn">Refresh Notice</button></div><div class="phase44-small-note" id="phase44NoticeStatus">Checking status...</div>';
+    box.id = 'phase47OnboardingAdminBox';
+    box.className = 'phase47-admin-box';
+    box.innerHTML = '<h3>⚠️ Global Hub Under Construction Notice</h3><p>Turns on a page-wide warning for everyone. Users can drag it or close it on their own screen. Turning the global notice off/on again makes it reappear.</p><div class="phase47-admin-row"><button type="button" class="admin-btn" id="phase47ToggleNoticeBtn">Loading...</button><button type="button" class="admin-btn" id="phase47RefreshNoticeBtn">Refresh Notice</button><button type="button" class="admin-btn" id="phase47ResetLocalNoticeBtn">Reset My Notice Position</button></div><div class="phase47-small-note" id="phase47NoticeStatus">Checking status...</div>';
     panel.insertBefore(box, panel.firstChild);
-    document.getElementById('phase44ToggleNoticeBtn').addEventListener('click', function(){
-      readStatus().then(function(active){ return saveStatus(!active).then(function(){ applyNotice(!active); toast('Global Hub notice ' + (!active ? 'turned on.' : 'turned off.')); }); }).catch(function(err){ alert('Notice update failed: ' + (err && err.message ? err.message : err)); });
+    document.getElementById('phase47ToggleNoticeBtn').addEventListener('click', function(){
+      readStatus().then(function(status){ return saveStatus(!status.active).then(function(saved){ applyNotice(saved); toast('Global Hub notice ' + (!status.active ? 'turned on.' : 'turned off.')); }); }).catch(function(err){ alert('Notice update failed: ' + (err && err.message ? err.message : err)); });
     });
-    document.getElementById('phase44RefreshNoticeBtn').addEventListener('click', refreshNotice);
+    document.getElementById('phase47RefreshNoticeBtn').addEventListener('click', refreshNotice);
+    document.getElementById('phase47ResetLocalNoticeBtn').addEventListener('click', resetLocalNotice);
     refreshNotice();
   }
   function csvEscape(value){ var s=String(value == null ? '' : value); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
@@ -21051,13 +21111,13 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function parseObjects(text){ var parsed=parseCsv(text); if(parsed.length<2) throw new Error('CSV has no data rows.'); var heads=parsed[0].map(function(h){return String(h||'').trim().toLowerCase().replace(/\s+/g,'_');}); return parsed.slice(1).map(function(r){var o={}; heads.forEach(function(h,i){o[h]=String(r[i] == null ? '' : r[i]).trim();}); return o;}); }
   function numberTemplate(){ downloadCsv('carrier_agent_numbers_template.csv', [['agent_name','email','carrier','agent_number','status','product_type','state','notes'], ['Brian DeRoss','brdeross@fjins.net','Aetna','123456','Active','Medicare','NJ','Example only']]); }
   function loadNumbers(){
-    return fetch(P44_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(P44_HUB) + '&select=id,agent_name,email,carrier,agent_number,status,product_type,state,notes&order=agent_name.asc,carrier.asc', {headers:headers({'Cache-Control':'no-cache'})})
+    return fetch(P47_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(P47_HUB) + '&select=id,agent_name,email,carrier,agent_number,status,product_type,state,notes&order=agent_name.asc,carrier.asc', {headers:headers({'Cache-Control':'no-cache'})})
       .then(function(r){ if(!r.ok) throw new Error('read '+r.status); return r.json(); }).then(function(rows){ numberRowsCache = Array.isArray(rows) ? rows : []; renderNumbersAdmin(); return numberRowsCache; });
   }
   function renderNumbersAdmin(){
-    var out=document.getElementById('phase44AgentNumberList'); if(!out) return;
-    var count=document.getElementById('phase44AgentNumberCount'); if(count) count.textContent = numberRowsCache.length + ' record' + (numberRowsCache.length===1?'':'s');
-    if(!numberRowsCache.length){ out.innerHTML='<div class="phase44-small-note">No agent number records are currently stored.</div>'; return; }
+    var out=document.getElementById('phase47AgentNumberList') || document.getElementById('phase44AgentNumberList'); if(!out) return;
+    var count=document.getElementById('phase47AgentNumberCount') || document.getElementById('phase44AgentNumberCount'); if(count) count.textContent = numberRowsCache.length + ' record' + (numberRowsCache.length===1?'':'s');
+    if(!numberRowsCache.length){ out.innerHTML='<div class="phase47-small-note">No agent number records are currently stored.</div>'; return; }
     out.innerHTML = '<div style="max-height:220px;overflow:auto;border:1px solid rgba(255,255,255,.1);border-radius:10px;"><table class="carrier-number-table" style="width:100%;font-size:11px;"><thead><tr><th>Agent</th><th>Email</th><th>Carrier</th><th>Number</th><th>Status</th></tr></thead><tbody>' + numberRowsCache.slice(0,80).map(function(r){return '<tr><td>'+esc(r.agent_name)+'</td><td>'+esc(r.email)+'</td><td>'+esc(r.carrier)+'</td><td>'+esc(r.agent_number)+'</td><td>'+esc(r.status)+'</td></tr>';}).join('') + '</tbody></table></div>';
   }
   function exportNumbers(){
@@ -21068,7 +21128,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     }).catch(function(err){ alert('Agent number export failed: ' + (err && err.message ? err.message : err)); });
   }
   function deleteOne(row){
-    var url=P44_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(P44_HUB) + '&email=eq.' + encodeURIComponent(row.email) + '&carrier=eq.' + encodeURIComponent(row.carrier);
+    var url=P47_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(P47_HUB) + '&email=eq.' + encodeURIComponent(row.email) + '&carrier=eq.' + encodeURIComponent(row.carrier);
     return fetch(url,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})}).then(function(r){ if(!r.ok) throw new Error('delete '+r.status); });
   }
   function uploadNumbers(file){
@@ -21078,11 +21138,11 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     reader.onload=function(){
       try{
         var objs=parseObjects(reader.result);
-        var rows=objs.map(function(o){return {hub:P44_HUB, agent_name:o.agent_name||o.name||'', email:String(o.email||'').toLowerCase(), carrier:o.carrier||'', agent_number:o.agent_number||o.writing_number||o.number||'', status:o.status||'', product_type:o.product_type||o.product||'', state:o.state||o.states||'', notes:o.notes||''};}).filter(function(r){return r.email && r.carrier;});
+        var rows=objs.map(function(o){return {hub:P47_HUB, agent_name:o.agent_name||o.name||'', email:String(o.email||'').toLowerCase(), carrier:o.carrier||'', agent_number:o.agent_number||o.writing_number||o.number||'', status:o.status||'', product_type:o.product_type||o.product||'', state:o.state||o.states||'', notes:o.notes||''};}).filter(function(r){return r.email && r.carrier;});
         if(!rows.length) throw new Error('No valid rows found. Required: email and carrier.');
         if(!confirm('Upload ' + rows.length + ' agent number row(s)? This add/updates matching email + carrier records and does not wipe unrelated records.')) return;
         var chain=Promise.resolve();
-        rows.forEach(function(row){ chain=chain.then(function(){return deleteOne(row);}).then(function(){return fetch(P44_URL + '/rest/v1/carrier_agent_numbers',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(row)}).then(function(r){if(!r.ok) throw new Error('insert '+r.status);});}); });
+        rows.forEach(function(row){ chain=chain.then(function(){return deleteOne(row);}).then(function(){return fetch(P47_URL + '/rest/v1/carrier_agent_numbers',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(row)}).then(function(r){if(!r.ok) throw new Error('insert '+r.status);});}); });
         chain.then(function(){ toast('Agent numbers uploaded.'); if(typeof window.refreshCarrierAgentDirectory==='function') window.refreshCarrierAgentDirectory(); return loadNumbers(); }).catch(function(err){ alert('Agent number upload failed: ' + (err && err.message ? err.message : err)); });
       }catch(err){ alert('CSV error: ' + (err && err.message ? err.message : err)); }
     };
@@ -21090,20 +21150,23 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   }
   function injectCarrierAdmin(){
     var panel=document.querySelector('#adminTabCarriers .admin-body');
-    if(!panel || document.getElementById('phase44CarrierNumberAdminBox')) return;
+    if(!panel) return;
+    var old=document.getElementById('phase44CarrierNumberAdminBox');
+    if(old && !document.getElementById('phase47CarrierNumberAdminBox')) old.remove();
+    if(document.getElementById('phase47CarrierNumberAdminBox')) return;
     var box=document.createElement('div');
-    box.id='phase44CarrierNumberAdminBox';
-    box.className='phase44-admin-box';
-    box.innerHTML='<h3>🪪 Agent Number Updates</h3><p>Manage carrier writing numbers used by the Carrier Directory. Uploads add/update by email + carrier and do not wipe unrelated records.</p><input id="phase44AgentNumberCsv" type="file" accept=".csv,text/csv" style="display:none;"><div class="phase44-admin-row"><button type="button" class="admin-btn" id="phase44NumTemplate">Download Template</button><button type="button" class="admin-btn" id="phase44NumExport">Export Current Agent Numbers</button><button type="button" class="admin-btn" id="phase44NumUpload">Upload Agent Numbers CSV</button><button type="button" class="admin-btn" id="phase44NumRefresh">Refresh List</button><span class="count-chip" id="phase44AgentNumberCount">Loading...</span></div><div class="phase44-small-note">CSV columns: agent_name, email, carrier, agent_number, status, product_type, state, notes</div><div id="phase44AgentNumberList" style="margin-top:10px;"></div>';
+    box.id='phase47CarrierNumberAdminBox';
+    box.className='phase47-admin-box';
+    box.innerHTML='<h3>🪪 Agent Number Updates</h3><p>Manage carrier writing numbers used by the Carrier Directory. Uploads add/update by email + carrier and do not wipe unrelated records.</p><input id="phase47AgentNumberCsv" type="file" accept=".csv,text/csv" style="display:none;"><div class="phase47-admin-row"><button type="button" class="admin-btn" id="phase47NumTemplate">Download Template</button><button type="button" class="admin-btn" id="phase47NumExport">Export Current Agent Numbers</button><button type="button" class="admin-btn" id="phase47NumUpload">Upload Agent Numbers CSV</button><button type="button" class="admin-btn" id="phase47NumRefresh">Refresh List</button><span class="count-chip" id="phase47AgentNumberCount">Loading...</span></div><div class="phase47-small-note">CSV columns: agent_name, email, carrier, agent_number, status, product_type, state, notes</div><div id="phase47AgentNumberList" style="margin-top:10px;"></div>';
     var after=panel.querySelector('.admin-section-title');
     if(after && after.nextSibling) panel.insertBefore(box, after.nextSibling); else panel.insertBefore(box, panel.firstChild);
-    document.getElementById('phase44NumTemplate').addEventListener('click', numberTemplate);
-    document.getElementById('phase44NumExport').addEventListener('click', exportNumbers);
-    document.getElementById('phase44NumRefresh').addEventListener('click', function(){ loadNumbers().catch(function(err){ alert('Agent number load failed: '+(err&&err.message?err.message:err)); }); });
-    var inp=document.getElementById('phase44AgentNumberCsv');
-    document.getElementById('phase44NumUpload').addEventListener('click', function(){ inp.value=''; inp.click(); });
+    document.getElementById('phase47NumTemplate').addEventListener('click', numberTemplate);
+    document.getElementById('phase47NumExport').addEventListener('click', exportNumbers);
+    document.getElementById('phase47NumRefresh').addEventListener('click', function(){ loadNumbers().catch(function(err){ alert('Agent number load failed: '+(err&&err.message?err.message:err)); }); });
+    var inp=document.getElementById('phase47AgentNumberCsv');
+    document.getElementById('phase47NumUpload').addEventListener('click', function(){ inp.value=''; inp.click(); });
     inp.addEventListener('change', function(){ uploadNumbers(inp.files && inp.files[0]); });
-    loadNumbers().catch(function(err){ var out=document.getElementById('phase44AgentNumberList'); if(out) out.innerHTML='<div class="phase44-small-note">Could not load agent numbers: '+esc(err&&err.message?err.message:err)+'</div>'; });
+    loadNumbers().catch(function(err){ var out=document.getElementById('phase47AgentNumberList'); if(out) out.innerHTML='<div class="phase47-small-note">Could not load agent numbers: '+esc(err&&err.message?err.message:err)+'</div>'; });
   }
   function boot(){
     ensureNoticeNode(); refreshNotice(); injectOnboardingAdmin(); injectCarrierAdmin();
@@ -21112,5 +21175,6 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
+
 </body>
 </html>
