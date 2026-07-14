@@ -6955,6 +6955,22 @@ Upload a CSV or Excel file with one row per agent and one column per month. Requ
 </div>
 <div id="adminTabCerts" class="admin-tab-panel">
 <div class="admin-section-title">🎓 Carrier Certification Tracker</div>
+<div id="phase58CertReleaseAdminBox" class="phase58-release-admin-box" style="margin:0 0 14px 0;padding:12px 14px;border:1px solid rgba(20,184,166,.35);background:linear-gradient(135deg,rgba(20,184,166,.13),rgba(15,23,42,.34));border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.14);">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px;">
+    <div>
+      <div style="font-size:13px;font-weight:950;color:#eaffff;letter-spacing:.02em;">📅 Carrier Release Dates</div>
+      <div style="font-size:11px;color:var(--muted-2);margin-top:3px;">Post compact release dates for carriers on the Cert Tracker page.</div>
+    </div>
+  </div>
+  <div class="phase58-release-admin-form" style="display:grid;grid-template-columns:minmax(160px,1fr) 150px auto auto;gap:8px;align-items:end;">
+    <div><label style="display:block;font-size:10px;color:var(--muted);font-weight:900;text-transform:uppercase;margin-bottom:4px;">Carrier</label><select id="phase58CarrierSelect" class="admin-input"></select></div>
+    <div><label style="display:block;font-size:10px;color:var(--muted);font-weight:900;text-transform:uppercase;margin-bottom:4px;">Release Date</label><input id="phase58CarrierDate" type="date" class="admin-input"></div>
+    <button type="button" class="admin-save-btn" style="padding:10px 14px;min-height:39px;" onclick="phase58SaveCarrierReleaseDate();return false;">Save Date</button>
+    <button type="button" class="admin-save-btn" style="padding:10px 14px;min-height:39px;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18);color:#dbeafe;" onclick="phase58ClearCarrierReleaseDate();return false;">Clear</button>
+  </div>
+  <div id="phase58ReleaseAdminList" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:#dbeafe;"></div>
+  <div id="phase58ReleaseAdminStatus" style="font-size:11px;color:#93c5fd;font-weight:800;margin-top:7px;"></div>
+</div>
 <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
 Upload your certification CSV or Excel file. Columns: <code>Agent Name</code>, <code>Certification Year</code>, then one column per carrier (<code>AHIP</code>, <code>AARP/UHC</code>, etc.).<br>
 Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <strong>N</strong> for not certified.
@@ -9734,449 +9750,97 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 
 
-<!-- Phase 56: Cert Release Dates Visible Mount Fix - isolated to Cert Tracker only -->
-<style id="phase56-cert-release-dates-visible-style">
-  #certTrackerContent .phase56-release-panel{
-    flex:1 1 100%!important;
-    width:100%!important;
-    box-sizing:border-box!important;
-    display:flex!important;
-    align-items:center!important;
-    gap:8px!important;
-    flex-wrap:wrap!important;
-    padding:8px 12px!important;
-    border-top:1px solid rgba(255,255,255,.14)!important;
-    background:linear-gradient(90deg,rgba(8,15,35,.54),rgba(0,194,184,.10),rgba(220,20,60,.10))!important;
-  }
-  #certTrackerContent .phase56-release-title{
-    display:inline-flex!important;
-    align-items:center!important;
-    min-height:24px!important;
-    padding:4px 9px!important;
-    border-radius:999px!important;
-    background:rgba(255,255,255,.10)!important;
-    color:#ffffff!important;
-    font-size:11px!important;
-    font-weight:950!important;
-    letter-spacing:.05em!important;
-    text-transform:uppercase!important;
-    white-space:nowrap!important;
-  }
-  #certTrackerContent .phase56-release-list{
-    display:flex!important;
-    align-items:center!important;
-    gap:6px!important;
-    flex-wrap:wrap!important;
-    min-width:160px!important;
-    flex:1 1 280px!important;
-  }
-  #certTrackerContent .phase56-release-chip{
-    display:inline-flex!important;
-    align-items:center!important;
-    gap:6px!important;
-    min-height:24px!important;
-    padding:4px 8px!important;
-    border-radius:999px!important;
-    border:1px solid rgba(0,214,202,.32)!important;
-    background:rgba(0,214,202,.12)!important;
-    color:#ecfeff!important;
-    font-size:11px!important;
-    font-weight:850!important;
-    line-height:1!important;
-    white-space:nowrap!important;
-  }
-  #certTrackerContent .phase56-release-chip.empty{
-    border-color:rgba(255,255,255,.18)!important;
-    background:rgba(255,255,255,.07)!important;
-    color:#dbeafe!important;
-  }
-  #certTrackerContent .phase56-release-chip strong{color:#7dfcf0!important;font-weight:950!important;}
-  #certTrackerContent .phase56-release-date{color:#ffffff!important;font-weight:950!important;}
-  #certTrackerContent .phase56-release-admin{
-    display:flex!important;
-    align-items:center!important;
-    gap:6px!important;
-    flex-wrap:wrap!important;
-    padding:5px 7px!important;
-    border-radius:12px!important;
-    border:1px solid rgba(255,255,255,.16)!important;
-    background:rgba(3,8,20,.40)!important;
-    margin-left:auto!important;
-  }
-  #certTrackerContent .phase56-release-admin span{
-    color:#bffefa!important;
-    font-size:10px!important;
-    font-weight:950!important;
-    text-transform:uppercase!important;
-    letter-spacing:.04em!important;
-    white-space:nowrap!important;
-  }
-  #certTrackerContent .phase56-release-admin select,
-  #certTrackerContent .phase56-release-admin input{
-    height:26px!important;
-    border-radius:8px!important;
-    border:1px solid rgba(255,255,255,.18)!important;
-    background:#091a32!important;
-    color:#ffffff!important;
-    font-size:11px!important;
-    font-weight:850!important;
-    padding:0 7px!important;
-    outline:none!important;
-    color-scheme:dark!important;
-  }
-  #certTrackerContent .phase56-release-admin select{max-width:170px!important;}
-  #certTrackerContent .phase56-release-admin button{
-    height:26px!important;
-    border:0!important;
-    border-radius:999px!important;
-    padding:0 10px!important;
-    background:linear-gradient(90deg,#00d6ca,#2f80ff)!important;
-    color:#06182a!important;
-    font-size:10px!important;
-    font-weight:950!important;
-    cursor:pointer!important;
-  }
-  #certTrackerContent .phase56-release-admin button.phase56-clear{
-    background:rgba(255,255,255,.08)!important;
-    border:1px solid rgba(255,255,255,.18)!important;
-    color:#dbeafe!important;
-  }
-  @media(max-width:760px){
-    #certTrackerContent .phase56-release-panel{padding:8px!important;}
-    #certTrackerContent .phase56-release-admin{width:100%!important;margin-left:0!important;}
-  }
+<!-- Phase 58: Clean Cert Carrier Release Dates - admin box + visible cert strip only -->
+<style id="phase58-cert-release-dates-style">
+  #certTrackerContent .phase58-release-strip{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important;width:100%!important;padding:8px 14px!important;background:rgba(3,8,20,.28)!important;border-top:1px solid rgba(255,255,255,.12)!important;}
+  #certTrackerContent .phase58-release-label{font-size:11px!important;font-weight:950!important;text-transform:uppercase!important;letter-spacing:.55px!important;color:#ffd166!important;white-space:nowrap!important;}
+  #certTrackerContent .phase58-release-chip{display:inline-flex!important;align-items:center!important;gap:6px!important;border-radius:999px!important;border:1px solid rgba(125,211,252,.24)!important;background:rgba(15,23,42,.52)!important;color:#eff6ff!important;padding:5px 9px!important;font-size:11px!important;font-weight:850!important;line-height:1!important;}
+  #certTrackerContent .phase58-release-chip strong{color:#7dfcf0!important;font-weight:950!important;}
+  #certTrackerContent .phase58-release-chip.empty{color:#cbd5e1!important;background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.15)!important;}
+  #phase58ReleaseAdminList .phase58-admin-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(125,211,252,.24);background:rgba(15,23,42,.42);border-radius:999px;padding:5px 8px;font-weight:850;}
+  #phase58ReleaseAdminList .phase58-admin-chip strong{color:#7dfcf0;}
+  #phase58ReleaseAdminList .phase58-admin-chip.empty{color:#cbd5e1;border-color:rgba(255,255,255,.15);}
+  @media(max-width:760px){#phase58CertReleaseAdminBox .phase58-release-admin-form{grid-template-columns:1fr!important;}#phase58CertReleaseAdminBox button{width:100%;}}
 </style>
-<script id="phase56-cert-release-dates-visible-script">
+<script id="phase58-cert-release-dates-script">
 (function(){
-  if(window.__phase56CertReleaseDatesVisibleReady) return;
-  window.__phase56CertReleaseDatesVisibleReady=true;
+  if(window.__phase58CertReleaseDatesReady) return;
+  window.__phase58CertReleaseDatesReady=true;
   var URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var KEY='';
-  try{ if(typeof CERT_SUPA_KEY!=='undefined' && CERT_SUPA_KEY) KEY=CERT_SUPA_KEY; }catch(e){}
-  if(!KEY){ KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'; }
+  var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
   var HUB='medi';
   var TILE_KEY='cert_release_dates';
-  var state={dates:{},loaded:false,busy:false};
   var fallbackCarriers=['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
-  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function headers(extra){var o={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; if(extra){Object.keys(extra).forEach(function(k){o[k]=extra[k];});} return o;}
-  function parseData(x){ if(!x) return {}; if(typeof x==='string'){ try{return JSON.parse(x);}catch(e){return {};}} return x; }
-  function toast(msg){ if(window.showSnuToast) window.showSnuToast(msg); else if(window.showToast) window.showToast(msg); else console.log('[Phase56]',msg); }
-  function currentUser(){ return window.HUB_CURRENT_USER || window.currentHubUser || window.__hubUserProfile || null; }
-  function isAdmin(){ var u=currentUser()||{}; var p=u.permissions||{}; var role=String(u.role||'').toLowerCase(); var email=String(u.email||u.user_email||window.loggedInEmail||'').toLowerCase(); return role==='admin' || p.admin===true || p.admin==='true' || email==='brdeross@fjins.net'; }
-  function cleanCarrierName(t){ return String(t||'').replace(/\s+/g,' ').trim(); }
-  function getCarriers(){
-    var ths=Array.from(document.querySelectorAll('#certTrackerContent .cert-lock-table thead th'));
-    var names=ths.map(function(th){return cleanCarrierName(th.textContent);}).filter(Boolean);
-    var skip=/^(agent|name|plan\s*year|year|progress|complete|completion)$/i;
-    var fromTable=names.filter(function(n){return !skip.test(n);});
-    if(fromTable.length>2) return fromTable;
-    try{ if(typeof CERT_CARRIERS!=='undefined' && CERT_CARRIERS && CERT_CARRIERS.length) return CERT_CARRIERS.slice().map(cleanCarrierName).filter(Boolean); }catch(e){}
-    return fallbackCarriers.slice();
-  }
-  function displayDate(v){ if(!v) return ''; var d=new Date(String(v)+'T00:00:00'); if(isNaN(d.getTime())) d=new Date(String(v)); if(isNaN(d.getTime())) return String(v); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
-  async function readDates(){
-    try{
-      var r=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY)+'&select=data&limit=20',{headers:headers()});
-      if(!r.ok) throw new Error('read '+r.status);
-      var rows=await r.json();
-      var merged={};
-      (rows||[]).forEach(function(row){ var data=parseData(row.data); var dates=parseData(data.dates); Object.keys(dates||{}).forEach(function(k){ if(dates[k]) merged[k]=dates[k]; }); });
-      state.dates=merged;
-    }catch(e){ console.warn('[Phase56 cert release dates] read failed',e); state.dates={}; }
-    state.loaded=true;
-    renderReleaseDates();
-  }
-  async function saveDates(){
-    var payload={dates:state.dates,updatedAt:new Date().toISOString()};
-    var delUrl=URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY);
-    var r=await fetch(delUrl,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
-    if(!r.ok && r.status!==404) throw new Error('delete '+r.status);
-    r=await fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({hub:HUB,key:TILE_KEY,data:JSON.stringify(payload)})});
-    if(!r.ok){ var txt=''; try{txt=await r.text();}catch(e){} throw new Error('save '+r.status+' '+txt.slice(0,180)); }
-  }
-  function chipHtml(carriers){
-    var posted=carriers.filter(function(c){ return state.dates && state.dates[c]; });
-    if(!posted.length) return '<span class="phase56-release-chip empty">No carrier release dates posted yet</span>';
-    return posted.map(function(c){ return '<span class="phase56-release-chip"><strong>'+esc(c)+'</strong><span class="phase56-release-date">'+esc(displayDate(state.dates[c]))+'</span></span>'; }).join('');
-  }
-  function adminHtml(carriers){
-    if(!isAdmin()) return '';
-    return '<div class="phase56-release-admin"><span>Set date</span><select id="phase56CarrierSelect">'+carriers.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select><input id="phase56CarrierDate" type="date"><button type="button" onclick="phase56SaveCarrierReleaseDate()">Save</button><button type="button" class="phase56-clear" onclick="phase56ClearCarrierReleaseDate()">Clear</button></div>';
-  }
-  window.renderReleaseDates=window.phase56RenderReleaseDates=function(){ renderReleaseDates(); };
-  function renderReleaseDates(){
-    var content=document.getElementById('certTrackerContent');
-    if(!content) return;
-    var top=content.querySelector('.cert-topbar') || content;
-    top.querySelectorAll('.phase56-release-panel').forEach(function(n){n.remove();});
-    var carriers=getCarriers();
-    var panel=document.createElement('div');
-    panel.className='phase56-release-panel';
-    panel.innerHTML='<span class="phase56-release-title">Release Dates</span><div class="phase56-release-list">'+chipHtml(carriers)+'</div>'+adminHtml(carriers);
-    if(top.classList && top.classList.contains('cert-topbar')) top.appendChild(panel); else top.insertBefore(panel, top.firstChild);
-  }
-  window.phase56SaveCarrierReleaseDate=async function(){
-    var carrier=(document.getElementById('phase56CarrierSelect')||{}).value||'';
-    var date=(document.getElementById('phase56CarrierDate')||{}).value||'';
-    if(!carrier) return toast('Choose a carrier.');
-    if(!date) return toast('Choose a release date.');
-    state.dates[carrier]=date;
-    renderReleaseDates();
-    try{ await saveDates(); toast('Carrier release date saved.'); }
-    catch(e){ console.warn('[Phase56 cert release dates] save failed',e); toast('Release date save failed: '+(e.message||e)); }
-  };
-  window.phase56ClearCarrierReleaseDate=async function(){
-    var carrier=(document.getElementById('phase56CarrierSelect')||{}).value||'';
-    if(!carrier) return toast('Choose a carrier.');
-    delete state.dates[carrier];
-    renderReleaseDates();
-    try{ await saveDates(); toast('Carrier release date cleared.'); }
-    catch(e){ console.warn('[Phase56 cert release dates] clear failed',e); toast('Clear failed: '+(e.message||e)); }
-  };
-  var debounce=null;
-  function schedule(){ clearTimeout(debounce); debounce=setTimeout(function(){ if(state.loaded) renderReleaseDates(); else readDates(); },120); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ readDates(); setTimeout(schedule,800); setTimeout(schedule,2000); });
-  else { readDates(); setTimeout(schedule,800); setTimeout(schedule,2000); }
-  var cert=document.getElementById('certTrackerContent');
-  if(cert && window.MutationObserver){
-    var obs=new MutationObserver(function(muts){
-      if(state.busy) return;
-      var meaningful=muts.some(function(m){ return Array.from(m.addedNodes||[]).concat(Array.from(m.removedNodes||[])).some(function(n){ return n.nodeType===1 && !(n.classList&&n.classList.contains('phase56-release-panel')); }); });
-      if(meaningful) schedule();
-    });
-    obs.observe(cert,{childList:true,subtree:true});
-  }
-  var oldRender=window.renderCertTracker;
-  if(typeof oldRender==='function'){
-    window.renderCertTracker=function(){ var out=oldRender.apply(this,arguments); setTimeout(schedule,160); return out; };
-  }
-})();
-</script>
-
-
-
-<!-- Phase 57: Cert Release Dates Admin Mount - isolated Certs admin + visible cert page only -->
-<style id="phase57-cert-release-admin-style">
-  #adminTabCerts .phase57-cert-release-box{
-    margin:14px 0 16px 0;
-    padding:12px 14px;
-    border:1px solid rgba(0,214,202,.34);
-    border-radius:14px;
-    background:linear-gradient(135deg,rgba(0,214,202,.12),rgba(220,20,60,.08));
-    box-shadow:0 10px 24px rgba(0,0,0,.14);
-  }
-  #adminTabCerts .phase57-cert-release-title{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:9px;
-    color:#e5f2ff;
-    font-size:13px;
-    font-weight:950;
-  }
-  #adminTabCerts .phase57-cert-release-title span{color:#7dfcf0;font-size:11px;font-weight:850;}
-  #adminTabCerts .phase57-cert-release-form{
-    display:grid;
-    grid-template-columns:minmax(150px,1.1fr) minmax(135px,.85fr) auto auto;
-    gap:8px;
-    align-items:end;
-  }
-  #adminTabCerts .phase57-cert-release-form label{
-    display:block;
-    font-size:10px;
-    color:var(--muted-2,#a8c7df);
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:.04em;
-    margin-bottom:4px;
-  }
-  #adminTabCerts .phase57-cert-release-form select,
-  #adminTabCerts .phase57-cert-release-form input{
-    width:100%;
-    height:34px;
-    box-sizing:border-box;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,.18);
-    background:#0b1d38;
-    color:#fff;
-    padding:0 10px;
-    font-size:12px;
-    font-weight:800;
-    color-scheme:dark;
-  }
-  #adminTabCerts .phase57-cert-release-form button{
-    height:34px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.16);
-    padding:0 14px;
-    font-size:11px;
-    font-weight:950;
-    cursor:pointer;
-    white-space:nowrap;
-    color:#06182a;
-    background:linear-gradient(90deg,#00d6ca,#63b3ed);
-  }
-  #adminTabCerts .phase57-cert-release-form button.clear{
-    background:rgba(255,255,255,.08);
-    color:#dbeafe;
-  }
-  #adminTabCerts .phase57-cert-release-list{
-    margin-top:10px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-  #adminTabCerts .phase57-cert-release-chip{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:5px 8px;
-    border-radius:999px;
-    border:1px solid rgba(0,214,202,.28);
-    background:rgba(0,214,202,.10);
-    color:#ecfeff;
-    font-size:11px;
-    font-weight:850;
-  }
-  #adminTabCerts .phase57-cert-release-chip.empty{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dbeafe;}
-  #adminTabCerts .phase57-cert-release-status{margin-top:7px;font-size:11px;color:#93c5fd;font-weight:850;}
-  #certTrackerContent .phase57-cert-release-visible{
-    display:flex!important;
-    align-items:center!important;
-    gap:7px!important;
-    flex-wrap:wrap!important;
-    width:100%!important;
-    padding:7px 10px!important;
-    border-top:1px solid rgba(255,255,255,.12)!important;
-    background:linear-gradient(90deg,rgba(0,214,202,.12),rgba(220,20,60,.09))!important;
-  }
-  #certTrackerContent .phase57-cert-release-visible-title{
-    font-size:11px!important;
-    font-weight:950!important;
-    text-transform:uppercase!important;
-    color:#fff!important;
-    padding:4px 8px!important;
-    border-radius:999px!important;
-    background:rgba(255,255,255,.10)!important;
-  }
-  #certTrackerContent .phase57-cert-release-visible-chip{
-    display:inline-flex!important;
-    gap:6px!important;
-    align-items:center!important;
-    padding:4px 8px!important;
-    border-radius:999px!important;
-    border:1px solid rgba(0,214,202,.28)!important;
-    background:rgba(0,214,202,.12)!important;
-    color:#ecfeff!important;
-    font-size:11px!important;
-    font-weight:850!important;
-  }
-  #certTrackerContent .phase57-cert-release-visible-chip.empty{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.18)!important;color:#dbeafe!important;}
-  @media(max-width:760px){#adminTabCerts .phase57-cert-release-form{grid-template-columns:1fr 1fr;}#adminTabCerts .phase57-cert-release-form button{width:100%;}}
-</style>
-<script id="phase57-cert-release-admin-script">
-(function(){
-  if(window.__phase57CertReleaseAdminReady) return;
-  window.__phase57CertReleaseAdminReady=true;
-  var URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var KEY='';
-  try{ if(typeof CERT_SUPA_KEY!=='undefined' && CERT_SUPA_KEY) KEY=CERT_SUPA_KEY; }catch(e){}
-  if(!KEY){ KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'; }
-  var HUB='medi';
-  var TILE_KEY='cert_release_dates';
-  var state={dates:{},loaded:false};
-  var carriers=['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
+  var dates={};
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function headers(extra){var h={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; if(extra){Object.keys(extra).forEach(function(k){h[k]=extra[k];});} return h;}
+  function toast(msg){try{ if(window.showSnuToast) window.showSnuToast(msg); else if(window.showToast) window.showToast(msg); else alert(msg); }catch(e){console.log(msg);}}
   function parseData(x){ if(!x) return {}; if(typeof x==='string'){try{return JSON.parse(x);}catch(e){return {};}} return x; }
-  function toast(msg){ if(window.showSnuToast) window.showSnuToast(msg); else if(window.showToast) window.showToast(msg); else console.log('[Phase57]',msg); }
-  function displayDate(v){ if(!v) return ''; var d=new Date(String(v)+'T00:00:00'); if(isNaN(d.getTime())) d=new Date(String(v)); if(isNaN(d.getTime())) return String(v); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
-  function currentCarrierList(){
-    var list=[];
-    try{ if(typeof CERT_CARRIERS!=='undefined' && CERT_CARRIERS && CERT_CARRIERS.length) list=CERT_CARRIERS.slice(); }catch(e){}
-    if(!list.length){
-      var ths=[].slice.call(document.querySelectorAll('#certTrackerContent .cert-lock-table thead th'));
-      list=ths.map(function(th){return String(th.textContent||'').trim();}).filter(function(n){return n && !/^(agent|year|progress)$/i.test(n);});
-    }
-    if(!list.length) list=carriers.slice();
-    return list.filter(function(c,i,a){return c && a.indexOf(c)===i;});
+  function getCarriers(){
+    var ths=[].slice.call(document.querySelectorAll('#certTrackerContent .cert-lock-table thead th'));
+    var names=ths.slice(3).map(function(th){return th.textContent.trim();}).filter(Boolean);
+    if(names.length) return names;
+    try{ if(Array.isArray(window.CERT_CARRIERS) && window.CERT_CARRIERS.length) return window.CERT_CARRIERS.slice(); }catch(e){}
+    return fallbackCarriers.slice();
   }
-  async function readDates(){
+  function displayDate(v){ if(!v) return ''; var d=new Date(String(v)+'T00:00:00'); if(isNaN(d.getTime())) return String(v); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+  async function loadDates(){
     try{
-      var r=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY)+'&select=data&limit=20',{headers:headers()});
+      var r=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY)+'&select=data&limit=1',{headers:headers()});
       if(!r.ok) throw new Error('read '+r.status);
       var rows=await r.json();
-      var merged={};
-      (rows||[]).forEach(function(row){ var d=parseData(row.data); var dates=parseData(d.dates); Object.keys(dates||{}).forEach(function(k){ if(dates[k]) merged[k]=dates[k]; }); });
-      state.dates=merged; state.loaded=true;
-    }catch(e){ console.warn('[Phase57 release dates] read failed',e); state.loaded=true; }
+      var data=parseData(rows&&rows[0]?rows[0].data:null);
+      dates=parseData(data.dates)||{};
+    }catch(e){ console.warn('[Phase58 release dates] read failed',e); }
     renderAll();
   }
   async function saveDates(){
-    var payload={dates:state.dates,updatedAt:new Date().toISOString()};
+    var payload={dates:dates,updatedAt:new Date().toISOString()};
     var del=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
-    if(!del.ok && del.status!==404) throw new Error('delete '+del.status);
-    var r=await fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({hub:HUB,key:TILE_KEY,data:JSON.stringify(payload)})});
-    if(!r.ok){var t='';try{t=await r.text();}catch(e){} throw new Error('save '+r.status+' '+t.slice(0,160));}
+    if(!del.ok && del.status!==404){ throw new Error('delete '+del.status); }
+    var body={hub:HUB,key:TILE_KEY,data:JSON.stringify(payload)};
+    var post=await fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(body)});
+    if(!post.ok){ var t=''; try{t=await post.text();}catch(e){} throw new Error('save '+post.status+' '+t.slice(0,160)); }
   }
   function chips(cls){
-    var list=currentCarrierList().filter(function(c){return state.dates[c];});
-    if(!list.length) return '<span class="'+cls+' empty">No carrier release dates posted yet</span>';
-    return list.map(function(c){return '<span class="'+cls+'"><strong>'+esc(c)+'</strong><span>'+esc(displayDate(state.dates[c]))+'</span></span>';}).join('');
-  }
-  function ensureAdminBox(){
-    var tab=document.getElementById('adminTabCerts'); if(!tab) return null;
-    var box=document.getElementById('phase57CertReleaseAdminBox');
-    if(!box){
-      box=document.createElement('div'); box.id='phase57CertReleaseAdminBox'; box.className='phase57-cert-release-box';
-      var drop=tab.querySelector('#certCsvDrop') || tab.querySelector('.csv-drop-zone');
-      if(drop && drop.parentNode) drop.parentNode.insertBefore(box, drop); else tab.insertBefore(box, tab.firstChild);
-    }
-    return box;
+    var carriers=getCarriers();
+    var posted=carriers.filter(function(c){return dates && dates[c];});
+    if(!posted.length) return '<span class="'+cls+' empty">No carrier release dates posted yet</span>';
+    return posted.map(function(c){return '<span class="'+cls+'"><strong>'+esc(c)+'</strong> '+esc(displayDate(dates[c]))+'</span>';}).join('');
   }
   function renderAdmin(){
-    var box=ensureAdminBox(); if(!box) return;
-    var opts=currentCarrierList().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
-    box.innerHTML='<div class="phase57-cert-release-title">📅 Carrier Release Dates <span>Admin date posts for cert page</span></div>'+
-      '<div class="phase57-cert-release-form"><div><label>Carrier</label><select id="phase57CarrierSelect">'+opts+'</select></div><div><label>Release date</label><input id="phase57CarrierDate" type="date"></div><button type="button" onclick="phase57SaveCarrierReleaseDate()">Save Date</button><button type="button" class="clear" onclick="phase57ClearCarrierReleaseDate()">Clear</button></div>'+
-      '<div class="phase57-cert-release-list">'+chips('phase57-cert-release-chip')+'</div><div id="phase57CertReleaseStatus" class="phase57-cert-release-status"></div>';
+    var box=document.getElementById('phase58CertReleaseAdminBox'); if(!box) return;
+    var sel=document.getElementById('phase58CarrierSelect');
+    if(sel){ var current=sel.value; var html=getCarriers().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join(''); if(sel.innerHTML!==html) sel.innerHTML=html; if(current) sel.value=current; }
+    var list=document.getElementById('phase58ReleaseAdminList'); if(list) list.innerHTML=chips('phase58-admin-chip');
   }
   function renderVisible(){
-    var content=document.getElementById('certTrackerContent'); if(!content) return;
-    var top=content.querySelector('.cert-topbar'); if(!top) return;
-    [].slice.call(top.querySelectorAll('.phase57-cert-release-visible')).forEach(function(n){n.remove();});
-    var panel=document.createElement('div'); panel.className='phase57-cert-release-visible';
-    panel.innerHTML='<span class="phase57-cert-release-visible-title">Release Dates</span>'+chips('phase57-cert-release-visible-chip');
-    top.appendChild(panel);
+    var top=document.querySelector('#certTrackerContent .cert-topbar'); if(!top) return;
+    [].slice.call(top.querySelectorAll('.phase58-release-strip')).forEach(function(n){n.remove();});
+    var strip=document.createElement('div'); strip.className='phase58-release-strip'; strip.innerHTML='<span class="phase58-release-label">Release Dates</span>'+chips('phase58-release-chip'); top.appendChild(strip);
   }
   function renderAll(){ renderAdmin(); renderVisible(); }
-  window.phase57SaveCarrierReleaseDate=async function(){
-    var c=(document.getElementById('phase57CarrierSelect')||{}).value||''; var d=(document.getElementById('phase57CarrierDate')||{}).value||'';
-    if(!c) return toast('Choose a carrier.'); if(!d) return toast('Choose a release date.');
-    state.dates[c]=d; renderAll();
-    try{ await saveDates(); toast('Carrier release date saved.'); var s=document.getElementById('phase57CertReleaseStatus'); if(s) s.textContent='Saved '+c+' release date.'; if(window.phase56RenderReleaseDates) window.phase56RenderReleaseDates(); }
-    catch(e){ toast('Release date save failed: '+(e.message||e)); }
+  window.phase58SaveCarrierReleaseDate=async function(){
+    var sel=document.getElementById('phase58CarrierSelect'); var input=document.getElementById('phase58CarrierDate'); var carrier=sel?sel.value:''; var date=input?input.value:'';
+    if(!carrier) return toast('Choose a carrier.'); if(!date) return toast('Choose a release date.');
+    dates[carrier]=date; renderAll();
+    try{ await saveDates(); var s=document.getElementById('phase58ReleaseAdminStatus'); if(s) s.textContent='Saved '+carrier+' release date.'; toast('Carrier release date saved.'); }
+    catch(e){ console.warn(e); toast('Release date save failed: '+(e.message||e)); }
   };
-  window.phase57ClearCarrierReleaseDate=async function(){
-    var c=(document.getElementById('phase57CarrierSelect')||{}).value||''; if(!c) return toast('Choose a carrier.');
-    delete state.dates[c]; renderAll();
-    try{ await saveDates(); toast('Carrier release date cleared.'); var s=document.getElementById('phase57CertReleaseStatus'); if(s) s.textContent='Cleared '+c+' release date.'; if(window.phase56RenderReleaseDates) window.phase56RenderReleaseDates(); }
-    catch(e){ toast('Clear failed: '+(e.message||e)); }
+  window.phase58ClearCarrierReleaseDate=async function(){
+    var sel=document.getElementById('phase58CarrierSelect'); var carrier=sel?sel.value:'';
+    if(!carrier) return toast('Choose a carrier.'); delete dates[carrier]; renderAll();
+    try{ await saveDates(); var s=document.getElementById('phase58ReleaseAdminStatus'); if(s) s.textContent='Cleared '+carrier+' release date.'; toast('Carrier release date cleared.'); }
+    catch(e){ console.warn(e); toast('Clear failed: '+(e.message||e)); }
   };
-  window.phase57RefreshCertReleaseDates=function(){ readDates(); };
-  function schedule(){ setTimeout(renderAll,80); setTimeout(renderAll,600); setTimeout(renderAll,1600); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){readDates(); schedule();}); else {readDates(); schedule();}
-  document.addEventListener('click',function(e){ if(e.target && e.target.closest && e.target.closest('[onclick*="adminTabCerts"], .admin-tab')) setTimeout(renderAll,250); });
-  var oldSwitch=window.switchAdminTab;
-  if(typeof oldSwitch==='function'){
-    window.switchAdminTab=function(){ var r=oldSwitch.apply(this,arguments); setTimeout(renderAll,180); return r; };
-  }
+  window.phase58RefreshCarrierReleaseDates=function(){ loadDates(); };
+  function boot(){ loadDates(); setTimeout(renderAll,600); setTimeout(renderAll,1600); setTimeout(renderAll,3200); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   var oldRender=window.renderCertTracker;
   if(typeof oldRender==='function'){
-    window.renderCertTracker=function(){ var r=oldRender.apply(this,arguments); setTimeout(renderVisible,180); return r; };
+    window.renderCertTracker=function(){ var out=oldRender.apply(this,arguments); setTimeout(renderAll,150); return out; };
   }
+  try{ var obs=new MutationObserver(function(){ setTimeout(renderAll,80); }); obs.observe(document.body,{childList:true,subtree:true}); }catch(e){}
 })();
 </script>
 
@@ -21854,214 +21518,6 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 <!-- END PHASE 48 -->
-
-
-<!-- Phase 53: Cert carrier release dates compact top-bar module -->
-<style id="phase53-cert-release-dates-style">
-  #certTrackerContent .cert-topbar{
-    flex-wrap:wrap!important;
-    align-items:center!important;
-    gap:8px 12px!important;
-    min-height:72px!important;
-    padding-bottom:10px!important;
-  }
-  #certTrackerContent .phase53-cert-release-strip{
-    flex:1 1 100%!important;
-    display:flex!important;
-    align-items:center!important;
-    gap:7px!important;
-    overflow-x:auto!important;
-    padding:6px 2px 0!important;
-    scrollbar-width:thin!important;
-  }
-  #certTrackerContent .phase53-release-label{
-    flex:0 0 auto!important;
-    font-size:11px!important;
-    font-weight:950!important;
-    letter-spacing:.05em!important;
-    text-transform:uppercase!important;
-    color:#eaf6ff!important;
-    opacity:.92!important;
-    margin-right:2px!important;
-  }
-  #certTrackerContent .phase53-release-chip{
-    flex:0 0 auto!important;
-    display:inline-flex!important;
-    align-items:center!important;
-    gap:5px!important;
-    border-radius:999px!important;
-    padding:5px 8px!important;
-    border:1px solid rgba(0,214,202,.32)!important;
-    background:rgba(0,214,202,.10)!important;
-    color:#eaffff!important;
-    font-size:11px!important;
-    font-weight:850!important;
-    white-space:nowrap!important;
-    line-height:1!important;
-  }
-  #certTrackerContent .phase53-release-chip.empty{
-    border-color:rgba(255,255,255,.16)!important;
-    background:rgba(255,255,255,.06)!important;
-    color:#cbd5e1!important;
-  }
-  #certTrackerContent .phase53-release-chip strong{color:#7dfcf0!important;font-weight:950!important;}
-  #certTrackerContent .phase53-release-date{color:#fff!important;font-weight:950!important;}
-  #certTrackerContent .phase53-release-admin{
-    flex:1 1 100%!important;
-    display:flex!important;
-    align-items:center!important;
-    gap:7px!important;
-    flex-wrap:wrap!important;
-    padding:7px 8px!important;
-    border-radius:12px!important;
-    border:1px solid rgba(255,255,255,.14)!important;
-    background:rgba(6,18,38,.38)!important;
-    max-width:780px!important;
-  }
-  #certTrackerContent .phase53-release-admin span{
-    color:#aeefff!important;
-    font-size:11px!important;
-    font-weight:900!important;
-    text-transform:uppercase!important;
-    letter-spacing:.04em!important;
-  }
-  #certTrackerContent .phase53-release-admin select,
-  #certTrackerContent .phase53-release-admin input{
-    height:28px!important;
-    border-radius:9px!important;
-    border:1px solid rgba(255,255,255,.18)!important;
-    background:#091a32!important;
-    color:#ffffff!important;
-    font-size:12px!important;
-    font-weight:800!important;
-    padding:0 8px!important;
-    outline:none!important;
-    color-scheme:dark!important;
-  }
-  #certTrackerContent .phase53-release-admin select{max-width:190px!important;}
-  #certTrackerContent .phase53-release-admin button{
-    height:28px!important;
-    border:0!important;
-    border-radius:999px!important;
-    padding:0 11px!important;
-    background:linear-gradient(90deg,#00d6ca,#2f80ff)!important;
-    color:#06182a!important;
-    font-size:11px!important;
-    font-weight:950!important;
-    cursor:pointer!important;
-  }
-  #certTrackerContent .phase53-release-admin button.clear{
-    background:rgba(255,255,255,.08)!important;
-    border:1px solid rgba(255,255,255,.18)!important;
-    color:#dbeafe!important;
-  }
-</style>
-<script id="phase53-cert-release-dates-script">
-(function(){
-  if(window.__phase53CertReleaseDatesReady) return;
-  window.__phase53CertReleaseDatesReady = true;
-  var URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var KEY='';
-  try { if (typeof CERT_SUPA_KEY !== 'undefined' && CERT_SUPA_KEY) KEY = CERT_SUPA_KEY; } catch(e) {}
-  if(!KEY){ KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'; }
-  var HUB='medi';
-  var TILE_KEY='cert_release_dates';
-  var fallbackCarriers=['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
-  var state={dates:{},loaded:false};
-  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function h(extra){var o={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; if(extra){Object.keys(extra).forEach(function(k){o[k]=extra[k];});} return o;}
-  function parseData(x){ if(!x) return {}; if(typeof x==='string'){ try{return JSON.parse(x);}catch(e){return {};}} return x; }
-  function toast(msg){ if(window.showSnuToast) window.showSnuToast(msg); else if(window.showToast) window.showToast(msg); else console.log('[Phase53]',msg); }
-  function currentUser(){ return window.HUB_CURRENT_USER || window.currentHubUser || window.__hubUserProfile || null; }
-  function isAdmin(){ var u=currentUser()||{}; var p=u.permissions||{}; var role=String(u.role||'').toLowerCase(); return role==='admin' || p.admin===true || p.admin==='true' || p.cert_tracker===true && p.admin===true; }
-  function getCarriers(){
-    var table=document.querySelector('#certTrackerContent .cert-lock-table');
-    var headers=table?Array.from(table.querySelectorAll('thead th')).slice(3).map(function(th){return th.textContent.trim();}).filter(Boolean):[];
-    if(headers.length) return headers;
-    try { if (typeof CERT_CARRIERS !== 'undefined' && CERT_CARRIERS && CERT_CARRIERS.length) return CERT_CARRIERS.slice(); } catch(e) {}
-    return fallbackCarriers.slice();
-  }
-  function displayDate(val){
-    if(!val) return '';
-    var d=new Date(String(val)+'T00:00:00');
-    if(isNaN(d.getTime())) return String(val);
-    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  }
-  async function readDates(){
-    try{
-      var r=await fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY)+'&select=data&limit=1',{headers:h()});
-      if(!r.ok) throw new Error('read '+r.status);
-      var rows=await r.json();
-      var data=parseData(rows&&rows[0]?rows[0].data:null);
-      state.dates=parseData(data.dates)||{};
-    }catch(e){ console.warn('[Phase53 cert release dates] read failed',e); state.dates={}; }
-    state.loaded=true;
-    render();
-  }
-  async function saveDates(){
-    var payload={dates:state.dates,updatedAt:new Date().toISOString()};
-    var delUrl=URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(TILE_KEY);
-    var body={hub:HUB,key:TILE_KEY,data:JSON.stringify(payload)};
-    var r=await fetch(delUrl,{method:'DELETE',headers:h({'Prefer':'return=minimal'})});
-    if(!r.ok && r.status!==404) throw new Error('delete '+r.status);
-    r=await fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:h({'Prefer':'return=minimal'}),body:JSON.stringify(body)});
-    if(!r.ok){ var txt=''; try{txt=await r.text();}catch(e){} throw new Error('save '+r.status+' '+txt.slice(0,180)); }
-  }
-  function chipHtml(carriers){
-    var posted=carriers.filter(function(c){return state.dates && state.dates[c];});
-    if(!posted.length) return '<span class="phase53-release-chip empty">No carrier release dates posted yet</span>';
-    return posted.map(function(c){return '<span class="phase53-release-chip"><strong>'+esc(c)+'</strong><span class="phase53-release-date">'+esc(displayDate(state.dates[c]))+'</span></span>';}).join('');
-  }
-  function adminHtml(carriers){
-    if(!isAdmin()) return '';
-    return '<div class="phase53-release-admin"><span>Admin release date</span><select id="phase53CarrierSelect">'+carriers.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select><input id="phase53CarrierDate" type="date"><button type="button" onclick="phase53SaveCarrierReleaseDate()">Save</button><button type="button" class="clear" onclick="phase53ClearCarrierReleaseDate()">Clear</button></div>';
-  }
-  function render(){
-    var top=document.querySelector('#certTrackerContent .cert-topbar');
-    if(!top) return;
-    top.querySelectorAll('.phase53-cert-release-strip,.phase53-release-admin').forEach(function(n){n.remove();});
-    var carriers=getCarriers();
-    var strip=document.createElement('div');
-    strip.className='phase53-cert-release-strip';
-    strip.innerHTML='<span class="phase53-release-label">Release dates</span>'+chipHtml(carriers);
-    top.appendChild(strip);
-    if(isAdmin()){
-      var admin=document.createElement('div');
-      admin.innerHTML=adminHtml(carriers);
-      top.appendChild(admin.firstChild);
-    }
-  }
-  window.phase53SaveCarrierReleaseDate=async function(){
-    var carrier=(document.getElementById('phase53CarrierSelect')||{}).value||'';
-    var date=(document.getElementById('phase53CarrierDate')||{}).value||'';
-    if(!carrier) return toast('Choose a carrier.');
-    if(!date) return toast('Choose a release date.');
-    state.dates[carrier]=date;
-    render();
-    try{ await saveDates(); toast('Release date saved.'); }
-    catch(e){ console.warn('[Phase53 cert release dates] save failed',e); toast('Release date save failed: '+(e.message||e)); }
-  };
-  window.phase53ClearCarrierReleaseDate=async function(){
-    var carrier=(document.getElementById('phase53CarrierSelect')||{}).value||'';
-    if(!carrier) return;
-    delete state.dates[carrier];
-    render();
-    try{ await saveDates(); toast('Release date cleared.'); }
-    catch(e){ console.warn('[Phase53 cert release dates] clear failed',e); toast('Clear failed: '+(e.message||e)); }
-  };
-  function schedule(){ setTimeout(function(){ if(!state.loaded) readDates(); else render(); },200); setTimeout(render,1200); setTimeout(render,3200); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',schedule); else schedule();
-  var oldRender=window.renderCertTracker;
-  if(typeof oldRender==='function'){
-    window.renderCertTracker=function(){ var out=oldRender.apply(this,arguments); setTimeout(function(){ if(state.loaded) render(); else readDates();},80); return out; };
-  }
-  var oldEmergency=window.emergencyReloadCoreHubData;
-  if(typeof oldEmergency==='function'){
-    window.emergencyReloadCoreHubData=function(){ var out=oldEmergency.apply(this,arguments); setTimeout(function(){ if(state.loaded) render(); else readDates();},450); return out; };
-  }
-})();
-</script>
-
 
 
 <!-- Phase 55: Onboarding fullscreen title/scroll fix - isolated to onboarding overlay only -->
