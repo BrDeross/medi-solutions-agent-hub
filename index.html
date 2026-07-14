@@ -20924,5 +20924,177 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 </script>
 
 
+
+
+<!-- Phase 44: isolated restore - onboarding notice + admin agent number tools only -->
+<style id="phase44-isolated-style">
+  #phase44OnboardingNotice{
+    display:none;
+    margin: 0 0 18px 0;
+    border: 2px solid rgba(255,138,0,.75);
+    background: linear-gradient(135deg, rgba(255,138,0,.28), rgba(255,193,7,.14), rgba(15,23,42,.88));
+    box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 0 24px rgba(255,138,0,.28);
+    border-radius: 16px;
+    padding: 14px 16px;
+    color: #fff7ed;
+    animation: phase44Pulse 1.25s ease-in-out infinite;
+  }
+  #phase44OnboardingNotice .p44-title{font-weight:900;letter-spacing:.2px;margin-bottom:4px;color:#ffedd5;}
+  #phase44OnboardingNotice .p44-body{font-size:13px;line-height:1.45;color:#fff7ed;opacity:.96;}
+  @keyframes phase44Pulse{
+    0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px rgba(255,138,0,.22);transform:translateY(0);}
+    50%{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 0 34px rgba(255,138,0,.55);transform:translateY(-1px);}
+  }
+  .phase44-admin-box{
+    margin: 0 0 16px 0;
+    padding: 14px;
+    border: 1px solid rgba(45,212,191,.25);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, .35);
+  }
+  .phase44-admin-box h3{margin:0 0 6px 0;font-size:15px;color:#e5f9ff;}
+  .phase44-admin-box p{margin:0 0 10px 0;font-size:12px;color:var(--muted-2);line-height:1.45;}
+  .phase44-admin-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .phase44-small-note{margin-top:8px;font-size:11px;color:var(--muted-2);line-height:1.45;}
+</style>
+<script id="phase44-isolated-onboarding-agentnumbers">
+(function(){
+  'use strict';
+  var P44_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var P44_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'.replace('eyJpc3MiOiJIUzI1NiIsInJlZiI6','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6');
+  var P44_HUB = 'medi';
+  var NOTICE_KEY = 'onboarding_status';
+  var numberRowsCache = [];
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function headers(extra){ var h = {'apikey': P44_KEY, 'Authorization':'Bearer '+P44_KEY, 'Content-Type':'application/json'}; if(extra){ Object.keys(extra).forEach(function(k){h[k]=extra[k];}); } return h; }
+  function toast(msg){ if (typeof window.showSnuToast === 'function') window.showSnuToast(msg); else console.log('[Phase44]', msg); }
+  function currentUser(){ return window.currentHubUser || window.HUB_CURRENT_USER || window.__hubUserProfile || null; }
+  function isAdmin(){ var u=currentUser()||{}; var role=String(u.role||'').toLowerCase(); var p=u.permissions||{}; return role==='admin' || p.admin===true || p.carrier_directory_upload===true || p.carrier_directory_edit===true; }
+  function readStatus(){
+    return fetch(P44_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(P44_HUB) + '&key=eq.' + encodeURIComponent(NOTICE_KEY) + '&select=data&limit=1', {headers: headers({'Cache-Control':'no-cache'})})
+      .then(function(r){ if(!r.ok) throw new Error('status read '+r.status); return r.json(); })
+      .then(function(rows){
+        var data = rows && rows[0] ? rows[0].data : null;
+        if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e){} }
+        return !!(data && (data.active === true || data.active === 'true' || data.on === true || data.enabled === true));
+      }).catch(function(){
+        return localStorage.getItem('phase44_onboarding_notice_active') === 'true';
+      });
+  }
+  function saveStatus(active){
+    localStorage.setItem('phase44_onboarding_notice_active', active ? 'true' : 'false');
+    var body = {hub:P44_HUB, key:NOTICE_KEY, data:{active:!!active, updatedAt:new Date().toISOString(), source:'phase44'}};
+    return fetch(P44_URL + '/rest/v1/tile_content?on_conflict=hub,key', {
+      method:'POST', headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}), body:JSON.stringify(body)
+    }).then(function(r){ if(!r.ok) throw new Error('status save '+r.status); });
+  }
+  function ensureNoticeNode(){
+    var sec = document.getElementById('ga-resources');
+    if(!sec) return null;
+    var wrap = sec.querySelector('.wrap') || sec;
+    var node = document.getElementById('phase44OnboardingNotice');
+    if(!node){
+      node = document.createElement('div');
+      node.id = 'phase44OnboardingNotice';
+      node.innerHTML = '<div class="p44-title">⚠️ Agent Onboarding Section Under Construction</div><div class="p44-body">This section is currently being updated. If a form, link, video, or instruction appears to be missing, please contact the support team before assuming it is unavailable.</div>';
+      var head = wrap.querySelector('.section-head');
+      if(head && head.nextSibling) wrap.insertBefore(node, head.nextSibling); else wrap.insertBefore(node, wrap.firstChild);
+    }
+    return node;
+  }
+  function applyNotice(active){
+    var node = ensureNoticeNode();
+    if(node) node.style.display = active ? 'block' : 'none';
+    var status = document.getElementById('phase44NoticeStatus');
+    if(status) status.textContent = active ? 'Currently ON - agents can see the warning.' : 'Currently OFF - agents do not see the warning.';
+    var btn = document.getElementById('phase44ToggleNoticeBtn');
+    if(btn) btn.textContent = active ? 'Turn Notice Off' : 'Turn Notice On';
+  }
+  function refreshNotice(){ readStatus().then(applyNotice); }
+  function injectOnboardingAdmin(){
+    var panel = document.querySelector('#adminTabOnboarding .admin-body');
+    if(!panel || document.getElementById('phase44OnboardingAdminBox')) return;
+    var box = document.createElement('div');
+    box.id = 'phase44OnboardingAdminBox';
+    box.className = 'phase44-admin-box';
+    box.innerHTML = '<h3>⚠️ Page Under Construction Notice</h3><p>Toggle the flashing orange Agent Onboarding warning for all users who can see the Agent Onboarding & Resources section.</p><div class="phase44-admin-row"><button type="button" class="admin-btn" id="phase44ToggleNoticeBtn">Loading...</button><button type="button" class="admin-btn" id="phase44RefreshNoticeBtn">Refresh Notice</button></div><div class="phase44-small-note" id="phase44NoticeStatus">Checking status...</div>';
+    panel.insertBefore(box, panel.firstChild);
+    document.getElementById('phase44ToggleNoticeBtn').addEventListener('click', function(){
+      readStatus().then(function(active){ return saveStatus(!active).then(function(){ applyNotice(!active); toast('Onboarding notice ' + (!active ? 'turned on.' : 'turned off.')); }); }).catch(function(err){ alert('Notice update failed: ' + (err && err.message ? err.message : err)); });
+    });
+    document.getElementById('phase44RefreshNoticeBtn').addEventListener('click', refreshNotice);
+    refreshNotice();
+  }
+  function csvEscape(value){ var s=String(value == null ? '' : value); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
+  function downloadCsv(name, rows){ var csv=rows.map(function(r){return r.map(csvEscape).join(',');}).join('\n'); var blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(a.href);},800); }
+  function parseCsv(text){
+    var rows=[], row=[], cell='', q=false, s=String(text||'');
+    for(var i=0;i<s.length;i++){var ch=s[i], nx=s[i+1]; if(ch==='"'){ if(q && nx==='"'){cell+='"'; i++;} else q=!q;} else if(ch===',' && !q){row.push(cell);cell='';} else if((ch==='\n'||ch==='\r')&&!q){ if(ch==='\r'&&nx==='\n') i++; row.push(cell); cell=''; if(row.some(function(v){return String(v).trim()!=='';})) rows.push(row); row=[];} else cell+=ch;}
+    row.push(cell); if(row.some(function(v){return String(v).trim()!=='';})) rows.push(row); return rows;
+  }
+  function parseObjects(text){ var parsed=parseCsv(text); if(parsed.length<2) throw new Error('CSV has no data rows.'); var heads=parsed[0].map(function(h){return String(h||'').trim().toLowerCase().replace(/\s+/g,'_');}); return parsed.slice(1).map(function(r){var o={}; heads.forEach(function(h,i){o[h]=String(r[i] == null ? '' : r[i]).trim();}); return o;}); }
+  function numberTemplate(){ downloadCsv('carrier_agent_numbers_template.csv', [['agent_name','email','carrier','agent_number','status','product_type','state','notes'], ['Brian DeRoss','brdeross@fjins.net','Aetna','123456','Active','Medicare','NJ','Example only']]); }
+  function loadNumbers(){
+    return fetch(P44_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(P44_HUB) + '&select=id,agent_name,email,carrier,agent_number,status,product_type,state,notes&order=agent_name.asc,carrier.asc', {headers:headers({'Cache-Control':'no-cache'})})
+      .then(function(r){ if(!r.ok) throw new Error('read '+r.status); return r.json(); }).then(function(rows){ numberRowsCache = Array.isArray(rows) ? rows : []; renderNumbersAdmin(); return numberRowsCache; });
+  }
+  function renderNumbersAdmin(){
+    var out=document.getElementById('phase44AgentNumberList'); if(!out) return;
+    var count=document.getElementById('phase44AgentNumberCount'); if(count) count.textContent = numberRowsCache.length + ' record' + (numberRowsCache.length===1?'':'s');
+    if(!numberRowsCache.length){ out.innerHTML='<div class="phase44-small-note">No agent number records are currently stored.</div>'; return; }
+    out.innerHTML = '<div style="max-height:220px;overflow:auto;border:1px solid rgba(255,255,255,.1);border-radius:10px;"><table class="carrier-number-table" style="width:100%;font-size:11px;"><thead><tr><th>Agent</th><th>Email</th><th>Carrier</th><th>Number</th><th>Status</th></tr></thead><tbody>' + numberRowsCache.slice(0,80).map(function(r){return '<tr><td>'+esc(r.agent_name)+'</td><td>'+esc(r.email)+'</td><td>'+esc(r.carrier)+'</td><td>'+esc(r.agent_number)+'</td><td>'+esc(r.status)+'</td></tr>';}).join('') + '</tbody></table></div>';
+  }
+  function exportNumbers(){
+    loadNumbers().then(function(rows){
+      var out=[['agent_name','email','carrier','agent_number','status','product_type','state','notes']];
+      rows.forEach(function(r){ out.push([r.agent_name,r.email,r.carrier,r.agent_number,r.status,r.product_type,r.state,r.notes]); });
+      downloadCsv('carrier_agent_numbers_export.csv', out);
+    }).catch(function(err){ alert('Agent number export failed: ' + (err && err.message ? err.message : err)); });
+  }
+  function deleteOne(row){
+    var url=P44_URL + '/rest/v1/carrier_agent_numbers?hub=eq.' + encodeURIComponent(P44_HUB) + '&email=eq.' + encodeURIComponent(row.email) + '&carrier=eq.' + encodeURIComponent(row.carrier);
+    return fetch(url,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})}).then(function(r){ if(!r.ok) throw new Error('delete '+r.status); });
+  }
+  function uploadNumbers(file){
+    if(!isAdmin()){ alert('Admin permission required.'); return; }
+    if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(){
+      try{
+        var objs=parseObjects(reader.result);
+        var rows=objs.map(function(o){return {hub:P44_HUB, agent_name:o.agent_name||o.name||'', email:String(o.email||'').toLowerCase(), carrier:o.carrier||'', agent_number:o.agent_number||o.writing_number||o.number||'', status:o.status||'', product_type:o.product_type||o.product||'', state:o.state||o.states||'', notes:o.notes||''};}).filter(function(r){return r.email && r.carrier;});
+        if(!rows.length) throw new Error('No valid rows found. Required: email and carrier.');
+        if(!confirm('Upload ' + rows.length + ' agent number row(s)? This add/updates matching email + carrier records and does not wipe unrelated records.')) return;
+        var chain=Promise.resolve();
+        rows.forEach(function(row){ chain=chain.then(function(){return deleteOne(row);}).then(function(){return fetch(P44_URL + '/rest/v1/carrier_agent_numbers',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(row)}).then(function(r){if(!r.ok) throw new Error('insert '+r.status);});}); });
+        chain.then(function(){ toast('Agent numbers uploaded.'); if(typeof window.refreshCarrierAgentDirectory==='function') window.refreshCarrierAgentDirectory(); return loadNumbers(); }).catch(function(err){ alert('Agent number upload failed: ' + (err && err.message ? err.message : err)); });
+      }catch(err){ alert('CSV error: ' + (err && err.message ? err.message : err)); }
+    };
+    reader.readAsText(file);
+  }
+  function injectCarrierAdmin(){
+    var panel=document.querySelector('#adminTabCarriers .admin-body');
+    if(!panel || document.getElementById('phase44CarrierNumberAdminBox')) return;
+    var box=document.createElement('div');
+    box.id='phase44CarrierNumberAdminBox';
+    box.className='phase44-admin-box';
+    box.innerHTML='<h3>🪪 Agent Number Updates</h3><p>Manage carrier writing numbers used by the Carrier Directory. Uploads add/update by email + carrier and do not wipe unrelated records.</p><input id="phase44AgentNumberCsv" type="file" accept=".csv,text/csv" style="display:none;"><div class="phase44-admin-row"><button type="button" class="admin-btn" id="phase44NumTemplate">Download Template</button><button type="button" class="admin-btn" id="phase44NumExport">Export Current Agent Numbers</button><button type="button" class="admin-btn" id="phase44NumUpload">Upload Agent Numbers CSV</button><button type="button" class="admin-btn" id="phase44NumRefresh">Refresh List</button><span class="count-chip" id="phase44AgentNumberCount">Loading...</span></div><div class="phase44-small-note">CSV columns: agent_name, email, carrier, agent_number, status, product_type, state, notes</div><div id="phase44AgentNumberList" style="margin-top:10px;"></div>';
+    var after=panel.querySelector('.admin-section-title');
+    if(after && after.nextSibling) panel.insertBefore(box, after.nextSibling); else panel.insertBefore(box, panel.firstChild);
+    document.getElementById('phase44NumTemplate').addEventListener('click', numberTemplate);
+    document.getElementById('phase44NumExport').addEventListener('click', exportNumbers);
+    document.getElementById('phase44NumRefresh').addEventListener('click', function(){ loadNumbers().catch(function(err){ alert('Agent number load failed: '+(err&&err.message?err.message:err)); }); });
+    var inp=document.getElementById('phase44AgentNumberCsv');
+    document.getElementById('phase44NumUpload').addEventListener('click', function(){ inp.value=''; inp.click(); });
+    inp.addEventListener('change', function(){ uploadNumbers(inp.files && inp.files[0]); });
+    loadNumbers().catch(function(err){ var out=document.getElementById('phase44AgentNumberList'); if(out) out.innerHTML='<div class="phase44-small-note">Could not load agent numbers: '+esc(err&&err.message?err.message:err)+'</div>'; });
+  }
+  function boot(){
+    ensureNoticeNode(); refreshNotice(); injectOnboardingAdmin(); injectCarrierAdmin();
+    var tries=0; var t=setInterval(function(){ tries++; ensureNoticeNode(); refreshNotice(); injectOnboardingAdmin(); injectCarrierAdmin(); if(tries>8) clearInterval(t); }, 1000);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
 </body>
 </html>
