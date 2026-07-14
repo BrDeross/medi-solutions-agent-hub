@@ -4796,7 +4796,7 @@ cursor: pointer; white-space: nowrap;
       var p = document.createElement('div');
       p.id = 'phase40MeetingEditNote';
       p.className = 'phase40-edit-note';
-      p.textContent = 'Use Edit on an existing meeting, make changes above, then click Update Meeting. New meetings use Add Meeting.';
+      p.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
       var title = panel.querySelector('.admin-section-title');
       if(title && title.parentNode) title.parentNode.insertBefore(p, title.nextSibling);
     }
@@ -7004,7 +7004,7 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
 <div><label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Zoom / Meeting Link (optional)</label><input class="admin-input" id="fridayLink" placeholder="https://zoom.us/j/..."></div>
 <div><label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Resource / Login Link (optional)</label><input class="admin-input" id="fridayLink2" placeholder="https://..."></div>
 </div>
-<button type="button" class="admin-save-btn" id="phase36FridaySaveBtn" onclick="addFridayMeeting();return false;" style="width:auto;padding:10px 24px;">➕ Add Meeting</button>
+<button type="button" class="admin-save-btn" id="phase36FridaySaveBtn" onclick="addFridayMeeting();return false;" style="width:auto;padding:10px 24px;">➕ Add / Update Meeting</button>
 <div class="admin-section-title" style="margin-top:20px;">📋 Scheduled Meetings <span id="fridayAdminCount" style="font-weight:400;color:var(--muted-2);font-size:11px;"></span></div>
 <div id="fridayAdminList"></div>
 </div>
@@ -10365,7 +10365,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -10415,6 +10415,41 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -13224,7 +13259,7 @@ w.document.write(`<html><body style="margin:0;display:flex;justify-content:cente
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -13274,6 +13309,41 @@ w.document.write(`<html><body style="margin:0;display:flex;justify-content:cente
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -13781,7 +13851,7 @@ w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -13831,6 +13901,41 @@ w.document.write('<html><head><title>Election Period Cheat Sheet</title></head><
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -14184,7 +14289,7 @@ w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -14234,6 +14339,41 @@ w.document.write('<html><head><title>2019/2020 Election Period Booklet</title></
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -16051,7 +16191,7 @@ window.printAncillaryCompare = function(){
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -16101,6 +16241,41 @@ window.printAncillaryCompare = function(){
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -16888,7 +17063,7 @@ table{width:100%;border-collapse:collapse;border:1px solid #cbd5e1;} th{backgrou
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -16938,6 +17113,41 @@ table{width:100%;border-collapse:collapse;border:1px solid #cbd5e1;} th{backgrou
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -17659,7 +17869,7 @@ h1{font-size:18px;font-weight:800;margin-bottom:20px;}
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -17709,6 +17919,41 @@ h1{font-size:18px;font-weight:800;margin-bottom:20px;}
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -18741,7 +18986,7 @@ body { font-family: Georgia, serif; color: #1a1a2e; margin: 0; padding: 0; font-
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -18791,6 +19036,41 @@ body { font-family: Georgia, serif; color: #1a1a2e; margin: 0; padding: 0; font-
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -19473,7 +19753,7 @@ border-radius: 16px 16px 0 0 !important;
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -19523,6 +19803,41 @@ border-radius: 16px 16px 0 0 !important;
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -20084,7 +20399,7 @@ function printVacationSummary() {
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -20134,6 +20449,41 @@ function printVacationSummary() {
     if(tab && /Meetings|friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase36LoadFridayAdmin(false); }, 180);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
@@ -24999,7 +25349,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){ var e=byId(id); if(e) e.value=''; });
     if(dp){ dp.value=''; dp.dataset.originalDate=''; dp.placeholder=''; dp.title=''; }
     var btn = byId('phase36FridaySaveBtn');
-    if(btn) btn.textContent = '➕ Add Meeting';
+    if(btn) btn.textContent = '➕ Add / Update Meeting';
     window.setFridayType('in-person');
     try { await saveMeetings(currentMeetings); if(typeof showSnuToast === 'function') showSnuToast('✓ Meeting saved.'); }
     catch(err){ console.error('[Phase 36] Save failed', err); if(typeof showSnuToast === 'function') showSnuToast('⚠ Meeting save failed.'); }
@@ -25135,7 +25485,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   window.phase37LoadFridayAdmin=async function(show){try{ensureFridayAdminMarkup();setStatus('Loading current meetings from Supabase...',false);meetings=await fetchMeetings();window._fridayMeetings=meetings.slice();renderPublic();renderAdmin();setStatus('Loaded '+meetings.length+' existing meeting'+(meetings.length===1?'':'s')+'.',false);if(show)toast('✓ Existing Friday meetings loaded: '+meetings.length);console.log('[Phase 37] Friday admin loaded',meetings.length);}catch(err){console.error('[Phase 37] Friday load failed',err);setStatus('Load failed: '+(err.message||err),true);}};
   window.phase37EditFridayMeeting=function(i){var m=meetings[i]; if(!m)return; editIndex=i; var dp=byId('fridayDatePicker'); if(dp){dp.value=dateForInput(m); dp.dataset.originalDate=m.date||''; dp.placeholder=m.date||''; dp.title=m.date?'Current: '+m.date:'';} if(byId('fridayTime'))byId('fridayTime').value=m.time||''; if(byId('fridayTopic'))byId('fridayTopic').value=m.topic||''; if(byId('fridayNotes'))byId('fridayNotes').value=m.notes||''; if(byId('fridayLink'))byId('fridayLink').value=m.link||''; if(byId('fridayLink2'))byId('fridayLink2').value=m.link2||''; window.setFridayType(m.type||'in-person'); var b=byId('phase37FridaySaveBtn'); if(b)b.textContent='💾 Save Meeting'; var topic=byId('fridayTopic'); if(topic){topic.scrollIntoView({behavior:'smooth',block:'center'});topic.focus();} toast('✏️ Edit the fields, then click Save Meeting.');};
   window.phase37DeleteFridayMeeting=async function(i){if(!meetings[i])return; if(!confirm('Remove this Friday meeting?'))return; meetings.splice(i,1); editIndex=null; try{await saveMeetings(meetings);toast('✓ Meeting removed.');}catch(e){console.error(e);toast('⚠ Delete failed to save.');}};
-  window.addFridayMeeting=async function(){var topic=gv('fridayTopic'); if(!topic){toast('⚠ Please enter a meeting topic.');return false;} var dp=byId('fridayDatePicker'); var raw=dp&&dp.value?dp.value:''; var original=dp&&dp.dataset?dp.dataset.originalDate:''; var m=normalize({id:(editIndex!==null&&meetings[editIndex])?meetings[editIndex].id:Date.now(),date:raw?formatDate(raw):original,dateISO:raw||'',time:gv('fridayTime'),topic:topic,notes:gv('fridayNotes'),link:gv('fridayLink'),link2:gv('fridayLink2'),type:fType}); if(editIndex!==null&&meetings[editIndex]) meetings[editIndex]=m; else meetings.push(m); editIndex=null; ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){var e=byId(id);if(e)e.value='';}); if(dp){dp.value='';dp.dataset.originalDate='';dp.placeholder='';dp.title='';} var b=byId('phase37FridaySaveBtn'); if(b)b.textContent='➕ Add Meeting'; window.setFridayType('in-person'); try{await saveMeetings(meetings);toast('✓ Meeting saved.');}catch(e){console.error(e);toast('⚠ Meeting save failed.');} return false;};
+  window.addFridayMeeting=async function(){var topic=gv('fridayTopic'); if(!topic){toast('⚠ Please enter a meeting topic.');return false;} var dp=byId('fridayDatePicker'); var raw=dp&&dp.value?dp.value:''; var original=dp&&dp.dataset?dp.dataset.originalDate:''; var m=normalize({id:(editIndex!==null&&meetings[editIndex])?meetings[editIndex].id:Date.now(),date:raw?formatDate(raw):original,dateISO:raw||'',time:gv('fridayTime'),topic:topic,notes:gv('fridayNotes'),link:gv('fridayLink'),link2:gv('fridayLink2'),type:fType}); if(editIndex!==null&&meetings[editIndex]) meetings[editIndex]=m; else meetings.push(m); editIndex=null; ['fridayTime','fridayTopic','fridayNotes','fridayLink','fridayLink2'].forEach(function(id){var e=byId(id);if(e)e.value='';}); if(dp){dp.value='';dp.dataset.originalDate='';dp.placeholder='';dp.title='';} var b=byId('phase37FridaySaveBtn'); if(b)b.textContent='➕ Add / Update Meeting'; window.setFridayType('in-person'); try{await saveMeetings(meetings);toast('✓ Meeting saved.');}catch(e){console.error(e);toast('⚠ Meeting save failed.');} return false;};
   window.renderFridayAdminList=function(){renderAdmin();};
   window.scrollCertTable=function(dir){var shell=document.querySelector('#certTrackerContent .cert-lock-shell')||document.querySelector('#certTrackerContent [style*="overflow"]')||document.querySelector('#certTrackerContent'); if(!shell)return false; var amount=Math.max(340,Math.floor((shell.clientWidth||600)*0.72)); if(dir==='home'){shell.scrollTo({left:0,behavior:'smooth'});return false;} if(dir==='end'){shell.scrollTo({left:shell.scrollWidth,behavior:'smooth'});return false;} shell.scrollBy({left:(Number(dir)||1)*amount,behavior:'smooth'}); return false;};
   async function certNote(){
@@ -25288,7 +25638,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   }
   function updateSaveButton(){
     var b = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
-    if(b) b.textContent = editIndex === null ? '➕ Add Meeting' : '💾 Update Meeting';
+    if(b) b.textContent = '➕ Add / Update Meeting';
     var cancel = byId('phase38CancelFridayEdit');
     if(cancel) cancel.style.display = editIndex === null ? 'none' : 'inline-flex';
   }
@@ -25449,6 +25799,41 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     if(tab && /Meeting|Friday/i.test(tab.textContent || '')) setTimeout(function(){ window.phase38LoadFridayAdmin(false); }, 220);
   }, true);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+
+
+<!-- Phase 41: Friday Meetings single Add / Update button label hardening -->
+<script id="phase41-friday-add-update-button-label">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function normalizeFridaySaveButton(){
+    var panel = byId('adminTabFriday') || document;
+    var btn = byId('phase38FridaySaveBtn') || byId('phase37FridaySaveBtn') || byId('phase36FridaySaveBtn');
+    if(!btn && panel){
+      btn = Array.from(panel.querySelectorAll('button')).find(function(b){
+        return /Add Meeting|Update Meeting|Save Meeting|Add\s*\/\s*Update/i.test(b.textContent || '') && !/Reload|Cancel|Delete|Edit/i.test(b.textContent || '');
+      });
+    }
+    if(btn){
+      btn.type = 'button';
+      btn.id = 'phase38FridaySaveBtn';
+      btn.textContent = '➕ Add / Update Meeting';
+      btn.title = 'Adds a new meeting, or updates the meeting currently opened with Edit.';
+      if(typeof window.phase38SaveFridayMeeting === 'function'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); return window.phase38SaveFridayMeeting(); };
+      }
+    }
+    var note = byId('phase40MeetingEditNote');
+    if(note){
+      note.textContent = 'Use Edit on an existing meeting, make changes above, then click Add / Update Meeting. The same button adds new meetings or updates the selected meeting.';
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFridaySaveButton); else normalizeFridaySaveButton();
+  setTimeout(normalizeFridaySaveButton, 600);
+  setTimeout(normalizeFridaySaveButton, 1800);
+  setInterval(normalizeFridaySaveButton, 2500);
 })();
 </script>
 
