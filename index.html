@@ -20431,7 +20431,20 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       agents.forEach(function(a){ Object.keys((a && a.certs) || {}).forEach(function(k){ if (carriers.indexOf(k) === -1) carriers.push(k); }); });
       if (badge) badge.textContent = agents.length + ' agent' + (agents.length === 1 ? '' : 's');
       if (!agents.length) { el.innerHTML = '<div class="trip-empty">No certification data found in Supabase.</div>'; return; }
-      var metaText = (obj.meta && (obj.meta.year || obj.meta.updatedAt || obj.meta.monthLabel)) ? esc(obj.meta.year || obj.meta.monthLabel || obj.meta.updatedAt) : 'Supabase live data';
+      var certMeta = (obj && obj.meta) || {};
+      var certParts = [];
+      var certYear = certMeta.year || (agents[0] && agents[0].year) || '';
+      if (certYear) certParts.push('Plan Year ' + certYear);
+      var certUpdatedRaw = certMeta.updatedAt || certMeta.updated_at || certMeta.lastUpdated || certMeta.savedAt || certMeta.timestamp || '';
+      if (certUpdatedRaw) {
+        var certUpdatedDate = new Date(certUpdatedRaw);
+        certParts.push('Last updated ' + (isNaN(certUpdatedDate.getTime()) ? String(certUpdatedRaw) : certUpdatedDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' ' + certUpdatedDate.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})));
+      } else if (certMeta.monthLabel) {
+        certParts.push('Last updated ' + certMeta.monthLabel);
+      } else {
+        certParts.push('Last updated date not stored');
+      }
+      var metaText = certParts.length ? certParts.join(' • ') : 'Last updated date not stored';
       var head = '<thead><tr><th class="cert-agent-head">Agent</th><th>Year</th><th>Progress</th>' + carriers.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead>';
       var body = '<tbody>' + agents.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||'')); }).map(function(a, idx){
         var certs = a.certs || {};
@@ -20893,7 +20906,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
         parts.push('Last updated ' + (isNaN(d.getTime()) ? String(meta.updatedAt) : d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})));
       } else if(meta.monthLabel) parts.push('Last updated ' + meta.monthLabel);
       var note = document.querySelector('#certTrackerContent .phase31-cert-note');
-      if(note && parts.length) note.textContent = parts.join(' • ');
+      if(note) note.textContent = parts.length ? parts.join(' • ') : 'Last updated date not stored';
     }catch(e){ console.warn('[Phase 36] Cert updated label failed', e); }
   }
   function boot(){
