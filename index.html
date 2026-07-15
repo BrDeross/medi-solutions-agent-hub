@@ -21511,98 +21511,124 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 
-<!-- Cert release dates: global save + mobile-safe mount v63 -->
-<script id="cert-release-dates-global-mobile-fix-script">
+
+
+<!-- Cert release dates: secure admin-only editor + global mobile display v65 -->
+<script id="cert-release-dates-admin-locked-global-v65">
 (function(){
   'use strict';
-  var RD_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var RD_SUPA_KEY = (typeof NF_KEY !== 'undefined' && NF_KEY) ? NF_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
-  var RD_HUB = 'medi';
-  var RD_KEY = 'cert_release_dates';
-  var RD_DEFAULT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
-  var rdDates = {};
-  var rdLoaded = false;
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = (typeof NF_KEY !== 'undefined' && NF_KEY) ? NF_KEY : ((typeof CERT_SUPA_KEY !== 'undefined' && CERT_SUPA_KEY) ? CERT_SUPA_KEY : '');
+  var RELEASE_KEYS = ['cert_release_dates','certReleaseDates'];
+  var RELEASE_HUBS = ['medi','ga'];
+  var DEFAULT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
+  var releaseDates = {};
+  var releaseUpdatedAt = '';
+  var isSaving = false;
 
   function esc(v){ return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-  function hdr(extra){ var h = {'apikey':RD_SUPA_KEY,'Authorization':'Bearer '+RD_SUPA_KEY}; if(extra){ Object.keys(extra).forEach(function(k){ h[k]=extra[k]; }); } return h; }
-  function parseData(raw){
-    if(!raw) return {dates:{}, updatedAt:''};
+  function headers(extra){
+    var h = {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+    if(extra){ Object.keys(extra).forEach(function(k){ h[k]=extra[k]; }); }
+    return h;
+  }
+  function parsePayload(raw){
     var d = raw;
     for(var i=0;i<4;i++){
       if(typeof d === 'string'){
-        try { d = JSON.parse(d); } catch(e) { break; }
+        try { d = JSON.parse(d); } catch(e){ break; }
       }
     }
-    if(d && typeof d === 'object'){
-      if(d.dates && typeof d.dates === 'object') return {dates:d.dates, updatedAt:d.updatedAt || d.updated_at || d.lastUpdated || ''};
-      var copy = {};
-      Object.keys(d).forEach(function(k){ if(!/updated/i.test(k) && d[k]) copy[k] = d[k]; });
-      return {dates:copy, updatedAt:d.updatedAt || d.updated_at || d.lastUpdated || ''};
-    }
-    return {dates:{}, updatedAt:''};
+    if(!d || typeof d !== 'object') return {dates:{}, updatedAt:''};
+    if(d.dates && typeof d.dates === 'object') return {dates:d.dates, updatedAt:d.updatedAt || d.updated_at || d.lastUpdated || ''};
+    var copy = {};
+    Object.keys(d).forEach(function(k){
+      if(!/updated/i.test(k) && d[k]) copy[k] = d[k];
+    });
+    return {dates:copy, updatedAt:d.updatedAt || d.updated_at || d.lastUpdated || ''};
   }
+  function normalizeCarrier(c){ return String(c || '').trim(); }
   function getCarriers(){
-    try{ if(typeof getCertCarrierColumns === 'function'){ var cols = getCertCarrierColumns(); if(Array.isArray(cols) && cols.length) return cols; } }catch(e){}
-    try{ if(typeof CERT_CARRIERS !== 'undefined' && Array.isArray(CERT_CARRIERS) && CERT_CARRIERS.length) return CERT_CARRIERS.slice(); }catch(e){}
-    try{ if(typeof _certMeta !== 'undefined' && _certMeta && Array.isArray(_certMeta.carriers) && _certMeta.carriers.length) return _certMeta.carriers; }catch(e){}
-    return RD_DEFAULT_CARRIERS.slice();
+    try { if(typeof getCertCarrierColumns === 'function'){ var c = getCertCarrierColumns(); if(Array.isArray(c) && c.length) return c.map(normalizeCarrier).filter(Boolean); } } catch(e){}
+    try { if(typeof CERT_CARRIERS !== 'undefined' && Array.isArray(CERT_CARRIERS) && CERT_CARRIERS.length) return CERT_CARRIERS.map(normalizeCarrier).filter(Boolean); } catch(e){}
+    try { if(typeof _certMeta !== 'undefined' && _certMeta && Array.isArray(_certMeta.carriers) && _certMeta.carriers.length) return _certMeta.carriers.map(normalizeCarrier).filter(Boolean); } catch(e){}
+    return DEFAULT_CARRIERS.slice();
   }
-  function carrierUnion(){
+  function allCarriers(){
     var seen = {}, out = [];
-    getCarriers().concat(Object.keys(rdDates || {})).forEach(function(c){
-      c = String(c || '').trim();
+    getCarriers().concat(Object.keys(releaseDates || {})).forEach(function(c){
+      c = normalizeCarrier(c);
       if(!c) return;
-      var key = c.toLowerCase();
-      if(!seen[key]){ seen[key] = true; out.push(c); }
+      var k = c.toLowerCase();
+      if(!seen[k]){ seen[k]=1; out.push(c); }
     });
     return out;
   }
-  function dateText(v){
+  function formatDate(v){
     if(!v) return '';
-    var parts = String(v).split('-');
-    if(parts.length === 3) return parts[1].replace(/^0/,'') + '/' + parts[2].replace(/^0/,'') + '/' + parts[0];
-    return String(v);
+    var s = String(v);
+    var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return String(Number(m[2])) + '/' + String(Number(m[3])) + '/' + m[1];
+    var d = new Date(s);
+    if(!isNaN(d.getTime())) return d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+    return s;
   }
-  function bestPayloadFromRows(rows){
-    var best = {dates:{}, updatedAt:''};
-    (rows || []).forEach(function(row){
-      var p = parseData(row && row.data);
-      Object.keys(p.dates || {}).forEach(function(k){ if(p.dates[k]) best.dates[k] = p.dates[k]; });
-      if(p.updatedAt && (!best.updatedAt || String(p.updatedAt) > String(best.updatedAt))) best.updatedAt = p.updatedAt;
+  function storageUrl(selectAll){
+    if(selectAll) return SUPA_URL + '/rest/v1/tile_content?select=hub,key,data&key=in.(' + RELEASE_KEYS.map(encodeURIComponent).join(',') + ')&_=' + Date.now();
+    return SUPA_URL + '/rest/v1/tile_content';
+  }
+  function readReleaseDates(){
+    if(!SUPA_KEY){ console.warn('[Cert Release Dates] Missing Supabase key'); return Promise.resolve(releaseDates); }
+    return fetch(storageUrl(true), {cache:'no-store', headers:headers({'Cache-Control':'no-cache','Pragma':'no-cache'})})
+      .then(function(r){ if(!r.ok) throw new Error('read status ' + r.status); return r.json(); })
+      .then(function(rows){
+        var next = {}, latest = '';
+        (rows || []).forEach(function(row){
+          if(RELEASE_KEYS.indexOf(row.key) === -1) return;
+          var p = parsePayload(row.data);
+          Object.keys(p.dates || {}).forEach(function(k){ if(p.dates[k]) next[k] = p.dates[k]; });
+          if(p.updatedAt && (!latest || String(p.updatedAt) > String(latest))) latest = p.updatedAt;
+        });
+        releaseDates = next;
+        releaseUpdatedAt = latest;
+        window.certReleaseDatesData = releaseDates;
+        return releaseDates;
+      })
+      .catch(function(err){ console.warn('[Cert Release Dates] global read failed', err); return releaseDates; });
+  }
+  function deleteOne(hub, key){
+    var url = SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(hub) + '&key=eq.' + encodeURIComponent(key);
+    return fetch(url, {method:'DELETE', headers:headers({'Prefer':'return=minimal'})}).then(function(r){ if(!r.ok) throw new Error('delete ' + hub + '/' + key + ' ' + r.status); });
+  }
+  function insertOne(hub, key, payload){
+    var row = {hub:hub, key:key, data:payload};
+    return fetch(SUPA_URL + '/rest/v1/tile_content', {method:'POST', headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}), body:JSON.stringify(row)})
+      .then(function(r){ if(!r.ok) throw new Error('insert ' + hub + '/' + key + ' ' + r.status); });
+  }
+  function saveReleaseDates(){
+    var payload = {dates:releaseDates, updatedAt:new Date().toISOString()};
+    var chain = Promise.resolve();
+    RELEASE_HUBS.forEach(function(hub){
+      RELEASE_KEYS.forEach(function(key){
+        chain = chain.then(function(){ return deleteOne(hub, key).catch(function(){ return null; }); })
+                     .then(function(){ return insertOne(hub, key, payload); });
+      });
     });
-    return best;
-  }
-  function readDates(){
-    var keys = [RD_KEY, 'certReleaseDates'];
-    var ors = keys.map(function(k){ return 'key.eq.' + encodeURIComponent(k); }).join(',');
-    var url = RD_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(RD_HUB) + '&or=(' + ors + ')&select=key,data&_=' + Date.now();
-    return fetch(url, {cache:'no-store', headers:hdr({'Cache-Control':'no-cache','Pragma':'no-cache'})})
-      .then(function(r){ if(!r.ok) throw new Error('release date read ' + r.status); return r.json(); })
-      .then(function(rows){ var p = bestPayloadFromRows(rows); rdDates = p.dates || {}; rdLoaded = true; window.certReleaseDatesData = rdDates; return rdDates; })
-      .catch(function(err){ console.warn('[Cert Release Dates] read failed', err); rdLoaded = true; window.certReleaseDatesData = rdDates; return rdDates; });
-  }
-  function saveOneKey(keyName){
-    var payload = {dates:rdDates, updatedAt:new Date().toISOString()};
-    var delUrl = RD_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(RD_HUB) + '&key=eq.' + encodeURIComponent(keyName);
-    var body = {hub:RD_HUB, key:keyName, data:JSON.stringify(payload)};
-    return fetch(delUrl, {method:'DELETE', headers:hdr({'Prefer':'return=minimal'})})
-      .then(function(r){ if(!r.ok) throw new Error('release date cleanup ' + r.status); })
-      .then(function(){ return fetch(RD_SUPA_URL + '/rest/v1/tile_content', {method:'POST', headers:hdr({'Content-Type':'application/json','Prefer':'return=minimal'}), body:JSON.stringify(body)}); })
-      .then(function(r){ if(!r.ok) throw new Error('release date save ' + r.status); });
-  }
-  function saveDates(){
-    return saveOneKey(RD_KEY).then(function(){ return saveOneKey('certReleaseDates'); }).then(function(){ return readDates(); });
+    return chain.then(readReleaseDates);
   }
   function ensureStyles(){
-    if(document.getElementById('certReleaseDatesGlobalMobileStyles')) return;
-    var s = document.createElement('style');
-    s.id = 'certReleaseDatesGlobalMobileStyles';
-    s.textContent = [
-      '#cert-tracker{overflow-x:hidden!important;}',
-      '#certTrackerContent{width:100%!important;max-width:100%!important;box-sizing:border-box!important;overflow:visible!important;}',
-      '#certTrackerContent .cert-topbar{width:100%!important;max-width:100%!important;box-sizing:border-box!important;display:flex!important;flex-wrap:wrap!important;overflow:visible!important;}',
-      '#certTrackerContent .cert-lock-shell{display:block!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important;overscroll-behavior-x:contain!important;}',
+    if(document.getElementById('certReleaseDatesV65Styles')) return;
+    var st = document.createElement('style');
+    st.id = 'certReleaseDatesV65Styles';
+    st.textContent = [
+      '#certReleaseDateAdminBox{display:none!important}',
+      'body.cert-admin-release-unlocked #certReleaseDateAdminBox{display:block!important}',
+      '#certTrackerContent{width:100%!important;max-width:100%!important;box-sizing:border-box!important;}',
+      '#certTrackerContent .cert-lock-shell{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important;}',
       '#certTrackerContent .cert-lock-table{width:max-content!important;min-width:1500px!important;}',
+      '.cert-release-display{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:10px 18px;background:linear-gradient(90deg,rgba(15,23,42,.96),rgba(20,35,65,.96));border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(0,194,184,.24);color:#eafffb;line-height:1.25}',
+      '.cert-release-display .label{border-radius:999px;padding:6px 10px;background:linear-gradient(135deg,#ffd166,#ff9f1c);color:#111827;text-transform:uppercase;letter-spacing:.55px;font-size:10px;font-weight:1000;white-space:nowrap}',
+      '.cert-release-chip{font-size:11px;font-weight:900;border-radius:999px;padding:6px 9px;border:1px solid rgba(0,245,212,.28);background:rgba(0,194,184,.16);color:#ecfffb;white-space:nowrap}',
       '.cert-release-admin{margin:0 0 14px;padding:12px 14px;border:1px solid rgba(0,194,184,.28);border-radius:14px;background:linear-gradient(135deg,rgba(0,194,184,.10),rgba(220,20,60,.07));box-shadow:0 12px 24px rgba(0,0,0,.12)}',
       '.cert-release-admin h4{margin:0 0 4px;font-size:13px;font-weight:900;color:#e6fffb;letter-spacing:.02em}',
       '.cert-release-admin p{margin:0 0 10px;font-size:11px;color:var(--muted-2);line-height:1.35}',
@@ -21612,100 +21638,110 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       '.cert-release-btn{height:34px;border-radius:999px;border:1px solid rgba(0,245,212,.38);background:rgba(0,194,184,.20);color:#d8fffb;font-size:11px;font-weight:950;cursor:pointer;padding:0 12px;white-space:nowrap;font-family:inherit}',
       '.cert-release-btn.clear{border-color:rgba(248,113,113,.34);background:rgba(220,20,60,.14);color:#ffd6dc}',
       '.cert-release-list{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}',
-      '.cert-release-chip{font-size:11px;font-weight:900;border-radius:999px;padding:6px 9px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#e2e8f0;white-space:nowrap}',
-      '.cert-release-display{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:10px 18px;background:linear-gradient(90deg,rgba(15,23,42,.96),rgba(20,35,65,.96));border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(0,194,184,.24);font-size:12px;font-weight:900;color:#eafffb;line-height:1.25}',
-      '.cert-release-display .label{display:inline-flex;align-items:center;border-radius:999px;padding:6px 10px;background:linear-gradient(135deg,#ffd166,#ff9f1c);border:1px solid rgba(255,255,255,.22);color:#111827;text-transform:uppercase;letter-spacing:.75px;font-size:10px;font-weight:1000;box-shadow:0 6px 16px rgba(0,0,0,.22);white-space:nowrap}',
-      '.cert-release-display .cert-release-chip{background:rgba(0,194,184,.16);border-color:rgba(0,245,212,.28);color:#ecfffb;font-size:11px;padding:6px 9px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}',
-      '@media(max-width:720px){#cert-tracker{padding-left:8px!important;padding-right:8px!important;}#certTrackerContent .cert-lock-table{min-width:1360px!important;}#certTrackerContent .cert-topbar{border-radius:16px 16px 0 0!important;}#certTrackerContent .cert-lock-meta{flex:1 1 100%!important;width:100%!important;min-width:0!important;flex-wrap:wrap!important;padding:10px 12px!important;}#certTrackerContent .cert-scroll-controls{width:100%!important;justify-content:flex-start!important;overflow-x:auto!important;border-left:0!important;border-top:1px solid rgba(255,255,255,.12)!important;}#certTrackerContent .cert-release-display{flex-wrap:nowrap!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;padding:9px 10px!important;}#certTrackerContent .cert-lock-shell{border-radius:0 0 16px 16px!important;} .cert-release-row{grid-template-columns:1fr}.cert-release-btn{width:100%}}'
+      '@media(max-width:720px){#cert-tracker{padding-left:8px!important;padding-right:8px!important;}#certTrackerContent .cert-lock-table{min-width:1360px!important;}#certTrackerContent .cert-release-display{flex-wrap:nowrap!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;padding:9px 10px!important}.cert-release-row{grid-template-columns:1fr}.cert-release-btn{width:100%}}'
     ].join('\n');
-    document.head.appendChild(s);
+    document.head.appendChild(st);
   }
-  function selectedListHtml(limit){
+  function chipsHtml(){
     var chips = [];
-    carrierUnion().forEach(function(c){ if(rdDates[c]) chips.push('<span class="cert-release-chip">'+esc(c)+': '+esc(dateText(rdDates[c]))+'</span>'); });
+    allCarriers().forEach(function(c){ if(releaseDates[c]) chips.push('<span class="cert-release-chip">'+esc(c)+': '+esc(formatDate(releaseDates[c]))+'</span>'); });
     if(!chips.length) return '<span class="cert-release-chip">No release dates posted yet</span>';
-    return chips.slice(0, limit || 99).join('');
+    return chips.join('');
   }
   function renderPublicDisplay(){
     ensureStyles();
     var content = document.getElementById('certTrackerContent');
     if(!content) return;
     var row = document.getElementById('certReleaseDateDisplay');
-    if(!row){
-      row = document.createElement('div');
-      row.id = 'certReleaseDateDisplay';
-      row.className = 'cert-release-display';
-    }
+    if(!row){ row = document.createElement('div'); row.id = 'certReleaseDateDisplay'; row.className = 'cert-release-display'; }
+    row.innerHTML = '<span class="label">Carrier Release Dates</span>' + chipsHtml();
     var meta = content.querySelector('.cert-lock-meta');
     if(meta && meta.parentNode){ meta.parentNode.insertBefore(row, meta.nextSibling); }
     else if(row.parentNode !== content){ content.insertBefore(row, content.firstChild || null); }
-    row.innerHTML = '<span class="label">Carrier Release Dates</span>' + selectedListHtml(99);
   }
-  function adminCertPanelUnlocked(){
+  function adminPanelReallyUnlocked(){
     var modal = document.getElementById('adminModal');
-    var form = document.getElementById('adminForm');
     var gate = document.getElementById('adminLoginGate');
+    var form = document.getElementById('adminForm');
     var panel = document.getElementById('adminTabCerts');
-    var modalOpen = !!(modal && modal.classList && modal.classList.contains('open'));
-    var formVisible = !!(form && window.getComputedStyle(form).display !== 'none');
-    var gateHidden = !gate || window.getComputedStyle(gate).display === 'none';
-    var panelVisible = !!(panel && window.getComputedStyle(panel).display !== 'none');
-    return modalOpen && formVisible && gateHidden && panelVisible;
+    if(!modal || !form || !panel) return false;
+    var modalOpen = modal.classList && modal.classList.contains('open');
+    var formStyle = window.getComputedStyle(form);
+    var panelStyle = window.getComputedStyle(panel);
+    var gateStyle = gate ? window.getComputedStyle(gate) : null;
+    var formVisible = formStyle.display !== 'none' && formStyle.visibility !== 'hidden';
+    var panelVisible = panelStyle.display !== 'none' && panelStyle.visibility !== 'hidden';
+    var gateClosed = !gate || gateStyle.display === 'none' || gateStyle.visibility === 'hidden';
+    return !!(modalOpen && formVisible && panelVisible && gateClosed);
   }
   function renderAdminBox(){
     ensureStyles();
     var existing = document.getElementById('certReleaseDateAdminBox');
-    if(!adminCertPanelUnlocked()){
+    if(!adminPanelReallyUnlocked()){
+      document.body.classList.remove('cert-admin-release-unlocked');
       if(existing && existing.parentNode) existing.parentNode.removeChild(existing);
       return;
     }
+    document.body.classList.add('cert-admin-release-unlocked');
     var anchor = document.getElementById('certCsvDrop');
-    if(!anchor) return;
+    if(!anchor || !anchor.parentNode) return;
     if(!existing){
       existing = document.createElement('div');
       existing.id = 'certReleaseDateAdminBox';
       existing.className = 'cert-release-admin';
       anchor.parentNode.insertBefore(existing, anchor);
     }
-    var opts = carrierUnion().map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
-    existing.innerHTML = '<h4>Carrier Release Dates</h4><p>Add compact release dates for each cert carrier. Dates display on the Cert Tracker top bar and are saved globally.</p><div class="cert-release-row"><div><label>Carrier</label><select id="certReleaseCarrier">'+opts+'</select></div><div><label>Release Date</label><input id="certReleaseDateInput" type="date"></div><button type="button" class="cert-release-btn" id="certReleaseSaveBtn">Save Date</button><button type="button" class="cert-release-btn clear" id="certReleaseClearBtn">Clear</button></div><div class="cert-release-list" id="certReleaseAdminList">'+selectedListHtml(99)+'</div>';
+    var opts = allCarriers().map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
+    existing.innerHTML = '<h4>Carrier Release Dates</h4><p>Admin only. Add compact release dates for each certification carrier. Dates display on the Cert Tracker top bar for all users.</p><div class="cert-release-row"><div><label>Carrier</label><select id="certReleaseCarrier">'+opts+'</select></div><div><label>Release Date</label><input id="certReleaseDateInput" type="date"></div><button type="button" class="cert-release-btn" id="certReleaseSaveBtn">Save Date</button><button type="button" class="cert-release-btn clear" id="certReleaseClearBtn">Clear</button></div><div class="cert-release-list" id="certReleaseAdminList">'+chipsHtml()+'</div>';
     var sel = document.getElementById('certReleaseCarrier');
     var inp = document.getElementById('certReleaseDateInput');
-    function sync(){ if(sel && inp) inp.value = rdDates[sel.value] || ''; }
+    function sync(){ if(sel && inp) inp.value = releaseDates[sel.value] || ''; }
     if(sel){ sel.onchange = sync; sync(); }
     var save = document.getElementById('certReleaseSaveBtn');
-    if(save){ save.onclick = function(){ var c = sel ? sel.value : ''; var d = inp ? inp.value : ''; if(!c || !d){ alert('Choose a carrier and release date.'); return; } rdDates[c] = d; save.textContent='Saving...'; save.disabled=true; saveDates().then(function(){ renderAdminBox(); renderPublicDisplay(); if(typeof showSnuToast === 'function') showSnuToast('✓ Release date saved globally.'); }).catch(function(err){ alert('Release date save failed: ' + (err.message || err)); }).finally(function(){ save.disabled=false; save.textContent='Save Date'; }); }; }
-    var clear = document.getElementById('certReleaseClearBtn');
-    if(clear){ clear.onclick = function(){ var c = sel ? sel.value : ''; if(!c) return; delete rdDates[c]; clear.textContent='Clearing...'; clear.disabled=true; saveDates().then(function(){ renderAdminBox(); renderPublicDisplay(); if(typeof showSnuToast === 'function') showSnuToast('✓ Release date cleared globally.'); }).catch(function(err){ alert('Release date clear failed: ' + (err.message || err)); }).finally(function(){ clear.disabled=false; clear.textContent='Clear'; }); }; }
-  }
-  function renderAll(){ renderAdminBox(); renderPublicDisplay(); }
-  function init(){ ensureStyles(); readDates().then(renderAll); setTimeout(renderAll, 900); setTimeout(renderAll, 2500); setTimeout(function(){ readDates().then(renderAll); }, 5000); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-  document.addEventListener('click', function(e){
-    var t = e.target;
-    if(t && (t.getAttribute('href') === '#cert-tracker' || (t.textContent || '').toLowerCase().indexOf('cert') >= 0)){
-      setTimeout(function(){ readDates().then(renderAll); }, 300);
+    if(save){
+      save.onclick = function(){
+        if(isSaving) return;
+        var c = sel ? sel.value : '';
+        var d = inp ? inp.value : '';
+        if(!c || !d){ alert('Choose a carrier and release date.'); return; }
+        releaseDates[c] = d;
+        isSaving = true; save.disabled = true; save.textContent = 'Saving...';
+        saveReleaseDates().then(function(){ renderPublicDisplay(); renderAdminBox(); if(typeof showSnuToast === 'function') showSnuToast('✓ Release date saved globally.'); })
+          .catch(function(err){ alert('Release date save failed: ' + (err.message || err)); })
+          .finally(function(){ isSaving = false; save.disabled = false; save.textContent = 'Save Date'; });
+      };
     }
-  }, true);
+    var clear = document.getElementById('certReleaseClearBtn');
+    if(clear){
+      clear.onclick = function(){
+        if(isSaving) return;
+        var c = sel ? sel.value : '';
+        if(!c) return;
+        delete releaseDates[c];
+        isSaving = true; clear.disabled = true; clear.textContent = 'Clearing...';
+        saveReleaseDates().then(function(){ renderPublicDisplay(); renderAdminBox(); if(typeof showSnuToast === 'function') showSnuToast('✓ Release date cleared globally.'); })
+          .catch(function(err){ alert('Release date clear failed: ' + (err.message || err)); })
+          .finally(function(){ isSaving = false; clear.disabled = false; clear.textContent = 'Clear'; });
+      };
+    }
+  }
+  function renderAll(){ renderPublicDisplay(); renderAdminBox(); }
+  function refresh(){ return readReleaseDates().then(renderAll); }
+  function init(){ ensureStyles(); refresh(); setTimeout(refresh,700); setTimeout(refresh,2200); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   var oldRender = window.renderCertTracker;
   if(typeof oldRender === 'function'){
-    window.renderCertTracker = function(){ var result = oldRender.apply(this, arguments); setTimeout(function(){ readDates().then(renderAll); }, 80); return result; };
+    window.renderCertTracker = function(){ var r = oldRender.apply(this, arguments); setTimeout(refresh,80); return r; };
   }
   var oldSwitch = window.switchAdminTab;
   if(typeof oldSwitch === 'function'){
-    window.switchAdminTab = function(tab, el){ var r = oldSwitch.apply(this, arguments); if(tab === 'certs') setTimeout(function(){ readDates().then(renderAll); }, 100); return r; };
+    window.switchAdminTab = function(tab, el){ var r = oldSwitch.apply(this, arguments); setTimeout(function(){ if(tab === 'certs') refresh(); else renderAdminBox(); }, 120); return r; };
   }
-  setInterval(function(){ if(document.getElementById('certTrackerContent')) readDates().then(renderAll); }, 30000);
-  window.refreshCertReleaseDates = function(){ return readDates().then(renderAll); };
-  window.scrollCertTable = function(dir){
-    var shell = document.querySelector('#certTrackerContent .cert-lock-shell');
-    if(!shell) return;
-    var amount = Math.max(220, Math.round(shell.clientWidth * 0.68));
-    if(dir === 'home') shell.scrollTo({left:0, behavior:'smooth'});
-    else if(dir === 'end') shell.scrollTo({left:shell.scrollWidth, behavior:'smooth'});
-    else shell.scrollBy({left:(Number(dir) || 1) * amount, behavior:'smooth'});
-  };
+  document.addEventListener('click', function(){ setTimeout(renderAdminBox, 75); }, true);
+  setInterval(function(){ if(document.getElementById('certTrackerContent')) refresh(); else renderAdminBox(); }, 30000);
+  window.refreshCertReleaseDates = refresh;
 })();
 </script>
+
 </body>
 </html>
