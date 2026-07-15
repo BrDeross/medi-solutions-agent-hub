@@ -21607,5 +21607,209 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   document.addEventListener('DOMContentLoaded', populateSelect); setTimeout(populateSelect, 600); setTimeout(populateSelect, 1800); window.phase77PopulateCertReleaseAdmin = populateSelect;
 })();
 </script>
+
+
+<!-- Phase 79: Onboarding usability polish - display only, onboarding section only -->
+<style id="phase79-onboarding-usability-polish-style">
+  #phase48OnboardingDashboard .p48-onboard-shell{
+    border-radius:22px!important;
+    border:1px solid rgba(125,211,252,.32)!important;
+    background:
+      radial-gradient(circle at top left,rgba(0,214,202,.16),transparent 34%),
+      linear-gradient(135deg,rgba(7,22,48,.98),rgba(16,50,91,.95))!important;
+    box-shadow:0 18px 48px rgba(0,0,0,.28)!important;
+  }
+  #phase48OnboardingDashboard .p48-onboard-head{
+    align-items:center!important;
+    padding-bottom:12px!important;
+    border-bottom:1px solid rgba(255,255,255,.10)!important;
+  }
+  #phase48OnboardingDashboard .p48-onboard-title{
+    letter-spacing:-.02em!important;
+    font-size:24px!important;
+  }
+  #phase48OnboardingDashboard .p48-onboard-sub{
+    max-width:900px!important;
+    color:#cbe7ff!important;
+  }
+  #phase48OnboardingDashboard .p48-pill{
+    background:linear-gradient(90deg,#00d6ca,#2f80ff)!important;
+    color:#06182a!important;
+    box-shadow:0 10px 24px rgba(0,214,202,.18)!important;
+  }
+  #phase48OnboardingDashboard .p48-next-step{
+    margin:14px 0 16px!important;
+    display:grid!important;
+    grid-template-columns:auto 1fr auto!important;
+    gap:12px!important;
+    align-items:center!important;
+    padding:14px!important;
+    border-radius:18px!important;
+    border:1px solid rgba(0,214,202,.34)!important;
+    background:linear-gradient(135deg,rgba(0,214,202,.15),rgba(47,128,255,.10))!important;
+    box-shadow:0 12px 28px rgba(0,0,0,.18)!important;
+  }
+  #phase48OnboardingDashboard .p48-next-icon{
+    width:42px!important;height:42px!important;border-radius:14px!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    background:rgba(0,214,202,.18)!important;border:1px solid rgba(0,214,202,.35)!important;
+    font-size:20px!important;
+  }
+  #phase48OnboardingDashboard .p48-next-kicker{
+    color:#8beaf1!important;font-size:11px!important;font-weight:950!important;text-transform:uppercase!important;letter-spacing:.08em!important;margin-bottom:3px!important;
+  }
+  #phase48OnboardingDashboard .p48-next-title{color:#fff!important;font-size:16px!important;font-weight:950!important;line-height:1.2!important;}
+  #phase48OnboardingDashboard .p48-next-copy{color:#cbe7ff!important;font-size:12.5px!important;margin-top:3px!important;line-height:1.35!important;}
+  #phase48OnboardingDashboard .p48-next-action{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    border-radius:999px!important;padding:9px 12px!important;text-decoration:none!important;
+    color:#071832!important;background:#fff!important;font-size:12px!important;font-weight:950!important;
+    white-space:nowrap!important;
+  }
+  #phase48OnboardingDashboard .p48-role-strip{
+    display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin:0 0 14px!important;
+  }
+  #phase48OnboardingDashboard .p48-role-chip{
+    display:inline-flex!important;align-items:center!important;gap:6px!important;padding:7px 10px!important;border-radius:999px!important;
+    background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.13)!important;
+    color:#dbeafe!important;font-size:11.5px!important;font-weight:900!important;
+  }
+  #phase48OnboardingDashboard .p48-progress-card{
+    background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.055))!important;
+    border:1px solid rgba(255,255,255,.15)!important;
+  }
+  #phase48OnboardingDashboard .p48-progress-num{
+    font-size:46px!important;line-height:.95!important;
+    background:linear-gradient(90deg,#00d6ca,#fff,#ff2d55)!important;
+    -webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
+  }
+  #phase48OnboardingDashboard .p48-progress-track{height:13px!important;background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.12)!important;}
+  #phase48OnboardingDashboard .p48-progress-fill{background:linear-gradient(90deg,#ff2d55,#ffb703,#00d6ca)!important;}
+  #phase48OnboardingDashboard .p48-stage-grid{gap:10px!important;}
+  #phase48OnboardingDashboard .p48-stage-card{
+    position:relative!important;overflow:hidden!important;
+    border-radius:16px!important;padding:13px!important;
+    min-height:118px!important;
+  }
+  #phase48OnboardingDashboard .p48-stage-card:before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(148,163,184,.65);
+  }
+  #phase48OnboardingDashboard .p48-stage-card.complete:before{background:#00d6ca!important;}
+  #phase48OnboardingDashboard .p48-stage-card.current:before{background:#ffb703!important;}
+  #phase48OnboardingDashboard .p48-stage-card.upcoming:before{background:#64748b!important;}
+  #phase48OnboardingDashboard .p48-stage-status{
+    display:inline-flex!important;padding:5px 8px!important;border-radius:999px!important;
+    background:rgba(255,255,255,.10)!important;color:#dbeafe!important;font-size:10px!important;font-weight:950!important;text-transform:uppercase!important;letter-spacing:.05em!important;
+  }
+  #phase48OnboardingDashboard .p48-stage-card.current .p48-stage-status{background:rgba(255,183,3,.17)!important;color:#fde68a!important;}
+  #phase48OnboardingDashboard .p48-stage-card.complete .p48-stage-status{background:rgba(0,214,202,.16)!important;color:#99fff7!important;}
+  #phase48OnboardingDashboard .p48-dashboard-grid{gap:16px!important;align-items:start!important;}
+  #phase48OnboardingDashboard .p48-panel{
+    border-radius:18px!important;border:1px solid rgba(255,255,255,.14)!important;
+    background:rgba(4,17,39,.62)!important;box-shadow:0 12px 30px rgba(0,0,0,.18)!important;
+  }
+  #phase48OnboardingDashboard .p48-panel h3{
+    display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;
+    margin-bottom:12px!important;border-bottom:1px solid rgba(255,255,255,.10)!important;padding-bottom:10px!important;
+  }
+  #phase48OnboardingDashboard .p48-panel h3:after{
+    content:'Auto-synced';font-size:10px!important;font-weight:950!important;text-transform:uppercase!important;letter-spacing:.07em!important;color:#8beaf1!important;background:rgba(0,214,202,.10)!important;border:1px solid rgba(0,214,202,.25)!important;border-radius:999px!important;padding:4px 8px!important;
+  }
+  #phase48OnboardingDashboard .p48-task{
+    border-radius:15px!important;border:1px solid rgba(255,255,255,.12)!important;
+    background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.035))!important;
+    padding:12px!important;transition:transform .14s ease, border-color .14s ease, background .14s ease!important;
+  }
+  #phase48OnboardingDashboard .p48-task:hover{transform:translateY(-1px)!important;border-color:rgba(0,214,202,.28)!important;background:rgba(255,255,255,.085)!important;}
+  #phase48OnboardingDashboard .p48-task-title{font-size:14px!important;color:#fff!important;line-height:1.25!important;}
+  #phase48OnboardingDashboard .p48-task-desc{font-size:12.5px!important;color:#c7ddf5!important;line-height:1.35!important;}
+  #phase48OnboardingDashboard .p48-badge{
+    border-radius:999px!important;padding:4px 8px!important;background:rgba(148,163,184,.14)!important;border:1px solid rgba(148,163,184,.22)!important;color:#dbeafe!important;font-size:10.5px!important;font-weight:900!important;
+  }
+  #phase48OnboardingDashboard .p48-badge.required{background:rgba(255,45,85,.15)!important;border-color:rgba(255,45,85,.28)!important;color:#ffd4df!important;}
+  #phase48OnboardingDashboard .p48-badge.review{background:rgba(255,183,3,.16)!important;border-color:rgba(255,183,3,.30)!important;color:#fde68a!important;}
+  #phase48OnboardingDashboard .p48-task-check{box-shadow:0 7px 18px rgba(0,0,0,.20)!important;}
+  #phase48OnboardingDashboard .p48-task-check.complete{background:#00d6ca!important;color:#062028!important;}
+  #phase48OnboardingDashboard .p48-task-check.pending{background:#ffb703!important;color:#271700!important;}
+  #phase48OnboardingDashboard .p48-task-action{
+    border-radius:999px!important;padding:8px 11px!important;font-size:11.5px!important;font-weight:950!important;white-space:nowrap!important;
+  }
+  #phase48OnboardingDashboard .p48-resource{
+    border-radius:15px!important;border:1px solid rgba(125,211,252,.16)!important;background:rgba(255,255,255,.055)!important;padding:13px!important;
+  }
+  #phase48OnboardingDashboard .p48-resource-title{font-size:14px!important;color:#fff!important;}
+  #phase48OnboardingDashboard .p48-resource a{display:inline-flex!important;margin-top:8px!important;border-radius:999px!important;padding:7px 10px!important;background:rgba(0,214,202,.12)!important;border:1px solid rgba(0,214,202,.24)!important;color:#9ffbf6!important;font-weight:950!important;text-decoration:none!important;font-size:12px!important;}
+  @media(max-width:800px){
+    #phase48OnboardingDashboard .p48-next-step{grid-template-columns:1fr!important;}
+    #phase48OnboardingDashboard .p48-next-action{width:max-content!important;}
+    #phase48OnboardingDashboard .p48-onboard-title{font-size:20px!important;}
+    #phase48OnboardingDashboard .p48-progress-num{font-size:38px!important;}
+  }
+</style>
+<script id="phase79-onboarding-usability-polish-script">
+(function(){
+  if(window.__phase79OnboardingPolishReady) return;
+  window.__phase79OnboardingPolishReady = true;
+  var SUPA_URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var HUB='medi';
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function headers(){return {apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json','Cache-Control':'no-cache'};}
+  function api(path){return fetch(SUPA_URL+'/rest/v1/'+path,{headers:headers()}).then(function(r){if(!r.ok) return []; return r.json();}).catch(function(){return [];});}
+  function session(){try{return JSON.parse(sessionStorage.getItem('medi_hub_session')||'null')||{};}catch(e){return{};}}
+  function userEmail(){return String((session().email||localStorage.getItem('mh_user_email')||'')).trim().toLowerCase();}
+  function roleLabel(){var s=session(),p=s.permissions||{},r=String(s.role||'').toLowerCase(); if(r==='admin'||p.admin) return 'Admin view: showing GA and LOA onboarding'; if(r==='ga'||p.ga_resources||p.ga_tools) return 'GA onboarding path'; if(r==='internal'||r==='loa'||r==='manager'||p.loa_resources||p.agent_tools) return 'LOA/Internal onboarding path'; return 'Onboarding path';}
+  function audiences(){var s=session(),p=s.permissions||{},r=String(s.role||'').toLowerCase(),a=['both','all']; if(r==='admin'||p.admin){a.push('ga','loa');return a;} if(r==='ga'||p.ga_resources||p.ga_tools)a.push('ga'); if(r==='internal'||r==='loa'||r==='manager'||p.loa_resources||p.agent_tools)a.push('loa'); return a;}
+  function visible(row){return audiences().indexOf(String(row.audience||'both').toLowerCase())>-1;}
+  function statusFor(list,id){return (list||[]).find(function(x){return Number(x.task_id)===Number(id);})||null;}
+  function addRoleStrip(){
+    var shell=document.querySelector('#phase48OnboardingDashboard .p48-onboard-shell');
+    var head=document.querySelector('#phase48OnboardingDashboard .p48-onboard-head');
+    if(!shell||!head) return;
+    var old=document.getElementById('phase79RoleStrip'); if(old) old.remove();
+    var strip=document.createElement('div'); strip.id='phase79RoleStrip'; strip.className='p48-role-strip';
+    strip.innerHTML='<span class="p48-role-chip">🧭 '+esc(roleLabel())+'</span><span class="p48-role-chip">✅ Required tasks drive progress</span><span class="p48-role-chip">🟡 Admin review tasks count after approval</span>';
+    head.insertAdjacentElement('afterend',strip);
+  }
+  function addNextStep(tasks,statuses,stages){
+    var shell=document.querySelector('#phase48OnboardingDashboard .p48-onboard-shell');
+    if(!shell) return;
+    var old=document.getElementById('phase79NextStep'); if(old) old.remove();
+    var filtered=(tasks||[]).filter(function(t){return visible(t) && t.active!==false;}).sort(function(a,b){
+      var sa=(stages.find(function(s){return Number(s.id)===Number(a.stage_id);})||{}).sort_order||0;
+      var sb=(stages.find(function(s){return Number(s.id)===Number(b.stage_id);})||{}).sort_order||0;
+      return sa-sb || (a.sort_order||0)-(b.sort_order||0);
+    });
+    var next=filtered.find(function(t){var st=statusFor(statuses,t.id); return !(st && String(st.status).toLowerCase()==='complete') && !(st && String(st.status).toLowerCase()==='pending_review');});
+    var pending=filtered.find(function(t){var st=statusFor(statuses,t.id); return st && String(st.status).toLowerCase()==='pending_review';});
+    var task=next||pending;
+    if(!task) return;
+    var stage=stages.find(function(s){return Number(s.id)===Number(task.stage_id);})||{};
+    var div=document.createElement('div'); div.id='phase79NextStep'; div.className='p48-next-step';
+    var isPending=!!pending && !next;
+    var action=task.resource_url?'<a class="p48-next-action" href="'+esc(task.resource_url)+'" target="_blank" rel="noopener">Open Resource</a>':'<span></span>';
+    div.innerHTML='<div class="p48-next-icon">'+(isPending?'🟡':'➡️')+'</div><div><div class="p48-next-kicker">'+(isPending?'Waiting on admin review':'Recommended next step')+'</div><div class="p48-next-title">'+esc(task.title||'Next task')+'</div><div class="p48-next-copy">'+esc(stage.title||'Onboarding')+(task.description?' • '+esc(task.description):'')+'</div></div>'+action;
+    var role=document.getElementById('phase79RoleStrip');
+    if(role) role.insertAdjacentElement('afterend',div); else shell.insertBefore(div,shell.children[1]||null);
+  }
+  function enhance(){
+    addRoleStrip();
+    var email=userEmail();
+    Promise.all([
+      api('onboarding_stages?hub=eq.'+HUB+'&active=eq.true&select=*&order=sort_order.asc'),
+      api('onboarding_tasks?hub=eq.'+HUB+'&active=eq.true&select=*&order=sort_order.asc'),
+      email?api('onboarding_agent_task_status?hub=eq.'+HUB+'&email=eq.'+encodeURIComponent(email)+'&select=*'):Promise.resolve([])
+    ]).then(function(out){addNextStep(out[1]||[],out[2]||[],out[0]||[]);});
+  }
+  function schedule(){setTimeout(enhance,500);setTimeout(enhance,1600);setTimeout(enhance,3200);}
+  document.addEventListener('DOMContentLoaded',schedule);
+  window.addEventListener('pageshow',schedule);
+  document.addEventListener('click',function(e){if(e.target && (e.target.closest('.p48-task-action')||e.target.closest('.p48-task-check'))){setTimeout(enhance,1400);}});
+  var mo=new MutationObserver(function(){var d=document.getElementById('phase48OnboardingDashboard'); if(d && !document.getElementById('phase79RoleStrip')) schedule();});
+  try{mo.observe(document.body,{childList:true,subtree:true});}catch(e){}
+})();
+</script>
+<!-- End Phase 79 onboarding usability polish -->
+
 </body>
 </html>
