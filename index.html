@@ -21641,11 +21641,26 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     else if(row.parentNode !== content){ content.insertBefore(row, content.firstChild || null); }
     row.innerHTML = '<span class="label">Carrier Release Dates</span>' + selectedListHtml(99);
   }
+  function adminCertPanelUnlocked(){
+    var modal = document.getElementById('adminModal');
+    var form = document.getElementById('adminForm');
+    var gate = document.getElementById('adminLoginGate');
+    var panel = document.getElementById('adminTabCerts');
+    var modalOpen = !!(modal && modal.classList && modal.classList.contains('open'));
+    var formVisible = !!(form && window.getComputedStyle(form).display !== 'none');
+    var gateHidden = !gate || window.getComputedStyle(gate).display === 'none';
+    var panelVisible = !!(panel && window.getComputedStyle(panel).display !== 'none');
+    return modalOpen && formVisible && gateHidden && panelVisible;
+  }
   function renderAdminBox(){
     ensureStyles();
+    var existing = document.getElementById('certReleaseDateAdminBox');
+    if(!adminCertPanelUnlocked()){
+      if(existing && existing.parentNode) existing.parentNode.removeChild(existing);
+      return;
+    }
     var anchor = document.getElementById('certCsvDrop');
     if(!anchor) return;
-    var existing = document.getElementById('certReleaseDateAdminBox');
     if(!existing){
       existing = document.createElement('div');
       existing.id = 'certReleaseDateAdminBox';
