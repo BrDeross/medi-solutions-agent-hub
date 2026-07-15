@@ -6959,27 +6959,20 @@ Upload a CSV or Excel file with one row per agent and one column per month. Requ
 Upload your certification CSV or Excel file. Columns: <code>Agent Name</code>, <code>Certification Year</code>, then one column per carrier (<code>AHIP</code>, <code>AARP/UHC</code>, etc.).<br>
 Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <strong>N</strong> for not certified.
 </p>
-<div id="certReleaseAdminPanel" style="margin:0 0 16px 0;padding:12px 14px;border:1px solid rgba(0,194,184,.30);background:linear-gradient(135deg,rgba(0,194,184,.12),rgba(220,20,60,.08));border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.14);">
+<div id="certReleaseAdminBox" class="cert-release-admin-box" style="margin:0 0 16px 0;padding:14px;border:1px solid rgba(0,194,184,.30);background:rgba(15,23,42,.55);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.14);">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
     <div>
-      <div style="font-size:13px;font-weight:900;color:var(--text);letter-spacing:.02em;">Carrier Release Dates</div>
-      <div style="font-size:11px;color:var(--muted-2);line-height:1.45;margin-top:2px;">Admin only. These dates display on the left side of the Cert Tracker bar for all users.</div>
+      <div style="font-size:13px;font-weight:950;color:#e5fbff;letter-spacing:.02em;">Carrier Release Dates</div>
+      <div style="font-size:11px;color:var(--muted-2);margin-top:3px;line-height:1.45;">Add release dates for carrier certifications. Dates display globally on the Cert Tracker.</div>
     </div>
-    <div id="certReleaseAdminSavedList" style="font-size:11px;color:var(--muted);font-weight:800;max-width:420px;text-align:right;"></div>
+    <div id="certReleaseAdminStatus" style="font-size:11px;color:#9ee7ff;font-weight:800;min-height:16px;"></div>
   </div>
-  <div style="display:grid;grid-template-columns:minmax(180px,1fr) 160px auto auto;gap:9px;align-items:end;">
-    <div>
-      <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;">Carrier</label>
-      <select id="certReleaseCarrierSelect" class="admin-input" style="width:100%;"></select>
-    </div>
-    <div>
-      <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;">Release Date</label>
-      <input id="certReleaseDateInput" type="date" class="admin-input" style="width:100%;">
-    </div>
-    <button type="button" class="admin-save-btn" onclick="saveCertReleaseDate();return false;" style="height:38px;white-space:nowrap;">Save Date</button>
-    <button type="button" class="admin-save-btn" onclick="clearCertReleaseDate();return false;" style="height:38px;white-space:nowrap;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.30);color:#ef4444;">Clear</button>
+  <div style="display:grid;grid-template-columns:minmax(180px,1.4fr) minmax(150px,.9fr) auto auto;gap:10px;align-items:end;">
+    <div><label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Carrier</label><select id="certReleaseCarrierSelect" class="admin-input" style="width:100%;"></select></div>
+    <div><label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Release Date</label><input id="certReleaseDateInput" type="date" class="admin-input" style="width:100%;"></div>
+    <button type="button" id="certReleaseSaveBtn" class="admin-save-btn" style="white-space:nowrap;">Save Date</button>
+    <button type="button" id="certReleaseClearBtn" class="admin-save-btn" style="white-space:nowrap;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;">Clear</button>
   </div>
-  <div id="certReleaseAdminStatus" style="font-size:11px;color:var(--muted-2);font-weight:800;margin-top:8px;min-height:16px;"></div>
 </div>
 <div class="csv-drop-zone" id="certCsvDrop" onclick="document.getElementById('certCsvInput').click()">
 <div class="csv-drop-icon">📂</div>
@@ -13992,8 +13985,6 @@ const CERT_KEY = 'cert_tracker_v1';
 const CERT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
 let _certAgents = []; // [{name, year, certs:{AHIP:'', ...}}]
 let _certMeta = {};
-let _certReleaseDates = {};
-let _certReleaseUpdatedAt = '';
 function certNormKey(v) {
 return String(v || '').trim().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -14126,10 +14117,6 @@ st.textContent = `
 #certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:0 0 22px 22px;border:1px solid rgba(255,255,255,.18);border-top:0;background:linear-gradient(180deg,#f8fafc 0%,#eef6fb 100%);box-shadow:0 24px 54px rgba(0,0,0,.34),0 0 0 1px rgba(0,194,184,.10),0 0 34px rgba(220,20,60,.10);padding-bottom:12px;}
 #certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.12);background:linear-gradient(90deg,#dc143c 0%,#111827 50%,#00c2b8 100%);font-size:12px;color:rgba(255,255,255,.86);width:100%;box-sizing:border-box;font-weight:800;letter-spacing:.2px;}
 #certTrackerContent .cert-lock-meta strong{color:#fff;text-shadow:0 0 12px rgba(255,255,255,.22);}
-#certTrackerContent .cert-release-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:260px;max-width:70%;}
-#certTrackerContent .cert-release-title{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.45px;color:#fff;white-space:nowrap;text-shadow:0 0 12px rgba(0,0,0,.28);}
-#certTrackerContent .cert-release-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:rgba(4,12,24,.55);border:1px solid rgba(255,255,255,.25);color:#f8ffff;font-size:11px;font-weight:950;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.18);white-space:nowrap;}
-#certTrackerContent .cert-release-empty{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:rgba(4,12,24,.35);border:1px dashed rgba(255,255,255,.25);color:#d7fffb;font-size:11px;font-weight:850;white-space:nowrap;}
 #certTrackerContent .cert-scroll-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:11px 14px;background:linear-gradient(90deg,#1f2937 0%,#151b2b 52%,#0f2d32 100%);border-bottom:1px solid rgba(255,255,255,.10);width:100%;box-sizing:border-box;}
 #certTrackerContent .cert-scroll-label{margin-right:auto;font-size:11px;font-weight:950;letter-spacing:.55px;text-transform:uppercase;color:#bffefa;text-shadow:0 0 10px rgba(0,245,212,.25);}
 #certTrackerContent .cert-scroll-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(0,245,212,.35);background:linear-gradient(180deg,rgba(0,194,184,.95),rgba(0,129,128,.95));color:#ffffff;border-radius:999px;min-width:42px;height:34px;padding:0 13px;font-size:18px;font-weight:1000;cursor:pointer;box-shadow:0 8px 20px rgba(0,194,184,.22),inset 0 1px 0 rgba(255,255,255,.24);}
@@ -14160,7 +14147,7 @@ st.textContent = `
 #certTrackerContent .cert-mark{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;min-width:25px;border-radius:999px;border:1px solid transparent;font-size:15px;font-weight:950;line-height:1;}
 #certTrackerContent .cert-mark.yes{color:#ffffff;background:linear-gradient(180deg,#00e3d8,#008d91);border-color:rgba(0,128,128,.28);box-shadow:0 0 0 2px rgba(0,194,184,.12),0 4px 11px rgba(0,194,184,.24),inset 0 1px 0 rgba(255,255,255,.28);}
 #certTrackerContent .cert-mark.no{color:#64748b;background:#e5e7eb;border-color:#cbd5e1;font-size:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.72);}
-@media(max-width:760px){#cert-tracker{padding-top:32px;padding-bottom:36px;}#cert-tracker .section-head{padding:14px;border-radius:18px;}#certTrackerContent .cert-lock-table{min-width:1450px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;align-items:flex-start;flex-direction:column;}#certTrackerContent .cert-release-left{max-width:100%;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;-webkit-overflow-scrolling:touch;}#certTrackerContent .phase31-cert-note{align-self:flex-start;}#certTrackerContent .cert-scroll-controls{padding:9px 10px;gap:7px;}#certTrackerContent .cert-scroll-label{display:none;}#certTrackerContent .cert-scroll-btn{min-width:38px;height:32px;padding:0 10px;}#certTrackerContent .cert-scroll-btn.home{min-width:58px;}#certTrackerContent .cert-cell{min-width:76px;}#certTrackerContent .cert-mark{width:24px;height:24px;min-width:24px;font-size:15px;}}
+@media(max-width:760px){#cert-tracker{padding-top:32px;padding-bottom:36px;}#cert-tracker .section-head{padding:14px;border-radius:18px;}#certTrackerContent .cert-lock-table{min-width:1450px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-scroll-controls{padding:9px 10px;gap:7px;}#certTrackerContent .cert-scroll-label{display:none;}#certTrackerContent .cert-scroll-btn{min-width:38px;height:32px;padding:0 10px;}#certTrackerContent .cert-scroll-btn.home{min-width:58px;}#certTrackerContent .cert-cell{min-width:76px;}#certTrackerContent .cert-mark{width:24px;height:24px;min-width:24px;font-size:15px;}}
 `;
 document.head.appendChild(st);
 }
@@ -14208,186 +14195,6 @@ if (!w) { alert('Allow pop-ups for this site to print this certification row.');
 w.document.open();
 w.document.write(html);
 w.document.close();
-}
-
-function certReleaseNormalizeData(raw) {
-let d = raw;
-for (let i = 0; i < 4; i++) {
-  if (typeof d === 'string') {
-    try { d = JSON.parse(d); } catch(e) { break; }
-  }
-}
-if (d && d.dates && typeof d.dates === 'object') return d.dates;
-if (d && typeof d === 'object') {
-  const out = {};
-  Object.keys(d).forEach(k => {
-    if (!/updated/i.test(k) && d[k]) out[k] = d[k];
-  });
-  return out;
-}
-return {};
-}
-function certReleaseDateText(v) {
-if (!v) return '';
-const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
-if (m) return String(Number(m[2])) + '/' + String(Number(m[3])) + '/' + m[1];
-return String(v);
-}
-function certReleaseKey(v) {
-return certNormKey(v).replace(/\s+/g, '');
-}
-function getCertReleaseDateForCarrier(carrier) {
-const target = certReleaseKey(carrier);
-const keys = Object.keys(_certReleaseDates || {});
-for (let i = 0; i < keys.length; i++) {
-  if (certReleaseKey(keys[i]) === target) return _certReleaseDates[keys[i]] || '';
-}
-return '';
-}
-function setCertReleaseDateForCarrier(carrier, dateValue) {
-carrier = String(carrier || '').trim();
-if (!carrier) return;
-const target = certReleaseKey(carrier);
-Object.keys(_certReleaseDates || {}).forEach(k => {
-  if (certReleaseKey(k) === target && k !== carrier) delete _certReleaseDates[k];
-});
-if (dateValue) _certReleaseDates[carrier] = dateValue;
-else delete _certReleaseDates[carrier];
-_certReleaseUpdatedAt = new Date().toISOString();
-}
-function getCertReleaseCarriers() {
-const seen = new Set();
-const out = [];
-(getCertCarrierColumns().length ? getCertCarrierColumns() : CERT_CARRIERS).concat(Object.keys(_certReleaseDates || {})).forEach(c => {
-  c = String(c || '').trim();
-  if (!c) return;
-  const k = certReleaseKey(c);
-  if (seen.has(k)) return;
-  seen.add(k);
-  out.push(c);
-});
-return out;
-}
-function certReleaseBarHtml(activeCols) {
-const carriers = (activeCols && activeCols.length ? activeCols : getCertReleaseCarriers());
-const chips = [];
-carriers.forEach(c => {
-  const d = getCertReleaseDateForCarrier(c);
-  if (d) chips.push('<span class="cert-release-chip"><b>' + certEscapeHtml(c) + '</b> ' + certEscapeHtml(certReleaseDateText(d)) + '</span>');
-});
-if (!chips.length) {
-  return '<div class="cert-release-left"><span class="cert-release-title">📅 Carrier Release Dates</span><span class="cert-release-empty">No release dates posted yet</span></div>';
-}
-return '<div class="cert-release-left"><span class="cert-release-title">📅 Carrier Release Dates</span>' + chips.join('') + '</div>';
-}
-async function loadCertReleaseDatesFromSupabase() {
-const keys = ['cert_release_dates','certReleaseDates'];
-const hubs = ['medi','ga'];
-const keyList = keys.map(encodeURIComponent).join(',');
-const hubList = hubs.map(encodeURIComponent).join(',');
-const url = CERT_SUPA_URL + '/rest/v1/tile_content?hub=in.(' + hubList + ')&key=in.(' + keyList + ')&select=hub,key,data&_=' + Date.now();
-try {
-  const r = await fetch(url, { cache:'no-store', headers:{ 'apikey': CERT_SUPA_KEY, 'Authorization':'Bearer ' + CERT_SUPA_KEY, 'Cache-Control':'no-cache', 'Pragma':'no-cache' } });
-  const text = await r.text();
-  if (!r.ok) throw new Error('release date read failed ' + r.status + ': ' + text.slice(0, 250));
-  const rows = text ? JSON.parse(text) : [];
-  const merged = {};
-  (rows || []).forEach(row => {
-    const parsed = certReleaseNormalizeData(row && row.data);
-    Object.keys(parsed || {}).forEach(k => { if (parsed[k]) merged[k] = parsed[k]; });
-    let d = row && row.data;
-    for (let i=0;i<3;i++){ if (typeof d === 'string') { try { d = JSON.parse(d); } catch(e){ break; } } }
-    if (d && (d.updatedAt || d.updated_at || d.lastUpdated)) _certReleaseUpdatedAt = d.updatedAt || d.updated_at || d.lastUpdated;
-  });
-  _certReleaseDates = merged;
-  try { localStorage.setItem('cert_release_dates_cache', JSON.stringify({dates:_certReleaseDates, updatedAt:_certReleaseUpdatedAt})); } catch(e) {}
-  renderCertReleaseAdminPanel();
-  renderCertTracker();
-} catch(err) {
-  console.warn('[CERT RELEASE DATES] load failed', err);
-  try {
-    const cached = JSON.parse(localStorage.getItem('cert_release_dates_cache') || '{}');
-    if (cached && cached.dates) { _certReleaseDates = cached.dates; _certReleaseUpdatedAt = cached.updatedAt || ''; }
-  } catch(e) {}
-  renderCertReleaseAdminPanel();
-  renderCertTracker();
-}
-}
-function renderCertReleaseAdminPanel() {
-const sel = document.getElementById('certReleaseCarrierSelect');
-const dateInput = document.getElementById('certReleaseDateInput');
-const list = document.getElementById('certReleaseAdminSavedList');
-if (!sel) return;
-const current = sel.value;
-const carriers = getCertReleaseCarriers();
-sel.innerHTML = carriers.map(c => '<option value="' + certEscapeHtml(c) + '">' + certEscapeHtml(c) + '</option>').join('');
-if (current && carriers.some(c => certReleaseKey(c) === certReleaseKey(current))) sel.value = current;
-if (dateInput && sel.value) dateInput.value = getCertReleaseDateForCarrier(sel.value) || '';
-if (list) {
-  const chips = carriers.map(c => {
-    const d = getCertReleaseDateForCarrier(c);
-    return d ? '<span style="display:inline-flex;margin:2px;padding:4px 7px;border-radius:999px;background:rgba(0,194,184,.16);border:1px solid rgba(0,194,184,.30);color:var(--text);white-space:nowrap;">' + certEscapeHtml(c) + ': ' + certEscapeHtml(certReleaseDateText(d)) + '</span>' : '';
-  }).filter(Boolean);
-  list.innerHTML = chips.length ? chips.join('') : '<span style="color:var(--muted-2);">No dates saved yet</span>';
-}
-}
-function certReleaseSetStatus(msg, bad) {
-const st = document.getElementById('certReleaseAdminStatus');
-if (st) { st.textContent = msg || ''; st.style.color = bad ? '#ef4444' : 'var(--muted-2)'; }
-}
-async function saveCertReleaseDatesToSupabase() {
-const payload = { dates: _certReleaseDates || {}, updatedAt: _certReleaseUpdatedAt || new Date().toISOString(), source: 'cert_release_dates_integrated_v76' };
-const keys = ['cert_release_dates','certReleaseDates'];
-const hubs = ['medi','ga'];
-const headersBase = { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Content-Type':'application/json', 'Cache-Control':'no-cache' };
-for (const hub of hubs) {
-  for (const key of keys) {
-    const delUrl = CERT_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(hub) + '&key=eq.' + encodeURIComponent(key);
-    let r = await fetch(delUrl, { method:'DELETE', headers:{ 'apikey': CERT_SUPA_KEY, 'Authorization':'Bearer ' + CERT_SUPA_KEY, 'Prefer':'return=minimal' } });
-    let t = await r.text();
-    if (!r.ok) throw new Error('DELETE ' + hub + '/' + key + ' failed ' + r.status + ': ' + t.slice(0, 220));
-    r = await fetch(CERT_SUPA_URL + '/rest/v1/tile_content', { method:'POST', headers:Object.assign({}, headersBase, { 'Prefer':'return=minimal' }), body:JSON.stringify({ hub, key, data:JSON.stringify(payload) }) });
-    t = await r.text();
-    if (!r.ok) throw new Error('POST ' + hub + '/' + key + ' failed ' + r.status + ': ' + t.slice(0, 220));
-  }
-}
-}
-async function saveCertReleaseDate() {
-const sel = document.getElementById('certReleaseCarrierSelect');
-const inp = document.getElementById('certReleaseDateInput');
-const carrier = sel ? sel.value : '';
-const dateValue = inp ? inp.value : '';
-if (!carrier) { alert('Choose a carrier first.'); return; }
-if (!dateValue) { alert('Choose a release date first.'); return; }
-try {
-  certReleaseSetStatus('Saving carrier release date...');
-  setCertReleaseDateForCarrier(carrier, dateValue);
-  await saveCertReleaseDatesToSupabase();
-  certReleaseSetStatus('Saved globally for desktop and mobile.');
-  renderCertReleaseAdminPanel();
-  renderCertTracker();
-} catch(err) {
-  console.error('[CERT RELEASE SAVE ERROR]', err);
-  certReleaseSetStatus('Save failed: ' + err.message, true);
-  alert('Release date save failed: ' + err.message);
-}
-}
-async function clearCertReleaseDate() {
-const sel = document.getElementById('certReleaseCarrierSelect');
-const carrier = sel ? sel.value : '';
-if (!carrier) { alert('Choose a carrier first.'); return; }
-try {
-  certReleaseSetStatus('Clearing carrier release date...');
-  setCertReleaseDateForCarrier(carrier, '');
-  await saveCertReleaseDatesToSupabase();
-  certReleaseSetStatus('Cleared globally for desktop and mobile.');
-  renderCertReleaseAdminPanel();
-  renderCertTracker();
-} catch(err) {
-  console.error('[CERT RELEASE CLEAR ERROR]', err);
-  certReleaseSetStatus('Clear failed: ' + err.message, true);
-  alert('Release date clear failed: ' + err.message);
-}
 }
 function getCertUpdatedStatusText(year, activeColCount) {
 const meta = _certMeta || {};
@@ -14444,11 +14251,11 @@ return `<tr>
 ${cells}
 </tr>`;
 }).join('');
-const metaLeft = certReleaseBarHtml(activeCols);
+const metaLeft = 'Certification Tracker';
 const metaRight = getCertUpdatedStatusText(year, activeCols.length);
 el.innerHTML = `
 <div class="cert-topbar">
-<div class="cert-lock-meta">${metaLeft}<span class="phase31-cert-note">${pesc(metaRight)}</span></div>
+<div class="cert-lock-meta"><span>${metaLeft}</span><span class="phase31-cert-note">${pesc(metaRight)}</span></div>
 <div class="cert-scroll-controls" aria-label="Certification table scroll controls">
 <span class="cert-scroll-label">Carrier columns</span>
 <button type="button" class="cert-scroll-btn home" onclick="scrollCertTable('home')" title="Back to agent names">Start</button>
@@ -14678,10 +14485,6 @@ const preview = document.getElementById('certAdminPreview'); if (preview) previe
 // Drag-and-drop for cert zone
 document.addEventListener('DOMContentLoaded', () => {
 loadCertData();
-loadCertReleaseDatesFromSupabase();
-renderCertReleaseAdminPanel();
-const certRelSel = document.getElementById('certReleaseCarrierSelect');
-if (certRelSel) certRelSel.addEventListener('change', function(){ const inp = document.getElementById('certReleaseDateInput'); if (inp) inp.value = getCertReleaseDateForCarrier(this.value) || ''; });
 const zone = document.getElementById('certCsvDrop');
 if (zone) {
 zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor='var(--accent)'; });
@@ -20593,6 +20396,41 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     });
     return best || {};
   }
+  function mergeReleaseDatesFromRows(rows){
+    var merged = {};
+    (rows || []).forEach(function(row){
+      var d = parseData(row && row.data);
+      if (typeof d === 'string') d = parseData(d);
+      var dates = null;
+      if (d && typeof d === 'object' && d.dates && typeof d.dates === 'object') dates = d.dates;
+      else if (d && typeof d === 'object') dates = d;
+      if (!dates) return;
+      Object.keys(dates).forEach(function(k){ var val = dates[k]; if (val && String(val).trim()) merged[String(k).trim()] = String(val).trim(); });
+    });
+    return merged;
+  }
+  function fetchCertReleaseDates(){
+    var url = SUPA_URL + '/rest/v1/tile_content?key=in.(cert_release_dates,certReleaseDates)&select=hub,key,data';
+    return fetch(url, { cache:'no-store', headers:{ apikey: SUPA_KEY, Authorization:'Bearer ' + SUPA_KEY, 'Cache-Control':'no-cache' }})
+      .then(function(r){ if(!r.ok) throw new Error('cert release dates read failed: ' + r.status); return r.json(); })
+      .then(mergeReleaseDatesFromRows)
+      .catch(function(err){ console.warn('[Cert Release Dates] read failed', err); return {}; });
+  }
+  function formatReleaseDateForCert(value){
+    if (!value) return '';
+    var parts = String(value).split('-');
+    if (parts.length === 3) { var y = parts[0], m = parseInt(parts[1],10), d = parseInt(parts[2],10); if (m && d) return m + '/' + d + '/' + String(y).slice(-2); }
+    var dt = new Date(value);
+    if (!isNaN(dt.getTime())) return dt.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'});
+    return String(value);
+  }
+  function renderCertReleaseRow(dates, carriers){
+    var carrierList = Array.isArray(carriers) && carriers.length ? carriers : CERT_CARRIERS;
+    var keys = Object.keys(dates || {}).filter(function(k){ return dates[k]; });
+    keys.sort(function(a,b){ var ia = carrierList.indexOf(a), ib = carrierList.indexOf(b); if (ia === -1) ia = 999; if (ib === -1) ib = 999; return ia === ib ? String(a).localeCompare(String(b)) : ia - ib; });
+    if (!keys.length) return '<div class="cert-release-row"><span class="cert-release-title">Carrier Release Dates</span><span class="cert-release-empty">No release dates posted yet</span></div>';
+    return '<div class="cert-release-row"><span class="cert-release-title">Carrier Release Dates</span><div class="cert-release-chip-wrap">' + keys.map(function(k){ return '<span class="cert-release-chip"><strong>' + esc(k) + '</strong> <span>' + esc(formatReleaseDateForCert(dates[k])) + '</span></span>'; }).join('') + '</div></div>';
+  }
   function ensureVisualCss(){
     if (document.getElementById('phase31-visual-css')) return;
     var st = document.createElement('style');
@@ -20610,6 +20448,15 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       #certTrackerContent .phase31-cert-note{font-size:12px;color:rgba(255,255,255,.86);font-weight:800;}
       #certTrackerContent .cert-lock-table img,#certTrackerContent .cert-lock-table svg,#fridayMeetingList img,#fridayMeetingList svg{filter:none!important;opacity:1!important;mix-blend-mode:normal!important;}
       #certTrackerContent .cert-agent-print-btn{color:#0f172a!important;}
+      #certTrackerContent .cert-lock-meta{flex-wrap:wrap!important;align-items:flex-start!important;}
+      #certTrackerContent .cert-release-row{display:flex!important;align-items:center!important;gap:10px!important;flex:1 1 100%!important;min-width:0!important;margin-top:6px!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;padding:6px 0 2px!important;}
+      #certTrackerContent .cert-release-title{flex:0 0 auto!important;font-size:11px!important;text-transform:uppercase!important;letter-spacing:.58px!important;font-weight:950!important;color:#ffffff!important;background:rgba(0,0,0,.24)!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:999px!important;padding:6px 10px!important;}
+      #certTrackerContent .cert-release-empty{font-size:12px!important;font-weight:850!important;color:#d7fffb!important;background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:999px!important;padding:6px 10px!important;white-space:nowrap!important;}
+      #certTrackerContent .cert-release-chip-wrap{display:flex!important;gap:8px!important;align-items:center!important;min-width:0!important;}
+      #certTrackerContent .cert-release-chip{display:inline-flex!important;align-items:center!important;gap:6px!important;white-space:nowrap!important;background:rgba(4,12,25,.72)!important;color:#ffffff!important;border:1px solid rgba(255,255,255,.23)!important;border-radius:999px!important;padding:7px 11px!important;font-size:12px!important;font-weight:900!important;box-shadow:0 5px 16px rgba(0,0,0,.20)!important;}
+      #certTrackerContent .cert-release-chip strong{color:#87fff7!important;font-weight:950!important;}
+      #certTrackerContent .cert-release-chip span{color:#ffffff!important;font-weight:950!important;}
+      @media(max-width:760px){#certTrackerContent .cert-release-row{width:100%!important;padding-bottom:8px!important;}#certTrackerContent .cert-release-chip{font-size:12px!important;padding:7px 10px!important;}}
     `;
     document.head.appendChild(st);
   }
@@ -20657,7 +20504,9 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     var badge = document.getElementById('certAgentCount');
     if (!el) return Promise.resolve();
     el.innerHTML = '<div class="trip-empty">Loading certification tracker from Supabase...</div>';
-    return getDataRows('cert_tracker','medi').then(function(rows){
+    return Promise.all([getDataRows('cert_tracker','medi'), fetchCertReleaseDates()]).then(function(results){
+      var rows = results[0] || [];
+      var releaseDates = results[1] || {};
       var obj = bestObjectFromRows(rows, 'agents');
       var agents = Array.isArray(obj.agents) ? obj.agents.filter(function(a){ return a && a.name; }) : [];
       var carriers = CERT_CARRIERS.slice();
@@ -20689,7 +20538,8 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
           + carriers.map(function(c){ return '<td class="cert-cell"><span class="cert-mark ' + (isYes(certs[c]) ? 'yes' : 'no') + '">' + (isYes(certs[c]) ? '✓' : '—') + '</span></td>'; }).join('')
           + '</tr>';
       }).join('') + '</tbody>';
-      el.innerHTML = '<div class="cert-topbar"><div class="cert-lock-meta"><strong>Certification Tracker</strong><span class="phase31-cert-note">' + metaText + '</span></div><div class="cert-scroll-controls"><span class="cert-scroll-label">Scroll carriers</span><button type="button" class="cert-scroll-btn home" onclick="scrollCertTable && scrollCertTable(\'home\')">Start</button><button type="button" class="cert-scroll-btn" onclick="scrollCertTable && scrollCertTable(-1)">‹</button><button type="button" class="cert-scroll-btn" onclick="scrollCertTable && scrollCertTable(1)">›</button><button type="button" class="cert-scroll-btn home" onclick="scrollCertTable && scrollCertTable(\'end\')">End</button></div></div><div class="cert-lock-shell"><table class="cert-lock-table">' + head + body + '</table></div>';
+      var releaseHtml = renderCertReleaseRow(releaseDates, carriers);
+      el.innerHTML = '<div class="cert-topbar"><div class="cert-lock-meta"><strong>Certification Tracker</strong><span class="phase31-cert-note">' + metaText + '</span>' + releaseHtml + '</div><div class="cert-scroll-controls"><span class="cert-scroll-label">Scroll carriers</span><button type="button" class="cert-scroll-btn home" onclick="scrollCertTable && scrollCertTable(&quot;home&quot;)">Start</button><button type="button" class="cert-scroll-btn" onclick="scrollCertTable && scrollCertTable(-1)">‹</button><button type="button" class="cert-scroll-btn" onclick="scrollCertTable && scrollCertTable(1)">›</button><button type="button" class="cert-scroll-btn home" onclick="scrollCertTable && scrollCertTable(&quot;end&quot;)">End</button></div></div><div class="cert-lock-shell"><table class="cert-lock-table">' + head + body + '</table></div>';
       console.log('[Phase 31] Cert tracker rendered:', agents.length);
     }).catch(function(err){ console.error('[Phase 31] Cert tracker rescue failed', err); el.innerHTML = '<div style="color:#fecaca;background:rgba(185,28,28,.16);border:1px solid rgba(248,113,113,.28);border-radius:12px;padding:12px;font-weight:800;">Cert tracker could not load from Supabase: ' + esc(err.message || err) + '</div>'; });
   }
@@ -21736,5 +21586,26 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 </script>
 
 <!-- Cert release dates: locked admin + restored working save v72 -->
+
+<script id="phase77-cert-release-admin-direct">
+(function(){
+  if (window.__phase77CertReleaseAdminDirect) return;
+  window.__phase77CertReleaseAdminDirect = true;
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  var CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
+  function parseData(value){ if(value == null) return null; if(typeof value === 'string'){ try{return JSON.parse(value);}catch(e){return value;} } return value; }
+  function headers(extra){ var h = { apikey: SUPA_KEY, Authorization:'Bearer ' + SUPA_KEY }; if(extra) Object.keys(extra).forEach(function(k){ h[k]=extra[k]; }); return h; }
+  function status(msg, good){ var el=document.getElementById('certReleaseAdminStatus'); if(el){ el.textContent=msg||''; el.style.color = good ? '#86efac' : '#fca5a5'; } }
+  function normalizeRows(rows){ var merged = {}; (rows || []).forEach(function(row){ var d = parseData(row && row.data); if (typeof d === 'string') d = parseData(d); var dates = d && typeof d === 'object' && d.dates && typeof d.dates === 'object' ? d.dates : (d && typeof d === 'object' ? d : null); if(!dates) return; Object.keys(dates).forEach(function(k){ if(dates[k]) merged[String(k).trim()] = String(dates[k]).trim(); }); }); return merged; }
+  async function readDates(){ var res = await fetch(SUPA_URL + '/rest/v1/tile_content?key=in.(cert_release_dates,certReleaseDates)&select=hub,key,data', {cache:'no-store', headers:headers({'Cache-Control':'no-cache'})}); if(!res.ok) throw new Error('Read failed: ' + res.status); return normalizeRows(await res.json()); }
+  async function writeDates(dates){ var payload = { dates: dates || {}, updatedAt: new Date().toISOString(), source:'cert_release_dates_admin_v77' }; var keys = ['cert_release_dates','certReleaseDates']; var hubs = ['medi','ga']; for (var i=0;i<hubs.length;i++) { for (var j=0;j<keys.length;j++) { var del = await fetch(SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(hubs[i]) + '&key=eq.' + encodeURIComponent(keys[j]), {method:'DELETE', headers:headers()}); if(!del.ok) throw new Error('Delete failed for ' + hubs[i] + '/' + keys[j] + ': ' + del.status); var post = await fetch(SUPA_URL + '/rest/v1/tile_content', {method:'POST', headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}), body:JSON.stringify({hub:hubs[i], key:keys[j], data:payload})}); if(!post.ok) throw new Error('Save failed for ' + hubs[i] + '/' + keys[j] + ': ' + post.status + ' ' + (await post.text()).slice(0,180)); } } }
+  function htmlEsc(v){ return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function populateSelect(){ var sel = document.getElementById('certReleaseCarrierSelect'); if(!sel || sel.dataset.phase77Ready) return; sel.innerHTML = CARRIERS.map(function(c){ return '<option value="' + htmlEsc(c) + '">' + htmlEsc(c) + '</option>'; }).join(''); sel.dataset.phase77Ready = '1'; readDates().then(function(dates){ var carrier = sel.value; var input = document.getElementById('certReleaseDateInput'); if(input && dates[carrier]) input.value = dates[carrier]; status('Loaded release dates', true); }).catch(function(e){ status(e.message || String(e), false); }); }
+  document.addEventListener('change', function(e){ if(e.target && e.target.id === 'certReleaseCarrierSelect') { readDates().then(function(dates){ var input=document.getElementById('certReleaseDateInput'); if(input) input.value = dates[e.target.value] || ''; }).catch(function(err){ status(err.message || String(err), false); }); } });
+  document.addEventListener('click', async function(e){ var save = e.target && e.target.closest ? e.target.closest('#certReleaseSaveBtn') : null; var clear = e.target && e.target.closest ? e.target.closest('#certReleaseClearBtn') : null; if(!save && !clear) return; e.preventDefault(); var sel = document.getElementById('certReleaseCarrierSelect'); var input = document.getElementById('certReleaseDateInput'); if(!sel || !input) return status('Carrier/date controls not found.', false); try { status(clear ? 'Clearing...' : 'Saving...', true); var dates = await readDates(); if(clear) { delete dates[sel.value]; input.value = ''; } else { if(!input.value) return status('Pick a release date first.', false); dates[sel.value] = input.value; } await writeDates(dates); status(clear ? 'Release date cleared.' : 'Release date saved globally.', true); if (typeof window.emergencyReloadCoreHubData === 'function') window.emergencyReloadCoreHubData(); } catch(err) { status(err.message || String(err), false); alert('Carrier release date save failed: ' + (err.message || err)); } });
+  document.addEventListener('DOMContentLoaded', populateSelect); setTimeout(populateSelect, 600); setTimeout(populateSelect, 1800); window.phase77PopulateCertReleaseAdmin = populateSelect;
+})();
+</script>
 </body>
 </html>
