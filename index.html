@@ -21512,13 +21512,13 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 
 
 <!-- Cert release dates: admin-locked picker save fix v68 -->
-<script id="cert-release-dates-admin-locked-picker-save-fix-v68">
+<script id="cert-release-dates-admin-locked-picker-save-fix-v69">
 (function(){
   'use strict';
   var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
   var SUPA_KEY = (typeof NF_KEY !== 'undefined' && NF_KEY) ? NF_KEY : ((typeof CERT_SUPA_KEY !== 'undefined' && CERT_SUPA_KEY) ? CERT_SUPA_KEY : '');
   var RELEASE_KEYS = ['cert_release_dates','certReleaseDates'];
-  var RELEASE_HUBS = ['medi','ga'];
+  var RELEASE_HUBS = ['medi']; // medi is the single global source of truth for cert release dates
   var DEFAULT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
   var releaseDates = {};
   var releaseUpdatedAt = '';
@@ -21605,41 +21605,64 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       })
       .catch(function(err){ console.warn('[Cert Release Dates] global read failed', err); return releaseDates; });
   }
-  function deleteOne(hub, key){
-    var url = SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(hub) + '&key=eq.' + encodeURIComponent(key);
-    return fetch(url, {method:'DELETE', headers:headers({'Prefer':'return=minimal'})}).then(function(r){ if(!r.ok) throw new Error('delete ' + hub + '/' + key + ' ' + r.status); });
+  function readResponseText(r){
+    return r.text().then(function(t){ return {ok:r.ok, status:r.status, text:t}; });
   }
-  function insertOne(hub, key, payload){
-    // tile_content.data has existed as both json/jsonb and text in different Hub builds.
-    // Try JSON object first; if PostgREST rejects it, retry with a stringified payload.
-    var rowObject = {hub:hub, key:key, data:payload};
-    var rowString = {hub:hub, key:key, data:JSON.stringify(payload)};
-    return fetch(SUPA_URL + '/rest/v1/tile_content', {
+  function saveOneVersion(hub, key, payload, stringifyData){
+    var dataValue = stringifyData ? JSON.stringify(payload) : payload;
+    var body = {hub:hub, key:key, data:dataValue};
+    var upsertUrl = SUPA_URL + '/rest/v1/tile_content?on_conflict=hub,key';
+    return fetch(upsertUrl, {
       method:'POST',
-      headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
-      body:JSON.stringify(rowObject)
-    }).then(function(r){
-      if(r.ok) return true;
-      return fetch(SUPA_URL + '/rest/v1/tile_content', {
-        method:'POST',
-        headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
-        body:JSON.stringify(rowString)
-      }).then(function(r2){
-        if(!r2.ok) throw new Error('insert ' + hub + '/' + key + ' failed ' + r.status + '/' + r2.status);
-        return true;
+      headers:headers({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=representation'}),
+      body:JSON.stringify(body)
+    }).then(readResponseText).then(function(res){
+      if(res.ok) return true;
+      // If upsert is unavailable because the unique index is missing, try updating any existing row.
+      var patchUrl = SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(hub) + '&key=eq.' + encodeURIComponent(key);
+      return fetch(patchUrl, {
+        method:'PATCH',
+        headers:headers({'Content-Type':'application/json','Prefer':'return=representation'}),
+        body:JSON.stringify({data:dataValue})
+      }).then(readResponseText).then(function(patchRes){
+        if(patchRes.ok && patchRes.text && patchRes.text !== '[]') return true;
+        // Last-resort clean replace.
+        return fetch(patchUrl, {method:'DELETE', headers:headers({'Prefer':'return=minimal'})})
+          .then(function(){
+            return fetch(SUPA_URL + '/rest/v1/tile_content', {
+              method:'POST',
+              headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
+              body:JSON.stringify(body)
+            }).then(readResponseText).then(function(postRes){
+              if(postRes.ok) return true;
+              throw new Error('save ' + hub + '/' + key + ' failed. upsert ' + res.status + ' ' + (res.text||'') + ' | patch ' + patchRes.status + ' ' + (patchRes.text||'') + ' | post ' + postRes.status + ' ' + (postRes.text||''));
+            });
+          });
       });
+    });
+  }
+  function saveOneKey(hub, key, payload){
+    return saveOneVersion(hub, key, payload, false).catch(function(firstErr){
+      console.warn('[Cert Release Dates] object save failed, retrying string payload', firstErr);
+      return saveOneVersion(hub, key, payload, true);
     });
   }
   function saveReleaseDates(){
-    var payload = {dates:releaseDates, updatedAt:new Date().toISOString()};
-    var chain = Promise.resolve();
+    var payload = {dates:releaseDates, updatedAt:new Date().toISOString(), source:'cert_release_dates_admin'};
+    var jobs = [];
     RELEASE_HUBS.forEach(function(hub){
-      RELEASE_KEYS.forEach(function(key){
-        chain = chain.then(function(){ return deleteOne(hub, key).catch(function(){ return null; }); }).then(function(){ return insertOne(hub, key, payload); });
-      });
+      RELEASE_KEYS.forEach(function(key){ jobs.push(saveOneKey(hub, key, payload)); });
     });
-    return chain.then(readReleaseDates);
+    return Promise.allSettled(jobs).then(function(results){
+      var ok = results.some(function(r){ return r.status === 'fulfilled'; });
+      if(!ok){
+        var msg = results.map(function(r){ return r.reason && (r.reason.message || String(r.reason)); }).join(' || ');
+        throw new Error(msg || 'No release-date save method succeeded.');
+      }
+      return readReleaseDates();
+    });
   }
+
 
   function ensureStyles(){
     if(document.getElementById('certReleaseDatesV67Styles')) return;
