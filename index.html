@@ -21511,8 +21511,8 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 
 
 
-<!-- Cert release dates: admin-locked reliable save fix v70 -->
-<script id="cert-release-dates-admin-locked-reliable-save-v70">
+<!-- Cert release dates: admin-locked simple save fix v71 -->
+<script id="cert-release-dates-admin-locked-simple-save-v71">
 (function(){
   'use strict';
   var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
@@ -21630,10 +21630,29 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       });
   }
   function saveReleaseDates(changedCarrier, changedDate){
-    var payload = {dates:releaseDates, updatedAt:new Date().toISOString(), source:'cert_release_dates_admin_v70'};
-    var jobs = [];
-    RELEASE_HUBS.forEach(function(hub){ RELEASE_KEYS.forEach(function(key){ jobs.push(replaceOneRow(hub, key, payload)); }); });
-    return Promise.all(jobs).then(function(){ return verifySaved(changedCarrier, changedDate); });
+    // Phase 71: restore the simple save pattern that worked in earlier files.
+    // Single source of truth is hub=medi / key=cert_release_dates.
+    // A legacy camelCase key is written as best-effort backup, but cannot block Save.
+    var payload = {dates:releaseDates, updatedAt:new Date().toISOString(), source:'cert_release_dates_admin_v71'};
+    function simpleSave(key){
+      var delUrl = SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(PRIMARY_HUB) + '&key=eq.' + encodeURIComponent(key);
+      var body = {hub:PRIMARY_HUB, key:key, data:JSON.stringify(payload)};
+      return fetch(delUrl, {method:'DELETE', headers:headers({'Prefer':'return=minimal'})})
+        .then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error('DELETE '+key+' failed '+r.status+': '+t.slice(0,180)); }); })
+        .then(function(){
+          return fetch(SUPA_URL + '/rest/v1/tile_content', {
+            method:'POST',
+            headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
+            body:JSON.stringify(body)
+          });
+        })
+        .then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error('POST '+key+' failed '+r.status+': '+t.slice(0,180)); }); return true; });
+    }
+    return simpleSave('cert_release_dates')
+      .then(function(){
+        return simpleSave('certReleaseDates').catch(function(err){ console.warn('[Cert Release Dates] backup key save failed; primary save succeeded', err); return true; });
+      })
+      .then(function(){ releaseUpdatedAt = payload.updatedAt; window.certReleaseDatesData = releaseDates; return true; });
   }
   function ensureStyles(){
     if(document.getElementById('certReleaseDatesV70Styles')) return;
