@@ -21079,7 +21079,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       .then(function(r){ if(r.ok) return true; return fetch(P47_URL + '/rest/v1/tile_content', {method:'POST', headers:headers({'Prefer':'return=minimal'}), body:JSON.stringify(bodyString)}).then(function(r2){ if(!r2.ok) throw new Error('status save '+r.status+'/'+r2.status); return true; }); });
   }
   function saveStatus(active){
-    var payload = {active:!!active, updatedAt:new Date().toISOString(), source:'phase47'};
+    var payload = {active:!!active, updatedAt:new Date().toISOString(), source:'global_notice'};
     var delUrl = P47_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(P47_HUB) + '&key=eq.' + encodeURIComponent(NOTICE_KEY);
     return fetch(delUrl, {method:'DELETE', headers:headers({'Prefer':'return=minimal'})})
       .then(function(r){ if(!r.ok) console.warn('[Phase47 notice] delete before save returned', r.status); return postStatus(payload); })
@@ -21278,7 +21278,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function fmtDate(v){ if(!v) return ''; var d=new Date(v); if(isNaN(d.getTime())) return ''; return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
   function onboardingLastUpdated(){ var vals=[]; ['stages','tasks','resources','statuses'].forEach(function(k){ (state[k]||[]).forEach(function(x){ var v=x.updated_at||x.updatedAt||x.savedAt||x.created_at; if(v){ var d=new Date(v); if(!isNaN(d.getTime())) vals.push(d); } }); }); if(!vals.length) return 'Last updated date not stored'; vals.sort(function(a,b){return b-a;}); return 'Last updated ' + fmtDate(vals[0]); }
   function ensureMount(){ var section=document.getElementById('ga-resources'); if(!section) return null; var wrap=section.querySelector('.wrap')||section; var existing=document.getElementById('phase48OnboardingDashboard'); if(existing) return existing; var mount=document.createElement('div'); mount.id='phase48OnboardingDashboard'; var resourceShell=wrap.querySelector('.ga-resource-shell'); if(resourceShell) wrap.insertBefore(mount, resourceShell); else wrap.appendChild(mount); return mount; }
-  function showSetupMessage(e){ var m=ensureMount(); if(!m) return; m.innerHTML='<div class="p48-onboard-shell"><div class="p48-onboard-head"><div><h3 class="p48-onboard-title">Agent Onboarding Dashboard</h3><p class="p48-onboard-sub">The onboarding database tables are not ready yet. Run the Phase 48 Supabase SQL file, then refresh this page.</p></div><span class="p48-pill">Setup Required</span></div><div class="p48-empty">'+esc(e && e.message ? e.message : 'Onboarding tables unavailable')+'</div></div>'; }
+  function showSetupMessage(e){ var m=ensureMount(); if(!m) return; m.innerHTML='<div class="p48-onboard-shell"><div class="p48-onboard-head"><div><h3 class="p48-onboard-title">Agent Onboarding Dashboard</h3><p class="p48-onboard-sub">The onboarding database tables are not ready yet. Run the onboarding Supabase setup SQL, then refresh this page.</p></div><span class="p48-pill">Setup Required</span></div><div class="p48-empty">'+esc(e && e.message ? e.message : 'Onboarding tables unavailable')+'</div></div>'; }
   function renderDashboard(){ var m=ensureMount(); if(!m) return; var stages=state.stages.filter(visibleForAudience); var metrics=calc(); var cur=currentStage(); var lastUpdated=onboardingLastUpdated(); var stageCards=stages.map(function(s){ var req=stageTasks(s.id).filter(function(t){return t.required!==false;}); var done=req.filter(function(t){ var st=statusForTask(t.id); return st && String(st.status).toLowerCase()==='complete';}).length; var cls=req.length && done===req.length?'complete':(cur && Number(cur.id)===Number(s.id)?'current':'upcoming'); var label=cls==='complete'?'Complete':(cls==='current'?'Current Stage':'Upcoming'); return '<div class="p48-stage-card '+cls+'"><div class="p48-stage-status">'+label+'</div><div class="p48-stage-title">'+esc(s.title)+'</div><div class="p48-stage-copy">'+esc(s.description||'')+'</div><div class="p48-stage-mini">'+done+' / '+req.length+' required</div></div>'; }).join('') || '<div class="p48-empty">No onboarding stages are set up for this role yet.</div>';
     var allTasks=state.tasks.filter(visibleForAudience).sort(function(a,b){ var sa=(state.stages.find(function(s){return Number(s.id)===Number(a.stage_id);})||{}).sort_order||0; var sb=(state.stages.find(function(s){return Number(s.id)===Number(b.stage_id);})||{}).sort_order||0; return sa-sb || (a.sort_order||0)-(b.sort_order||0); });
     var taskHtml=allTasks.map(renderTask).join('') || '<div class="p48-empty">No checklist tasks are assigned yet.</div>';
@@ -21291,7 +21291,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function adminStageOptions(){ return state.stages.map(function(s){ return '<option value="'+Number(s.id)+'">'+esc(s.title)+' ('+esc(s.audience)+')</option>'; }).join(''); }
   function ensureAdminMount(){ var panel=document.querySelector('#adminTabOnboarding .admin-body') || document.getElementById('adminTabOnboarding'); if(!panel) return null; var box=document.getElementById('phase48OnboardingAdmin'); if(box) return box; box=document.createElement('div'); box.id='phase48OnboardingAdmin'; panel.insertBefore(box, panel.firstChild); return box; }
   function renderAdmin(){ if(!isAdmin()) return; var box=ensureAdminMount(); if(!box) return; var pending=state.statuses.filter(function(s){return String(s.status)==='pending_review';}); var pendingHtml=pending.map(function(p){ var task=state.tasks.find(function(t){return Number(t.id)===Number(p.task_id);})||{}; return '<div class="p48-pending-row"><div><strong>'+esc(p.email)+'</strong><br>'+esc(task.title||'Task')+'</div><button class="approve" onclick="phase48ApproveTask('+Number(p.task_id)+',\''+esc(p.email)+'\')">Approve</button><button class="reject" onclick="phase48RejectTask('+Number(p.task_id)+',\''+esc(p.email)+'\')">Reject</button></div>'; }).join('') || '<div class="p48-empty">No pending review items.</div>';
-    box.innerHTML='<div class="p48-admin-box"><h3>🚀 Phase 48 Onboarding Dashboard Manager</h3><p style="font-size:12px;color:#cbd5e1;margin:0 0 12px;line-height:1.45;">Build professional onboarding timelines, task checklists, and resource links. Agent progress calculates automatically from required completed tasks.</p><div class="p48-admin-grid"><div><h3>Add Timeline Stage</h3><div class="p48-admin-field"><label>Title</label><input id="p48StageTitle" placeholder="Week 1"></div><div class="p48-admin-field"><label>Description</label><input id="p48StageDesc" placeholder="Systems setup and training"></div><div class="p48-admin-field"><label>Audience</label><select id="p48StageAudience"><option value="both">Both</option><option value="loa">LOA/Internal</option><option value="ga">GA</option></select></div><div class="p48-admin-field"><label>Sort Order</label><input id="p48StageSort" type="number" value="100"></div><div class="p48-admin-actions"><button class="p48-admin-btn" onclick="phase48AddStage()">Add Stage</button></div></div><div><h3>Add Task</h3><div class="p48-admin-field"><label>Stage</label><select id="p48TaskStage">'+adminStageOptions()+'</select></div><div class="p48-admin-field"><label>Task Title</label><input id="p48TaskTitle" placeholder="Submit E&O"></div><div class="p48-admin-field"><label>Description</label><input id="p48TaskDesc" placeholder="Short instruction"></div><div class="p48-admin-field"><label>Audience</label><select id="p48TaskAudience"><option value="both">Both</option><option value="loa">LOA/Internal</option><option value="ga">GA</option></select></div><div class="p48-admin-field"><label>Resource URL</label><input id="p48TaskUrl" placeholder="https://..."></div><div class="p48-admin-field"><label>Resource Label</label><input id="p48TaskResourceLabel" placeholder="Open form"></div><div style="display:flex;gap:12px;margin:8px 0;color:#dbeafe;font-size:12px;"><label><input id="p48TaskRequired" type="checkbox" checked> Counts toward progress</label><label><input id="p48TaskReview" type="checkbox"> Requires admin review</label></div><div class="p48-admin-actions"><button class="p48-admin-btn" onclick="phase48AddTask()">Add Task</button></div></div><div><h3>Add Resource / Form / Link</h3><div class="p48-admin-field"><label>Stage</label><select id="p48ResStage">'+adminStageOptions()+'</select></div><div class="p48-admin-field"><label>Title</label><input id="p48ResTitle" placeholder="Contracting Packet"></div><div class="p48-admin-field"><label>Type</label><select id="p48ResType"><option value="document">Document</option><option value="form">Fillable Form</option><option value="link">Link</option><option value="video">Video</option><option value="download">Download</option><option value="contact">Contact</option></select></div><div class="p48-admin-field"><label>URL / File Link</label><input id="p48ResUrl" placeholder="https://..."></div><div class="p48-admin-field"><label>Audience</label><select id="p48ResAudience"><option value="both">Both</option><option value="loa">LOA/Internal</option><option value="ga">GA</option></select></div><div class="p48-admin-field"><label>Description</label><textarea id="p48ResDesc" placeholder="What this is used for"></textarea></div><div class="p48-admin-actions"><button class="p48-admin-btn" onclick="phase48AddResource()">Add Resource</button><button class="p48-admin-btn alt" onclick="phase48Refresh()">Refresh</button></div></div></div><h3 style="margin-top:14px;">Pending Review</h3><div>'+pendingHtml+'</div><h3 style="margin-top:14px;">Current Stages / Tasks / Resources</h3><div class="p48-admin-mini-list">'+adminMiniList()+'</div></div>'; }
+    box.innerHTML='<div class="p48-admin-box"><h3>🚀 Onboarding Dashboard Manager</h3><p style="font-size:12px;color:#cbd5e1;margin:0 0 12px;line-height:1.45;">Build professional onboarding timelines, task checklists, and resource links. Agent progress calculates automatically from required completed tasks.</p><div class="p48-admin-grid"><div><h3>Add Timeline Stage</h3><div class="p48-admin-field"><label>Title</label><input id="p48StageTitle" placeholder="Week 1"></div><div class="p48-admin-field"><label>Description</label><input id="p48StageDesc" placeholder="Systems setup and training"></div><div class="p48-admin-field"><label>Audience</label><select id="p48StageAudience"><option value="both">Both</option><option value="loa">LOA/Internal</option><option value="ga">GA</option></select></div><div class="p48-admin-field"><label>Sort Order</label><input id="p48StageSort" type="number" value="100"></div><div class="p48-admin-actions"><button class="p48-admin-btn" onclick="phase48AddStage()">Add Stage</button></div></div><div><h3>Add Task</h3><div class="p48-admin-field"><label>Stage</label><select id="p48TaskStage">'+adminStageOptions()+'</select></div><div class="p48-admin-field"><label>Task Title</label><input id="p48TaskTitle" placeholder="Submit E&O"></div><div class="p48-admin-field"><label>Description</label><input id="p48TaskDesc" placeholder="Short instruction"></div><div class="p48-admin-field"><label>Audience</label><select id="p48TaskAudience"><option value="both">Both</option><option value="loa">LOA/Internal</option><option value="ga">GA</option></select></div><div class="p48-admin-field"><label>Resource URL</label><input id="p48TaskUrl" placeholder="https://..."></div><div class="p48-admin-field"><label>Resource Label</label><input id="p48TaskResourceLabel" placeholder="Open form"></div><div style="display:flex;gap:12px;margin:8px 0;color:#dbeafe;font-size:12px;"><label><input id="p48TaskRequired" type="checkbox" checked> Counts toward progress</label><label><input id="p48TaskReview" type="checkbox"> Requires admin review</label></div><div class="p48-admin-actions"><button class="p48-admin-btn" onclick="phase48AddTask()">Add Task</button></div></div><div><h3>Add Resource / Form / Link</h3><div class="p48-admin-field"><label>Stage</label><select id="p48ResStage">'+adminStageOptions()+'</select></div><div class="p48-admin-field"><label>Title</label><input id="p48ResTitle" placeholder="Contracting Packet"></div><div class="p48-admin-field"><label>Type</label><select id="p48ResType"><option value="document">Document</option><option value="form">Fillable Form</option><option value="link">Link</option><option value="video">Video</option><option value="download">Download</option><option value="contact">Contact</option></select></div><div class="p48-admin-field"><label>URL / File Link</label><input id="p48ResUrl" placeholder="https://..."></div><div class="p48-admin-field"><label>Audience</label><select id="p48ResAudience"><option value="both">Both</option><option value="loa">LOA/Internal</option><option value="ga">GA</option></select></div><div class="p48-admin-field"><label>Description</label><textarea id="p48ResDesc" placeholder="What this is used for"></textarea></div><div class="p48-admin-actions"><button class="p48-admin-btn" onclick="phase48AddResource()">Add Resource</button><button class="p48-admin-btn alt" onclick="phase48Refresh()">Refresh</button></div></div></div><h3 style="margin-top:14px;">Pending Review</h3><div>'+pendingHtml+'</div><h3 style="margin-top:14px;">Current Stages / Tasks / Resources</h3><div class="p48-admin-mini-list">'+adminMiniList()+'</div></div>'; }
   function adminMiniList(){ var rows=[]; state.stages.forEach(function(s){ rows.push('<div class="p48-admin-row"><span><strong>Stage:</strong> '+esc(s.title)+' • '+esc(s.audience)+'</span><button onclick="phase48DeleteRow(\'onboarding_stages\','+Number(s.id)+')">Delete</button></div>'); }); state.tasks.forEach(function(t){ rows.push('<div class="p48-admin-row"><span><strong>Task:</strong> '+esc(t.title)+' • '+esc(t.audience)+'</span><button onclick="phase48DeleteRow(\'onboarding_tasks\','+Number(t.id)+')">Delete</button></div>'); }); state.resources.forEach(function(r){ rows.push('<div class="p48-admin-row"><span><strong>Resource:</strong> '+esc(r.title)+' • '+esc(r.audience)+'</span><button onclick="phase48DeleteRow(\'onboarding_resources\','+Number(r.id)+')">Delete</button></div>'); }); return rows.join('') || '<div class="p48-empty">No setup items yet.</div>'; }
   window.phase48Refresh=loadAll;
   window.phase48AddStage=function(){ var title=(document.getElementById('p48StageTitle')||{}).value||''; if(!title.trim()) return toast('Stage title required.'); var key=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36).slice(-4); var payload={hub:HUB,stage_key:key,title:title.trim(),description:(document.getElementById('p48StageDesc')||{}).value||'',audience:(document.getElementById('p48StageAudience')||{}).value||'both',sort_order:parseInt((document.getElementById('p48StageSort')||{}).value||'100',10),active:true}; api('onboarding_stages',{method:'POST',headers:h({'Prefer':'return=minimal'}),body:JSON.stringify(payload)}).then(loadAll).then(function(){toast('Stage added.');}).catch(function(){toast('Stage save failed.');}); };
@@ -21386,7 +21386,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function audienceOpts(v){v=v||'both'; return ['both','loa','ga'].map(function(a){return '<option value="'+a+'" '+(v===a?'selected':'')+'>'+(a==='both'?'Both':a==='loa'?'LOA/Internal':'GA')+'</option>';}).join('');}
   function typeOpts(v){v=v||'link'; return ['document','form','link','video','download','contact'].map(function(a){return '<option value="'+a+'" '+(v===a?'selected':'')+'>'+a.charAt(0).toUpperCase()+a.slice(1)+'</option>';}).join('');}
   function activeTabs(){return '<div class="p52-tabs"><button class="p52-tab '+(state.tab==='tasks'?'active':'')+'" onclick="phase52SetTab(\'tasks\')">Checklist Tasks</button><button class="p52-tab '+(state.tab==='resources'?'active':'')+'" onclick="phase52SetTab(\'resources\')">Resources / Forms</button><button class="p52-tab '+(state.tab==='progress'?'active':'')+'" onclick="phase52SetTab(\'progress\')">Agent Progress</button><button class="p52-tab '+(state.tab==='review'?'active':'')+'" onclick="phase52SetTab(\'review\')">Pending Review</button></div>';}
-  function render(){var box=ensure(); if(!box) return; box.innerHTML='<div class="p52-shell"><div class="p52-head"><div><h3>🚀 Onboarding Admin Center</h3><p>Manage timeline stages, checklist tasks, documents, fillable forms, links, videos, and approvals. Agent percentages calculate automatically from completed required tasks.</p></div><span class="p52-pill">Phase 52</span></div>'+activeTabs()+panels()+'</div>';}
+  function render(){var box=ensure(); if(!box) return; box.innerHTML='<div class="p52-shell"><div class="p52-head"><div><h3>🚀 Onboarding Admin Center</h3><p>Manage timeline stages, checklist tasks, documents, fillable forms, links, videos, and approvals. Agent percentages calculate automatically from completed required tasks.</p></div><span class="p52-pill">Admin Tools</span></div>'+activeTabs()+panels()+'</div>';}
   function panels(){return '<div id="p52PanelTasks" class="p52-subpanel '+(state.tab==='tasks'?'active':'')+'">'+tasksPanel()+'</div><div id="p52PanelResources" class="p52-subpanel '+(state.tab==='resources'?'active':'')+'">'+resourcesPanel()+'</div><div id="p52PanelProgress" class="p52-subpanel '+(state.tab==='progress'?'active':'')+'">'+progressPanel()+'</div><div id="p52PanelReview" class="p52-subpanel '+(state.tab==='review'?'active':'')+'">'+reviewPanel()+'</div>';}
   function tasksPanel(){return '<div class="p52-grid"><div class="p52-card"><h4>'+(state.editStage?'Edit Timeline Stage':'Add Timeline Stage')+'</h4><div class="p52-field"><label>Title</label><input id="p52StageTitle" value="'+esc(state.editStage?state.editStage.title:'')+'" placeholder="Week 1"></div><div class="p52-field"><label>Description</label><textarea id="p52StageDesc" placeholder="What happens in this stage">'+esc(state.editStage?state.editStage.description:'')+'</textarea></div><div class="p52-field"><label>Audience</label><select id="p52StageAudience">'+audienceOpts(state.editStage?state.editStage.audience:'both')+'</select></div><div class="p52-field"><label>Sort Order</label><input id="p52StageSort" type="number" value="'+esc(state.editStage?state.editStage.sort_order:100)+'"></div><div class="p52-checks"><label><input id="p52StageActive" type="checkbox" '+(!state.editStage||state.editStage.active?'checked':'')+'> Active</label></div><div class="p52-actions"><button class="p52-btn" onclick="phase52SaveStage()">'+(state.editStage?'Update Stage':'Add Stage')+'</button>'+(state.editStage?'<button class="p52-btn alt" onclick="phase52CancelEdit()">Cancel</button>':'')+'</div></div><div class="p52-card"><h4>'+(state.editTask?'Edit Task':'Add Task')+'</h4><div class="p52-field"><label>Stage</label><select id="p52TaskStage">'+stageOpts(state.editTask?state.editTask.stage_id:null)+'</select></div><div class="p52-field"><label>Task Title</label><input id="p52TaskTitle" value="'+esc(state.editTask?state.editTask.title:'')+'" placeholder="Submit E&O"></div><div class="p52-field"><label>Description</label><textarea id="p52TaskDesc" placeholder="Short instruction">'+esc(state.editTask?state.editTask.description:'')+'</textarea></div><div class="p52-field"><label>Audience</label><select id="p52TaskAudience">'+audienceOpts(state.editTask?state.editTask.audience:'both')+'</select></div><div class="p52-field"><label>Resource URL</label><input id="p52TaskUrl" value="'+esc(state.editTask?state.editTask.resource_url:'')+'" placeholder="https://..."></div><div class="p52-field"><label>Resource Button Label</label><input id="p52TaskResourceLabel" value="'+esc(state.editTask?state.editTask.resource_label:'')+'" placeholder="Open form"></div><div class="p52-field"><label>Notes</label><textarea id="p52TaskNotes" placeholder="Notes carried from CSV, exceptions, or extra instructions">'+esc(state.editTask?state.editTask.notes:'')+'</textarea></div><div class="p52-field"><label>Sort Order</label><input id="p52TaskSort" type="number" value="'+esc(state.editTask?state.editTask.sort_order:100)+'"></div><div class="p52-checks"><label><input id="p52TaskRequired" type="checkbox" '+(!state.editTask||state.editTask.required?'checked':'')+'> Counts toward progress</label><label><input id="p52TaskReview" type="checkbox" '+(state.editTask&&state.editTask.requires_review?'checked':'')+'> Requires admin review</label><label><input id="p52TaskActive" type="checkbox" '+(!state.editTask||state.editTask.active?'checked':'')+'> Active</label></div><div class="p52-actions"><button class="p52-btn" onclick="phase52SaveTask()">'+(state.editTask?'Update Task':'Add Task')+'</button>'+(state.editTask?'<button class="p52-btn alt" onclick="phase52CancelEdit()">Cancel</button>':'')+'</div></div><div class="p52-card"><h4>Existing Stages & Tasks</h4><div class="p52-list">'+stageTaskList()+'</div></div></div>';}
   function stageTaskList(){var rows=[]; state.stages.forEach(function(s){rows.push('<div class="p52-row"><div><div class="p52-row-title">Stage: '+esc(s.title)+'</div><div class="p52-row-meta">'+esc(s.audience||'both')+' • order '+esc(s.sort_order)+' • '+(s.active?'active':'inactive')+'</div></div><div class="p52-actions"><button class="p52-mini-btn" onclick="phase52EditStage('+Number(s.id)+')">Edit</button><button class="p52-mini-btn danger" onclick="phase52Delete(\'onboarding_stages\','+Number(s.id)+')">Delete</button></div></div>'); state.tasks.filter(function(t){return Number(t.stage_id)===Number(s.id);}).forEach(function(t){rows.push('<div class="p52-row" style="margin-left:14px;"><div><div class="p52-row-title">Task: '+esc(t.title)+'</div><div class="p52-row-meta">'+esc(t.audience||'both')+' • '+(t.required?'counts toward progress':'optional')+' • '+(t.requires_review?'admin review':'agent complete')+' • '+(t.active?'active':'inactive')+(t.updated_at?' • Updated '+esc(new Date(t.updated_at).toLocaleDateString()):'')+(t.notes?'<br>Notes: '+esc(t.notes):'')+'</div></div><div class="p52-actions"><button class="p52-mini-btn" onclick="phase52EditTask('+Number(t.id)+')">Edit</button><button class="p52-mini-btn danger" onclick="phase52Delete(\'onboarding_tasks\','+Number(t.id)+')">Delete</button></div></div>');});}); return rows.join('')||'<div class="p52-empty">No stages or tasks yet.</div>';}
@@ -21509,6 +21509,135 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     };
   });
 })();
+</script>
+
+<!-- Cert release dates: clean admin/public mount -->
+<script id="cert-release-dates-clean-script">
+(function(){
+  'use strict';
+  var RD_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var RD_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  var RD_HUB = 'medi';
+  var RD_KEY = 'cert_release_dates';
+  var RD_DEFAULT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
+  var rdDates = {};
+  var rdLoaded = false;
+
+  function esc(v){ return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function hdr(extra){ var h = {'apikey':RD_SUPA_KEY,'Authorization':'Bearer '+RD_SUPA_KEY}; if(extra){ Object.keys(extra).forEach(function(k){ h[k]=extra[k]; }); } return h; }
+  function parseData(raw){
+    if(!raw) return {};
+    var d = raw;
+    if(typeof d === 'string'){ try{ d = JSON.parse(d); }catch(e){ d = {}; } }
+    if(d && d.dates && typeof d.dates === 'object') return d.dates;
+    if(d && typeof d === 'object') return d;
+    return {};
+  }
+  function getCarriers(){
+    try{ if(typeof getCertCarrierColumns === 'function'){ var cols = getCertCarrierColumns(); if(Array.isArray(cols) && cols.length) return cols; } }catch(e){}
+    try{ if(typeof _certMeta !== 'undefined' && _certMeta && Array.isArray(_certMeta.carriers) && _certMeta.carriers.length) return _certMeta.carriers; }catch(e){}
+    return RD_DEFAULT_CARRIERS.slice();
+  }
+  function dateText(v){
+    if(!v) return '';
+    var parts = String(v).split('-');
+    if(parts.length === 3) return parts[1].replace(/^0/,'') + '/' + parts[2].replace(/^0/,'') + '/' + parts[0];
+    return String(v);
+  }
+  function readDates(){
+    var url = RD_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(RD_HUB) + '&key=eq.' + encodeURIComponent(RD_KEY) + '&select=data&limit=1';
+    return fetch(url, {headers:hdr({'Cache-Control':'no-cache'})})
+      .then(function(r){ if(!r.ok) throw new Error('release date read ' + r.status); return r.json(); })
+      .then(function(rows){ rdDates = parseData(rows && rows[0] ? rows[0].data : null); rdLoaded = true; return rdDates; })
+      .catch(function(err){ console.warn('[Cert Release Dates] read failed', err); rdLoaded = true; return rdDates; });
+  }
+  function saveDates(){
+    var payload = {dates:rdDates, updatedAt:new Date().toISOString()};
+    var delUrl = RD_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(RD_HUB) + '&key=eq.' + encodeURIComponent(RD_KEY);
+    var body = {hub:RD_HUB, key:RD_KEY, data:JSON.stringify(payload)};
+    return fetch(delUrl, {method:'DELETE', headers:hdr({'Prefer':'return=minimal'})})
+      .then(function(){ return fetch(RD_SUPA_URL + '/rest/v1/tile_content', {method:'POST', headers:hdr({'Content-Type':'application/json','Prefer':'return=minimal'}), body:JSON.stringify(body)}); })
+      .then(function(r){ if(!r.ok) throw new Error('release date save ' + r.status); return true; });
+  }
+  function ensureStyles(){
+    if(document.getElementById('certReleaseDatesCleanStyles')) return;
+    var s = document.createElement('style');
+    s.id = 'certReleaseDatesCleanStyles';
+    s.textContent = [
+      '.cert-release-admin{margin:0 0 14px;padding:12px 14px;border:1px solid rgba(0,194,184,.28);border-radius:14px;background:linear-gradient(135deg,rgba(0,194,184,.10),rgba(220,20,60,.07));box-shadow:0 12px 24px rgba(0,0,0,.12)}',
+      '.cert-release-admin h4{margin:0 0 4px;font-size:13px;font-weight:900;color:#e6fffb;letter-spacing:.02em}',
+      '.cert-release-admin p{margin:0 0 10px;font-size:11px;color:var(--muted-2);line-height:1.35}',
+      '.cert-release-row{display:grid;grid-template-columns:1.2fr .9fr auto auto;gap:8px;align-items:end}',
+      '.cert-release-row label{display:block;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.65px;color:#9ee7e2;margin:0 0 4px}',
+      '.cert-release-row select,.cert-release-row input{width:100%;height:34px;box-sizing:border-box;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(2,6,23,.55);color:#fff;padding:0 9px;font-family:inherit;font-size:12px;outline:none}',
+      '.cert-release-btn{height:34px;border-radius:999px;border:1px solid rgba(0,245,212,.38);background:rgba(0,194,184,.20);color:#d8fffb;font-size:11px;font-weight:950;cursor:pointer;padding:0 12px;white-space:nowrap;font-family:inherit}',
+      '.cert-release-btn.clear{border-color:rgba(248,113,113,.34);background:rgba(220,20,60,.14);color:#ffd6dc}',
+      '.cert-release-list{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}',
+      '.cert-release-chip{font-size:10px;font-weight:900;border-radius:999px;padding:5px 8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#e2e8f0}',
+      '.cert-release-display{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:8px 14px;background:linear-gradient(90deg,rgba(220,20,60,.13),rgba(0,194,184,.13));border-bottom:1px solid rgba(255,255,255,.10);font-size:11px;font-weight:900;color:#eafffb}',
+      '.cert-release-display .label{color:#fef3c7;text-transform:uppercase;letter-spacing:.7px;font-size:10px}',
+      '@media(max-width:720px){.cert-release-row{grid-template-columns:1fr}.cert-release-btn{width:100%}}'
+    ].join('\n');
+    document.head.appendChild(s);
+  }
+  function selectedListHtml(limit){
+    var carriers = getCarriers();
+    var chips = [];
+    carriers.forEach(function(c){ if(rdDates[c]) chips.push('<span class="cert-release-chip">'+esc(c)+': '+esc(dateText(rdDates[c]))+'</span>'); });
+    if(!chips.length) return '<span class="cert-release-chip">No release dates posted yet</span>';
+    return chips.slice(0, limit || 99).join('');
+  }
+  function renderPublicDisplay(){
+    ensureStyles();
+    var content = document.getElementById('certTrackerContent');
+    if(!content) return;
+    var row = document.getElementById('certReleaseDateDisplay');
+    if(!row){
+      row = document.createElement('div');
+      row.id = 'certReleaseDateDisplay';
+      row.className = 'cert-release-display';
+      var meta = content.querySelector('.cert-lock-meta');
+      if(meta && meta.parentNode){ meta.parentNode.insertBefore(row, meta.nextSibling); }
+      else { content.insertBefore(row, content.firstChild || null); }
+    }
+    row.innerHTML = '<span class="label">Release Dates</span>' + selectedListHtml(14);
+  }
+  function renderAdminBox(){
+    ensureStyles();
+    var anchor = document.getElementById('certCsvDrop');
+    if(!anchor) return;
+    var existing = document.getElementById('certReleaseDateAdminBox');
+    if(!existing){
+      existing = document.createElement('div');
+      existing.id = 'certReleaseDateAdminBox';
+      existing.className = 'cert-release-admin';
+      anchor.parentNode.insertBefore(existing, anchor);
+    }
+    var opts = getCarriers().map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
+    existing.innerHTML = '<h4>Carrier Release Dates</h4><p>Add compact release dates for each cert carrier. Dates display on the Cert Tracker top bar.</p><div class="cert-release-row"><div><label>Carrier</label><select id="certReleaseCarrier">'+opts+'</select></div><div><label>Release Date</label><input id="certReleaseDateInput" type="date"></div><button type="button" class="cert-release-btn" id="certReleaseSaveBtn">Save Date</button><button type="button" class="cert-release-btn clear" id="certReleaseClearBtn">Clear</button></div><div class="cert-release-list" id="certReleaseAdminList">'+selectedListHtml(99)+'</div>';
+    var sel = document.getElementById('certReleaseCarrier');
+    var inp = document.getElementById('certReleaseDateInput');
+    function sync(){ if(sel && inp) inp.value = rdDates[sel.value] || ''; }
+    if(sel){ sel.onchange = sync; sync(); }
+    var save = document.getElementById('certReleaseSaveBtn');
+    if(save){ save.onclick = function(){ var c = sel ? sel.value : ''; var d = inp ? inp.value : ''; if(!c || !d){ alert('Choose a carrier and release date.'); return; } rdDates[c] = d; saveDates().then(function(){ renderAdminBox(); renderPublicDisplay(); if(typeof showSnuToast === 'function') showSnuToast('✓ Release date saved.'); }).catch(function(err){ alert('Release date save failed: ' + (err.message || err)); }); }; }
+    var clear = document.getElementById('certReleaseClearBtn');
+    if(clear){ clear.onclick = function(){ var c = sel ? sel.value : ''; if(!c) return; delete rdDates[c]; saveDates().then(function(){ renderAdminBox(); renderPublicDisplay(); if(typeof showSnuToast === 'function') showSnuToast('✓ Release date cleared.'); }).catch(function(err){ alert('Release date clear failed: ' + (err.message || err)); }); }; }
+  }
+  function renderAll(){ renderAdminBox(); renderPublicDisplay(); }
+  function init(){ ensureStyles(); readDates().then(renderAll); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  var oldRender = window.renderCertTracker;
+  if(typeof oldRender === 'function'){
+    window.renderCertTracker = function(){ var result = oldRender.apply(this, arguments); setTimeout(function(){ if(!rdLoaded) readDates().then(renderAll); else renderAll(); }, 80); return result; };
+  }
+  var oldSwitch = window.switchAdminTab;
+  if(typeof oldSwitch === 'function'){
+    window.switchAdminTab = function(tab, el){ var r = oldSwitch.apply(this, arguments); if(tab === 'certs') setTimeout(function(){ if(!rdLoaded) readDates().then(renderAll); else renderAll(); }, 100); return r; };
+  }
+  window.refreshCertReleaseDates = function(){ return readDates().then(renderAll); };
+})();
+
 </script>
 </body>
 </html>
