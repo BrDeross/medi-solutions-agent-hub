@@ -21511,8 +21511,8 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 
 
 
-<!-- Cert release dates: admin-locked picker fix v67 -->
-<script id="cert-release-dates-admin-locked-picker-fix-v67">
+<!-- Cert release dates: admin-locked picker save fix v68 -->
+<script id="cert-release-dates-admin-locked-picker-save-fix-v68">
 (function(){
   'use strict';
   var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
@@ -21610,9 +21610,25 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     return fetch(url, {method:'DELETE', headers:headers({'Prefer':'return=minimal'})}).then(function(r){ if(!r.ok) throw new Error('delete ' + hub + '/' + key + ' ' + r.status); });
   }
   function insertOne(hub, key, payload){
-    var row = {hub:hub, key:key, data:payload};
-    return fetch(SUPA_URL + '/rest/v1/tile_content', {method:'POST', headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}), body:JSON.stringify(row)})
-      .then(function(r){ if(!r.ok) throw new Error('insert ' + hub + '/' + key + ' ' + r.status); });
+    // tile_content.data has existed as both json/jsonb and text in different Hub builds.
+    // Try JSON object first; if PostgREST rejects it, retry with a stringified payload.
+    var rowObject = {hub:hub, key:key, data:payload};
+    var rowString = {hub:hub, key:key, data:JSON.stringify(payload)};
+    return fetch(SUPA_URL + '/rest/v1/tile_content', {
+      method:'POST',
+      headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
+      body:JSON.stringify(rowObject)
+    }).then(function(r){
+      if(r.ok) return true;
+      return fetch(SUPA_URL + '/rest/v1/tile_content', {
+        method:'POST',
+        headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
+        body:JSON.stringify(rowString)
+      }).then(function(r2){
+        if(!r2.ok) throw new Error('insert ' + hub + '/' + key + ' failed ' + r.status + '/' + r2.status);
+        return true;
+      });
+    });
   }
   function saveReleaseDates(){
     var payload = {dates:releaseDates, updatedAt:new Date().toISOString()};
