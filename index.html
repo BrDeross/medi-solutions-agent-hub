@@ -6959,6 +6959,28 @@ Upload a CSV or Excel file with one row per agent and one column per month. Requ
 Upload your certification CSV or Excel file. Columns: <code>Agent Name</code>, <code>Certification Year</code>, then one column per carrier (<code>AHIP</code>, <code>AARP/UHC</code>, etc.).<br>
 Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <strong>N</strong> for not certified.
 </p>
+<div id="certReleaseAdminPanel" style="margin:0 0 16px 0;padding:12px 14px;border:1px solid rgba(0,194,184,.30);background:linear-gradient(135deg,rgba(0,194,184,.12),rgba(220,20,60,.08));border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.14);">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+    <div>
+      <div style="font-size:13px;font-weight:900;color:var(--text);letter-spacing:.02em;">Carrier Release Dates</div>
+      <div style="font-size:11px;color:var(--muted-2);line-height:1.45;margin-top:2px;">Admin only. These dates display on the left side of the Cert Tracker bar for all users.</div>
+    </div>
+    <div id="certReleaseAdminSavedList" style="font-size:11px;color:var(--muted);font-weight:800;max-width:420px;text-align:right;"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(180px,1fr) 160px auto auto;gap:9px;align-items:end;">
+    <div>
+      <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;">Carrier</label>
+      <select id="certReleaseCarrierSelect" class="admin-input" style="width:100%;"></select>
+    </div>
+    <div>
+      <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;">Release Date</label>
+      <input id="certReleaseDateInput" type="date" class="admin-input" style="width:100%;">
+    </div>
+    <button type="button" class="admin-save-btn" onclick="saveCertReleaseDate();return false;" style="height:38px;white-space:nowrap;">Save Date</button>
+    <button type="button" class="admin-save-btn" onclick="clearCertReleaseDate();return false;" style="height:38px;white-space:nowrap;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.30);color:#ef4444;">Clear</button>
+  </div>
+  <div id="certReleaseAdminStatus" style="font-size:11px;color:var(--muted-2);font-weight:800;margin-top:8px;min-height:16px;"></div>
+</div>
 <div class="csv-drop-zone" id="certCsvDrop" onclick="document.getElementById('certCsvInput').click()">
 <div class="csv-drop-icon">📂</div>
 <div class="csv-drop-text">Drop CSV/Excel here or <span>click to browse</span></div>
@@ -13970,6 +13992,8 @@ const CERT_KEY = 'cert_tracker_v1';
 const CERT_CARRIERS = ['AHIP','AARP/UHC','AETNA MA','AMERIHEALTH/IBC','ANTHEM','Ambetter','CIGNA MA','CLOVER','GetCovered','HBC','HUMANA','Oscar','WELLCARE','Devoted'];
 let _certAgents = []; // [{name, year, certs:{AHIP:'', ...}}]
 let _certMeta = {};
+let _certReleaseDates = {};
+let _certReleaseUpdatedAt = '';
 function certNormKey(v) {
 return String(v || '').trim().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -14102,6 +14126,10 @@ st.textContent = `
 #certTrackerContent .cert-lock-shell{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;border-radius:0 0 22px 22px;border:1px solid rgba(255,255,255,.18);border-top:0;background:linear-gradient(180deg,#f8fafc 0%,#eef6fb 100%);box-shadow:0 24px 54px rgba(0,0,0,.34),0 0 0 1px rgba(0,194,184,.10),0 0 34px rgba(220,20,60,.10);padding-bottom:12px;}
 #certTrackerContent .cert-lock-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.12);background:linear-gradient(90deg,#dc143c 0%,#111827 50%,#00c2b8 100%);font-size:12px;color:rgba(255,255,255,.86);width:100%;box-sizing:border-box;font-weight:800;letter-spacing:.2px;}
 #certTrackerContent .cert-lock-meta strong{color:#fff;text-shadow:0 0 12px rgba(255,255,255,.22);}
+#certTrackerContent .cert-release-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:260px;max-width:70%;}
+#certTrackerContent .cert-release-title{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.45px;color:#fff;white-space:nowrap;text-shadow:0 0 12px rgba(0,0,0,.28);}
+#certTrackerContent .cert-release-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:rgba(4,12,24,.55);border:1px solid rgba(255,255,255,.25);color:#f8ffff;font-size:11px;font-weight:950;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.18);white-space:nowrap;}
+#certTrackerContent .cert-release-empty{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:rgba(4,12,24,.35);border:1px dashed rgba(255,255,255,.25);color:#d7fffb;font-size:11px;font-weight:850;white-space:nowrap;}
 #certTrackerContent .cert-scroll-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:11px 14px;background:linear-gradient(90deg,#1f2937 0%,#151b2b 52%,#0f2d32 100%);border-bottom:1px solid rgba(255,255,255,.10);width:100%;box-sizing:border-box;}
 #certTrackerContent .cert-scroll-label{margin-right:auto;font-size:11px;font-weight:950;letter-spacing:.55px;text-transform:uppercase;color:#bffefa;text-shadow:0 0 10px rgba(0,245,212,.25);}
 #certTrackerContent .cert-scroll-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(0,245,212,.35);background:linear-gradient(180deg,rgba(0,194,184,.95),rgba(0,129,128,.95));color:#ffffff;border-radius:999px;min-width:42px;height:34px;padding:0 13px;font-size:18px;font-weight:1000;cursor:pointer;box-shadow:0 8px 20px rgba(0,194,184,.22),inset 0 1px 0 rgba(255,255,255,.24);}
@@ -14132,7 +14160,7 @@ st.textContent = `
 #certTrackerContent .cert-mark{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;min-width:25px;border-radius:999px;border:1px solid transparent;font-size:15px;font-weight:950;line-height:1;}
 #certTrackerContent .cert-mark.yes{color:#ffffff;background:linear-gradient(180deg,#00e3d8,#008d91);border-color:rgba(0,128,128,.28);box-shadow:0 0 0 2px rgba(0,194,184,.12),0 4px 11px rgba(0,194,184,.24),inset 0 1px 0 rgba(255,255,255,.28);}
 #certTrackerContent .cert-mark.no{color:#64748b;background:#e5e7eb;border-color:#cbd5e1;font-size:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.72);}
-@media(max-width:760px){#cert-tracker{padding-top:32px;padding-bottom:36px;}#cert-tracker .section-head{padding:14px;border-radius:18px;}#certTrackerContent .cert-lock-table{min-width:1450px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;}#certTrackerContent .cert-scroll-controls{padding:9px 10px;gap:7px;}#certTrackerContent .cert-scroll-label{display:none;}#certTrackerContent .cert-scroll-btn{min-width:38px;height:32px;padding:0 10px;}#certTrackerContent .cert-scroll-btn.home{min-width:58px;}#certTrackerContent .cert-cell{min-width:76px;}#certTrackerContent .cert-mark{width:24px;height:24px;min-width:24px;font-size:15px;}}
+@media(max-width:760px){#cert-tracker{padding-top:32px;padding-bottom:36px;}#cert-tracker .section-head{padding:14px;border-radius:18px;}#certTrackerContent .cert-lock-table{min-width:1450px;}#certTrackerContent .cert-lock-table th.cert-agent-head,#certTrackerContent .cert-lock-table td.cert-agent-cell{min-width:170px;max-width:190px;}#certTrackerContent .cert-lock-meta{font-size:11px;padding:10px 12px;align-items:flex-start;flex-direction:column;}#certTrackerContent .cert-release-left{max-width:100%;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;-webkit-overflow-scrolling:touch;}#certTrackerContent .phase31-cert-note{align-self:flex-start;}#certTrackerContent .cert-scroll-controls{padding:9px 10px;gap:7px;}#certTrackerContent .cert-scroll-label{display:none;}#certTrackerContent .cert-scroll-btn{min-width:38px;height:32px;padding:0 10px;}#certTrackerContent .cert-scroll-btn.home{min-width:58px;}#certTrackerContent .cert-cell{min-width:76px;}#certTrackerContent .cert-mark{width:24px;height:24px;min-width:24px;font-size:15px;}}
 `;
 document.head.appendChild(st);
 }
@@ -14180,6 +14208,186 @@ if (!w) { alert('Allow pop-ups for this site to print this certification row.');
 w.document.open();
 w.document.write(html);
 w.document.close();
+}
+
+function certReleaseNormalizeData(raw) {
+let d = raw;
+for (let i = 0; i < 4; i++) {
+  if (typeof d === 'string') {
+    try { d = JSON.parse(d); } catch(e) { break; }
+  }
+}
+if (d && d.dates && typeof d.dates === 'object') return d.dates;
+if (d && typeof d === 'object') {
+  const out = {};
+  Object.keys(d).forEach(k => {
+    if (!/updated/i.test(k) && d[k]) out[k] = d[k];
+  });
+  return out;
+}
+return {};
+}
+function certReleaseDateText(v) {
+if (!v) return '';
+const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+if (m) return String(Number(m[2])) + '/' + String(Number(m[3])) + '/' + m[1];
+return String(v);
+}
+function certReleaseKey(v) {
+return certNormKey(v).replace(/\s+/g, '');
+}
+function getCertReleaseDateForCarrier(carrier) {
+const target = certReleaseKey(carrier);
+const keys = Object.keys(_certReleaseDates || {});
+for (let i = 0; i < keys.length; i++) {
+  if (certReleaseKey(keys[i]) === target) return _certReleaseDates[keys[i]] || '';
+}
+return '';
+}
+function setCertReleaseDateForCarrier(carrier, dateValue) {
+carrier = String(carrier || '').trim();
+if (!carrier) return;
+const target = certReleaseKey(carrier);
+Object.keys(_certReleaseDates || {}).forEach(k => {
+  if (certReleaseKey(k) === target && k !== carrier) delete _certReleaseDates[k];
+});
+if (dateValue) _certReleaseDates[carrier] = dateValue;
+else delete _certReleaseDates[carrier];
+_certReleaseUpdatedAt = new Date().toISOString();
+}
+function getCertReleaseCarriers() {
+const seen = new Set();
+const out = [];
+(getCertCarrierColumns().length ? getCertCarrierColumns() : CERT_CARRIERS).concat(Object.keys(_certReleaseDates || {})).forEach(c => {
+  c = String(c || '').trim();
+  if (!c) return;
+  const k = certReleaseKey(c);
+  if (seen.has(k)) return;
+  seen.add(k);
+  out.push(c);
+});
+return out;
+}
+function certReleaseBarHtml(activeCols) {
+const carriers = (activeCols && activeCols.length ? activeCols : getCertReleaseCarriers());
+const chips = [];
+carriers.forEach(c => {
+  const d = getCertReleaseDateForCarrier(c);
+  if (d) chips.push('<span class="cert-release-chip"><b>' + certEscapeHtml(c) + '</b> ' + certEscapeHtml(certReleaseDateText(d)) + '</span>');
+});
+if (!chips.length) {
+  return '<div class="cert-release-left"><span class="cert-release-title">📅 Carrier Release Dates</span><span class="cert-release-empty">No release dates posted yet</span></div>';
+}
+return '<div class="cert-release-left"><span class="cert-release-title">📅 Carrier Release Dates</span>' + chips.join('') + '</div>';
+}
+async function loadCertReleaseDatesFromSupabase() {
+const keys = ['cert_release_dates','certReleaseDates'];
+const hubs = ['medi','ga'];
+const keyList = keys.map(encodeURIComponent).join(',');
+const hubList = hubs.map(encodeURIComponent).join(',');
+const url = CERT_SUPA_URL + '/rest/v1/tile_content?hub=in.(' + hubList + ')&key=in.(' + keyList + ')&select=hub,key,data&_=' + Date.now();
+try {
+  const r = await fetch(url, { cache:'no-store', headers:{ 'apikey': CERT_SUPA_KEY, 'Authorization':'Bearer ' + CERT_SUPA_KEY, 'Cache-Control':'no-cache', 'Pragma':'no-cache' } });
+  const text = await r.text();
+  if (!r.ok) throw new Error('release date read failed ' + r.status + ': ' + text.slice(0, 250));
+  const rows = text ? JSON.parse(text) : [];
+  const merged = {};
+  (rows || []).forEach(row => {
+    const parsed = certReleaseNormalizeData(row && row.data);
+    Object.keys(parsed || {}).forEach(k => { if (parsed[k]) merged[k] = parsed[k]; });
+    let d = row && row.data;
+    for (let i=0;i<3;i++){ if (typeof d === 'string') { try { d = JSON.parse(d); } catch(e){ break; } } }
+    if (d && (d.updatedAt || d.updated_at || d.lastUpdated)) _certReleaseUpdatedAt = d.updatedAt || d.updated_at || d.lastUpdated;
+  });
+  _certReleaseDates = merged;
+  try { localStorage.setItem('cert_release_dates_cache', JSON.stringify({dates:_certReleaseDates, updatedAt:_certReleaseUpdatedAt})); } catch(e) {}
+  renderCertReleaseAdminPanel();
+  renderCertTracker();
+} catch(err) {
+  console.warn('[CERT RELEASE DATES] load failed', err);
+  try {
+    const cached = JSON.parse(localStorage.getItem('cert_release_dates_cache') || '{}');
+    if (cached && cached.dates) { _certReleaseDates = cached.dates; _certReleaseUpdatedAt = cached.updatedAt || ''; }
+  } catch(e) {}
+  renderCertReleaseAdminPanel();
+  renderCertTracker();
+}
+}
+function renderCertReleaseAdminPanel() {
+const sel = document.getElementById('certReleaseCarrierSelect');
+const dateInput = document.getElementById('certReleaseDateInput');
+const list = document.getElementById('certReleaseAdminSavedList');
+if (!sel) return;
+const current = sel.value;
+const carriers = getCertReleaseCarriers();
+sel.innerHTML = carriers.map(c => '<option value="' + certEscapeHtml(c) + '">' + certEscapeHtml(c) + '</option>').join('');
+if (current && carriers.some(c => certReleaseKey(c) === certReleaseKey(current))) sel.value = current;
+if (dateInput && sel.value) dateInput.value = getCertReleaseDateForCarrier(sel.value) || '';
+if (list) {
+  const chips = carriers.map(c => {
+    const d = getCertReleaseDateForCarrier(c);
+    return d ? '<span style="display:inline-flex;margin:2px;padding:4px 7px;border-radius:999px;background:rgba(0,194,184,.16);border:1px solid rgba(0,194,184,.30);color:var(--text);white-space:nowrap;">' + certEscapeHtml(c) + ': ' + certEscapeHtml(certReleaseDateText(d)) + '</span>' : '';
+  }).filter(Boolean);
+  list.innerHTML = chips.length ? chips.join('') : '<span style="color:var(--muted-2);">No dates saved yet</span>';
+}
+}
+function certReleaseSetStatus(msg, bad) {
+const st = document.getElementById('certReleaseAdminStatus');
+if (st) { st.textContent = msg || ''; st.style.color = bad ? '#ef4444' : 'var(--muted-2)'; }
+}
+async function saveCertReleaseDatesToSupabase() {
+const payload = { dates: _certReleaseDates || {}, updatedAt: _certReleaseUpdatedAt || new Date().toISOString(), source: 'cert_release_dates_integrated_v76' };
+const keys = ['cert_release_dates','certReleaseDates'];
+const hubs = ['medi','ga'];
+const headersBase = { 'apikey': CERT_SUPA_KEY, 'Authorization': 'Bearer ' + CERT_SUPA_KEY, 'Content-Type':'application/json', 'Cache-Control':'no-cache' };
+for (const hub of hubs) {
+  for (const key of keys) {
+    const delUrl = CERT_SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(hub) + '&key=eq.' + encodeURIComponent(key);
+    let r = await fetch(delUrl, { method:'DELETE', headers:{ 'apikey': CERT_SUPA_KEY, 'Authorization':'Bearer ' + CERT_SUPA_KEY, 'Prefer':'return=minimal' } });
+    let t = await r.text();
+    if (!r.ok) throw new Error('DELETE ' + hub + '/' + key + ' failed ' + r.status + ': ' + t.slice(0, 220));
+    r = await fetch(CERT_SUPA_URL + '/rest/v1/tile_content', { method:'POST', headers:Object.assign({}, headersBase, { 'Prefer':'return=minimal' }), body:JSON.stringify({ hub, key, data:JSON.stringify(payload) }) });
+    t = await r.text();
+    if (!r.ok) throw new Error('POST ' + hub + '/' + key + ' failed ' + r.status + ': ' + t.slice(0, 220));
+  }
+}
+}
+async function saveCertReleaseDate() {
+const sel = document.getElementById('certReleaseCarrierSelect');
+const inp = document.getElementById('certReleaseDateInput');
+const carrier = sel ? sel.value : '';
+const dateValue = inp ? inp.value : '';
+if (!carrier) { alert('Choose a carrier first.'); return; }
+if (!dateValue) { alert('Choose a release date first.'); return; }
+try {
+  certReleaseSetStatus('Saving carrier release date...');
+  setCertReleaseDateForCarrier(carrier, dateValue);
+  await saveCertReleaseDatesToSupabase();
+  certReleaseSetStatus('Saved globally for desktop and mobile.');
+  renderCertReleaseAdminPanel();
+  renderCertTracker();
+} catch(err) {
+  console.error('[CERT RELEASE SAVE ERROR]', err);
+  certReleaseSetStatus('Save failed: ' + err.message, true);
+  alert('Release date save failed: ' + err.message);
+}
+}
+async function clearCertReleaseDate() {
+const sel = document.getElementById('certReleaseCarrierSelect');
+const carrier = sel ? sel.value : '';
+if (!carrier) { alert('Choose a carrier first.'); return; }
+try {
+  certReleaseSetStatus('Clearing carrier release date...');
+  setCertReleaseDateForCarrier(carrier, '');
+  await saveCertReleaseDatesToSupabase();
+  certReleaseSetStatus('Cleared globally for desktop and mobile.');
+  renderCertReleaseAdminPanel();
+  renderCertTracker();
+} catch(err) {
+  console.error('[CERT RELEASE CLEAR ERROR]', err);
+  certReleaseSetStatus('Clear failed: ' + err.message, true);
+  alert('Release date clear failed: ' + err.message);
+}
 }
 function getCertUpdatedStatusText(year, activeColCount) {
 const meta = _certMeta || {};
@@ -14236,11 +14444,11 @@ return `<tr>
 ${cells}
 </tr>`;
 }).join('');
-const metaLeft = 'Certification Tracker';
+const metaLeft = certReleaseBarHtml(activeCols);
 const metaRight = getCertUpdatedStatusText(year, activeCols.length);
 el.innerHTML = `
 <div class="cert-topbar">
-<div class="cert-lock-meta"><span>${metaLeft}</span><span class="phase31-cert-note">${pesc(metaRight)}</span></div>
+<div class="cert-lock-meta">${metaLeft}<span class="phase31-cert-note">${pesc(metaRight)}</span></div>
 <div class="cert-scroll-controls" aria-label="Certification table scroll controls">
 <span class="cert-scroll-label">Carrier columns</span>
 <button type="button" class="cert-scroll-btn home" onclick="scrollCertTable('home')" title="Back to agent names">Start</button>
@@ -14470,6 +14678,10 @@ const preview = document.getElementById('certAdminPreview'); if (preview) previe
 // Drag-and-drop for cert zone
 document.addEventListener('DOMContentLoaded', () => {
 loadCertData();
+loadCertReleaseDatesFromSupabase();
+renderCertReleaseAdminPanel();
+const certRelSel = document.getElementById('certReleaseCarrierSelect');
+if (certRelSel) certRelSel.addEventListener('change', function(){ const inp = document.getElementById('certReleaseDateInput'); if (inp) inp.value = getCertReleaseDateForCarrier(this.value) || ''; });
 const zone = document.getElementById('certCsvDrop');
 if (zone) {
 zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor='var(--accent)'; });
