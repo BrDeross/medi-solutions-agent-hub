@@ -23153,5 +23153,129 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 
+
+
+<!-- Phase 74: Cert release dates mobile/global display-only fix. Do not alter Save/Clear. -->
+<script id="cert-release-mobile-display-only-v74">
+(function(){
+  'use strict';
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = (function(){
+    try { if (typeof CERT_SUPA_KEY !== 'undefined' && CERT_SUPA_KEY) return CERT_SUPA_KEY; } catch(e) {}
+    try { if (typeof TILE_KEY2 !== 'undefined' && TILE_KEY2) return TILE_KEY2; } catch(e) {}
+    try { if (typeof NF_KEY !== 'undefined' && NF_KEY) return NF_KEY; } catch(e) {}
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  })();
+  var KEYS = ['cert_release_dates','certReleaseDates'];
+  var currentDates = {};
+  var running = false;
+
+  function esc(v){ return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function headers(){ return {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Cache-Control':'no-cache','Pragma':'no-cache'}; }
+  function parse(raw){
+    var d = raw;
+    for(var i=0;i<5;i++){
+      if(typeof d === 'string'){
+        try { d = JSON.parse(d); } catch(e){ break; }
+      }
+    }
+    if(d && d.dates && typeof d.dates === 'object') return d.dates;
+    if(d && typeof d === 'object'){
+      var out = {};
+      Object.keys(d).forEach(function(k){
+        if(!/^(updatedAt|updated_at|savedAt|timestamp|source|notes)$/i.test(k) && d[k]) out[k] = d[k];
+      });
+      return out;
+    }
+    return {};
+  }
+  function norm(v){ return String(v || '').trim(); }
+  function keyOf(v){ return norm(v).toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9]+/g,''); }
+  function setDate(out, carrier, date){
+    carrier = norm(carrier); date = norm(date);
+    if(!carrier || !date) return;
+    var nk = keyOf(carrier);
+    Object.keys(out).forEach(function(k){ if(keyOf(k) === nk && k !== carrier) delete out[k]; });
+    out[carrier] = date;
+  }
+  function dateText(v){
+    var m = String(v || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return String(Number(m[2])) + '/' + String(Number(m[3])) + '/' + m[1];
+    return String(v || '');
+  }
+  function getCarrierList(){
+    var list = [];
+    try { if(typeof getCertCarrierColumns === 'function') list = list.concat(getCertCarrierColumns() || []); } catch(e) {}
+    try { if(typeof CERT_CARRIERS !== 'undefined' && Array.isArray(CERT_CARRIERS)) list = list.concat(CERT_CARRIERS); } catch(e) {}
+    try { if(typeof _certMeta !== 'undefined' && _certMeta && Array.isArray(_certMeta.carriers)) list = list.concat(_certMeta.carriers); } catch(e) {}
+    list = list.concat(Object.keys(currentDates || {}));
+    var seen = {}, out = [];
+    list.forEach(function(c){ c = norm(c); if(!c) return; var k = keyOf(c); if(!seen[k]){ seen[k]=1; out.push(c); } });
+    return out;
+  }
+  function getDate(carrier){
+    if(currentDates[carrier]) return currentDates[carrier];
+    var k = keyOf(carrier);
+    var keys = Object.keys(currentDates || {});
+    for(var i=0;i<keys.length;i++){ if(keyOf(keys[i]) === k) return currentDates[keys[i]]; }
+    return '';
+  }
+  function ensureStyle(){
+    if(document.getElementById('certReleaseMobileDisplayV74Styles')) return;
+    var s = document.createElement('style');
+    s.id = 'certReleaseMobileDisplayV74Styles';
+    s.textContent = '.cert-release-display{display:flex!important;align-items:center!important;gap:9px!important;flex-wrap:wrap!important;margin:8px 10px 10px!important;padding:12px 14px!important;background:linear-gradient(90deg,rgba(3,14,38,.78),rgba(0,194,184,.26))!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:14px!important;color:#fff!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}.cert-release-display .label{color:#fff!important;text-transform:uppercase!important;letter-spacing:.8px!important;font-size:11px!important;font-weight:950!important;white-space:nowrap!important;background:rgba(220,20,60,.34)!important;border:1px solid rgba(255,255,255,.25)!important;border-radius:999px!important;padding:6px 10px!important}.cert-release-chip{font-size:12px!important;font-weight:950!important;border-radius:999px!important;padding:7px 11px!important;border:1px solid rgba(255,255,255,.42)!important;background:rgba(3,14,38,.86)!important;color:#fff!important;white-space:nowrap!important;box-shadow:0 4px 12px rgba(0,0,0,.18)!important}@media(max-width:720px){.cert-release-display{flex-wrap:nowrap!important;overflow-x:auto!important;margin-left:4px!important;margin-right:4px!important}.cert-release-chip{font-size:12px!important;min-width:max-content!important}}';
+    document.head.appendChild(s);
+  }
+  function render(){
+    ensureStyle();
+    var content = document.getElementById('certTrackerContent');
+    if(!content) return;
+    var row = document.getElementById('certReleaseDateDisplay');
+    if(!row){ row = document.createElement('div'); row.id = 'certReleaseDateDisplay'; row.className = 'cert-release-display'; }
+    var chips = [];
+    getCarrierList().forEach(function(c){ var d = getDate(c); if(d) chips.push('<span class="cert-release-chip">'+esc(c)+': '+esc(dateText(d))+'</span>'); });
+    row.innerHTML = '<span class="label">Carrier Release Dates</span>' + (chips.length ? chips.join('') : '<span class="cert-release-chip">No release dates posted yet</span>');
+    var meta = content.querySelector('.cert-lock-meta');
+    if(meta && meta.parentNode){ meta.parentNode.insertBefore(row, meta.nextSibling); }
+    else if(row.parentNode !== content){ content.insertBefore(row, content.firstChild || null); }
+  }
+  function readAll(){
+    if(running) return Promise.resolve(currentDates);
+    running = true;
+    var url = SUPA_URL + '/rest/v1/tile_content?key=in.(' + KEYS.map(encodeURIComponent).join(',') + ')&select=hub,key,data&_=' + Date.now();
+    return fetch(url, {cache:'no-store', headers:headers()})
+      .then(function(r){ if(!r.ok) throw new Error('cert release display read ' + r.status); return r.json(); })
+      .then(function(rows){
+        var merged = {};
+        (rows || []).forEach(function(row){
+          var parsed = parse(row.data);
+          Object.keys(parsed || {}).forEach(function(k){ setDate(merged, k, parsed[k]); });
+        });
+        currentDates = merged;
+        window.certReleaseDatesData = merged;
+        render();
+        return merged;
+      })
+      .catch(function(err){ console.warn('[Cert Release Dates Display V74] read failed', err); render(); return currentDates; })
+      .finally(function(){ running = false; });
+  }
+  function refresh(){ return readAll(); }
+  function init(){ ensureStyle(); refresh(); setTimeout(refresh, 900); setTimeout(refresh, 2600); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  var oldRender = window.renderCertTracker;
+  if(typeof oldRender === 'function'){
+    window.renderCertTracker = function(){ var result = oldRender.apply(this, arguments); setTimeout(refresh, 120); setTimeout(refresh, 1100); return result; };
+  }
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.closest && (e.target.closest('#certReleaseSaveBtn') || e.target.closest('#certReleaseClearBtn'))){
+      setTimeout(refresh, 1800); setTimeout(refresh, 4000);
+    }
+  }, true);
+  setInterval(function(){ if(document.getElementById('certTrackerContent')) refresh(); }, 30000);
+  window.refreshCertReleaseDatesDisplayOnly = refresh;
+})();
+</script>
+
 </body>
 </html>
