@@ -22086,5 +22086,109 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 
+
+
+<!-- Phase 83: Onboarding Add Task stage picker fix - isolated to Admin -> Onboarding only -->
+<style id="phase83-onboarding-stage-picker-fix-style">
+  #adminTabOnboarding #p52TaskStage,
+  #adminTabOnboarding #p48TaskStage,
+  #adminTabOnboarding #p52ResStage,
+  #adminTabOnboarding #p48ResStage,
+  #adminTabOnboarding #p81Stage{
+    pointer-events:auto!important;
+    opacity:1!important;
+    visibility:visible!important;
+    position:relative!important;
+    z-index:9999!important;
+    background:#ffffff!important;
+    color:#0f172a!important;
+    border:2px solid rgba(47,128,255,.65)!important;
+  }
+  #adminTabOnboarding #p52TaskStage.phase83-stage-list,
+  #adminTabOnboarding #p48TaskStage.phase83-stage-list{
+    min-height:138px!important;
+    overflow:auto!important;
+    cursor:pointer!important;
+  }
+  #adminTabOnboarding .phase83-stage-helper{
+    display:block!important;
+    margin-top:5px!important;
+    color:#a9c9ec!important;
+    font-size:11px!important;
+    font-weight:800!important;
+    line-height:1.3!important;
+  }
+</style>
+<script id="phase83-onboarding-stage-picker-fix-script">
+(function(){
+  'use strict';
+  if(window.__phase83OnboardingStagePickerFix) return;
+  window.__phase83OnboardingStagePickerFix = true;
+
+  var SUPA = (typeof SUPA_URL !== 'undefined' && SUPA_URL) ? SUPA_URL : 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var KEY = (typeof SUPA_KEY !== 'undefined' && SUPA_KEY) ? SUPA_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var HUB = 'medi';
+
+  function h(){ return {apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', 'Cache-Control':'no-cache'}; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  async function getStages(){
+    var r = await fetch(SUPA + '/rest/v1/onboarding_stages?hub=eq.' + encodeURIComponent(HUB) + '&active=eq.true&select=id,title,audience,sort_order&order=sort_order.asc', {headers:h()});
+    if(!r.ok) throw new Error(await r.text());
+    return await r.json();
+  }
+  function currentOpts(sel){ return Array.prototype.map.call(sel.options||[], function(o){return String(o.value||'');}); }
+  function fillSelect(sel, stages, includeBlank){
+    if(!sel || !stages || !stages.length) return;
+    var chosen = sel.value;
+    var opts = includeBlank ? '<option value="">No stage / General</option>' : '';
+    opts += stages.map(function(s){
+      var label = (s.title||'Stage') + ' (' + (s.audience||'both') + ')';
+      return '<option value="'+Number(s.id)+'">'+esc(label)+'</option>';
+    }).join('');
+    sel.innerHTML = opts;
+    if(chosen && currentOpts(sel).indexOf(String(chosen))>=0) sel.value = chosen;
+  }
+  function enhanceSelect(sel, isTask){
+    if(!sel) return;
+    sel.style.pointerEvents='auto';
+    sel.disabled=false;
+    sel.removeAttribute('disabled');
+    if(isTask){
+      var count = Math.max(2, Math.min(7, sel.options.length || 6));
+      sel.setAttribute('size', String(count));
+      sel.classList.add('phase83-stage-list');
+      if(!sel.nextElementSibling || !sel.nextElementSibling.classList || !sel.nextElementSibling.classList.contains('phase83-stage-helper')){
+        var small=document.createElement('small');
+        small.className='phase83-stage-helper';
+        small.textContent='Select the timeline stage from this visible list. This replaces the stuck drop-down.';
+        sel.parentNode.insertBefore(small, sel.nextSibling);
+      }
+    }
+  }
+  async function repair(){
+    var panel = document.getElementById('adminTabOnboarding');
+    if(!panel) return;
+    var taskSelects = ['p52TaskStage','p48TaskStage'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+    var resSelects = ['p52ResStage','p48ResStage','p81Stage'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+    if(!taskSelects.length && !resSelects.length) return;
+    var needsLoad = taskSelects.concat(resSelects).some(function(s){ return !s.options || s.options.length===0 || (s.options.length===1 && !s.options[0].value); });
+    if(needsLoad){
+      try{
+        var stages = await getStages();
+        taskSelects.forEach(function(s){ fillSelect(s, stages, false); });
+        resSelects.forEach(function(s){ fillSelect(s, stages, true); });
+      }catch(e){ console.warn('[Phase83] Could not reload onboarding stages for picker', e); }
+    }
+    taskSelects.forEach(function(s){ enhanceSelect(s,true); });
+    resSelects.forEach(function(s){ enhanceSelect(s,false); });
+  }
+  document.addEventListener('click', function(){ setTimeout(repair, 100); setTimeout(repair, 500); }, true);
+  document.addEventListener('change', function(e){ if(e.target && /^(p52TaskStage|p48TaskStage)$/.test(e.target.id)){ e.target.dataset.phase83Selected = e.target.value; } }, true);
+  var timer=setInterval(repair, 900);
+  setTimeout(function(){ clearInterval(timer); repair(); }, 16000);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(repair,800); }); else setTimeout(repair,800);
+})();
+</script>
+<!-- END PHASE 83 -->
 </body>
 </html>
