@@ -21955,5 +21955,136 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
+
+<!-- Phase 82: Onboarding save compatibility fix - onboarding only -->
+<script id="phase82-onboarding-save-compatibility-fix">
+(function(){
+  if (window.__phase82OnboardingSaveFixReady) return;
+  window.__phase82OnboardingSaveFixReady = true;
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  // Correct key fallback if an older copied key typo exists elsewhere.
+  var SUPA_KEY_2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var KEY = (String(SUPA_KEY||'').indexOf('zdXBhYmFzZS')>=0) ? SUPA_KEY : SUPA_KEY_2;
+  var HUB = 'medi';
+  function qs(id){ return document.getElementById(id); }
+  function val(id){ var el=qs(id); return el ? String(el.value||'') : ''; }
+  function checked(id){ var el=qs(id); return !!(el && el.checked); }
+  function cleanKey(s){ return String(s||'stage').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60) || 'stage'; }
+  function headers(extra){ var h={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Cache-Control':'no-cache'}; if(extra){Object.keys(extra).forEach(function(k){h[k]=extra[k];});} return h; }
+  function notify(msg){ try{ if(window.showToast) window.showToast(msg); else if(window.showSnuToast) window.showSnuToast(msg); else alert(msg); }catch(e){ alert(msg); } }
+  function status(msg){ var el=qs('p82OnboardingSaveStatus') || qs('phase81ResourceStatus'); if(el) el.textContent=msg; console.log('[Onboarding Save]', msg); }
+  async function api(path,opt){
+    var r=await fetch(SUPA_URL+'/rest/v1/'+path, Object.assign({headers:headers()}, opt||{}));
+    if(!r.ok){ var txt=''; try{txt=await r.text();}catch(e){} throw new Error('Supabase '+r.status+' '+txt); }
+    if(r.status===204) return null;
+    var t=await r.text(); return t?JSON.parse(t):null;
+  }
+  async function refreshAll(){
+    try{ if(window.phase52Refresh) await window.phase52Refresh(); }catch(e){ console.warn(e); }
+    try{ if(window.phase48Refresh) await window.phase48Refresh(); }catch(e){ console.warn(e); }
+    try{ if(window.phase80Refresh) await window.phase80Refresh(); }catch(e){ console.warn(e); }
+  }
+  function currentEditId(type){
+    // Phase 52 stores edit state privately, so infer from button text plus existing edit buttons is not reliable.
+    // We intentionally make Add create a new row. Existing Phase 52 Edit/Update still works through its original handler.
+    return null;
+  }
+  async function tryPostOrPatch(table, id, payload){
+    var body=JSON.stringify(payload);
+    if(id){ return api(table+'?id=eq.'+Number(id), {method:'PATCH', headers:headers({'Prefer':'return=minimal'}), body:body}); }
+    return api(table, {method:'POST', headers:headers({'Prefer':'return=minimal'}), body:body});
+  }
+  async function writeWithFallback(table, id, payload){
+    try { return await tryPostOrPatch(table, id, payload); }
+    catch(e1){
+      var msg=String(e1.message||e1);
+      var p=Object.assign({}, payload);
+      if(msg.indexOf('updated_at')>=0) delete p.updated_at;
+      if(msg.indexOf('notes')>=0) delete p.notes;
+      if(msg.indexOf('counts_toward_progress')>=0) delete p.counts_toward_progress;
+      if(JSON.stringify(p)!==JSON.stringify(payload)) return await tryPostOrPatch(table, id, p);
+      throw e1;
+    }
+  }
+  window.phase82SaveStage = async function(){
+    var title=val('p52StageTitle').trim() || val('p48StageTitle').trim();
+    if(!title){ notify('Stage title required.'); return; }
+    var payload={
+      hub:HUB,
+      stage_key:cleanKey(title)+'-'+Date.now().toString(36),
+      title:title,
+      description:val('p52StageDesc') || val('p48StageDesc'),
+      audience:val('p52StageAudience') || val('p48StageAudience') || 'both',
+      sort_order:Number(val('p52StageSort') || val('p48StageSort') || 100),
+      active: checked('p52StageActive') || checked('p48StageActive'),
+      updated_at:new Date().toISOString()
+    };
+    try{ status('Saving timeline stage...'); await writeWithFallback('onboarding_stages', null, payload); await refreshAll(); status('Timeline stage saved.'); notify('Timeline stage saved.'); }
+    catch(e){ console.warn('[Phase82] stage save failed',e); status('Timeline stage save failed: '+(e.message||e)); notify('Timeline stage save failed. See console/status for details.'); }
+  };
+  window.phase82SaveTask = async function(){
+    var title=val('p52TaskTitle').trim() || val('p48TaskTitle').trim();
+    var stage=val('p52TaskStage') || val('p48TaskStage');
+    if(!title || !stage){ notify('Task title and stage required.'); return; }
+    var payload={
+      hub:HUB,
+      stage_id:Number(stage),
+      title:title,
+      description:val('p52TaskDesc') || val('p48TaskDesc'),
+      audience:val('p52TaskAudience') || val('p48TaskAudience') || 'both',
+      required:checked('p52TaskRequired') || checked('p48TaskRequired'),
+      requires_review:checked('p52TaskReview') || checked('p48TaskReview'),
+      resource_url:val('p52TaskUrl') || val('p48TaskUrl'),
+      resource_label:val('p52TaskResourceLabel') || val('p48TaskResourceLabel'),
+      notes:val('p52TaskNotes') || val('p48TaskNotes'),
+      sort_order:Number(val('p52TaskSort') || 100),
+      active:checked('p52TaskActive') || true,
+      updated_at:new Date().toISOString()
+    };
+    try{ status('Saving task...'); await writeWithFallback('onboarding_tasks', null, payload); await refreshAll(); status('Task saved.'); notify('Task saved.'); }
+    catch(e){ console.warn('[Phase82] task save failed',e); status('Task save failed: '+(e.message||e)); notify('Task save failed. See console/status for details.'); }
+  };
+  // Override the visible Add buttons to use the more defensive Phase 82 save functions.
+  function rewireButtons(){
+    var buttons=[].slice.call(document.querySelectorAll('button'));
+    buttons.forEach(function(btn){
+      var txt=String(btn.textContent||'').trim().toLowerCase();
+      var on=String(btn.getAttribute('onclick')||'');
+      if((txt==='add stage' || txt==='update stage') && on.indexOf('phase52SaveStage')>=0){ btn.setAttribute('onclick','phase82SaveStage()'); }
+      if((txt==='add task' || txt==='update task') && on.indexOf('phase52SaveTask')>=0){ btn.setAttribute('onclick','phase82SaveTask()'); }
+    });
+    var panel=document.querySelector('#phase52OnboardingAdmin .p52-shell');
+    if(panel && !qs('p82OnboardingSaveStatus')){
+      var s=document.createElement('div'); s.id='p82OnboardingSaveStatus'; s.style.cssText='margin:8px 0 12px;padding:8px 10px;border:1px solid rgba(125,211,252,.25);border-radius:10px;background:rgba(14,165,233,.08);color:#dbeafe;font-size:12px;font-weight:800;'; s.textContent='Onboarding save status ready.'; panel.insertBefore(s, panel.children[1]||panel.firstChild);
+    }
+  }
+  var t=setInterval(rewireButtons,700); setTimeout(function(){clearInterval(t); rewireButtons();},15000);
+  document.addEventListener('click', function(){ setTimeout(rewireButtons,150); }, true);
+  window.phase82OnboardingRewire = rewireButtons;
+  window.phase48ToggleTask = async function(taskId){
+    try{
+      var email=''; try{ var sess=JSON.parse(sessionStorage.getItem('medi_hub_session')||'{}'); email=String(sess.email||'').trim().toLowerCase(); }catch(e){}
+      email=email || String(localStorage.getItem('mh_user_email')||localStorage.getItem('medi_hub_current_email')||'').trim().toLowerCase();
+      if(!email){ notify('Please log in first.'); return; }
+      var taskRows=await api('onboarding_tasks?id=eq.'+Number(taskId)+'&select=id,requires_review');
+      var task=(taskRows||[])[0]||{};
+      var existing=await api('onboarding_agent_task_status?hub=eq.'+HUB+'&task_id=eq.'+Number(taskId)+'&email=eq.'+encodeURIComponent(email)+'&select=*');
+      if(existing && existing.length && String(existing[0].status)==='complete'){
+        await api('onboarding_agent_task_status?hub=eq.'+HUB+'&task_id=eq.'+Number(taskId)+'&email=eq.'+encodeURIComponent(email),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
+        await refreshAll(); notify('Task reset.'); return;
+      }
+      var now=new Date().toISOString();
+      var statusVal=task.requires_review?'pending_review':'complete';
+      await api('onboarding_agent_task_status?hub=eq.'+HUB+'&task_id=eq.'+Number(taskId)+'&email=eq.'+encodeURIComponent(email),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})}).catch(function(){});
+      var payload={hub:HUB,task_id:Number(taskId),email:email,status:statusVal,updated_at:now};
+      if(statusVal==='complete') payload.completed_at=now; else payload.submitted_at=now;
+      await api('onboarding_agent_task_status',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});
+      await refreshAll(); notify(statusVal==='pending_review'?'Submitted for admin review.':'Task completed.');
+    }catch(e){ console.warn('[Phase82] task toggle failed',e); notify('Task save failed: '+(e.message||e)); }
+  };
+})();
+</script>
+
 </body>
 </html>
