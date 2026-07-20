@@ -22273,5 +22273,140 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
 })();
 </script>
 <!-- END PHASE 84 -->
+
+<!-- Phase 87: Admin Onboarding compact layout - styling only -->
+<style id="phase87-onboarding-admin-compact-style">
+  /* Tighten Admin > Onboarding only. No logic changes. */
+  #adminTabOnboarding .p52-shell,
+  #adminTabOnboarding #phase80OnboardingAdmin,
+  #adminTabOnboarding #phase81OnboardingResourceLibrary,
+  #adminTabOnboarding #phase84OnboardingManagerAdmin{
+    margin-top:10px!important;
+    padding:12px!important;
+    border-radius:14px!important;
+  }
+  #adminTabOnboarding .p52-head{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    margin-bottom:10px!important;
+    padding-bottom:8px!important;
+    border-bottom:1px solid rgba(255,255,255,.10)!important;
+  }
+  #adminTabOnboarding .p52-head h3,
+  #adminTabOnboarding #phase80OnboardingAdmin h3,
+  #adminTabOnboarding #phase81OnboardingResourceLibrary h3,
+  #adminTabOnboarding #phase84OnboardingManagerAdmin h3{
+    margin:0!important;
+    font-size:16px!important;
+    line-height:1.15!important;
+  }
+  #adminTabOnboarding .p52-head p,
+  #adminTabOnboarding #phase80OnboardingAdmin p,
+  #adminTabOnboarding #phase81OnboardingResourceLibrary p,
+  #adminTabOnboarding #phase84OnboardingManagerAdmin p{
+    margin:3px 0 0!important;
+    font-size:11px!important;
+    line-height:1.35!important;
+    max-width:900px!important;
+  }
+  #adminTabOnboarding .p52-pill{
+    font-size:10px!important;
+    padding:5px 9px!important;
+    white-space:nowrap!important;
+  }
+  #adminTabOnboarding .p52-tabs{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+    margin:8px 0 10px!important;
+  }
+  #adminTabOnboarding .p52-tab{
+    padding:8px 11px!important;
+    min-height:0!important;
+    border-radius:10px!important;
+    font-size:12px!important;
+    line-height:1!important;
+  }
+  #adminTabOnboarding .p52-grid,
+  #adminTabOnboarding .p80-grid,
+  #adminTabOnboarding .p81-grid,
+  #adminTabOnboarding .p84-grid{
+    display:grid!important;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr))!important;
+    gap:10px!important;
+  }
+  #adminTabOnboarding .p52-card,
+  #adminTabOnboarding .p80-card,
+  #adminTabOnboarding .p81-card,
+  #adminTabOnboarding .p84-card{
+    padding:11px!important;
+    border-radius:12px!important;
+  }
+  #adminTabOnboarding label{
+    font-size:11px!important;
+    margin-bottom:4px!important;
+  }
+  #adminTabOnboarding input,
+  #adminTabOnboarding select,
+  #adminTabOnboarding textarea{
+    padding:8px 10px!important;
+    min-height:0!important;
+    font-size:12px!important;
+    border-radius:9px!important;
+  }
+  #adminTabOnboarding textarea{
+    min-height:58px!important;
+  }
+  #adminTabOnboarding button,
+  #adminTabOnboarding .p52-btn,
+  #adminTabOnboarding .p80-btn,
+  #adminTabOnboarding .p81-btn,
+  #adminTabOnboarding .p84-btn{
+    padding:8px 12px!important;
+    min-height:0!important;
+    border-radius:9px!important;
+    font-size:12px!important;
+    line-height:1.1!important;
+  }
+  #adminTabOnboarding .p52-table-wrap,
+  #adminTabOnboarding .p80-table-wrap,
+  #adminTabOnboarding .p81-table-wrap,
+  #adminTabOnboarding .p84-table-wrap{
+    max-height:360px!important;
+    overflow:auto!important;
+    border-radius:12px!important;
+  }
+  #adminTabOnboarding table th,
+  #adminTabOnboarding table td{
+    padding:8px 9px!important;
+    font-size:12px!important;
+    vertical-align:top!important;
+  }
+  #adminTabOnboarding .p52-mini,
+  #adminTabOnboarding .p80-mini,
+  #adminTabOnboarding .p81-mini,
+  #adminTabOnboarding .p84-mini{
+    font-size:10.5px!important;
+    line-height:1.3!important;
+  }
+  #adminTabOnboarding .p52-status,
+  #adminTabOnboarding .p80-status,
+  #adminTabOnboarding .p81-status,
+  #adminTabOnboarding .p84-status{
+    margin-top:8px!important;
+    font-size:11px!important;
+    line-height:1.3!important;
+  }
+  #adminTabOnboarding .p52-actions,
+  #adminTabOnboarding .p80-actions,
+  #adminTabOnboarding .p81-actions,
+  #adminTabOnboarding .p84-actions{
+    gap:7px!important;
+    margin-top:9px!important;
+    flex-wrap:wrap!important;
+  }
+</style>
 </body>
 </html>
