@@ -6074,10 +6074,6 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
           <label><input type="checkbox" data-hub-perm="device_approvals"> Device Approvals</label>
           <label><input type="checkbox" data-hub-perm="admin"> Admin Tools</label>
         </div>
-        <div class="hub-perm-note">
-          Best default: both GA and internal LOA agents can use shared onboarding. Internal agents get LOA/internal resources but not GA-specific resources. GAs get GA-specific resources but not internal production boards. Only admin should receive Admin Tools and all carrier numbers. Delete User removes Hub access only; use Inactive instead when you want to preserve the user in the permission list.
-        </div>
-
         <div class="hub-perm-note" style="margin-top:12px;">
           <strong>Bulk User CSV Update</strong><br>
           Use this when adding or updating multiple Hub users. Upload mode is <strong>update/add only</strong>: matching emails are updated, new emails are added, and users not in the CSV are left alone.
@@ -22223,9 +22219,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   if(window.__phase84OnboardingPrivacyManagerReady) return;
   window.__phase84OnboardingPrivacyManagerReady = true;
   var SUPA_URL='https://bjlzwmoogypfefjxvgyt.supabase.co';
-  var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw'.replace('eyJpc3MiOiJIUzI1Ni','eyJpc3MiOiJzdXBhYmFzZSJ9');
-  // Fallback if the protected replacement above is altered by minifiers/templates.
-  if(SUPA_KEY.indexOf('zdXBhYmFzZS')<0) SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
   var HUB='medi';
   var PATH_KEY='onboarding_agent_paths';
   var state={users:[],stages:[],tasks:[],statuses:[],assignments:[],paths:{}};
