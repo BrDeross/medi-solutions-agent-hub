@@ -5938,7 +5938,6 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <!-- Tabs -->
 <div class="admin-tabs">
 <button class="admin-tab" onclick="switchAdminTab('announcement',this)">📢 Banner</button>
-<button class="admin-tab" onclick="switchAdminTab('construction',this); setTimeout(function(){ if (typeof window.phase47RefreshGlobalNoticeAdmin === 'function') window.phase47RefreshGlobalNoticeAdmin(); }, 75);">🚧 Construction</button>
 <button class="admin-tab" onclick="switchAdminTab('directory',this)">👥 Directory</button>
 <button class="admin-tab" onclick="switchAdminTab('permissions',this); setTimeout(function(){ if (typeof loadHubUsersAdmin === 'function') loadHubUsersAdmin(); }, 50);">🔐 Permissions</button>
 <button class="admin-tab" onclick="switchAdminTab('tasks',this)">✅ Tasks</button>
@@ -6113,15 +6112,6 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
         <div id="hubDeviceRequestList" class="hub-perm-user-list" style="margin-top:10px;max-height:260px;"></div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- ── Tab: Global Construction Notice ── -->
-<div id="adminTabConstruction" class="admin-tab-panel">
-  <div class="admin-body">
-    <div class="admin-section-title">🚧 Global Hub Construction Notice</div>
-    <p class="admin-help" style="font-size:12px;color:var(--muted-2);margin-bottom:12px;line-height:1.45;">Use this when any Hub page or tool is being updated. This is global and separate from onboarding.</p>
-    <div id="phase47ConstructionNoticeMount"></div>
   </div>
 </div>
 
@@ -21219,16 +21209,15 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     if(btn) btn.textContent = status.active ? 'Turn Global Notice Off' : 'Turn Global Notice On';
   }
   function refreshNotice(){ readStatus().then(applyNotice); }
-  window.phase47RefreshGlobalNoticeAdmin = refreshNotice;
   function resetLocalNotice(){ localStorage.removeItem(DISMISS_KEY); localStorage.removeItem(POSITION_KEY); var node=ensureNoticeNode(); node.style.left='50%'; node.style.top='14px'; node.style.transform='translateX(-50%)'; refreshNotice(); }
   function injectOnboardingAdmin(){
-    var panel = document.getElementById('phase47ConstructionNoticeMount') || document.querySelector('#adminTabConstruction .admin-body') || document.getElementById('adminTabConstruction');
+    var panel = document.querySelector('#adminTabOnboarding .admin-body');
     if(!panel) return;
-    var old = document.getElementById('phase44GlobalNoticeAdminBox');
-    if(old && !document.getElementById('phase47GlobalNoticeAdminBox')) old.remove();
-    if(document.getElementById('phase47GlobalNoticeAdminBox')) return;
+    var old = document.getElementById('phase44OnboardingAdminBox');
+    if(old && !document.getElementById('phase47OnboardingAdminBox')) old.remove();
+    if(document.getElementById('phase47OnboardingAdminBox')) return;
     var box = document.createElement('div');
-    box.id = 'phase47GlobalNoticeAdminBox';
+    box.id = 'phase47OnboardingAdminBox';
     box.className = 'phase47-admin-box';
     box.innerHTML = '<h3>⚠️ Global Hub Under Construction Notice</h3><p>Turns on a page-wide warning for everyone. Users can drag it or close it on their own screen. Turning the global notice off/on again makes it reappear.</p><div class="phase47-admin-row"><button type="button" class="admin-btn" id="phase47ToggleNoticeBtn">Loading...</button><button type="button" class="admin-btn" id="phase47RefreshNoticeBtn">Refresh Notice</button><button type="button" class="admin-btn" id="phase47ResetLocalNoticeBtn">Reset My Notice Position</button></div><div class="phase47-small-note" id="phase47NoticeStatus">Checking status...</div>';
     panel.insertBefore(box, panel.firstChild);
@@ -22419,292 +22408,5 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     flex-wrap:wrap!important;
   }
 </style>
-
-<!-- Phase 88: stronger Admin > Onboarding compaction - layout only -->
-<style id="phase88-onboarding-admin-true-compact-style">
-  #adminTabOnboarding .admin-body{
-    display:flex!important;
-    flex-direction:column!important;
-    gap:10px!important;
-  }
-  #phase88OnboardingCommandCenter{
-    position:sticky;
-    top:0;
-    z-index:8;
-    background:linear-gradient(135deg,rgba(15,38,82,.98),rgba(18,70,105,.95));
-    border:1px solid rgba(125,211,252,.28);
-    box-shadow:0 10px 24px rgba(0,0,0,.18);
-    border-radius:14px;
-    padding:10px 12px;
-    margin:0 0 4px!important;
-  }
-  #phase88OnboardingCommandCenter .p88-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  #phase88OnboardingCommandCenter h3{
-    margin:0!important;
-    font-size:16px!important;
-    line-height:1.15!important;
-    color:#f8fafc!important;
-  }
-  #phase88OnboardingCommandCenter p{
-    margin:2px 0 0!important;
-    font-size:11px!important;
-    line-height:1.25!important;
-    color:#b9d8f6!important;
-  }
-  #phase88OnboardingCommandCenter .p88-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-  #phase88OnboardingCommandCenter button{
-    border:1px solid rgba(125,211,252,.35)!important;
-    background:rgba(255,255,255,.08)!important;
-    color:#dff7ff!important;
-    border-radius:999px!important;
-    padding:7px 10px!important;
-    font-size:11px!important;
-    font-weight:800!important;
-    cursor:pointer!important;
-    min-height:0!important;
-  }
-  #phase88OnboardingCommandCenter button:hover{
-    background:rgba(20,184,166,.23)!important;
-    border-color:rgba(45,212,191,.7)!important;
-  }
-  #phase88LegacyOnboardingTools{
-    border:1px solid rgba(148,163,184,.20);
-    background:rgba(15,23,42,.22);
-    border-radius:13px;
-    padding:0;
-    margin:0!important;
-    overflow:hidden;
-  }
-  #phase88LegacyOnboardingTools summary{
-    cursor:pointer;
-    list-style:none;
-    padding:10px 12px;
-    color:#dbeafe;
-    font-size:12px;
-    font-weight:900;
-    letter-spacing:.02em;
-    background:rgba(255,255,255,.04);
-  }
-  #phase88LegacyOnboardingTools summary::-webkit-details-marker{display:none;}
-  #phase88LegacyOnboardingTools .p88-legacy-content{
-    padding:10px 12px;
-    display:grid;
-    gap:8px;
-  }
-  #phase88LegacyOnboardingTools .admin-section-title{margin:0!important;font-size:14px!important;}
-  #phase88LegacyOnboardingTools p{margin:0!important;font-size:11px!important;line-height:1.3!important;}
-  #phase88LegacyOnboardingTools .csv-drop-zone{min-height:72px!important;padding:12px!important;margin:0 0 6px!important;}
-  #phase88LegacyOnboardingTools .csv-drop-icon{font-size:24px!important;margin-bottom:4px!important;}
-  #phase88LegacyOnboardingTools .csv-drop-text{font-size:13px!important;}
-  #phase88LegacyOnboardingTools .csv-drop-hint{font-size:10.5px!important;}
-  #adminTabOnboarding #phase48OnboardingAdmin,
-  #adminTabOnboarding #phase52OnboardingAdmin,
-  #adminTabOnboarding #phase80OnboardingAdmin,
-  #adminTabOnboarding #phase81OnboardingResourceLibrary,
-  #adminTabOnboarding #phase84OnboardingManagerAdmin,
-  #adminTabOnboarding #phase47GlobalNoticeAdminBox{
-    border:1px solid rgba(125,211,252,.22)!important;
-    background:rgba(15,23,42,.34)!important;
-    border-radius:14px!important;
-    padding:12px!important;
-    margin:0!important;
-  }
-  #adminTabOnboarding #phase47GlobalNoticeAdminBox{
-    order:1;
-  }
-  #adminTabOnboarding #phase48OnboardingAdmin{
-    order:2;
-  }
-  #adminTabOnboarding #phase52OnboardingAdmin{
-    order:3;
-  }
-  #adminTabOnboarding #phase81OnboardingResourceLibrary{
-    order:4;
-  }
-  #adminTabOnboarding #phase80OnboardingAdmin{
-    order:5;
-  }
-  #adminTabOnboarding #phase84OnboardingManagerAdmin{
-    order:6;
-  }
-  #adminTabOnboarding #phase48OnboardingAdmin > h3,
-  #adminTabOnboarding #phase52OnboardingAdmin h3,
-  #adminTabOnboarding #phase80OnboardingAdmin h3,
-  #adminTabOnboarding #phase81OnboardingResourceLibrary h3,
-  #adminTabOnboarding #phase84OnboardingManagerAdmin h3,
-  #adminTabOnboarding #phase47GlobalNoticeAdminBox h3{
-    font-size:15px!important;
-    margin:0 0 7px!important;
-    line-height:1.15!important;
-  }
-  #adminTabOnboarding #phase48OnboardingAdmin > p,
-  #adminTabOnboarding #phase52OnboardingAdmin p,
-  #adminTabOnboarding #phase80OnboardingAdmin p,
-  #adminTabOnboarding #phase81OnboardingResourceLibrary p,
-  #adminTabOnboarding #phase84OnboardingManagerAdmin p,
-  #adminTabOnboarding #phase47GlobalNoticeAdminBox p{
-    font-size:11px!important;
-    line-height:1.3!important;
-    margin:0 0 8px!important;
-    color:#b7cfee!important;
-  }
-  #adminTabOnboarding .p48-admin-grid,
-  #adminTabOnboarding .p52-grid,
-  #adminTabOnboarding .p80-grid,
-  #adminTabOnboarding .p81-grid,
-  #adminTabOnboarding .p84-grid{
-    display:grid!important;
-    grid-template-columns:repeat(auto-fit,minmax(245px,1fr))!important;
-    gap:9px!important;
-  }
-  #adminTabOnboarding .p48-admin-grid > div,
-  #adminTabOnboarding .p52-card,
-  #adminTabOnboarding .p80-card,
-  #adminTabOnboarding .p81-card,
-  #adminTabOnboarding .p84-card{
-    background:rgba(255,255,255,.045)!important;
-    border:1px solid rgba(255,255,255,.10)!important;
-    border-radius:12px!important;
-    padding:10px!important;
-  }
-  #adminTabOnboarding .p48-admin-field,
-  #adminTabOnboarding .p52-field,
-  #adminTabOnboarding .p80-field,
-  #adminTabOnboarding .p81-field,
-  #adminTabOnboarding .p84-field{
-    margin:0 0 7px!important;
-  }
-  #adminTabOnboarding label{font-size:10.5px!important;line-height:1.1!important;}
-  #adminTabOnboarding input,
-  #adminTabOnboarding select,
-  #adminTabOnboarding textarea{
-    padding:7px 9px!important;
-    font-size:12px!important;
-    line-height:1.2!important;
-    border-radius:8px!important;
-  }
-  #adminTabOnboarding textarea{min-height:46px!important;}
-  #adminTabOnboarding button,
-  #adminTabOnboarding .p48-admin-btn,
-  #adminTabOnboarding .p52-btn,
-  #adminTabOnboarding .p80-btn,
-  #adminTabOnboarding .p81-btn,
-  #adminTabOnboarding .p84-btn{
-    padding:7px 10px!important;
-    font-size:11.5px!important;
-    line-height:1.1!important;
-    border-radius:8px!important;
-  }
-  #adminTabOnboarding .p48-admin-mini-list,
-  #adminTabOnboarding .p52-table-wrap,
-  #adminTabOnboarding .p80-table-wrap,
-  #adminTabOnboarding .p81-table-wrap,
-  #adminTabOnboarding .p84-table-wrap,
-  #adminTabOnboarding #onboardAdminList{
-    max-height:300px!important;
-    overflow:auto!important;
-    border-radius:12px!important;
-    scrollbar-width:thin;
-  }
-  #adminTabOnboarding table th,
-  #adminTabOnboarding table td{
-    padding:7px 8px!important;
-    font-size:11.5px!important;
-  }
-  #adminTabOnboarding .p52-tabs,
-  #adminTabOnboarding .p80-tabs,
-  #adminTabOnboarding .p81-tabs{
-    gap:6px!important;
-    margin:6px 0 9px!important;
-  }
-  #adminTabOnboarding .p52-tab,
-  #adminTabOnboarding .p80-tab,
-  #adminTabOnboarding .p81-tab{
-    padding:7px 10px!important;
-    font-size:11.5px!important;
-  }
-  @media(max-width:800px){
-    #phase88OnboardingCommandCenter{position:relative;}
-    #phase88OnboardingCommandCenter .p88-head{align-items:flex-start;}
-    #adminTabOnboarding .p48-admin-grid,
-    #adminTabOnboarding .p52-grid,
-    #adminTabOnboarding .p80-grid,
-    #adminTabOnboarding .p81-grid,
-    #adminTabOnboarding .p84-grid{grid-template-columns:1fr!important;}
-  }
-</style>
-<script id="phase88-onboarding-admin-true-compact-script">
-(function(){
-  if(window.__phase88OnboardingAdminTrueCompactReady) return;
-  window.__phase88OnboardingAdminTrueCompactReady = true;
-  function q(sel,root){return (root||document).querySelector(sel);}
-  function all(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));}
-  function findAdminBody(){return q('#adminTabOnboarding .admin-body') || q('#adminTabOnboarding');}
-  function smoothTo(id){var el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});}
-  window.phase88OnboardingJump = smoothTo;
-  function makeCommandCenter(body){
-    if(document.getElementById('phase88OnboardingCommandCenter')) return;
-    var top=document.createElement('div');
-    top.id='phase88OnboardingCommandCenter';
-    top.innerHTML='<div class="p88-head"><div><h3>🚀 Onboarding Admin Center</h3><p>Compact manager for stages, tasks, resources, progress review, manager assignments, and legacy imports.</p></div><div class="p88-actions"><button type="button" onclick="phase88OnboardingJump(\'phase48OnboardingAdmin\')">Stages / Tasks</button><button type="button" onclick="phase88OnboardingJump(\'phase81OnboardingResourceLibrary\')">Resources</button><button type="button" onclick="phase88OnboardingJump(\'phase80OnboardingAdmin\')">Progress</button><button type="button" onclick="phase88OnboardingJump(\'phase84OnboardingManagerAdmin\')">Managers</button><button type="button" onclick="phase88OpenLegacyTools()">Legacy Import</button></div></div>';
-    body.insertBefore(top, body.firstChild);
-  }
-  window.phase88OpenLegacyTools=function(){var d=document.getElementById('phase88LegacyOnboardingTools'); if(d){d.open=true; d.scrollIntoView({behavior:'smooth',block:'start'});} };
-  function wrapLegacy(body){
-    if(document.getElementById('phase88LegacyOnboardingTools')) return;
-    var anchor=q('#phase47GlobalNoticeAdminBox',body) || q('#phase48OnboardingAdmin',body) || q('#phase52OnboardingAdmin',body) || q('#phase80OnboardingAdmin',body) || q('#phase81OnboardingResourceLibrary',body) || q('#phase84OnboardingManagerAdmin',body);
-    if(!anchor) return;
-    var details=document.createElement('details');
-    details.id='phase88LegacyOnboardingTools';
-    details.innerHTML='<summary>📁 Legacy Onboarding Checklist / CSV Import</summary><div class="p88-legacy-content"></div>';
-    anchor.parentNode.insertBefore(details, anchor);
-    var content=q('.p88-legacy-content',details);
-    var nodes=[];
-    var started=false;
-    all(':scope > *', body).forEach(function(n){
-      if(n===details || n===anchor) return;
-      if(n.id==='phase88OnboardingCommandCenter') return;
-      if(n.matches && (n.matches('#phase47GlobalNoticeAdminBox,#phase48OnboardingAdmin,#phase52OnboardingAdmin,#phase80OnboardingAdmin,#phase81OnboardingResourceLibrary,#phase84OnboardingManagerAdmin'))) return;
-      if(n.compareDocumentPosition(anchor) & Node.DOCUMENT_POSITION_FOLLOWING){ nodes.push(n); }
-    });
-    nodes.forEach(function(n){ content.appendChild(n); });
-  }
-  function tagSections(){
-    var map=[['phase48OnboardingAdmin','Stages / Tasks'],['phase81OnboardingResourceLibrary','Resources / Forms'],['phase80OnboardingAdmin','Agent Progress'],['phase84OnboardingManagerAdmin','Manager Assignments'],['phase47GlobalNoticeAdminBox','Hub Notice']];
-    map.forEach(function(pair){var el=document.getElementById(pair[0]); if(!el || el.dataset.p88Tagged) return; el.dataset.p88Tagged='1'; el.setAttribute('data-section-label',pair[1]);});
-  }
-  function run(){
-    var body=findAdminBody(); if(!body) return;
-    makeCommandCenter(body);
-    wrapLegacy(body);
-    tagSections();
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
-  document.addEventListener('click',function(e){var t=e.target; if(t && t.closest && (t.closest('#adminTabOnboarding') || (t.getAttribute && String(t.getAttribute('onclick')||'').indexOf('onboarding')>=0))){ setTimeout(run,250); setTimeout(run,1000); }});
-  var tries=0; var timer=setInterval(function(){ tries++; run(); if(tries>8) clearInterval(timer);},800);
-})();
-</script>
-<!-- END Phase 88 -->
-
-
-<style id="phase89-construction-tab-style">
-  #adminTabConstruction .admin-body{max-width:980px;margin:0 auto;}
-  #adminTabConstruction .phase47-admin-box{margin:12px 0 0!important;border:1px solid rgba(245,158,11,.38)!important;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(15,23,42,.94))!important;border-radius:16px!important;padding:14px!important;}
-  #adminTabConstruction .phase47-admin-box h3{margin:0 0 6px!important;font-size:18px!important;}
-  #adminTabConstruction .phase47-admin-box p{margin:0 0 10px!important;color:#cbd5e1!important;font-size:12px!important;}
-  #adminTabConstruction .phase47-admin-row{display:flex!important;gap:8px!important;flex-wrap:wrap!important;}
-  #adminTabConstruction .phase47-small-note{margin-top:8px!important;font-size:12px!important;color:#fef3c7!important;}
-</style>
-<!-- Phase 89: Construction tab moved out of Onboarding admin. -->
 </body>
 </html>
