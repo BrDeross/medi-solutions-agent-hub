@@ -5960,6 +5960,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <button class="admin-tab" onclick="switchAdminTab('forms',this)">📁 Forms Locker</button>
 <button class="admin-tab" onclick="switchAdminTab('layout',this)">🔀 Layout</button>
 <button class="admin-tab" onclick="switchAdminTab('notifications',this)">🔔 Notifications</button>
+<button class="admin-tab" onclick="switchAdminTab('construction',this)">🚧 Construction</button>
 </div>
 <!-- ── Tab: SNU Data ── -->
 
@@ -7225,7 +7226,16 @@ Build a library of articles. Each time you save the SNU leaderboard, the spotlig
 </div>
 <button onclick="pushNotification()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔔 Push to All Agents</button>
 </div>
+
 </div><!-- /adminTabNotifications -->
+
+<!-- ── Tab: Construction ── -->
+<div id="adminTabConstruction" class="admin-tab-panel">
+  <div class="admin-body">
+    <div class="admin-section-title">🚧 Global Hub Construction Notice</div>
+    <p style="font-size:12px;color:var(--muted-2);margin:0 0 14px;line-height:1.45;">Turn on a Hub-wide warning when any section is being updated. This is separate from onboarding and applies to the full Hub.</p>
+  </div>
+</div>
 <!-- ── STANDALONE PUSH NOTIFICATION (no IIFE dependency) ── -->
 <script>
 window.pushNotification = function() {
@@ -9970,13 +9980,22 @@ function verifyHubDeviceBeforeLogin(session, statusEl){
   var allowed = Math.max(0, Number(session.allowedDevices || 1));
   var requireApproval = !!session.requireDeviceApproval;
   var role = String(session.role || '').toLowerCase();
-  if (role === 'admin') { allowed = Math.max(allowed, 3); requireApproval = false; }
+  var perms = (session && session.permissions) || {};
+  var isAdminUser = role === 'admin' || perms.admin === true || perms.admin === 'true';
+  if (isAdminUser) { allowed = Math.max(allowed, 5); requireApproval = false; }
   // Phase 19: GA/outside users must use approved devices even if their record was migrated with the flag off.
-  if (role === 'ga' || role === 'outside' || role === 'broker' || (session.permissions && session.permissions.ga_tools === true && role !== 'admin')) {
+  if (!isAdminUser && (role === 'ga' || role === 'outside' || role === 'broker' || (session.permissions && session.permissions.ga_tools === true))) {
     requireApproval = true;
     allowed = Math.max(1, allowed || 1);
   }
   var email = String(session.email || '').toLowerCase();
+  // Phase 88 safety: admins and users explicitly marked as not requiring device approval should never be blocked by device limit.
+  if (isAdminUser || requireApproval === false) {
+    return approveCurrentHubDevice(session, deviceId).catch(function(err){
+      console.warn('[Hub Device Approval] bypass session save failed; allowing login:', err && err.message ? err.message : err);
+      return true;
+    });
+  }
   var url = SUPA_URL + '/rest/v1/hub_device_sessions?hub=eq.medi&email=eq.' + encodeURIComponent(email) + '&status=eq.active&approved=eq.true&select=id,device_id,last_seen';
   return fetch(url, { headers: hubDeviceHeaders() })
     .then(function(r){ if (!r.ok) throw new Error('Device session lookup failed: ' + r.status); return r.json(); })
@@ -21211,7 +21230,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
   function refreshNotice(){ readStatus().then(applyNotice); }
   function resetLocalNotice(){ localStorage.removeItem(DISMISS_KEY); localStorage.removeItem(POSITION_KEY); var node=ensureNoticeNode(); node.style.left='50%'; node.style.top='14px'; node.style.transform='translateX(-50%)'; refreshNotice(); }
   function injectOnboardingAdmin(){
-    var panel = document.querySelector('#adminTabOnboarding .admin-body');
+    var panel = document.querySelector('#adminTabConstruction .admin-body');
     if(!panel) return;
     var old = document.getElementById('phase44OnboardingAdminBox');
     if(old && !document.getElementById('phase47OnboardingAdminBox')) old.remove();
