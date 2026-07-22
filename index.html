@@ -6955,7 +6955,7 @@ Upload a CSV or Excel file with one row per agent and one column per month. Requ
 <p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">
 Upload your certification CSV or Excel file. Columns: <code>Agent Name</code>, <code>Certification Year</code>, then one column per carrier (<code>AHIP</code>, <code>AARP/UHC</code>, etc.).<br>
 Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <strong>N</strong> for not certified.<br>
-<strong>Save &amp; Publish replaces the shared Cert Tracker data in Supabase for every HUB user and verifies the cloud update before reporting success.</strong>
+<strong>Save &amp; Publish replaces the shared Cert Tracker data in Supabase for every HUB user and verifies the cloud update before reporting success.</strong><br><strong style="color:#fbbf24;">After installing this correction, upload the source CSV once and confirm the status identifies the ANTHEM header before clicking Save &amp; Publish.</strong>
 </p>
 <div id="certReleaseAdminBox" class="cert-release-admin-box" style="margin:0 0 16px 0;padding:14px;border:1px solid rgba(0,194,184,.30);background:rgba(15,23,42,.55);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.14);">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
@@ -6978,7 +6978,8 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
 <div class="csv-drop-hint">Columns: Agent Name, Certification Year, AHIP, AARP/UHC…</div>
 <input type="file" id="certCsvInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCertCsvFile(this.files[0])">
 </div>
-<div class="csv-status" id="certCsvStatus"></div>
+<div class="csv-status" id="certCsvStatus" data-parser-build="92"></div>
+<div style="font-size:10px;color:#8fb3ff;margin-top:4px;opacity:.9;">Cert import engine: Phase 92</div>
 <div style="display:flex;gap:10px;margin-top:16px;">
 <button class="admin-save-btn" onclick="saveCertData()">💾 Save &amp; Publish</button>
 <button class="admin-save-btn" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#ef4444;" onclick="clearCertData()">🗑️ Clear Cert Data</button>
@@ -11995,7 +11996,7 @@ rows = XLSX.utils.sheet_to_json(ws, {defval:''});
 } else {
 const text = e.target.result;
 const lines = text.split(/\r?\n/).filter(l => l.trim());
-const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
+const headers = smartSplitCsv(lines[0]).map(h => String(h).replace(/^\uFEFF/, '').replace(/\u00A0/g, ' ').trim().replace(/^"|"$/g,''));
 rows = lines.slice(1).map(line => {
 const vals = smartSplitCsv(line);
 const obj = {};
@@ -12003,7 +12004,6 @@ headers.forEach((h,i) => obj[h] = (vals[i]||'').replace(/^"|"$/g,'').trim());
 return obj;
 });
 }
-const ignoredCarrierHeaders = headers.filter(h => !isCertNonCarrierColumn(h, nameKey, yearKey) && !normalizeCertCarrierName(h));
 const agents = [];
 rows.forEach(r => {
 const nameKey = Object.keys(r).find(k => /name/i.test(k));
@@ -12036,7 +12036,7 @@ return `<div style="display:flex;justify-content:space-between;align-items:cente
 }
 renderTripTracker();
 renderTripAdminEditor();
-} catch(err) { setErr('Parse error: ' + err.message); }
+} catch(err) { console.error('[CERT IMPORT PHASE 92]', err); setErr('Phase 92 parse error: ' + err.message); }
 };
 if (file.name.match(/\.xlsx?$/i)) reader.readAsArrayBuffer(file);
 else reader.readAsText(file);
@@ -14030,11 +14030,14 @@ const aliases = [
 for (const [canonical, keys] of aliases) {
 if (keys.some(a => certNormKey(a) === k)) return canonical;
 }
-// Phase 90: tolerate common Anthem/Elevance/BCBS export labels that include
+// Phase 91: tolerate common Anthem/Elevance/BCBS export labels that include
 // plan-year or product suffixes, instead of silently dropping the column.
 if (/\b(anthem|elevance)\b/.test(k) || /\bempire\s+(blue\s*cross|bcbs)\b/.test(k)) return 'ANTHEM';
 if (/^bcbs(?:\s+ma|\s+medicare|\s+medicare\s+advantage)?$/.test(k)) return 'ANTHEM';
 if (/^blue\s+cross\s+blue\s+shield(?:\s+ma|\s+medicare|\s+medicare\s+advantage)?$/.test(k)) return 'ANTHEM';
+// Phase 91: after specific aliases (including Independence Blue Cross) are resolved,
+// treat remaining BCBS/Blue Cross export labels as Anthem/Elevance.
+if (/\bbcbs\b/.test(k) || /\bblue\s+cross(?:\s+blue\s+shield)?\b/.test(k)) return 'ANTHEM';
 return '';
 }
 function isCertSummaryRow(agent) {
@@ -14303,11 +14306,19 @@ ${headerCells}
 function isCertified(val) {
 if (val === null || val === undefined) return false;
 const s = String(val).trim().toLowerCase();
-return s === 'y' || s === 'yes' || s === '1' || s === 'true' || s === '✓' || s === '✔' || s === 'x' || s === 'certified' || s === 'complete' || s === 'completed' || s === 'done' || s === 'passed' || s === 'active';
+if (!s || /^(n|no|0|false|not certified|incomplete|expired|pending|blank|none|n\/a|na|-|—)$/.test(s)) return false;
+if (/^(y|yes|1|true|✓|✔|x|certified|complete|completed|done|passed|active|approved|rts|ready to sell)$/.test(s)) return true;
+if (/\b(certified|complete|completed|passed|active|approved|ready to sell|rts)\b/.test(s)) return true;
+// Some carrier exports use a certification year or completion date as the positive value.
+if (/^20\d{2}$/.test(s) || /^(?:\d{1,2}[\/-]){2}\d{2,4}$/.test(s)) return true;
+return false;
 }
 // ── CSV/Excel Handling ────────────────────────────────────────────────────
 function handleCertCsvFile(file) {
 if (!file) return;
+// Phase 92: declare this in the outer handler scope so every CSV/XLSX branch
+// and every later status message can access it safely.
+var ignoredCarrierHeaders = [];
 const status = document.getElementById('certCsvStatus');
 const setErr = m => { if(status){ status.textContent=m; status.className='csv-status err'; } };
 const setOk = m => { if(status){ status.textContent=m; status.className='csv-status ok'; } };
@@ -14326,7 +14337,7 @@ let hRow = 0;
 for (let i = 0; i < raw.length; i++) {
 if (raw[i].some(c => c !== '')) { hRow = i; break; }
 }
-headers = raw[hRow].map(h => String(h).trim());
+headers = raw[hRow].map(h => String(h).replace(/^\uFEFF/, '').replace(/\u00A0/g, ' ').trim());
 rows = raw.slice(hRow+1).filter(r => r.some(c => c !== '')).map(r => {
 const obj = {};
 headers.forEach((h,i) => obj[h] = r[i] !== undefined ? String(r[i]).trim() : '');
@@ -14357,6 +14368,12 @@ if (!entry) {
 }
 if (!entry.sources.some(src => String(src).toLowerCase() === String(h).toLowerCase())) entry.sources.push(h);
 });
+ignoredCarrierHeaders = headers.filter(h => !isCertNonCarrierColumn(h, nameKey, yearKey) && !normalizeCertCarrierName(h));
+const anthemEntry = certHeaderMap.find(x => x.canonical === 'ANTHEM');
+if (!anthemEntry) {
+  setErr('✗ ANTHEM column was not recognized. Nothing was changed or published. Rename that CSV header to ANTHEM, Anthem Medicare, Elevance, BCBS, or Blue Cross Blue Shield and upload again. Detected headers: ' + headers.join(' | '));
+  return;
+}
 const agents = [];
 rows.forEach(r => {
 const name = (r[nameKey]||'').trim();
@@ -14375,15 +14392,14 @@ if (!agents.length) { setErr('✗ No agent rows found. Check column headers.'); 
 _certAgents = normalizeCertAgents(agents);
 _certMeta = Object.assign({}, _certMeta || {}, { carriers: CERT_CARRIERS.slice(), year: (_certAgents[0]?.year || yearKey || '') });
 const matchedCols = [...new Set(certHeaderMap.map(x => x.canonical))];
-const anthemEntry = certHeaderMap.find(x => x.canonical === 'ANTHEM');
 const anthemValues = anthemEntry ? rows.map(r => anthemEntry.sources.map(source => String(r[source] || '').trim()).find(Boolean) || '').filter(Boolean) : [];
 const anthemCertified = anthemValues.filter(isCertified).length;
 console.log('[CERT IMPORT] Matched carrier headers:', certHeaderMap);
 console.log('[CERT IMPORT] ANTHEM:', { matchedHeaders: anthemEntry ? anthemEntry.sources : [], nonEmptyValues: anthemValues.length, certifiedValues: anthemCertified, sampleValues: [...new Set(anthemValues)].slice(0,10) });
 if (ignoredCarrierHeaders.length) console.warn('[CERT IMPORT] Ignored/unrecognized columns:', ignoredCarrierHeaders);
 let importMsg = `✓ Loaded ${_certAgents.length} agent${_certAgents.length!==1?'s':''} with ${matchedCols.length} locked certification column${matchedCols.length!==1?'s':''}.`;
-if (!anthemEntry) importMsg += ' ⚠ ANTHEM was not matched from the uploaded headers.';
-else importMsg += ` ANTHEM matched from ${anthemEntry.sources.join(' / ')} (${anthemCertified} certified).`;
+importMsg += ` ANTHEM matched from ${anthemEntry.sources.join(' / ')}: ${anthemValues.length} non-empty value${anthemValues.length!==1?'s':''}, ${anthemCertified} recognized as certified.`;
+if (!anthemValues.length) importMsg += ' ⚠ The ANTHEM column was found, but every Anthem cell was blank.';
 if (ignoredCarrierHeaders.length) importMsg += ` Ignored column${ignoredCarrierHeaders.length!==1?'s':''}: ${ignoredCarrierHeaders.join(', ')}.`;
 importMsg += ' Review below, remove any unwanted rows, then Save & Publish.';
 setOk(importMsg);
@@ -14529,7 +14545,7 @@ displayLocked: true,
 displayVersion: 'redline-aqua-v1',
 updatedAt: new Date().toISOString(),
 saveToken,
-source: 'cert_csv_global_save_phase90_anthem_fix'
+source: 'cert_csv_global_save_phase91_anthem_reupload_fix'
 });
 const data = { agents: _certAgents, meta: _certMeta };
 const localSignature = certAgentSignature(_certAgents);
