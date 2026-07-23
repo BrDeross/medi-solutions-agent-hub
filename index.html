@@ -23056,40 +23056,50 @@ const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Roth Conve
 '*{box-sizing:border-box;}'+
 'body{font-family:"Segoe UI",Arial,sans-serif;color:#1e293b;margin:0;padding:0;background:#fff;}'+
 '.wrap{max-width:840px;margin:0 auto;padding:0 44px 50px;}'+
-'.band{background:linear-gradient(135deg,#1e3d72 0%,#2a5298 100%);color:#fff;padding:38px 44px 30px;margin-bottom:32px;}'+
-'.band h1{font-size:26px;font-weight:800;letter-spacing:-.3px;margin:0 0 6px;}'+
-'.band .meta{font-size:13px;opacity:.85;line-height:1.6;}'+
-'.band .meta strong{opacity:1;}'+
-'.hero{background:linear-gradient(135deg,#0f2544,#1c3f74);color:#fff;border-radius:16px;padding:26px 30px;margin-bottom:34px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}'+
-'.hero-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-bottom:6px;}'+
-'.hero-scenario{font-size:15px;font-weight:700;margin-bottom:14px;color:#7dd3fc;}'+
-'.hero-value{font-size:42px;font-weight:800;line-height:1;}'+
-'.hero-sub{font-size:12px;opacity:.8;margin-top:8px;max-width:340px;line-height:1.5;}'+
+'.band{background:#fff;border-bottom:5px solid #1e3d72;padding:30px 44px 22px;margin-bottom:32px;}'+
+'.band h1{font-size:26px;font-weight:800;letter-spacing:-.3px;margin:0 0 6px;color:#1e3d72;}'+
+'.band .meta{font-size:13px;color:#475569;line-height:1.6;}'+
+'.band .meta strong{color:#1e293b;}'+
+'.hero{background:#eef4fc;border:1px solid #c7dbf2;border-left:6px solid #1e3d72;border-radius:14px;padding:24px 30px;margin-bottom:34px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}'+
+'.hero-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5b7aa8;margin-bottom:6px;}'+
+'.hero-scenario{font-size:15px;font-weight:700;margin-bottom:14px;color:#1d4ed8;}'+
+'.hero-value{font-size:42px;font-weight:800;line-height:1;color:#0f172a;}'+
+'.hero-sub{font-size:12px;color:#5b6b85;margin-top:8px;max-width:340px;line-height:1.5;}'+
 'h2{font-size:15px;font-weight:700;color:#1e3a6e;margin:34px 0 12px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;}'+
 '.sub{font-size:13px;color:#64748b;margin-bottom:4px;}'+
 'table{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:12.5px;}'+
-'th{background:#f1f5f9;color:#475569;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;text-align:left;padding:9px 12px;border-bottom:2px solid #e2e8f0;}'+
-'td{padding:9px 12px;border-bottom:1px solid #edf1f5;}'+
+'th{background:#f1f5f9;color:#475569;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;text-align:left;padding:9px 12px;border-bottom:2px solid #cbd5e1;}'+
+'td{padding:9px 12px;border-bottom:1px solid #edf1f5;color:#1e293b;}'+
 'td.num{text-align:right;font-variant-numeric:tabular-nums;}'+
 'td.wealth-col{font-weight:700;color:#0f172a;}'+
 'tr.best-row{background:#f0fdf4;}'+
-'tr.best-row td{font-weight:700;}'+
-'.best-tag{display:inline-block;background:#22c55e;color:#fff;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;}'+
-'td.hi{background:#eff6ff;font-weight:700;color:#1d4ed8;}'+
+'tr.best-row td{font-weight:700;border-bottom:1px solid #d7f2df;}'+
+'.best-tag{display:inline-block;background:#dcfce7;border:1px solid #86efac;color:#15803d;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;}'+
+'td.hi{background:#eff6ff;font-weight:700;color:#1d4ed8;border-bottom:1px solid #dbeafe;}'+
 '.assump-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 30px;font-size:12.5px;}'+
 '.assump-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #edf1f5;}'+
 '.assump-row span:first-child{color:#64748b;}'+
-'.assump-row span:last-child{font-weight:600;}'+
+'.assump-row span:last-child{font-weight:600;color:#0f172a;}'+
 '.disclosure{font-size:10.5px;color:#94a3b8;line-height:1.7;border-top:1px solid #e2e8f0;padding-top:16px;margin-top:36px;}'+
 '.disclosure strong{color:#64748b;}'+
 '.compliance-flag{display:inline-block;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;margin-top:14px;}'+
-'@media print{.wrap{padding:0 36px 30px;}.band{padding:26px 36px 22px;}}'+
+'.print-tip{background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:12px;font-weight:600;padding:10px 16px;border-radius:8px;margin:0 0 20px;}'+
+'*,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}'+
+'@media print{'+
+'.print-tip{display:none!important;}'+
+'.wrap{padding:0 36px 30px;}.band{padding:22px 36px 18px;}'+
+'@page{margin:14mm;}'+
+'table{page-break-inside:auto;}tr{page-break-inside:avoid;}'+
+'h2{page-break-after:avoid;}'+
+'.hero{page-break-inside:avoid;}'+
+'}'+
 '</style></head><body>'+
 '<div class="band"><h1>Roth Conversion Analysis</h1><div class="meta">'+
 (inp.clientName?'<strong>Prepared for:</strong> '+inp.clientName+' &nbsp;·&nbsp; ':'')+
 '<strong>Prepared on:</strong> '+date+(agentName?' &nbsp;·&nbsp; <strong>Prepared by:</strong> '+agentName:'')+
 '</div></div>'+
 '<div class="wrap">'+
+'<div class="print-tip">💡 Tip: in the print dialog, click "More settings" and check "Background graphics" for the best color quality. (The report is designed to stay fully readable either way.)</div>'+
 
 '<div class="hero">'+
 '<div><div class="hero-label">Total Wealth Generated — Best Option</div>'+
