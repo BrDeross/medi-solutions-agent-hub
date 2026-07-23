@@ -5080,6 +5080,14 @@ Agent Command Center
 <p>See prospects who filled out the Retirement Tax Bill landing page — their inputs, computed tax bill, and contact info.</p>
 <span class="card-tag">Lead Gen</span>
 </div>
+<div class="card hub-permission-hidden" data-card-id="rtb-link" data-color="rose" data-permission-required="rtb_leads" style="cursor:pointer;" onclick="copyMyRtbLink()">
+<span class="card-arrow">↗</span>
+<div class="card-shimmer"></div>
+<div class="card-icon-wrap">🔗</div>
+<h3>My Retirement Tax Bill Link</h3>
+<p>Copy your personal link to share with prospects — any leads it generates are automatically credited to you.</p>
+<span class="card-tag">Lead Gen</span>
+</div>
 <div class="card" data-card-id="sep-rules" data-color="teal" style="cursor:pointer;" onclick="openSepModal()">
 <span class="card-arrow">↗</span>
 <div class="card-shimmer"></div>
@@ -5976,6 +5984,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <button class="admin-tab" onclick="switchAdminTab('certs',this)">🎓 Certs</button>
 <button class="admin-tab" onclick="switchAdminTab('alliance',this)">🤝 Alliance</button>
 <button class="admin-tab" onclick="switchAdminTab('census',this)">📋 Census Form</button>
+<button class="admin-tab" onclick="switchAdminTab('rtbLink',this); setTimeout(function(){ if (typeof loadRtbLinkSetting === 'function') loadRtbLinkSetting(); }, 50);">🔗 RTB Link</button>
 <button class="admin-tab" onclick="switchAdminTab('articles',this)">📚 Article Locker</button>
 <button class="admin-tab" onclick="switchAdminTab('forms',this)">📁 Forms Locker</button>
 <button class="admin-tab" onclick="switchAdminTab('layout',this)">🔀 Layout</button>
@@ -7122,6 +7131,16 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
 <input class="admin-input" id="censusUrl" placeholder="https://…">
 </div>
 <button class="admin-save-btn" onclick="saveTileContent('census')" style="width:auto;padding:10px 24px;">💾 Save & Publish</button>
+</div>
+<div id="adminTabRtbLink" class="admin-tab-panel">
+<div class="admin-section-title">🔗 Retirement Tax Bill Landing Page URL</div>
+<p style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">This is the public landing page prospects fill out. When an agent clicks "My Retirement Tax Bill Link" in Agent Tools, the Hub appends <code>?a=their-email</code> to whatever URL is saved here. Update this any time the page moves — no code changes needed.</p>
+<div style="margin-bottom:16px;">
+<label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Landing Page URL</label>
+<input class="admin-input" id="rtbLinkUrlInput" placeholder="https://yourdomain.com/retirement-tax-bill.html">
+</div>
+<button class="admin-save-btn" onclick="saveRtbLinkSetting()" style="width:auto;padding:10px 24px;">💾 Save</button>
+<div id="rtbLinkSettingStatus" style="margin-top:10px;font-size:12px;color:var(--muted-2);"></div>
 </div>
 <div id="adminTabArticles" class="admin-tab-panel">
 <div class="admin-section-title">📚 Article Locker</div>
@@ -23469,6 +23488,90 @@ document.getElementById('rtbLeadsOverlay').classList.remove('open');
 document.body.style.overflow = '';
 };
 
+// ---- Personal RTB link (attributes leads back to whichever agent shared it) ----
+// The landing page URL is stored in Supabase (hub_settings) and editable from
+// Admin → RTB Link, so it never has to be hardcoded/edited in this file again.
+const RTB_SETTINGS_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+const RTB_SETTINGS_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const RTB_SETTINGS_HUB = 'medi';
+let rtbLandingUrlCache = 'https://brdeross.github.io/medi-solutions-agent-hub/retirement-tax-bill.html'; // fallback until Supabase responds
+
+async function rtbFetchLandingUrl(){
+try{
+const resp = await fetch(RTB_SETTINGS_URL + '/rest/v1/hub_settings?hub=eq.' + RTB_SETTINGS_HUB + '&key=eq.rtb_landing_url&select=value', {
+headers:{'apikey':RTB_SETTINGS_KEY,'Authorization':'Bearer '+RTB_SETTINGS_KEY}
+});
+if (!resp.ok) throw new Error('HTTP '+resp.status);
+const rows = await resp.json();
+if (rows && rows.length && rows[0].value) rtbLandingUrlCache = rows[0].value;
+}catch(e){ console.warn('[RTB link setting] using fallback URL:', e.message||e); }
+return rtbLandingUrlCache;
+}
+rtbFetchLandingUrl(); // warm the cache as soon as the Hub loads
+
+window.loadRtbLinkSetting = async function(){
+const statusEl = document.getElementById('rtbLinkSettingStatus');
+if (statusEl) statusEl.textContent = 'Loading…';
+const url = await rtbFetchLandingUrl();
+const input = document.getElementById('rtbLinkUrlInput');
+if (input) input.value = url;
+if (statusEl) statusEl.textContent = '';
+};
+
+window.saveRtbLinkSetting = async function(){
+const statusEl = document.getElementById('rtbLinkSettingStatus');
+const input = document.getElementById('rtbLinkUrlInput');
+const url = String(input && input.value || '').trim();
+if (!url || !/^https?:\/\//i.test(url)){
+if (statusEl){ statusEl.style.color = '#fb7185'; statusEl.textContent = 'Enter a full URL starting with https://'; }
+return;
+}
+if (statusEl){ statusEl.style.color = 'var(--muted-2)'; statusEl.textContent = 'Saving…'; }
+try{
+const existing = await fetch(RTB_SETTINGS_URL + '/rest/v1/hub_settings?hub=eq.' + RTB_SETTINGS_HUB + '&key=eq.rtb_landing_url&select=id', {
+headers:{'apikey':RTB_SETTINGS_KEY,'Authorization':'Bearer '+RTB_SETTINGS_KEY}
+}).then(function(r){ return r.json(); });
+const headers = {'Content-Type':'application/json','apikey':RTB_SETTINGS_KEY,'Authorization':'Bearer '+RTB_SETTINGS_KEY,'Prefer':'return=minimal'};
+if (existing && existing.length){
+await fetch(RTB_SETTINGS_URL + '/rest/v1/hub_settings?hub=eq.' + RTB_SETTINGS_HUB + '&key=eq.rtb_landing_url', {
+method:'PATCH', headers:headers, body:JSON.stringify({value:url, updated_at:new Date().toISOString()})
+});
+} else {
+await fetch(RTB_SETTINGS_URL + '/rest/v1/hub_settings', {
+method:'POST', headers:headers, body:JSON.stringify({hub:RTB_SETTINGS_HUB, key:'rtb_landing_url', value:url})
+});
+}
+rtbLandingUrlCache = url;
+if (statusEl){ statusEl.style.color = '#34d399'; statusEl.textContent = '✓ Saved. Agents will get this link from now on.'; }
+}catch(e){
+if (statusEl){ statusEl.style.color = '#fb7185'; statusEl.textContent = 'Save failed: ' + (e.message||e); }
+}
+};
+
+window.copyMyRtbLink = async function(){
+var sess = {}; try{ sess = JSON.parse(sessionStorage.getItem('medi_hub_session')||'{}')||{}; }catch(e){}
+if (typeof hubHasPermission === 'function' && !hubHasPermission(sess, 'rtb_leads')){
+if (typeof showSnuToast==='function') showSnuToast('⚠ You don\'t have access to this. Ask an admin to enable it under Permissions.');
+return;
+}
+var email = String(sess.email||'').trim().toLowerCase();
+if (!email){
+alert('Could not find your logged-in email. Please log in again and retry.');
+return;
+}
+var baseUrl = await rtbFetchLandingUrl();
+var link = baseUrl + '?a=' + encodeURIComponent(email);
+function done(copied){
+if (typeof showSnuToast==='function') showSnuToast(copied ? '✓ Link copied to clipboard!' : 'Link ready — copy it below:');
+if (!copied) window.prompt('Copy your Retirement Tax Bill link:', link);
+}
+if (navigator.clipboard && navigator.clipboard.writeText){
+navigator.clipboard.writeText(link).then(function(){ done(true); }).catch(function(){ done(false); });
+} else {
+done(false);
+}
+};
+
 window.rtbLoadLeads = async function(){
 const listEl = document.getElementById('rtbLeadsList');
 listEl.innerHTML = '<div style="font-size:12px;color:var(--muted-2);">Loading…</div>';
@@ -23505,6 +23608,7 @@ return '<div style="background:rgba(255,255,255,.05);border:1px solid var(--bord
 (r.contacted?' <span style="font-size:10px;background:rgba(52,211,153,.15);color:#34d399;padding:2px 8px;border-radius:999px;font-weight:700;">CONTACTED</span>':'')+
 '<div style="font-size:11px;color:var(--muted-2);margin-top:3px;">'+(r.email||'')+(r.phone?' · '+r.phone:'')+' · '+d+'</div>'+
 '<div style="font-size:11px;color:var(--muted-2);margin-top:3px;">Projected balance: '+rtblFmt(inp.projectedBalance)+' · Est. tax bill: <strong style="color:#f87171;">'+rtblFmt(inp.taxBill)+'</strong> ('+(inp.growthRate!=null?inp.growthRate+'% growth, ':'')+(inp.taxRate!=null?inp.taxRate+'% tax':'')+')</div>'+
+(r.source_agent?'<div style="font-size:11px;color:#60a5fa;margin-top:3px;">🔗 Referred by: '+r.source_agent+'</div>':'<div style="font-size:11px;color:var(--muted-2);margin-top:3px;font-style:italic;">No referring agent (generic link)</div>')+
 '</div>'+
 '<div style="display:flex;gap:8px;">'+
 '<button class="life-calc-btn ghost" style="padding:6px 12px;font-size:12px;" onclick="rtbToggleContacted(\''+r.id+'\', '+(!r.contacted)+')">'+(r.contacted?'Mark not contacted':'Mark contacted')+'</button>'+
@@ -23528,10 +23632,10 @@ alert('Could not update lead: '+(e.message||e));
 
 window.rtbExportLeadsCsv = function(){
 if (!rtblLeads.length){ if (typeof showSnuToast==='function') showSnuToast('⚠ No leads to export.'); return; }
-const rows = [['First Name','Last Name','Email','Phone','Date','Projected Balance','Tax Bill','Growth Rate','Tax Rate','Contacted']];
+const rows = [['First Name','Last Name','Email','Phone','Date','Projected Balance','Tax Bill','Growth Rate','Tax Rate','Contacted','Referred By']];
 rtblLeads.forEach(function(r){
 const inp = r.inputs || {};
-rows.push([r.first_name||'', r.last_name||'', r.email||'', r.phone||'', r.created_at?new Date(r.created_at).toLocaleDateString('en-US'):'', inp.projectedBalance||'', inp.taxBill||'', inp.growthRate||'', inp.taxRate||'', r.contacted?'Yes':'No']);
+rows.push([r.first_name||'', r.last_name||'', r.email||'', r.phone||'', r.created_at?new Date(r.created_at).toLocaleDateString('en-US'):'', inp.projectedBalance||'', inp.taxBill||'', inp.growthRate||'', inp.taxRate||'', r.contacted?'Yes':'No', r.source_agent||'']);
 });
 const csv = rows.map(function(row){ return row.map(function(cell){ return '"'+String(cell).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
 const blob = new Blob([csv], {type:'text/csv'});
