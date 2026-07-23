@@ -5011,7 +5011,7 @@ Agent Command Center
 <p>Coaching, marketing, and planning resources</p>
 </div>
 </div>
-<span class="count-chip">14 tools</span>
+<span class="count-chip">15 tools</span>
 <button class="reorder-btn" onclick="toggleReorder('agent-tools', this)">⠿ Reorder</button>
 </div>
 <!-- Tool Cards -->
@@ -5063,6 +5063,14 @@ Agent Command Center
 <h3>Life Insurance Calculator</h3>
 <p>Estimate coverage needs for debts, income replacement, children, weddings, properties, and final expenses.</p>
 <span class="card-tag">Protection</span>
+</div>
+<div class="card" data-card-id="roth-calc" data-color="gold" style="cursor:pointer;" onclick="openRothCalcModal()">
+<span class="card-arrow">↗</span>
+<div class="card-shimmer"></div>
+<div class="card-icon-wrap">🧮</div>
+<h3>Roth Conversion Calculator</h3>
+<p>Model RMD-only vs. level income vs. Roth conversion scenarios, tax bracket drift, IRMAA impact, and break-even wealth by conversion period.</p>
+<span class="card-tag">Retirement Planning</span>
 </div>
 <div class="card" data-card-id="sep-rules" data-color="teal" style="cursor:pointer;" onclick="openSepModal()">
 <span class="card-arrow">↗</span>
@@ -22555,6 +22563,607 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     flex-wrap:wrap!important;
   }
 </style>
+
+<!-- ══════════════════════════════════════════════
+     ROTH CONVERSION CALCULATOR — MODAL
+     ══════════════════════════════════════════════ -->
+<div class="life-modal-overlay" id="rothCalcOverlay" onclick="if(event.target===this)closeRothCalcModal()">
+<div class="life-modal-box" style="width:min(1180px,100%);">
+<div class="life-modal-header">
+<div class="life-modal-title">🧮 Roth Conversion Calculator</div>
+<button class="life-modal-close" onclick="closeRothCalcModal()">✕</button>
+</div>
+<div class="life-modal-body">
+
+<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+<button class="life-calc-btn" type="button" id="rcTabNewBtn" onclick="rcSwitchTab('new')">＋ New Analysis</button>
+<button class="life-calc-btn ghost" type="button" id="rcTabSavedBtn" onclick="rcSwitchTab('saved')">📁 Saved Team Reports</button>
+</div>
+
+<!-- ── NEW ANALYSIS PANEL ── -->
+<div id="rcPanelNew">
+
+<div class="life-calc-grid" style="grid-template-columns:1fr 1fr;gap:18px;">
+
+<div class="life-calc-card">
+<div class="life-calc-title">Client &amp; IRA Assumptions</div>
+<div class="life-calc-form">
+<label>Client Name<input type="text" id="rcClientName" class="admin-input" placeholder="Jane Client"></label>
+<label>Current IRA / 401(k) Balance ($)<input type="number" id="rcIraBalance" class="admin-input" value="1000000" min="0"></label>
+<label>Annual Pre-Tax Growth Rate (%, net of fees)<input type="number" id="rcGrowthRate" class="admin-input" value="6" step="0.1"></label>
+<label>IRA Owner Current Age<input type="number" id="rcOwnerAge" class="admin-input" value="65" min="18" max="99"></label>
+<label>RMD Start Age<input type="number" id="rcRmdStartAge" class="admin-input" value="73" min="70" max="75"></label>
+<label>Project Through Age<input type="number" id="rcEndAge" class="admin-input" value="95" min="75" max="100"></label>
+</div>
+</div>
+
+<div class="life-calc-card">
+<div class="life-calc-title">Income, Tax &amp; IRMAA Assumptions</div>
+<div class="life-calc-form">
+<label>Filing Status
+<select id="rcFilingStatus" class="admin-input">
+<option value="single">Single</option>
+<option value="joint" selected>Married Filing Jointly</option>
+</select>
+</label>
+<label>Other Annual Taxable Income (non-IRA — SS, pension, etc.) ($)<input type="number" id="rcOtherIncome" class="admin-input" value="60000" min="0"></label>
+<label>State/Local Marginal Tax Rate (%)<input type="number" id="rcStateRate" class="admin-input" value="5" step="0.1"></label>
+<label>Medicare Election Age<input type="number" id="rcMedicareAge" class="admin-input" value="65" min="0" max="99"></label>
+<label style="display:flex;align-items:center;gap:8px;flex-direction:row;"><input type="checkbox" id="rcSpouseMedicare" style="width:auto;"> Spouse also enrolled in Medicare (doubles IRMAA)</label>
+<label>Beneficiary Tax Rate on Inherited IRA (%)<input type="number" id="rcBeneficiaryRate" class="admin-input" value="24" step="0.1"></label>
+</div>
+</div>
+
+<div class="life-calc-card">
+<div class="life-calc-title">Conversion Scenario</div>
+<div class="life-calc-form">
+<label>Conversion Start Age<input type="number" id="rcConvertStartAge" class="admin-input" value="65" min="18" max="99"></label>
+<label>Conversion Period (years, for the detailed scenario below)<input type="number" id="rcConvertYears" class="admin-input" value="3" min="1" max="10"></label>
+<label>Level-Income Comparison Amount ($/yr — leave blank to auto-match conversion pace)<input type="number" id="rcLevelIncome" class="admin-input" placeholder="Auto"></label>
+</div>
+</div>
+
+<div class="life-calc-card">
+<div class="life-calc-title">Modeled Future Tax Change (optional)</div>
+<div class="life-calc-form">
+<label>Years From Now Rates Change<input type="number" id="rcTaxChangeYear" class="admin-input" value="0" min="0" max="30"></label>
+<label>Modeled Rate Increase (% — e.g. 20 means brackets rise 20% relative to today)<input type="number" id="rcTaxChangeIncrease" class="admin-input" value="0" step="1"></label>
+</div>
+</div>
+
+</div>
+
+<div class="life-calc-actions" style="margin-top:18px;">
+<button class="life-calc-btn" type="button" onclick="rcCalculate()">Calculate</button>
+<button class="life-calc-btn ghost" type="button" onclick="rcReset()">Reset</button>
+<button class="life-calc-btn ghost" type="button" onclick="rcPrintReport()">🖨 Print / Export Report</button>
+<button class="life-calc-btn ghost" type="button" onclick="rcSaveToTeam()">☁️ Save to Team Reports</button>
+</div>
+<div id="rcSaveStatus" style="margin-top:8px;font-size:12px;color:var(--muted-2);"></div>
+
+<div id="rcResults" style="margin-top:26px;display:none;">
+
+<h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:10px;color:#fff;">Scenario Comparison — Lifetime Taxes &amp; IRMAA</h3>
+<div id="rcScenarioCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:26px;"></div>
+
+<h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:10px;color:#fff;">Conversion Period Options (1–10 Years)</h3>
+<div style="overflow-x:auto;margin-bottom:26px;">
+<table style="width:100%;border-collapse:collapse;font-size:13px;color:#fff;" id="rcPeriodTable"></table>
+</div>
+
+<h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:10px;color:#fff;">Year-by-Year — Selected Conversion Period</h3>
+<div style="overflow-x:auto;margin-bottom:26px;">
+<table style="width:100%;border-collapse:collapse;font-size:13px;color:#fff;" id="rcYearByYearTable"></table>
+</div>
+
+<h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:10px;color:#fff;">Break-Even — Total After-Tax Wealth, Assuming Death in Given Year</h3>
+<div style="overflow-x:auto;margin-bottom:10px;">
+<table style="width:100%;border-collapse:collapse;font-size:13px;color:#fff;" id="rcBreakEvenTable"></table>
+</div>
+
+<div style="font-size:11px;color:var(--muted-2);line-height:1.5;margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+This is a hypothetical, educational model built on 2026 IRS tax brackets, the IRS Uniform Lifetime Table, and 2026 Medicare IRMAA brackets. It does not represent actual future tax law, market performance, or a specific client's full tax return. Figures assume distributions/conversions stack on top of the "other taxable income" entered above; state tax is modeled as a flat rate; IRMAA uses current-year MAGI rather than the true 2-year lookback, for simplicity. This is not tax, legal, or investment advice.
+⚠️ Review with compliance before presenting to a client.
+</div>
+
+</div>
+</div>
+
+<!-- ── SAVED TEAM REPORTS PANEL ── -->
+<div id="rcPanelSaved" style="display:none;">
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+<input type="text" id="rcSavedSearch" class="admin-input" placeholder="Search by client or agent…" style="max-width:280px;" oninput="rcRenderSavedList()">
+<button class="life-calc-btn ghost" type="button" onclick="rcLoadTeamReports()">↻ Refresh</button>
+<span style="font-size:11px;color:var(--muted-2);">Showing your saved reports<span id="rcAdminScopeNote"></span></span>
+</div>
+<div id="rcSavedList" style="display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   ROTH CONVERSION CALCULATOR — ENGINE
+   Built on: IRS Uniform Lifetime Table (RMDs),
+   2026 federal tax brackets (IRS Rev. Proc. 2025-32),
+   2026 Medicare IRMAA brackets (CMS, published Nov 2025).
+   These tables should be reviewed/updated each year.
+   ══════════════════════════════════════════════ */
+(function(){
+
+// ---- IRS Uniform Lifetime Table (RMD divisors), ages 72-100 ----
+const RC_RMD_TABLE = {72:27.4,73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:20.2,81:19.4,82:18.5,83:17.7,84:16.8,85:16.0,86:15.2,87:14.4,88:13.7,89:12.9,90:12.2,91:11.5,92:10.8,93:10.1,94:9.5,95:8.9,96:8.4,97:7.8,98:7.3,99:6.8,100:6.4};
+function rcRmdFactor(age){
+if (age < 72) return null;
+if (age > 100) return RC_RMD_TABLE[100];
+return RC_RMD_TABLE[age];
+}
+
+// ---- 2026 Federal ordinary-income tax brackets ----
+const RC_FED_SINGLE = [[0,.10],[12400,.12],[50400,.22],[105700,.24],[201775,.32],[256225,.35],[640600,.37]];
+const RC_FED_JOINT  = [[0,.10],[24800,.12],[100800,.22],[211400,.24],[403550,.32],[512450,.35],[768700,.37]];
+
+function rcBracketsFor(status, changeYearsOut, changeIncreasePct, yearOffset){
+const base = status === 'joint' ? RC_FED_JOINT : RC_FED_SINGLE;
+if (changeYearsOut > 0 && yearOffset >= changeYearsOut && changeIncreasePct){
+const mult = 1 + (changeIncreasePct/100);
+return base.map(function(b){ return [b[0], Math.min(b[1]*mult, 0.9)]; });
+}
+return base;
+}
+
+function rcProgressiveTax(taxableIncome, brackets){
+if (taxableIncome <= 0) return 0;
+let tax = 0;
+for (let i=0;i<brackets.length;i++){
+const [floor, rate] = brackets[i];
+const nextFloor = (i+1 < brackets.length) ? brackets[i+1][0] : Infinity;
+if (taxableIncome > floor){
+tax += (Math.min(taxableIncome, nextFloor) - floor) * rate;
+} else break;
+}
+return tax;
+}
+
+// ---- 2026 Medicare IRMAA brackets (per person, monthly $, Part B + Part D) ----
+// Source: CMS 2026 announcement (Nov 2025). Verify annually at medicare.gov/basics/costs.
+const RC_IRMAA_SINGLE = [
+{max:109000, b:0, d:0},
+{max:137000, b:81.20, d:14.50},
+{max:171000, b:202.90, d:37.50},
+{max:214000, b:324.70, d:60.50},
+{max:500000, b:446.40, d:83.00},
+{max:Infinity, b:487.00, d:91.00}
+];
+const RC_IRMAA_JOINT = [
+{max:218000, b:0, d:0},
+{max:274000, b:81.20, d:14.50},
+{max:342000, b:202.90, d:37.50},
+{max:428000, b:324.70, d:60.50},
+{max:750000, b:446.40, d:83.00},
+{max:Infinity, b:487.00, d:91.00}
+];
+
+function rcIrmaaMonthly(magi, status, inflatePct, yearOffset){
+const table = status === 'joint' ? RC_IRMAA_JOINT : RC_IRMAA_SINGLE;
+const infl = Math.pow(1 + (inflatePct||0)/100, Math.max(0,yearOffset));
+for (const tier of table){
+if (magi <= tier.max * infl || tier.max === Infinity){
+return (tier.b + tier.d) * infl;
+}
+}
+return (table[table.length-1].b + table[table.length-1].d) * infl;
+}
+
+function rcFmt(n){
+if (n === null || n === undefined || isNaN(n)) return '$0';
+const neg = n < 0; n = Math.abs(Math.round(n));
+const s = '$' + n.toLocaleString('en-US');
+return neg ? '-' + s : s;
+}
+function rcPct(n){ return (Math.round(n*10)/10) + '%'; }
+
+// ---- Core model ----
+function rcRunModel(inp){
+const status = inp.filingStatus;
+const spouseMultiplier = inp.spouseMedicare ? 2 : 1;
+const annualIrmaaIncreasePct = 6; // matches typical modeled CMS trend used in source reports; editable via inputs.rcIrmaaIncrease if present
+const irmaaIncreasePct = (typeof inp.irmaaIncreasePct === 'number') ? inp.irmaaIncreasePct : annualIrmaaIncreasePct;
+
+function taxImpactOfDistribution(dist, yearOffset, otherIncome){
+if (dist <= 0) return {tax:0, irmaa:0};
+const brackets = rcBracketsFor(status, inp.taxChangeYear, inp.taxChangeIncrease, yearOffset);
+const baseTax = rcProgressiveTax(otherIncome, brackets) + otherIncome*(inp.stateRate/100);
+const withDistTax = rcProgressiveTax(otherIncome+dist, brackets) + (otherIncome+dist)*(inp.stateRate/100);
+const fedStateTax = withDistTax - baseTax;
+let irmaa = 0;
+if (inp.ownerAge + yearOffset >= inp.medicareAge){
+const baseIrmaa = rcIrmaaMonthly(otherIncome, status, irmaaIncreasePct, yearOffset) * 12 * spouseMultiplier;
+const withIrmaa = rcIrmaaMonthly(otherIncome+dist, status, irmaaIncreasePct, yearOffset) * 12 * spouseMultiplier;
+irmaa = Math.max(0, withIrmaa - baseIrmaa);
+}
+return {tax: fedStateTax, irmaa: irmaa};
+}
+
+const yearsToProject = Math.max(1, inp.endAge - inp.ownerAge + 1);
+
+// ---- Scenario: Keep IRA, RMD only ----
+function runRmdOnly(){
+let balance = inp.iraBalance;
+let reinvested = 0;
+let cumTax = 0, cumIrmaa = 0;
+const rows = [];
+for (let y=0; y<yearsToProject; y++){
+const age = inp.ownerAge + y;
+let rmd = 0;
+const factor = rcRmdFactor(age);
+if (factor) rmd = balance / factor;
+const impact = taxImpactOfDistribution(rmd, y, inp.otherIncome);
+cumTax += impact.tax; cumIrmaa += impact.irmaa;
+const afterTax = rmd - impact.tax;
+reinvested = (reinvested + Math.max(0,afterTax)) * (1 + inp.growthRate/100);
+balance = (balance - rmd) * (1 + inp.growthRate/100);
+const wealthIfDeathNow = balance*(1-inp.beneficiaryRate/100) + reinvested;
+rows.push({year:y+1, age, distribution:rmd, tax:impact.tax, irmaa:impact.irmaa, balance, reinvested, wealth:wealthIfDeathNow});
+}
+return {cumTax, cumIrmaa, total: cumTax+cumIrmaa, rows, finalWealth: rows.length?rows[rows.length-1].wealth:inp.iraBalance};
+}
+
+// ---- Scenario: Keep IRA, level income over the conversion-period length ----
+function runLevelIncome(){
+const years = inp.convertYears;
+const annual = inp.levelIncome || (inp.iraBalance / years);
+let balance = inp.iraBalance;
+let reinvested = 0;
+let cumTax=0, cumIrmaa=0;
+const rows = [];
+for (let y=0; y<yearsToProject; y++){
+const age = inp.ownerAge + y;
+const dist = (y < years) ? Math.min(annual, balance) : 0;
+const impact = taxImpactOfDistribution(dist, y, inp.otherIncome);
+cumTax += impact.tax; cumIrmaa += impact.irmaa;
+const afterTax = dist - impact.tax;
+reinvested = (reinvested + Math.max(0,afterTax)) * (1 + inp.growthRate/100);
+balance = (balance - dist) * (1 + inp.growthRate/100);
+const wealthIfDeathNow = balance*(1-inp.beneficiaryRate/100) + reinvested;
+rows.push({year:y+1, age, distribution:dist, tax:impact.tax, irmaa:impact.irmaa, balance, reinvested, wealth:wealthIfDeathNow});
+}
+return {cumTax, cumIrmaa, total: cumTax+cumIrmaa, rows, finalWealth: rows.length?rows[rows.length-1].wealth:inp.iraBalance};
+}
+
+// ---- Scenario: Convert to Roth over N years ----
+function runConversion(years){
+const perYear = inp.iraBalance / years;
+let balance = inp.iraBalance;
+let rothBalance = 0;
+let cumTax=0, cumIrmaa=0;
+const rows = [];
+for (let y=0; y<yearsToProject; y++){
+const age = inp.ownerAge + y;
+const convertedThisYear = (y < years) ? Math.min(perYear, balance) : 0;
+const impact = taxImpactOfDistribution(convertedThisYear, y, inp.otherIncome);
+cumTax += impact.tax; cumIrmaa += impact.irmaa;
+balance = (balance - convertedThisYear) * (1 + inp.growthRate/100);
+rothBalance = (rothBalance + convertedThisYear) * (1 + inp.growthRate/100);
+const wealthIfDeathNow = rothBalance + balance*(1-inp.beneficiaryRate/100); // any un-converted remainder still IRA
+rows.push({year:y+1, age, converted:convertedThisYear, tax:impact.tax, irmaa:impact.irmaa, rothBalance, iraRemainder:balance, wealth:wealthIfDeathNow});
+}
+return {cumTax, cumIrmaa, total: cumTax+cumIrmaa, rows, finalWealth: rows.length?rows[rows.length-1].wealth:inp.iraBalance};
+}
+
+const rmdOnly = runRmdOnly();
+const levelIncome = runLevelIncome();
+const convert = runConversion(inp.convertYears);
+
+// ---- Period options 1-10 years ----
+const periodOptions = [];
+for (let n=1;n<=10;n++){
+const r = runConversion(n);
+periodOptions.push({years:n, tax:r.cumTax, irmaa:r.cumIrmaa, total:r.cumTax+r.cumIrmaa, wealth:r.finalWealth});
+}
+
+// ---- Break-even, year by year (RMD-only IRA path vs. Roth conversion path) ----
+const breakEven = [];
+const maxRows = Math.min(rmdOnly.rows.length, convert.rows.length);
+for (let i=0;i<maxRows;i++){
+breakEven.push({year:i+1, age:rmdOnly.rows[i].age, iraWealth:rmdOnly.rows[i].wealth, rothWealth:convert.rows[i].wealth});
+}
+
+return {scenarios:{rmdOnly, levelIncome, convert}, periodOptions, breakEven, inputs:inp};
+}
+
+// ---- UI wiring ----
+window.openRothCalcModal = function(){
+document.getElementById('rothCalcOverlay').classList.add('open');
+document.body.style.overflow = 'hidden';
+};
+window.closeRothCalcModal = function(){
+document.getElementById('rothCalcOverlay').classList.remove('open');
+document.body.style.overflow = '';
+};
+
+window.rcSwitchTab = function(tab){
+const newBtn = document.getElementById('rcTabNewBtn');
+const savedBtn = document.getElementById('rcTabSavedBtn');
+if (tab === 'new'){
+document.getElementById('rcPanelNew').style.display = '';
+document.getElementById('rcPanelSaved').style.display = 'none';
+newBtn.classList.remove('ghost'); savedBtn.classList.add('ghost');
+} else {
+document.getElementById('rcPanelNew').style.display = 'none';
+document.getElementById('rcPanelSaved').style.display = '';
+savedBtn.classList.remove('ghost'); newBtn.classList.add('ghost');
+rcLoadTeamReports();
+}
+};
+
+function rcCollectInputs(){
+return {
+clientName: document.getElementById('rcClientName').value.trim(),
+iraBalance: parseFloat(document.getElementById('rcIraBalance').value)||0,
+growthRate: parseFloat(document.getElementById('rcGrowthRate').value)||0,
+ownerAge: parseInt(document.getElementById('rcOwnerAge').value)||65,
+rmdStartAge: parseInt(document.getElementById('rcRmdStartAge').value)||73,
+endAge: parseInt(document.getElementById('rcEndAge').value)||95,
+filingStatus: document.getElementById('rcFilingStatus').value,
+otherIncome: parseFloat(document.getElementById('rcOtherIncome').value)||0,
+stateRate: parseFloat(document.getElementById('rcStateRate').value)||0,
+medicareAge: parseInt(document.getElementById('rcMedicareAge').value)||65,
+spouseMedicare: document.getElementById('rcSpouseMedicare').checked,
+beneficiaryRate: parseFloat(document.getElementById('rcBeneficiaryRate').value)||0,
+convertStartAge: parseInt(document.getElementById('rcConvertStartAge').value)||65,
+convertYears: Math.max(1, Math.min(10, parseInt(document.getElementById('rcConvertYears').value)||3)),
+levelIncome: parseFloat(document.getElementById('rcLevelIncome').value) || 0,
+taxChangeYear: parseInt(document.getElementById('rcTaxChangeYear').value)||0,
+taxChangeIncrease: parseFloat(document.getElementById('rcTaxChangeIncrease').value)||0
+};
+}
+
+let rcLastResults = null;
+
+window.rcCalculate = function(){
+const inp = rcCollectInputs();
+if (!inp.iraBalance || inp.iraBalance <= 0){
+if (typeof showSnuToast==='function') showSnuToast('⚠ Enter an IRA balance greater than $0.');
+return;
+}
+rcLastResults = rcRunModel(inp);
+rcRender(rcLastResults);
+document.getElementById('rcResults').style.display = '';
+};
+
+function rcRender(res){
+const s = res.scenarios;
+// Scenario cards
+const cardsEl = document.getElementById('rcScenarioCards');
+function card(title, data, colorVar){
+return '<div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:16px;">'+
+'<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted-2);margin-bottom:8px;">'+title+'</div>'+
+'<div style="font-size:22px;font-weight:800;color:'+colorVar+';margin-bottom:6px;">'+rcFmt(data.total)+'</div>'+
+'<div style="font-size:11px;color:var(--muted-2);">Taxes: '+rcFmt(data.cumTax)+' &nbsp;·&nbsp; IRMAA: '+rcFmt(data.cumIrmaa)+'</div>'+
+'<div style="font-size:11px;color:var(--muted-2);margin-top:4px;">Total wealth at end of projection: '+rcFmt(data.finalWealth)+'</div>'+
+'</div>';
+}
+cardsEl.innerHTML = card('Keep IRA — RMD Only', s.rmdOnly, 'var(--rose)') +
+card('Keep IRA — Level Income', s.levelIncome, 'var(--gold)') +
+card('Convert to Roth ('+res.inputs.convertYears+' yr)', s.convert, 'var(--green)');
+
+// Period options table
+const best = res.periodOptions.reduce((a,b)=> b.wealth>a.wealth?b:a, res.periodOptions[0]);
+let ph = '<thead><tr style="border-bottom:1px solid var(--border-2);text-align:left;">'+
+'<th style="padding:8px;">Conversion Period</th><th style="padding:8px;">Total Taxes</th><th style="padding:8px;">IRMAA Impact</th><th style="padding:8px;">Total (Tax+IRMAA)</th><th style="padding:8px;">Total Wealth Generated</th></tr></thead><tbody>';
+res.periodOptions.forEach(function(p){
+const hl = p.years===best.years ? 'background:rgba(52,211,153,.12);' : '';
+ph += '<tr style="border-bottom:1px solid var(--border);'+hl+'"><td style="padding:8px;">'+p.years+' Year'+(p.years>1?'s':'')+(p.years===best.years?' ★':'')+'</td><td style="padding:8px;">'+rcFmt(p.tax)+'</td><td style="padding:8px;">'+rcFmt(p.irmaa)+'</td><td style="padding:8px;">'+rcFmt(p.total)+'</td><td style="padding:8px;">'+rcFmt(p.wealth)+'</td></tr>';
+});
+ph += '</tbody>';
+document.getElementById('rcPeriodTable').innerHTML = ph;
+
+// Year by year (selected conversion period)
+let yh = '<thead><tr style="border-bottom:1px solid var(--border-2);text-align:left;">'+
+'<th style="padding:8px;">Year</th><th style="padding:8px;">Age</th><th style="padding:8px;">Converted</th><th style="padding:8px;">Tax</th><th style="padding:8px;">IRMAA</th><th style="padding:8px;">Roth Balance</th><th style="padding:8px;">IRA Remainder</th></tr></thead><tbody>';
+s.convert.rows.slice(0, Math.max(res.inputs.convertYears+2, 5)).forEach(function(r){
+yh += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">'+r.year+'</td><td style="padding:8px;">'+r.age+'</td><td style="padding:8px;">'+rcFmt(r.converted)+'</td><td style="padding:8px;">'+rcFmt(r.tax)+'</td><td style="padding:8px;">'+rcFmt(r.irmaa)+'</td><td style="padding:8px;">'+rcFmt(r.rothBalance)+'</td><td style="padding:8px;">'+rcFmt(r.iraRemainder)+'</td></tr>';
+});
+yh += '</tbody>';
+document.getElementById('rcYearByYearTable').innerHTML = yh;
+
+// Break-even
+let bh = '<thead><tr style="border-bottom:1px solid var(--border-2);text-align:left;">'+
+'<th style="padding:8px;">Year</th><th style="padding:8px;">Age</th><th style="padding:8px;">Keep IRA (RMD)</th><th style="padding:8px;">Convert to Roth</th></tr></thead><tbody>';
+res.breakEven.forEach(function(b){
+const iraHi = b.iraWealth >= b.rothWealth;
+bh += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">'+b.year+'</td><td style="padding:8px;">'+b.age+'</td>'+
+'<td style="padding:8px;'+(iraHi?'background:rgba(59,130,246,.18);font-weight:700;':'')+'">'+rcFmt(b.iraWealth)+'</td>'+
+'<td style="padding:8px;'+(!iraHi?'background:rgba(52,211,153,.18);font-weight:700;':'')+'">'+rcFmt(b.rothWealth)+'</td></tr>';
+});
+bh += '</tbody>';
+document.getElementById('rcBreakEvenTable').innerHTML = bh;
+}
+
+window.rcReset = function(){
+['rcClientName','rcLevelIncome'].forEach(function(id){document.getElementById(id).value='';});
+document.getElementById('rcIraBalance').value = 1000000;
+document.getElementById('rcGrowthRate').value = 6;
+document.getElementById('rcOwnerAge').value = 65;
+document.getElementById('rcRmdStartAge').value = 73;
+document.getElementById('rcEndAge').value = 95;
+document.getElementById('rcOtherIncome').value = 60000;
+document.getElementById('rcStateRate').value = 5;
+document.getElementById('rcMedicareAge').value = 65;
+document.getElementById('rcSpouseMedicare').checked = false;
+document.getElementById('rcBeneficiaryRate').value = 24;
+document.getElementById('rcConvertStartAge').value = 65;
+document.getElementById('rcConvertYears').value = 3;
+document.getElementById('rcTaxChangeYear').value = 0;
+document.getElementById('rcTaxChangeIncrease').value = 0;
+document.getElementById('rcResults').style.display = 'none';
+rcLastResults = null;
+};
+
+// ---- Print / Export ----
+window.rcPrintReport = function(){
+if (!rcLastResults){ if (typeof showSnuToast==='function') showSnuToast('⚠ Calculate first.'); return; }
+const res = rcLastResults, inp = res.inputs, s = res.scenarios;
+const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+function row(label, val){ return '<tr><td>'+label+'</td><td>'+rcFmt(val)+'</td></tr>'; }
+let periodRows = res.periodOptions.map(function(p){ return '<tr><td>'+p.years+' yr</td><td>'+rcFmt(p.tax)+'</td><td>'+rcFmt(p.irmaa)+'</td><td>'+rcFmt(p.total)+'</td><td>'+rcFmt(p.wealth)+'</td></tr>'; }).join('');
+let beRows = res.breakEven.map(function(b){ return '<tr><td>'+b.year+'</td><td>'+b.age+'</td><td>'+rcFmt(b.iraWealth)+'</td><td>'+rcFmt(b.rothWealth)+'</td></tr>'; }).join('');
+const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Roth Conversion Analysis</title><style>'+
+'body{font-family:Arial,sans-serif;color:#1e293b;padding:40px;max-width:820px;margin:0 auto;}'+
+'h1{font-size:22px;margin-bottom:4px;}h2{font-size:15px;margin:26px 0 8px;}'+
+'.sub{font-size:13px;color:#64748b;margin-bottom:20px;}'+
+'table{width:100%;border-collapse:collapse;margin-bottom:18px;font-size:12.5px;}'+
+'th,td{padding:7px 10px;border-bottom:1px solid #e2e8f0;text-align:left;}th{background:#f3f4f6;}'+
+'.note{font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:14px;margin-top:20px;}'+
+'@media print{body{padding:20px;}}</style></head><body>'+
+'<h1>Roth Conversion Analysis</h1>'+
+'<div class="sub">'+(inp.clientName?'Client: '+inp.clientName+' &nbsp;·&nbsp; ':'')+'Generated: '+date+'</div>'+
+'<h2>Assumptions</h2><table><tr><td>IRA Balance</td><td>'+rcFmt(inp.iraBalance)+'</td></tr><tr><td>Growth Rate</td><td>'+inp.growthRate+'%</td></tr><tr><td>Owner Age</td><td>'+inp.ownerAge+'</td></tr><tr><td>Filing Status</td><td>'+(inp.filingStatus==='joint'?'Married Filing Jointly':'Single')+'</td></tr><tr><td>Conversion Period</td><td>'+inp.convertYears+' years</td></tr><tr><td>Beneficiary Tax Rate</td><td>'+inp.beneficiaryRate+'%</td></tr></table>'+
+'<h2>Scenario Comparison — Lifetime Taxes &amp; IRMAA</h2><table><tr><th>Scenario</th><th>Taxes</th><th>IRMAA</th><th>Total</th></tr>'+
+'<tr><td>Keep IRA — RMD Only</td><td>'+rcFmt(s.rmdOnly.cumTax)+'</td><td>'+rcFmt(s.rmdOnly.cumIrmaa)+'</td><td>'+rcFmt(s.rmdOnly.total)+'</td></tr>'+
+'<tr><td>Keep IRA — Level Income</td><td>'+rcFmt(s.levelIncome.cumTax)+'</td><td>'+rcFmt(s.levelIncome.cumIrmaa)+'</td><td>'+rcFmt(s.levelIncome.total)+'</td></tr>'+
+'<tr><td>Convert to Roth</td><td>'+rcFmt(s.convert.cumTax)+'</td><td>'+rcFmt(s.convert.cumIrmaa)+'</td><td>'+rcFmt(s.convert.total)+'</td></tr></table>'+
+'<h2>Conversion Period Options</h2><table><tr><th>Period</th><th>Taxes</th><th>IRMAA</th><th>Total</th><th>Total Wealth Generated</th></tr>'+periodRows+'</table>'+
+'<h2>Break-Even — Total After-Tax Wealth by Year of Death</h2><table><tr><th>Year</th><th>Age</th><th>Keep IRA</th><th>Convert to Roth</th></tr>'+beRows+'</table>'+
+'<div class="note">This is a hypothetical, educational illustration only and not a guarantee of future performance, taxes, or fees. Built using 2026 IRS tax brackets, the IRS Uniform Lifetime Table, and 2026 Medicare IRMAA brackets — all subject to change. This material is not intended to provide tax, legal, or investment advice; consult a qualified professional about your individual situation. ⚠️ Review with compliance before use with clients.</div>'+
+'</body></html>';
+const w = window.open('', '_blank', 'width=860,height=760,scrollbars=yes');
+if (!w){ if (typeof showSnuToast==='function') showSnuToast('⚠ Allow pop-ups to print.'); return; }
+w.document.open(); w.document.write(html); w.document.close();
+w.focus(); setTimeout(function(){ w.print(); }, 500);
+};
+
+// ---- Supabase: save / load team reports ----
+const RC_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+const RC_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const RC_HUB = 'medi';
+
+function rcSession(){ try{ return JSON.parse(sessionStorage.getItem('medi_hub_session')||'{}')||{}; }catch(e){ return {}; } }
+function rcIsAdmin(){ const s=rcSession(), p=s.permissions||{}; return String(s.role||'').toLowerCase()==='admin' || p.admin===true || p.admin==='true'; }
+function rcMyEmail(){ return String(rcSession().email||'').trim().toLowerCase(); }
+function rcMyName(){ return rcSession().name || rcSession().email || 'Agent'; }
+
+window.rcSaveToTeam = async function(){
+if (!rcLastResults){ if (typeof showSnuToast==='function') showSnuToast('⚠ Calculate first.'); return; }
+const statusEl = document.getElementById('rcSaveStatus');
+const email = rcMyEmail();
+if (!email){ statusEl.textContent = '⚠ Log in via Agent Login (top of Hub) before saving.'; return; }
+statusEl.textContent = 'Saving…';
+const payload = {
+hub: RC_HUB,
+agent_name: rcMyName(),
+agent_email: email,
+client_name: rcLastResults.inputs.clientName || '(unnamed client)',
+inputs: rcLastResults.inputs,
+results: {
+scenarios: {
+rmdOnly: {cumTax:rcLastResults.scenarios.rmdOnly.cumTax, cumIrmaa:rcLastResults.scenarios.rmdOnly.cumIrmaa, total:rcLastResults.scenarios.rmdOnly.total, finalWealth:rcLastResults.scenarios.rmdOnly.finalWealth},
+levelIncome: {cumTax:rcLastResults.scenarios.levelIncome.cumTax, cumIrmaa:rcLastResults.scenarios.levelIncome.cumIrmaa, total:rcLastResults.scenarios.levelIncome.total, finalWealth:rcLastResults.scenarios.levelIncome.finalWealth},
+convert: {cumTax:rcLastResults.scenarios.convert.cumTax, cumIrmaa:rcLastResults.scenarios.convert.cumIrmaa, total:rcLastResults.scenarios.convert.total, finalWealth:rcLastResults.scenarios.convert.finalWealth}
+},
+periodOptions: rcLastResults.periodOptions
+}
+};
+try{
+const resp = await fetch(RC_SUPA_URL + '/rest/v1/roth_conversion_reports', {
+method:'POST',
+headers:{'Content-Type':'application/json','apikey':RC_SUPA_KEY,'Authorization':'Bearer '+RC_SUPA_KEY,'Prefer':'return=minimal'},
+body: JSON.stringify(payload)
+});
+if (!resp.ok) throw new Error('HTTP '+resp.status);
+statusEl.textContent = '✓ Saved to team reports.';
+}catch(e){
+console.error('[Roth Calc save error]', e);
+statusEl.textContent = '✗ Save failed — check Supabase table exists (see setup notes). '+(e.message||'');
+}
+};
+
+let rcSavedReports = [];
+window.rcLoadTeamReports = async function(){
+const listEl = document.getElementById('rcSavedList');
+const scopeNote = document.getElementById('rcAdminScopeNote');
+scopeNote.textContent = rcIsAdmin() ? ' (admin view: all agents)' : '';
+listEl.innerHTML = '<div style="font-size:12px;color:var(--muted-2);">Loading…</div>';
+try{
+const resp = await fetch(RC_SUPA_URL + '/rest/v1/roth_conversion_reports?hub=eq.'+RC_HUB+'&select=*&order=created_at.desc', {
+headers:{'apikey':RC_SUPA_KEY,'Authorization':'Bearer '+RC_SUPA_KEY}
+});
+if (!resp.ok) throw new Error('HTTP '+resp.status);
+const all = await resp.json();
+const myEmail = rcMyEmail();
+rcSavedReports = rcIsAdmin() ? all : all.filter(function(r){ return String(r.agent_email||'').toLowerCase() === myEmail; });
+rcRenderSavedList();
+}catch(e){
+console.error('[Roth Calc load error]', e);
+listEl.innerHTML = '<div style="font-size:12px;color:#fb7185;">Could not load saved reports — check Supabase table exists (see setup notes). '+(e.message||'')+'</div>';
+}
+};
+
+window.rcRenderSavedList = function(){
+const listEl = document.getElementById('rcSavedList');
+const q = (document.getElementById('rcSavedSearch').value||'').toLowerCase();
+const filtered = rcSavedReports.filter(function(r){
+return !q || (r.client_name||'').toLowerCase().includes(q) || (r.agent_name||'').toLowerCase().includes(q);
+});
+if (!filtered.length){ listEl.innerHTML = '<div style="font-size:12px;color:var(--muted-2);">No saved reports yet.</div>'; return; }
+listEl.innerHTML = filtered.map(function(r){
+const d = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+const total = r.results && r.results.scenarios ? rcFmt(r.results.scenarios.convert.total) : '$0';
+return '<div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">'+
+'<div><strong>'+(r.client_name||'(unnamed client)')+'</strong><div style="font-size:11px;color:var(--muted-2);">'+(r.agent_name||r.agent_email||'')+' · '+d+' · Convert total: '+total+'</div></div>'+
+'<div style="display:flex;gap:8px;">'+
+'<button class="life-calc-btn ghost" style="padding:6px 12px;font-size:12px;" onclick="rcLoadSavedReport(\''+r.id+'\')">Load</button>'+
+'<button class="life-calc-btn ghost" style="padding:6px 12px;font-size:12px;" onclick="rcDeleteSavedReport(\''+r.id+'\')">Delete</button>'+
+'</div></div>';
+}).join('');
+};
+
+window.rcLoadSavedReport = function(id){
+const r = rcSavedReports.find(function(x){ return String(x.id)===String(id); });
+if (!r) return;
+const inp = r.inputs;
+document.getElementById('rcClientName').value = inp.clientName||'';
+document.getElementById('rcIraBalance').value = inp.iraBalance;
+document.getElementById('rcGrowthRate').value = inp.growthRate;
+document.getElementById('rcOwnerAge').value = inp.ownerAge;
+document.getElementById('rcRmdStartAge').value = inp.rmdStartAge;
+document.getElementById('rcEndAge').value = inp.endAge;
+document.getElementById('rcFilingStatus').value = inp.filingStatus;
+document.getElementById('rcOtherIncome').value = inp.otherIncome;
+document.getElementById('rcStateRate').value = inp.stateRate;
+document.getElementById('rcMedicareAge').value = inp.medicareAge;
+document.getElementById('rcSpouseMedicare').checked = !!inp.spouseMedicare;
+document.getElementById('rcBeneficiaryRate').value = inp.beneficiaryRate;
+document.getElementById('rcConvertStartAge').value = inp.convertStartAge;
+document.getElementById('rcConvertYears').value = inp.convertYears;
+document.getElementById('rcLevelIncome').value = inp.levelIncome||'';
+document.getElementById('rcTaxChangeYear').value = inp.taxChangeYear;
+document.getElementById('rcTaxChangeIncrease').value = inp.taxChangeIncrease;
+rcSwitchTab('new');
+rcCalculate();
+};
+
+window.rcDeleteSavedReport = async function(id){
+if (!confirm('Delete this saved report for everyone who can see it?')) return;
+try{
+const resp = await fetch(RC_SUPA_URL + '/rest/v1/roth_conversion_reports?id=eq.'+id, {
+method:'DELETE',
+headers:{'apikey':RC_SUPA_KEY,'Authorization':'Bearer '+RC_SUPA_KEY}
+});
+if (!resp.ok) throw new Error('HTTP '+resp.status);
+rcLoadTeamReports();
+}catch(e){
+alert('Delete failed: '+(e.message||e));
+}
+};
+
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeRothCalcModal(); });
+
+})();
+</script>
 
 <!-- Phase 89: Cert CSV global Supabase update + verification applied to Phase 88 base -->
 </body>
