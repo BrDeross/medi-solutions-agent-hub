@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Retirement Tax Bill</title>
+<style>
+/* ============================================================
+   BRANDING — edit these to re-theme the whole page
+   ============================================================ */
+:root{
+  --ink:        #16233b;   /* primary dark navy — headlines, stamp */
+  --ink-soft:   #3c4a63;   /* secondary text */
+  --paper:      #f6f2e9;   /* page background — aged paper */
+  --paper-2:    #efe9db;   /* card background */
+  --line:       #d8cfba;   /* hairline rules */
+  --accent:     #9c3b2e;   /* brick-red accent — stamp ink, CTA */
+  --accent-2:   #c98a1c;   /* amber — secondary accent */
+  --white:      #fffdf8;
+  --shadow-sm:  0 2px 4px rgba(22,35,59,.12), 0 1px 2px rgba(22,35,59,.14);
+  --shadow-md:  0 8px 18px rgba(22,35,59,.18), 0 2px 6px rgba(22,35,59,.16);
+  --shadow-lg:  0 22px 48px rgba(22,35,59,.26), 0 8px 18px rgba(22,35,59,.18);
+  --shadow-xl:  0 30px 64px rgba(22,35,59,.34), 0 10px 24px rgba(22,35,59,.22);
+  --shadow-inset: inset 0 2px 4px rgba(22,35,59,.20);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{ font-family:"Lora","Georgia",serif; }
+.mono{ font-family:"IBM Plex Mono","Courier New",monospace; }
+
+a{color:inherit;}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 70px;}
+
+/* ---- Notice header bar ---- */
+.notice-bar{
+  background:var(--ink);
+  color:var(--paper);
+  padding:14px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  font-weight:600;
+  box-shadow:0 3px 10px rgba(22,35,59,.18);
+  position:relative;
+  z-index:2;
+}
+.notice-bar span.agency{ opacity:.85; }
+
+.hero{
+  padding:56px 0 34px;
+  text-align:center;
+  border-bottom:2px dashed var(--line);
+  margin-bottom:40px;
+}
+.hero .eyebrow{
+  font-size:12px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:700;
+  margin-bottom:14px;
+}
+.hero h1{
+  font-size:clamp(32px,6vw,52px);
+  line-height:1.08;
+  margin:0 0 18px;
+  font-weight:600;
+  color:var(--ink);
+}
+.hero h1 em{ font-style:italic; color:var(--accent); }
+.hero p{
+  font-size:16px;
+  color:var(--ink-soft);
+  max-width:520px;
+  margin:0 auto;
+  line-height:1.6;
+}
+
+/* ---- Trust bar ---- */
+.trust-bar{
+  background:var(--ink);
+  color:var(--paper);
+  text-align:center;
+  padding:14px 20px;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.4px;
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+  margin-bottom:44px;
+  box-shadow:var(--shadow-md);
+}
+.trust-bar span.dot{ margin:0 16px; opacity:.45; }
+.trust-bar span.item{ display:inline-flex; align-items:center; gap:6px; }
+
+/* ---- How it works / steps ---- */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+  margin:0 0 46px;
+  text-align:center;
+}
+@media (max-width:600px){ .steps{ grid-template-columns:1fr; gap:34px; } }
+.step-icon{
+  width:64px;
+  height:64px;
+  margin:0 auto 16px;
+  border-radius:50%;
+  background:var(--white);
+  border:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--accent);
+  box-shadow:var(--shadow-md);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.step:hover .step-icon{
+  transform:translateY(-4px) scale(1.06);
+  box-shadow:var(--shadow-xl);
+}
+.step-icon svg{ width:28px; height:28px; }
+.step h3{
+  font-family:"Lora","Georgia",serif;
+  font-size:21px;
+  font-weight:600;
+  color:var(--ink);
+  margin:0 0 6px;
+}
+.step p{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  line-height:1.5;
+  margin:0;
+  max-width:200px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* ---- Form card ---- */
+.card{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:34px 32px;
+  margin-bottom:34px;
+  box-shadow:var(--shadow-lg);
+}
+.card-label{
+  font-size:11px;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:700;
+  margin-bottom:6px;
+}
+.card h2{
+  font-size:22px;
+  margin:0 0 22px;
+  font-weight:600;
+}
+.field{ margin-bottom:20px; }
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:var(--ink);
+  margin-bottom:7px;
+}
+.field input[type="number"],
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="tel"]{
+  width:100%;
+  padding:12px 14px;
+  font-size:15px;
+  font-family:inherit;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:var(--paper);
+  color:var(--ink);
+  box-shadow:var(--shadow-inset);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+.field input:hover{
+  transform:translateY(-2px) scale(1.015);
+  background:var(--white);
+  box-shadow:var(--shadow-md);
+}
+.field input:focus{
+  outline:none;
+  border-color:var(--accent);
+  background:var(--white);
+  transform:translateY(-3px) scale(1.02);
+  box-shadow:var(--shadow-lg), 0 0 0 3px rgba(156,59,46,.18);
+}
+.rate-group{ display:flex; gap:8px; flex-wrap:wrap; }
+.slider-row{ display:flex; align-items:center; gap:16px; margin-top:6px; }
+.slider-value{
+  min-width:56px;
+  text-align:center;
+  font-family:"IBM Plex Mono",monospace;
+  font-size:20px;
+  font-weight:700;
+  color:var(--accent);
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:6px 4px;
+  box-shadow:var(--shadow-inset);
+}
+input[type="range"]{
+  flex:1;
+  -webkit-appearance:none;
+  appearance:none;
+  height:6px;
+  border-radius:3px;
+  background:linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--line) 50%, var(--line) 100%);
+  outline:none;
+  box-shadow:var(--shadow-inset);
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--ink);
+  border:3px solid var(--white);
+  box-shadow:0 0 0 1px var(--accent), 0 3px 8px rgba(22,35,59,.35);
+  cursor:pointer;
+  margin-top:0;
+  transition:transform .1s ease;
+}
+input[type="range"]::-webkit-slider-thumb:active{ transform:scale(1.12); }
+input[type="range"]::-moz-range-thumb{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--ink);
+  border:3px solid var(--white);
+  box-shadow:0 0 0 1px var(--accent), 0 3px 8px rgba(22,35,59,.35);
+  cursor:pointer;
+}
+input[type="range"]::-moz-range-track{
+  height:6px;
+  border-radius:3px;
+  background:var(--line);
+}
+.slider-ticks{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--ink-soft);
+  margin-top:6px;
+  padding:0 2px;
+}
+.rate-btn{
+  flex:1;
+  min-width:64px;
+  padding:11px 10px;
+  text-align:center;
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:5px;
+  cursor:pointer;
+  font-weight:700;
+  font-size:15px;
+  color:var(--ink-soft);
+  box-shadow:var(--shadow-sm);
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.rate-btn:hover{
+  transform:translateY(-4px) scale(1.05);
+  box-shadow:var(--shadow-xl);
+  background:var(--white);
+}
+.rate-btn.active{
+  background:var(--ink);
+  border-color:var(--ink);
+  color:var(--paper);
+  box-shadow:var(--shadow-inset), 0 1px 0 rgba(255,255,255,.06);
+  transform:translateY(0) scale(1);
+}
+.rate-btn.active:hover{
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:var(--shadow-lg);
+}
+
+.btn{
+  display:inline-block;
+  width:100%;
+  padding:15px 20px;
+  background:linear-gradient(180deg, #ad4535 0%, var(--accent) 100%);
+  color:var(--white);
+  border:none;
+  border-radius:5px;
+  font-family:inherit;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.3px;
+  cursor:pointer;
+  text-align:center;
+  box-shadow:0 5px 0 #5c1e14, var(--shadow-lg);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover{
+  filter:brightness(1.06);
+  transform:translateY(-3px);
+  box-shadow:0 8px 0 #5c1e14, var(--shadow-xl);
+}
+.btn:active{
+  transform:translateY(3px);
+  box-shadow:0 2px 0 #5c1e14, var(--shadow-sm);
+}
+.btn.secondary{
+  background:transparent;
+  border:1.5px solid var(--ink);
+  color:var(--ink);
+  box-shadow:none;
+}
+.btn.secondary:hover{ box-shadow:var(--shadow-md); transform:translateY(-2px); }
+.btn.secondary:active{ box-shadow:var(--shadow-inset); transform:translateY(0); }
+.helptext{ font-size:12px; color:var(--ink-soft); margin-top:8px; text-align:center; }
+
+/* ---- Result / stamped bill ---- */
+.bill{
+  position:relative;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:0;
+  margin-bottom:34px;
+  overflow:hidden;
+  display:none;
+  box-shadow:var(--shadow-lg);
+}
+.bill-head{
+  background:var(--ink);
+  color:var(--paper);
+  padding:16px 28px;
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  font-weight:700;
+}
+.bill-body{ padding:32px 32px 30px; position:relative; }
+.bill-row{
+  display:flex;
+  justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+  font-size:14.5px;
+}
+.bill-row span:first-child{ color:var(--ink-soft); }
+.bill-row span:last-child{ font-weight:700; }
+.bill-total{
+  margin-top:18px;
+  padding-top:18px;
+  border-top:2px solid var(--ink);
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+}
+.bill-total .label{ font-size:15px; font-weight:700; }
+.bill-total .amount{
+  font-size:40px;
+  font-weight:700;
+  color:var(--accent);
+}
+
+.locked-veil{
+  position:absolute; inset:0;
+  backdrop-filter:blur(7px);
+  background:rgba(246,242,233,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:5;
+}
+.stamp{
+  position:absolute;
+  top:38%; left:50%;
+  transform:translate(-50%,-50%) rotate(-9deg);
+  border:4px solid var(--accent);
+  color:var(--accent);
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:10px 18px;
+  border-radius:6px;
+  opacity:.85;
+  pointer-events:none;
+  z-index:6;
+  white-space:nowrap;
+  box-shadow:0 6px 16px rgba(156,59,46,.25);
+}
+
+.gate{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:30px 28px;
+  margin-bottom:34px;
+  box-shadow:var(--shadow-lg);
+}
+.gate h3{ font-size:18px; margin:0 0 6px; }
+.gate p{ font-size:13.5px; color:var(--ink-soft); margin:0 0 20px; line-height:1.55; }
+.gate-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; margin-bottom:18px; }
+.gate-grid .full{ grid-column:1 / -1; }
+@media (max-width:480px){ .gate-grid{ grid-template-columns:1fr; } }
+
+.comparison{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px; }
+@media (max-width:520px){ .comparison{ grid-template-columns:1fr; } }
+.comp-col{ border:1px solid var(--line); border-radius:6px; padding:18px; box-shadow:var(--shadow-md); transition:transform .18s ease, box-shadow .18s ease; }
+.comp-col:hover{ transform:translateY(-6px) scale(1.02); box-shadow:var(--shadow-xl); }
+.comp-col.deferred{ background:#fbf1ee; border-color:#e6c3ba; }
+.comp-col.free{ background:#f0f6ee; border-color:#c8dcc0; }
+.comp-col .tag{ font-size:11px; text-transform:uppercase; letter-spacing:.8px; font-weight:700; margin-bottom:8px; }
+.comp-col.deferred .tag{ color:var(--accent); }
+.comp-col.free .tag{ color:#3f6e33; }
+.comp-col .big{ font-size:26px; font-weight:700; }
+.comp-col.deferred .big{ color:var(--accent); }
+.comp-col.free .big{ color:#3f6e33; }
+.comp-col p{ font-size:12px; color:var(--ink-soft); margin:8px 0 0; line-height:1.5; }
+
+.cta{
+  text-align:center;
+  padding:36px 28px;
+  background:linear-gradient(180deg, #1c2c48 0%, var(--ink) 100%);
+  color:var(--paper);
+  border-radius:6px;
+  margin-bottom:34px;
+  box-shadow:var(--shadow-lg);
+}
+.cta h3{ font-size:22px; margin:0 0 10px; font-weight:600; }
+.cta p{ font-size:14px; opacity:.85; margin:0 0 22px; }
+.cta .btn{ max-width:320px; margin:0 auto; }
+.cta .phone{ margin-top:14px; font-size:14px; opacity:.9; }
+
+.disclosure{
+  font-size:11px;
+  color:var(--ink-soft);
+  line-height:1.7;
+  border-top:1px solid var(--line);
+  padding-top:18px;
+  opacity:.85;
+}
+.status-msg{ font-size:12px; margin-top:10px; text-align:center; min-height:16px; }
+</style>
+</head>
+<body>
+
+<div class="notice-bar">
+  <span>Retirement Tax Notice</span>
+  <span class="agency" id="agencyBarName">Medi Solutions Insurance Agency</span>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Every retirement account has a bill attached</div>
+    <h1 class="serif">What's <em>your</em><br>Retirement Tax Bill?</h1>
+    <p>Your IRA or 401(k) has grown tax-deferred — which means the IRS has a bill coming due. Answer four quick questions to see your number.</p>
+  </div>
+
+  <div class="trust-bar">
+    <span class="item">No-Cost Report</span><span class="dot">•</span><span class="item">Instant Results</span><span class="dot">•</span><span class="item">Privacy Protected</span>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M2 20h20"/><path d="M9 20l1-4h4l1 4"/></svg>
+      </div>
+      <h3 class="serif">Step 1:</h3>
+      <p>Enter your information</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="1.5"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+      </div>
+      <h3 class="serif">Step 2:</h3>
+      <p>Receive immediate results</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M18 6L6 18"/></svg>
+      </div>
+      <h3 class="serif">Step 3:</h3>
+      <p>Discover options to address your tax liability</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Step 1</div>
+    <h2 class="serif">Tell us about your account</h2>
+
+    <div class="field">
+      <label for="rtbAge">Your Current Age</label>
+      <input type="number" id="rtbAge" placeholder="e.g. 58" min="18" max="90">
+    </div>
+
+    <div class="field">
+      <label for="rtbRetireAge">Planned Retirement Age</label>
+      <input type="number" id="rtbRetireAge" placeholder="e.g. 65" min="18" max="90">
+    </div>
+
+    <div class="field">
+      <label for="rtbBalance">Current IRA / 401(k) Balance</label>
+      <input type="number" id="rtbBalance" placeholder="e.g. 500000" min="0">
+    </div>
+
+    <div class="field">
+      <label for="rtbGrowthSlider">Expected Annual Growth Rate</label>
+      <div class="slider-row">
+        <input type="range" id="rtbGrowthSlider" min="2" max="10" step="0.5" value="6">
+        <div class="slider-value" id="rtbGrowthSliderValue">6%</div>
+      </div>
+      <div class="slider-ticks"><span>2%</span><span>6%</span><span>10%</span></div>
+    </div>
+
+    <div class="field">
+      <label for="rtbTaxRate">Expected Tax Rate in Retirement</label>
+      <div class="rate-group">
+        <div class="rate-btn" data-taxrate="22">22%</div>
+        <div class="rate-btn active" data-taxrate="24">24%</div>
+        <div class="rate-btn" data-taxrate="32">32%</div>
+        <div class="rate-btn" data-taxrate="35">35%</div>
+      </div>
+    </div>
+
+    <button class="btn" id="rtbCalcBtn" type="button">Calculate My Tax Bill →</button>
+    <div class="helptext">Takes about 15 seconds. No obligation.</div>
+  </div>
+
+  <div class="bill" id="rtbBill">
+    <div class="bill-head"><span>Notice of Estimated Tax Liability</span><span id="rtbBillDate"></span></div>
+    <div class="bill-body">
+      <div class="bill-row"><span>Projected Account Balance at Retirement</span><span id="rtbProjBalance">$0</span></div>
+      <div class="bill-row"><span>Assumed Growth Rate</span><span id="rtbUsedRate">0%</span></div>
+      <div class="bill-row"><span>Assumed Tax Rate in Retirement</span><span id="rtbUsedTax">0%</span></div>
+      <div class="bill-total"><span class="label">Your Estimated Retirement Tax Bill</span><span class="amount" id="rtbTaxBill">$0</span></div>
+
+      <div class="locked-veil" id="rtbVeil"></div>
+      <div class="stamp" id="rtbStamp">Enter Info Below to Unlock</div>
+    </div>
+  </div>
+
+  <div class="gate" id="rtbGate" style="display:none;">
+    <h3 class="serif">See your full report</h3>
+    <p>Enter your name and email to unlock your complete tax breakdown, including how much of that bill could potentially be reduced.</p>
+    <div class="gate-grid">
+      <div class="field full" style="margin-bottom:0;">
+        <label for="rtbFirstName">First Name</label>
+        <input type="text" id="rtbFirstName" placeholder="Jane">
+      </div>
+      <div class="field full" style="margin-bottom:0;">
+        <label for="rtbLastName">Last Name</label>
+        <input type="text" id="rtbLastName" placeholder="Client">
+      </div>
+      <div class="field full" style="margin-bottom:0;">
+        <label for="rtbEmail">Email</label>
+        <input type="email" id="rtbEmail" placeholder="jane@email.com">
+      </div>
+      <div class="field full" style="margin-bottom:0;">
+        <label for="rtbPhone">Phone (optional)</label>
+        <input type="tel" id="rtbPhone" placeholder="(555) 555-5555">
+      </div>
+    </div>
+    <button class="btn" id="rtbUnlockBtn" type="button">Unlock My Full Report →</button>
+    <div class="status-msg" id="rtbGateStatus"></div>
+  </div>
+
+  <div id="rtbFullReport" style="display:none;">
+    <div class="card">
+      <div class="card-label">Your Full Report</div>
+      <h2 class="serif">Two ways this could play out</h2>
+      <div class="comparison">
+        <div class="comp-col deferred">
+          <div class="tag">Stay Tax-Deferred</div>
+          <div class="big" id="rtbCompDeferred">$0</div>
+          <p>Taxes owed on your full projected balance, due whenever you withdraw — often right when you can least control your tax bracket.</p>
+        </div>
+        <div class="comp-col free">
+          <div class="tag">Explore a Tax-Free Approach</div>
+          <div class="big" id="rtbCompFree">$0</div>
+          <p>An illustration of the potential tax bill if a portion of this balance were repositioned into a tax-free strategy ahead of retirement.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <h3 class="serif">Let's see what your options actually are</h3>
+      <p>This is a hypothetical estimate — a real conversation can show you what's actually possible for your situation.</p>
+      <a class="btn" href="#" id="rtbCtaBtn" target="_blank" rel="noopener">Schedule Your Free Consultation</a>
+      <div class="phone">Or call us directly: <strong id="agencyPhoneText">(555) 555-5555</strong></div>
+    </div>
+  </div>
+
+  <div class="disclosure">
+    This report is a hypothetical, educational illustration based on the inputs provided and general assumptions about tax rates and investment growth. It is not intended to predict future performance, taxes, or fees, and is not a guarantee of any kind. This material does not constitute tax, legal, or investment advice. Please consult a qualified tax professional before making any decisions about your retirement accounts. <span id="agencyNameFooter">Medi Solutions Insurance Agency</span> is not a CPA firm.
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+/* ============================================================
+   BRANDING / CONFIG — edit these for your agency
+   ============================================================ */
+const AGENCY_NAME  = 'Medi Solutions Insurance Agency';
+const AGENCY_PHONE = '(555) 555-5555';
+const BOOKING_URL  = 'https://calendly.com/your-scheduling-link'; // <-- replace with your real booking link
+
+document.getElementById('agencyBarName').textContent = AGENCY_NAME;
+document.getElementById('agencyPhoneText').textContent = AGENCY_PHONE;
+document.getElementById('agencyNameFooter').textContent = AGENCY_NAME;
+document.getElementById('rtbCtaBtn').href = BOOKING_URL;
+
+/* ============================================================
+   Supabase (same project as the internal Hub; anon key only)
+   ============================================================ */
+const RTB_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+const RTB_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const RTB_HUB = 'medi';
+
+/* ---- state ---- */
+let selectedGrowthRate = 6;
+let selectedTaxRate = 24;
+let lastCalc = null;
+
+/* ---- growth rate slider wiring ---- */
+const rtbGrowthSlider = document.getElementById('rtbGrowthSlider');
+const rtbGrowthSliderValue = document.getElementById('rtbGrowthSliderValue');
+function rtbUpdateSliderFill(el){
+const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+const pct = ((val - min) / (max - min)) * 100;
+el.style.background = 'linear-gradient(to right, var(--accent) 0%, var(--accent) ' + pct + '%, var(--line) ' + pct + '%, var(--line) 100%)';
+}
+rtbGrowthSlider.addEventListener('input', function(){
+selectedGrowthRate = parseFloat(this.value);
+rtbGrowthSliderValue.textContent = selectedGrowthRate + '%';
+rtbUpdateSliderFill(this);
+});
+rtbUpdateSliderFill(rtbGrowthSlider);
+
+document.querySelectorAll('[data-taxrate]').forEach(function(btn){
+btn.addEventListener('click', function(){
+document.querySelectorAll('[data-taxrate]').forEach(function(b){ b.classList.remove('active'); });
+btn.classList.add('active');
+selectedTaxRate = parseFloat(btn.dataset.taxrate);
+});
+});
+
+function fmt(n){
+if (n===null||n===undefined||isNaN(n)) return '$0';
+return '$' + Math.round(n).toLocaleString('en-US');
+}
+
+/* ---- calculate ---- */
+document.getElementById('rtbCalcBtn').addEventListener('click', function(){
+const age = parseInt(document.getElementById('rtbAge').value);
+const retireAge = parseInt(document.getElementById('rtbRetireAge').value);
+const balance = parseFloat(document.getElementById('rtbBalance').value);
+
+if (!age || !retireAge || !balance || retireAge <= age){
+alert('Please enter your current age, a retirement age greater than your current age, and your account balance.');
+return;
+}
+
+const years = retireAge - age;
+const projectedBalance = balance * Math.pow(1 + selectedGrowthRate/100, years);
+const taxBill = projectedBalance * (selectedTaxRate/100);
+const freeApproachBill = taxBill * 0.35; // illustrative: potential reduction from a tax-free repositioning strategy
+
+lastCalc = {
+age: age, retireAge: retireAge, years: years, balance: balance,
+growthRate: selectedGrowthRate, taxRate: selectedTaxRate,
+projectedBalance: projectedBalance, taxBill: taxBill, freeApproachBill: freeApproachBill
+};
+
+document.getElementById('rtbBillDate').textContent = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+document.getElementById('rtbProjBalance').textContent = fmt(projectedBalance);
+document.getElementById('rtbUsedRate').textContent = selectedGrowthRate + '%';
+document.getElementById('rtbUsedTax').textContent = selectedTaxRate + '%';
+document.getElementById('rtbTaxBill').textContent = fmt(taxBill);
+
+document.getElementById('rtbBill').style.display = 'block';
+document.getElementById('rtbGate').style.display = 'block';
+document.getElementById('rtbFullReport').style.display = 'none';
+document.getElementById('rtbVeil').style.display = 'flex';
+document.getElementById('rtbStamp').style.display = 'block';
+
+document.getElementById('rtbBill').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+/* ---- unlock (lead capture) ---- */
+document.getElementById('rtbUnlockBtn').addEventListener('click', async function(){
+const firstName = document.getElementById('rtbFirstName').value.trim();
+const lastName = document.getElementById('rtbLastName').value.trim();
+const email = document.getElementById('rtbEmail').value.trim();
+const phone = document.getElementById('rtbPhone').value.trim();
+const statusEl = document.getElementById('rtbGateStatus');
+
+if (!firstName || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+statusEl.style.color = '#9c3b2e';
+statusEl.textContent = 'Please enter your first name and a valid email.';
+return;
+}
+if (!lastCalc){ return; }
+
+statusEl.style.color = '#3c4a63';
+statusEl.textContent = 'Saving…';
+
+try{
+await fetch(RTB_SUPA_URL + '/rest/v1/rtb_leads', {
+method:'POST',
+headers:{'Content-Type':'application/json','apikey':RTB_SUPA_KEY,'Authorization':'Bearer '+RTB_SUPA_KEY,'Prefer':'return=minimal'},
+body: JSON.stringify({
+hub: RTB_HUB,
+first_name: firstName,
+last_name: lastName,
+email: email,
+phone: phone,
+inputs: lastCalc,
+source_url: window.location.href
+})
+});
+}catch(e){
+console.error('[RTB lead save error]', e);
+// still unlock the report for the visitor even if the save silently fails
+}
+
+document.getElementById('rtbVeil').style.display = 'none';
+document.getElementById('rtbStamp').style.display = 'none';
+document.getElementById('rtbGate').style.display = 'none';
+
+document.getElementById('rtbCompDeferred').textContent = fmt(lastCalc.taxBill);
+document.getElementById('rtbCompFree').textContent = fmt(lastCalc.freeApproachBill);
+document.getElementById('rtbFullReport').style.display = 'block';
+document.getElementById('rtbFullReport').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+})();
+</script>
+</body>
+</html>
