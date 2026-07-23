@@ -5072,6 +5072,14 @@ Agent Command Center
 <p>Model RMD-only vs. level income vs. Roth conversion scenarios, tax bracket drift, IRMAA impact, and break-even wealth by conversion period.</p>
 <span class="card-tag">Retirement Planning</span>
 </div>
+<div class="card hub-permission-hidden" data-card-id="rtb-leads" data-color="rose" data-permission-required="rtb_leads" style="cursor:pointer;" onclick="openRtbLeadsModal()">
+<span class="card-arrow">↗</span>
+<div class="card-shimmer"></div>
+<div class="card-icon-wrap">📄</div>
+<h3>Retirement Tax Bill Leads</h3>
+<p>See prospects who filled out the Retirement Tax Bill landing page — their inputs, computed tax bill, and contact info.</p>
+<span class="card-tag">Lead Gen</span>
+</div>
 <div class="card" data-card-id="sep-rules" data-color="teal" style="cursor:pointer;" onclick="openSepModal()">
 <span class="card-arrow">↗</span>
 <div class="card-shimmer"></div>
@@ -5390,6 +5398,10 @@ Agent Command Center
           <p id="carrierNumbersSub">Writing numbers are restricted by logged-in email unless you are admin.</p>
         </div>
         <span class="count-chip" id="carrierWritingCount">0 numbers</span>
+      </div>
+      <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:12px;padding:14px 16px;margin:0 0 16px;font-size:13px;font-weight:700;color:#fecaca;line-height:1.6;">
+        ⚠️ If you haven't written with a company in over 6 months, <u>please confirm by calling the office</u>. DO NOT write new business without doing so first.<br>
+        The same applies to <u>NON-Resident state licenses</u> — please confirm the license is still active before writing business in that state.
       </div>
       <div class="carrier-number-table-wrap">
         <table class="carrier-number-table">
@@ -6055,6 +6067,12 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
               <option value="all">All numbers</option>
             </select>
           </div>
+          <div class="admin-field"><label>Agency (pre-fills forms)</label>
+            <select class="admin-input" id="hubPermAgency">
+              <option value="Medi-Solutions Insurance Agency, LLC">Medi-Solutions Insurance Agency, LLC</option>
+              <option value="Buckley Insurance Group">Buckley Insurance Group</option>
+            </select>
+          </div>
           <div class="admin-field"><label>Preset</label>
             <select class="admin-input" id="hubPermPreset" onchange="applyHubPermPreset(this.value); this.value='';">
               <option value="">Apply preset...</option>
@@ -6077,6 +6095,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
           <label><input type="checkbox" data-hub-perm="cert_tracker"> Cert Tracker</label>
           <label><input type="checkbox" data-hub-perm="trip_tracker"> Trip Tracker</label>
           <label><input type="checkbox" data-hub-perm="roth_calculator"> Roth Conversion Calculator</label>
+          <label><input type="checkbox" data-hub-perm="rtb_leads"> Retirement Tax Bill Leads</label>
           <label><input type="checkbox" data-hub-perm="leaderboard"> Leaderboard / Production</label>
           <label><input type="checkbox" data-hub-perm="carrier_directory_view"> Carrier Directory</label>
           <label><input type="checkbox" data-hub-perm="carrier_directory_upload"> Carrier CSV Upload</label>
@@ -15298,7 +15317,11 @@ modal.innerHTML = `
 <!-- Toolbar -->
 <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#1a2340;border-radius:14px 14px 0 0;flex-shrink:0;">
 <div style="color:#fff;font-size:14px;font-weight:800;letter-spacing:.3px;">📄 Office Alliance Program</div>
-<div style="display:flex;gap:8px;">
+<div style="display:flex;align-items:center;gap:8px;">
+<select id="allianceAgencySelect" onchange="document.querySelectorAll('#allianceDocBody .agency-name-slot').forEach(function(el){el.textContent=this.value;}, this)" style="padding:6px 10px;border-radius:7px;border:none;font-size:12px;font-weight:700;font-family:inherit;">
+<option value="Medi-Solutions Insurance Agency, LLC">Medi-Solutions Insurance Agency, LLC</option>
+<option value="Buckley Insurance Group">Buckley Insurance Group</option>
+</select>
 <button onclick="printAllianceDoc()" style="padding:7px 16px;background:#c8a84b;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">🖨️ Print / Save PDF</button>
 <button onclick="document.getElementById('allianceDocModal').remove()" style="padding:7px 14px;background:rgba(255,255,255,.15);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✕ Close</button>
 </div>
@@ -15307,13 +15330,13 @@ modal.innerHTML = `
 <div id="allianceDocBody" style="overflow-y:auto;flex:1;padding:40px 48px;background:#f8f9fc;font-family:'Georgia',serif;color:#1a1a2e;">
 <!-- Header -->
 <div style="text-align:center;margin-bottom:36px;padding-bottom:28px;border-bottom:3px solid #1a2340;">
-<div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:8px;">Medi-Solutions Insurance Agency, LLC</div>
+<div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:8px;"><span class="agency-name-slot">Medi-Solutions Insurance Agency, LLC</span></div>
 <div style="font-size:28px;font-weight:900;color:#1a2340;letter-spacing:1px;text-transform:uppercase;">Office Alliance Program</div>
 <div style="width:60px;height:3px;background:#c8a84b;margin:14px auto 0;border-radius:2px;"></div>
 </div>
 <!-- Intro -->
 <div style="font-size:13.5px;line-height:1.85;color:#333;margin-bottom:28px;">
-<p style="margin-bottom:12px;">Over the years, Medi-Solutions Insurance Agency, LLC has become a trusted resource for Medicare explanations. Each producer is specifically trained and certified to provide your clients with the most up-to-date information available.</p>
+<p style="margin-bottom:12px;">Over the years, <span class="agency-name-slot">Medi-Solutions Insurance Agency, LLC</span> has become a trusted resource for Medicare explanations. Each producer is specifically trained and certified to provide your clients with the most up-to-date information available.</p>
 <p style="margin-bottom:12px;">The Agency's acquisition of a large national insurance agency presented a unique opportunity to share a well-trained agent roster and back office support, providing an exceptional experience for your clients.</p>
 <p style="margin-bottom:12px;">Medicare has become an emerging market with new offerings and changes to Medi-Gap creating an environment that professionals need to navigate. More than <strong>10,000 Americans become eligible for Medicare every day</strong>, producing more questions than answers.</p>
 <p style="margin-bottom:12px;">Make no mistake — Medicare is the best health plan available to most of the American senior population. Certain Medicare beneficiaries may be better served with supplemental coverage or other products.</p>
@@ -15405,12 +15428,20 @@ ${[
 </div>
 <!-- Footer -->
 <div style="text-align:center;font-size:11px;color:#aaa;padding-top:16px;border-top:1px solid #e0e0e0;">
-Medi-Solutions Insurance Agency, LLC &nbsp;·&nbsp; Office Alliance Program &nbsp;·&nbsp; Confidential — Not for Public Distribution
+<span class="agency-name-slot">Medi-Solutions Insurance Agency, LLC</span> &nbsp;·&nbsp; Office Alliance Program &nbsp;·&nbsp; Confidential — Not for Public Distribution
 </div>
 </div>
 </div>`;
 document.body.appendChild(modal);
 modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+(function(){
+try{
+var sess = JSON.parse(sessionStorage.getItem('medi_hub_session')||'{}')||{};
+var agency = (sess.permissions && sess.permissions.agency) || 'Medi-Solutions Insurance Agency, LLC';
+var sel = document.getElementById('allianceAgencySelect');
+if (sel){ sel.value = agency; sel.dispatchEvent(new Event('change')); }
+}catch(e){}
+})();
 }
 function printAllianceDoc() {
 const body = document.getElementById('allianceDocBody');
@@ -15458,7 +15489,11 @@ modal.innerHTML = `
 <!-- Toolbar -->
 <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#1a2340;border-radius:14px 14px 0 0;flex-shrink:0;">
 <div style="color:#fff;font-size:14px;font-weight:800;letter-spacing:.3px;">📋 Small Group Census Form</div>
-<div style="display:flex;gap:8px;">
+<div style="display:flex;align-items:center;gap:8px;">
+<select id="censusAgencySelect" onchange="document.querySelectorAll('#censusDocBody .agency-name-slot').forEach(function(el){el.textContent=this.value;}, this)" style="padding:6px 10px;border-radius:7px;border:none;font-size:12px;font-weight:700;font-family:inherit;">
+<option value="Medi-Solutions Insurance Agency, LLC">Medi-Solutions Insurance Agency, LLC</option>
+<option value="Buckley Insurance Group">Buckley Insurance Group</option>
+</select>
 <button onclick="printCensusDoc()" style="padding:7px 16px;background:#c8a84b;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">🖨️ Print / Save PDF</button>
 <button onclick="document.getElementById('censusDocModal').remove()" style="padding:7px 14px;background:rgba(255,255,255,.15);border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✕ Close</button>
 </div>
@@ -15467,7 +15502,7 @@ modal.innerHTML = `
 <div id="censusDocBody" style="overflow-y:auto;flex:1;padding:32px 36px;background:#f8f9fc;font-family:Arial,sans-serif;color:#1a1a2e;">
 <!-- Header -->
 <div style="text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:3px solid #1a2340;">
-<div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:6px;">Medi-Solutions Insurance Agency, LLC</div>
+<div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#c8a84b;text-transform:uppercase;margin-bottom:6px;"><span class="agency-name-slot">Medi-Solutions Insurance Agency, LLC</span></div>
 <div style="font-size:24px;font-weight:900;color:#1a2340;letter-spacing:.5px;">Small Group Census Form</div>
 <div style="width:60px;height:3px;background:#c8a84b;margin:10px auto 0;border-radius:2px;"></div>
 <div style="font-size:11px;color:#888;margin-top:10px;">Return Completed Census To: Christine Clark &nbsp;·&nbsp; <a href="mailto:cclark@fjins.net" style="color:#1a2340;">cclark@fjins.net</a> &nbsp;·&nbsp; Fax: (732) 308-4555</div>
@@ -15574,12 +15609,20 @@ M = Medicare
 </div>
 <!-- Footer -->
 <div style="text-align:center;font-size:11px;color:#aaa;padding-top:16px;margin-top:16px;border-top:1px solid #e0e0e0;">
-Medi-Solutions Insurance Agency, LLC &nbsp;·&nbsp; Small Group Census Form &nbsp;·&nbsp; Confidential
+<span class="agency-name-slot">Medi-Solutions Insurance Agency, LLC</span> &nbsp;·&nbsp; Small Group Census Form &nbsp;·&nbsp; Confidential
 </div>
 </div>
 </div>`;
 document.body.appendChild(modal);
 modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+(function(){
+try{
+var sess = JSON.parse(sessionStorage.getItem('medi_hub_session')||'{}')||{};
+var agency = (sess.permissions && sess.permissions.agency) || 'Medi-Solutions Insurance Agency, LLC';
+var sel = document.getElementById('censusAgencySelect');
+if (sel){ sel.value = agency; sel.dispatchEvent(new Event('change')); }
+}catch(e){}
+})();
 }
 function printCensusDoc() {
 const body = document.getElementById('censusDocBody');
@@ -19660,19 +19703,19 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     role = String(role || 'agent').toLowerCase();
     if (role === 'admin') return {
       role:'admin', status:'active', allowed_devices:3, require_device_approval:false,
-      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:true, ga_resources:true, forms:true, videos:true, cert_tracker:true, trip_tracker:true, roth_calculator:true, leaderboard:true, admin:true, carrier_directory_view:true, carrier_directory_scope:'all', carrier_directory_upload:true, carrier_directory_edit:true, device_approvals:true }
+      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:true, ga_resources:true, forms:true, videos:true, cert_tracker:true, trip_tracker:true, roth_calculator:true, rtb_leads:true, leaderboard:true, admin:true, carrier_directory_view:true, carrier_directory_scope:'all', carrier_directory_upload:true, carrier_directory_edit:true, device_approvals:true }
     };
     if (role === 'ga') return {
       role:'ga', status:'active', allowed_devices:1, require_device_approval:true,
-      permissions:{ agent_tools:false, onboarding_resources:true, loa_resources:false, ga_tools:true, ga_resources:true, forms:true, videos:true, cert_tracker:false, trip_tracker:false, roth_calculator:false, leaderboard:false, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+      permissions:{ agent_tools:false, onboarding_resources:true, loa_resources:false, ga_tools:true, ga_resources:true, forms:true, videos:true, cert_tracker:false, trip_tracker:false, roth_calculator:false, rtb_leads:false, leaderboard:false, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
     };
     if (role === 'manager') return {
       role:'manager', status:'active', allowed_devices:2, require_device_approval:false,
-      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:false, ga_resources:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, roth_calculator:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:false, ga_resources:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, roth_calculator:true, rtb_leads:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
     };
     return {
       role:'internal', status:'active', allowed_devices:2, require_device_approval:false,
-      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:false, ga_resources:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, roth_calculator:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
+      permissions:{ agent_tools:true, onboarding_resources:true, loa_resources:true, ga_tools:false, ga_resources:false, forms:true, videos:true, cert_tracker:true, trip_tracker:true, roth_calculator:true, rtb_leads:true, leaderboard:true, admin:false, carrier_directory_view:true, carrier_directory_scope:'self', carrier_directory_upload:false, carrier_directory_edit:false, device_approvals:false }
     };
   }
 
@@ -19803,6 +19846,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     setVal('hubPermAllowedDevices', row.allowed_devices || row.allowedDevices || 1);
     setVal('hubPermDeviceApproval', String(!!(row.require_device_approval || row.requireDeviceApproval)));
     setVal('hubPermCarrierScope', perms.carrier_directory_scope || 'self');
+    setVal('hubPermAgency', perms.agency || 'Medi-Solutions Insurance Agency, LLC');
     document.querySelectorAll('[data-hub-perm]').forEach(function(cb){
       var key = cb.getAttribute('data-hub-perm');
       cb.checked = perms[key] === true || perms[key] === 'true' || perms[key] === 'all';
@@ -19840,6 +19884,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     var permissions = {};
     document.querySelectorAll('[data-hub-perm]').forEach(function(cb){ permissions[cb.getAttribute('data-hub-perm')] = !!cb.checked; });
     permissions.carrier_directory_scope = String(document.getElementById('hubPermCarrierScope')?.value || 'self');
+    permissions.agency = String(document.getElementById('hubPermAgency')?.value || 'Medi-Solutions Insurance Agency, LLC');
     var payload = {
       hub: HP_HUB,
       name: name || email,
@@ -19981,14 +20026,14 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     return Number.isFinite(n) ? n : fallback;
   }
   function hubPermCsvHeaders(){
-    return ['name','email','role','status','allowed_devices','require_device_approval','agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','roth_calculator','leaderboard','carrier_directory_view','carrier_directory_scope','carrier_directory_upload','carrier_directory_edit','device_approvals','admin'];
+    return ['name','email','role','status','allowed_devices','require_device_approval','agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_scope','carrier_directory_upload','carrier_directory_edit','device_approvals','admin','agency'];
   }
   function downloadHubUserTemplate(){
     var headers = hubPermCsvHeaders();
     hpDownloadCsv('hub_user_permissions_template.csv', [
       headers,
-      ['Jane Internal','jane.internal@example.com','internal','active','2','false','true','false','true','true','true','true','true','true','true','self','false','false','false','false'],
-      ['John GA','john.ga@example.com','ga','active','1','true','false','true','true','true','false','false','false','false','true','self','false','false','false','false']
+      ['Jane Internal','jane.internal@example.com','internal','active','2','false','true','false','true','true','true','true','true','true','true','true','self','false','false','false','false','Medi-Solutions Insurance Agency, LLC'],
+      ['John GA','john.ga@example.com','ga','active','1','true','false','true','true','true','false','false','false','false','false','true','self','false','false','false','false','Buckley Insurance Group']
     ]);
   }
   function exportHubUsersCsv(){
@@ -19998,9 +20043,10 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       rows.push([
         u.name || '', u.email || '', u.role || '', u.status || '', u.allowed_devices || '', u.require_device_approval ? 'true' : 'false',
         p.agent_tools ? 'true' : 'false', p.ga_tools ? 'true' : 'false', p.forms ? 'true' : 'false', p.videos ? 'true' : 'false',
-        p.cert_tracker ? 'true' : 'false', p.trip_tracker ? 'true' : 'false', p.roth_calculator ? 'true' : 'false', p.leaderboard ? 'true' : 'false',
+        p.cert_tracker ? 'true' : 'false', p.trip_tracker ? 'true' : 'false', p.roth_calculator ? 'true' : 'false', p.rtb_leads ? 'true' : 'false', p.leaderboard ? 'true' : 'false',
         p.carrier_directory_view ? 'true' : 'false', p.carrier_directory_scope || 'self',
-        p.carrier_directory_upload ? 'true' : 'false', p.carrier_directory_edit ? 'true' : 'false', p.device_approvals ? 'true' : 'false', p.admin ? 'true' : 'false'
+        p.carrier_directory_upload ? 'true' : 'false', p.carrier_directory_edit ? 'true' : 'false', p.device_approvals ? 'true' : 'false', p.admin ? 'true' : 'false',
+        p.agency || 'Medi-Solutions Insurance Agency, LLC'
       ]);
     });
     hpDownloadCsv('hub_user_permissions_export.csv', rows);
@@ -20012,10 +20058,11 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     if (['admin','internal','ga','manager','agent'].indexOf(role) < 0) role = 'agent';
     var preset = presetFor(role);
     var perms = Object.assign({}, normalizePerms(preset.permissions));
-    ['agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','roth_calculator','leaderboard','carrier_directory_view','carrier_directory_upload','carrier_directory_edit','device_approvals','admin'].forEach(function(key){
+    ['agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_upload','carrier_directory_edit','device_approvals','admin'].forEach(function(key){
       if (Object.prototype.hasOwnProperty.call(row, key) && String(row[key]).trim() !== '') perms[key] = hpBool(row[key], !!perms[key]);
     });
     if (String(row.carrier_directory_scope || '').trim()) perms.carrier_directory_scope = String(row.carrier_directory_scope).trim().toLowerCase() === 'all' ? 'all' : 'self';
+    if (String(row.agency || '').trim()) perms.agency = String(row.agency).trim();
     return {
       hub: HP_HUB,
       name: String(row.name || '').trim() || email,
@@ -23015,6 +23062,87 @@ document.getElementById('rcResults').style.display = 'none';
 rcLastResults = null;
 };
 
+// ---- Lightweight SVG chart builders (print-safe: pure vector, no canvas/CDN) ----
+function rcNiceMax(n){
+if (n<=0) return 100;
+const mag = Math.pow(10, Math.floor(Math.log10(n)));
+const step = mag/2;
+return Math.ceil(n/step)*step;
+}
+function rcShortMoney(n){
+const a = Math.abs(n);
+if (a>=1000000) return '$'+(n/1000000).toFixed(a>=10000000?0:1)+'M';
+if (a>=1000) return '$'+Math.round(n/1000)+'K';
+return '$'+Math.round(n);
+}
+function rcLineChartSVG(breakEven){
+const W=720,H=300,padL=64,padR=16,padT=16,padB=36;
+const plotW=W-padL-padR, plotH=H-padT-padB;
+const maxVal = rcNiceMax(Math.max.apply(null, breakEven.map(function(b){return Math.max(b.iraWealth,b.rothWealth);})));
+const n = breakEven.length;
+function x(i){ return padL + (n<=1?0:(i/(n-1))*plotW); }
+function y(v){ return padT + plotH - (v/maxVal)*plotH; }
+function pathFor(key){
+return breakEven.map(function(b,i){ return (i===0?'M':'L')+x(i).toFixed(1)+','+y(b[key]).toFixed(1); }).join(' ');
+}
+let gridLines = '';
+const gridSteps = 4;
+for (let g=0; g<=gridSteps; g++){
+const val = (maxVal/gridSteps)*g;
+const gy = y(val);
+gridLines += '<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="#e2e8f0" stroke-width="1"/>';
+gridLines += '<text x="'+(padL-8)+'" y="'+(gy+4).toFixed(1)+'" font-size="10.5" fill="#64748b" text-anchor="end" font-family="Arial,sans-serif">'+rcShortMoney(val)+'</text>';
+}
+let xLabels = '';
+const labelEvery = Math.max(1, Math.ceil(n/8));
+breakEven.forEach(function(b,i){
+if (i % labelEvery === 0 || i === n-1){
+xLabels += '<text x="'+x(i).toFixed(1)+'" y="'+(H-padB+18)+'" font-size="10" fill="#64748b" text-anchor="middle" font-family="Arial,sans-serif">'+b.age+'</text>';
+}
+});
+return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:'+W+'px;" xmlns="http://www.w3.org/2000/svg">'+
+gridLines+
+'<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(H-padB)+'" stroke="#cbd5e1" stroke-width="1"/>'+
+'<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="#cbd5e1" stroke-width="1"/>'+
+'<path d="'+pathFor('iraWealth')+'" fill="none" stroke="#dc2626" stroke-width="2.5"/>'+
+'<path d="'+pathFor('rothWealth')+'" fill="none" stroke="#1d4ed8" stroke-width="2.5"/>'+
+xLabels+
+'<text x="'+(W/2)+'" y="'+(H-6)+'" font-size="10.5" fill="#475569" text-anchor="middle" font-family="Arial,sans-serif">Age at Death</text>'+
+'</svg>';
+}
+function rcBarChartSVG(periodOptions){
+const W=720,H=300,padL=64,padR=16,padT=16,padB=34;
+const plotW=W-padL-padR, plotH=H-padT-padB;
+const maxVal = rcNiceMax(Math.max.apply(null, periodOptions.map(function(p){return p.wealth;})));
+const n = periodOptions.length;
+const gap = 10;
+const barW = (plotW - gap*(n-1))/n;
+const best = periodOptions.reduce(function(a,b){return b.wealth>a.wealth?b:a;}, periodOptions[0]);
+let gridLines = '';
+const gridSteps = 4;
+for (let g=0; g<=gridSteps; g++){
+const val = (maxVal/gridSteps)*g;
+const gy = padT + plotH - (val/maxVal)*plotH;
+gridLines += '<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="#e2e8f0" stroke-width="1"/>';
+gridLines += '<text x="'+(padL-8)+'" y="'+(gy+4).toFixed(1)+'" font-size="10.5" fill="#64748b" text-anchor="end" font-family="Arial,sans-serif">'+rcShortMoney(val)+'</text>';
+}
+let bars = '';
+periodOptions.forEach(function(p,i){
+const bh = (p.wealth/maxVal)*plotH;
+const bx = padL + i*(barW+gap);
+const by = padT + plotH - bh;
+const isBest = p.years === best.years;
+bars += '<rect x="'+bx.toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+bh.toFixed(1)+'" fill="'+(isBest?'#16a34a':'#93b4e0')+'" rx="3"/>';
+bars += '<text x="'+(bx+barW/2).toFixed(1)+'" y="'+(H-padB+18)+'" font-size="10" fill="#475569" text-anchor="middle" font-family="Arial,sans-serif">'+p.years+'yr</text>';
+});
+return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:'+W+'px;" xmlns="http://www.w3.org/2000/svg">'+
+gridLines+
+'<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(H-padB)+'" stroke="#cbd5e1" stroke-width="1"/>'+
+'<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="#cbd5e1" stroke-width="1"/>'+
+bars+
+'</svg>';
+}
+
 // ---- Print / Export ----
 window.rcPrintReport = function(){
 if (!rcLastResults){ if (typeof showSnuToast==='function') showSnuToast('⚠ Calculate first.'); return; }
@@ -23083,6 +23211,11 @@ const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Roth Conve
 '.disclosure{font-size:10.5px;color:#94a3b8;line-height:1.7;border-top:1px solid #e2e8f0;padding-top:16px;margin-top:36px;}'+
 '.disclosure strong{color:#64748b;}'+
 '.compliance-flag{display:inline-block;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;margin-top:14px;}'+
+'.chart-wrap{background:#fafbfc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px 10px;margin-bottom:8px;text-align:center;}'+
+'.chart-legend{display:flex;justify-content:center;gap:22px;margin-top:6px;font-size:11.5px;color:#475569;}'+
+'.chart-legend span{display:inline-flex;align-items:center;gap:6px;}'+
+'.chart-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;}'+
+'.chart-caption{font-size:10.5px;color:#94a3b8;margin-top:4px;}'+
 '.print-tip{background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:12px;font-weight:600;padding:10px 16px;border-radius:8px;margin:0 0 20px;}'+
 '*,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}'+
 '@media print{'+
@@ -23092,6 +23225,7 @@ const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Roth Conve
 'table{page-break-inside:auto;}tr{page-break-inside:avoid;}'+
 'h2{page-break-after:avoid;}'+
 '.hero{page-break-inside:avoid;}'+
+'.chart-wrap{page-break-inside:avoid;}'+
 '}'+
 '</style></head><body>'+
 '<div class="band"><h1>Roth Conversion Analysis</h1><div class="meta">'+
@@ -23121,8 +23255,19 @@ const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Roth Conve
 '<h2>Scenario Comparison</h2>'+
 '<table><tr><th>Scenario</th><th>Total Wealth Generated</th><th>Taxes</th><th>IRMAA</th><th>Total Tax + IRMAA</th></tr>'+scenarioRows+'</table>'+
 
+'<h2>Wealth Over Time — Keep IRA vs. Convert to Roth</h2>'+
+'<div class="chart-wrap">'+rcLineChartSVG(res.breakEven)+
+'<div class="chart-legend"><span><i style="background:#dc2626;"></i>Keep IRA (RMD Only)</span><span><i style="background:#1d4ed8;"></i>Convert to Roth</span></div>'+
+'<div class="chart-caption">Total after-tax wealth passed on or retained, assuming death at the given age.</div>'+
+'</div>'+
+
 '<h2>Conversion Period Options</h2>'+
 '<table><tr><th>Period</th><th>Total Wealth Generated</th><th>Taxes</th><th>IRMAA</th><th>Total Tax + IRMAA</th></tr>'+periodRows+'</table>'+
+
+'<h2>Total Wealth Generated by Conversion Period</h2>'+
+'<div class="chart-wrap">'+rcBarChartSVG(res.periodOptions)+
+'<div class="chart-legend"><span><i style="background:#16a34a;"></i>Highest wealth option</span><span><i style="background:#93b4e0;"></i>Other periods</span></div>'+
+'</div>'+
 
 '<h2>Break-Even — Total After-Tax Wealth by Year of Death</h2>'+
 '<table><tr><th>Year</th><th>Age</th><th>Keep IRA</th><th>Convert to Roth</th></tr>'+beRows+'</table>'+
@@ -23263,6 +23408,143 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 
 })();
 </script>
+
+<!-- ══════════════════════════════════════════════
+     RETIREMENT TAX BILL LEADS — MODAL
+     ══════════════════════════════════════════════ -->
+<div class="life-modal-overlay" id="rtbLeadsOverlay" onclick="if(event.target===this)closeRtbLeadsModal()">
+<div class="life-modal-box" style="width:min(1100px,100%);">
+<div class="life-modal-header">
+<div class="life-modal-title">📄 Retirement Tax Bill Leads</div>
+<button class="life-modal-close" onclick="closeRtbLeadsModal()">✕</button>
+</div>
+<div class="life-modal-body">
+
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+<input type="text" id="rtbLeadsSearch" class="admin-input" placeholder="Search by name or email…" style="max-width:280px;" oninput="rtbRenderLeadsList()">
+<select id="rtbLeadsFilter" class="admin-input" style="max-width:180px;" onchange="rtbRenderLeadsList()">
+<option value="all">All leads</option>
+<option value="new">Not yet contacted</option>
+<option value="contacted">Contacted</option>
+</select>
+<button class="life-calc-btn ghost" type="button" onclick="rtbLoadLeads()">↻ Refresh</button>
+<button class="life-calc-btn ghost" type="button" onclick="rtbExportLeadsCsv()">⬇ Export CSV</button>
+<span style="font-size:11px;color:var(--muted-2);" id="rtbLeadsCount"></span>
+</div>
+<div id="rtbLeadsList" style="display:flex;flex-direction:column;gap:10px;"></div>
+
+<div style="font-size:11px;color:var(--muted-2);line-height:1.5;margin-top:20px;border-top:1px solid var(--border);padding-top:14px;">
+These are prospects who submitted the public Retirement Tax Bill landing page. Contact info was provided voluntarily in exchange for their report. Follow your agency's standard practices for lead follow-up, consent, and data handling (CAN-SPAM, TCPA, state privacy rules).
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+
+const RTBL_SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+const RTBL_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+const RTBL_HUB = 'medi';
+let rtblLeads = [];
+
+function rtblFmt(n){
+if (n===null||n===undefined||isNaN(n)) return '$0';
+return '$' + Math.round(n).toLocaleString('en-US');
+}
+
+window.openRtbLeadsModal = function(){
+var sess = {}; try{ sess = JSON.parse(sessionStorage.getItem('medi_hub_session')||'{}')||{}; }catch(e){}
+if (typeof hubHasPermission === 'function' && !hubHasPermission(sess, 'rtb_leads')){
+if (typeof showSnuToast==='function') showSnuToast('⚠ You don\'t have access to Retirement Tax Bill Leads. Ask an admin to enable it under Permissions.');
+return;
+}
+document.getElementById('rtbLeadsOverlay').classList.add('open');
+document.body.style.overflow = 'hidden';
+rtbLoadLeads();
+};
+window.closeRtbLeadsModal = function(){
+document.getElementById('rtbLeadsOverlay').classList.remove('open');
+document.body.style.overflow = '';
+};
+
+window.rtbLoadLeads = async function(){
+const listEl = document.getElementById('rtbLeadsList');
+listEl.innerHTML = '<div style="font-size:12px;color:var(--muted-2);">Loading…</div>';
+try{
+const resp = await fetch(RTBL_SUPA_URL + '/rest/v1/rtb_leads?hub=eq.'+RTBL_HUB+'&select=*&order=created_at.desc', {
+headers:{'apikey':RTBL_SUPA_KEY,'Authorization':'Bearer '+RTBL_SUPA_KEY}
+});
+if (!resp.ok) throw new Error('HTTP '+resp.status);
+rtblLeads = await resp.json();
+rtbRenderLeadsList();
+}catch(e){
+console.error('[RTB leads load error]', e);
+listEl.innerHTML = '<div style="font-size:12px;color:#fb7185;">Could not load leads — make sure the rtb_leads Supabase table exists (see setup notes). '+(e.message||'')+'</div>';
+}
+};
+
+window.rtbRenderLeadsList = function(){
+const listEl = document.getElementById('rtbLeadsList');
+const q = (document.getElementById('rtbLeadsSearch').value||'').toLowerCase();
+const filter = document.getElementById('rtbLeadsFilter').value;
+let filtered = rtblLeads.filter(function(r){
+const matchesQ = !q || (r.first_name||'').toLowerCase().includes(q) || (r.last_name||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q);
+const matchesFilter = filter==='all' || (filter==='contacted' ? r.contacted : !r.contacted);
+return matchesQ && matchesFilter;
+});
+document.getElementById('rtbLeadsCount').textContent = filtered.length + ' of ' + rtblLeads.length + ' leads';
+if (!filtered.length){ listEl.innerHTML = '<div style="font-size:12px;color:var(--muted-2);">No leads found.</div>'; return; }
+listEl.innerHTML = filtered.map(function(r){
+const d = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+const inp = r.inputs || {};
+return '<div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">'+
+'<div>'+
+'<strong>'+(r.first_name||'')+' '+(r.last_name||'')+'</strong>'+
+(r.contacted?' <span style="font-size:10px;background:rgba(52,211,153,.15);color:#34d399;padding:2px 8px;border-radius:999px;font-weight:700;">CONTACTED</span>':'')+
+'<div style="font-size:11px;color:var(--muted-2);margin-top:3px;">'+(r.email||'')+(r.phone?' · '+r.phone:'')+' · '+d+'</div>'+
+'<div style="font-size:11px;color:var(--muted-2);margin-top:3px;">Projected balance: '+rtblFmt(inp.projectedBalance)+' · Est. tax bill: <strong style="color:#f87171;">'+rtblFmt(inp.taxBill)+'</strong> ('+(inp.growthRate!=null?inp.growthRate+'% growth, ':'')+(inp.taxRate!=null?inp.taxRate+'% tax':'')+')</div>'+
+'</div>'+
+'<div style="display:flex;gap:8px;">'+
+'<button class="life-calc-btn ghost" style="padding:6px 12px;font-size:12px;" onclick="rtbToggleContacted(\''+r.id+'\', '+(!r.contacted)+')">'+(r.contacted?'Mark not contacted':'Mark contacted')+'</button>'+
+'</div></div>';
+}).join('');
+};
+
+window.rtbToggleContacted = async function(id, value){
+try{
+const resp = await fetch(RTBL_SUPA_URL + '/rest/v1/rtb_leads?id=eq.'+id, {
+method:'PATCH',
+headers:{'Content-Type':'application/json','apikey':RTBL_SUPA_KEY,'Authorization':'Bearer '+RTBL_SUPA_KEY,'Prefer':'return=minimal'},
+body: JSON.stringify({contacted: value})
+});
+if (!resp.ok) throw new Error('HTTP '+resp.status);
+rtbLoadLeads();
+}catch(e){
+alert('Could not update lead: '+(e.message||e));
+}
+};
+
+window.rtbExportLeadsCsv = function(){
+if (!rtblLeads.length){ if (typeof showSnuToast==='function') showSnuToast('⚠ No leads to export.'); return; }
+const rows = [['First Name','Last Name','Email','Phone','Date','Projected Balance','Tax Bill','Growth Rate','Tax Rate','Contacted']];
+rtblLeads.forEach(function(r){
+const inp = r.inputs || {};
+rows.push([r.first_name||'', r.last_name||'', r.email||'', r.phone||'', r.created_at?new Date(r.created_at).toLocaleDateString('en-US'):'', inp.projectedBalance||'', inp.taxBill||'', inp.growthRate||'', inp.taxRate||'', r.contacted?'Yes':'No']);
+});
+const csv = rows.map(function(row){ return row.map(function(cell){ return '"'+String(cell).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+const blob = new Blob([csv], {type:'text/csv'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url; a.download = 'rtb-leads-'+new Date().toISOString().slice(0,10)+'.csv';
+document.body.appendChild(a); a.click(); document.body.removeChild(a);
+URL.revokeObjectURL(url);
+};
+
+})();
+</script>
+
 
 <!-- Phase 89: Cert CSV global Supabase update + verification applied to Phase 88 base -->
 </body>
