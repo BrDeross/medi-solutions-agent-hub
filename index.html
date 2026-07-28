@@ -5169,7 +5169,7 @@ Agent Command Center
 <p>Filter ancillary plans by category and state, then compare carriers side by side.</p>
 <span class="card-tag">Ancillary</span>
 </div>
-<div class="card" data-card-id="onboarding" data-color="rose" style="cursor:pointer;" onclick="openOnboard()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openOnboard()}">
+<div class="card hub-permission-hidden" data-card-id="onboarding" data-color="rose" data-permission-required="onboarding_resources" style="cursor:pointer;" onclick="openOnboard()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openOnboard()}">
 <span class="card-arrow">↗</span>
 <div class="card-shimmer"></div>
 <div class="card-icon-wrap">🚀</div>
@@ -9890,7 +9890,9 @@ function hubHasPermission(profile, key) {
   if (hubUserIsAdmin(profile)) return true;
   var perms = (profile && profile.permissions) || {};
   if (key === 'onboarding_resources') {
-    return perms.onboarding_resources === true || perms.onboarding_resources === 'true' || perms.agent_tools === true || perms.agent_tools === 'true' || perms.ga_tools === true || perms.ga_tools === 'true' || perms.loa_resources === true || perms.loa_resources === 'true' || perms.ga_resources === true || perms.ga_resources === 'true';
+    // Shared Onboarding is controlled only by its own saved checkbox.
+    // Other tool/resource permissions must not silently override an admin's choice.
+    return perms.onboarding_resources === true || perms.onboarding_resources === 'true';
   }
   if (key === 'loa_resources') {
     return perms.loa_resources === true || perms.loa_resources === 'true' || perms.agent_tools === true || perms.agent_tools === 'true';
@@ -20045,14 +20047,14 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     return Number.isFinite(n) ? n : fallback;
   }
   function hubPermCsvHeaders(){
-    return ['name','email','role','status','allowed_devices','require_device_approval','agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_scope','carrier_directory_upload','carrier_directory_edit','device_approvals','admin','agency'];
+    return ['name','email','role','status','allowed_devices','require_device_approval','agent_tools','onboarding_resources','loa_resources','ga_tools','ga_resources','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_scope','carrier_directory_upload','carrier_directory_edit','device_approvals','manager_onboarding_view','admin','agency'];
   }
   function downloadHubUserTemplate(){
     var headers = hubPermCsvHeaders();
     hpDownloadCsv('hub_user_permissions_template.csv', [
       headers,
-      ['Jane Internal','jane.internal@example.com','internal','active','2','false','true','false','true','true','true','true','true','true','true','true','self','false','false','false','false','Medi-Solutions Insurance Agency, LLC'],
-      ['John GA','john.ga@example.com','ga','active','1','true','false','true','true','true','false','false','false','false','false','true','self','false','false','false','false','Buckley Insurance Group']
+      ['Jane Internal','jane.internal@example.com','internal','active','2','false','true','true','true','false','false','true','true','true','true','true','true','true','true','self','false','false','false','false','false','Medi-Solutions Insurance Agency, LLC'],
+      ['John GA','john.ga@example.com','ga','active','1','true','false','true','false','true','true','true','true','false','false','false','false','false','true','self','false','false','false','false','false','Buckley Insurance Group']
     ]);
   }
   function exportHubUsersCsv(){
@@ -20061,10 +20063,10 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       var p = normalizePerms(u.permissions);
       rows.push([
         u.name || '', u.email || '', u.role || '', u.status || '', u.allowed_devices || '', u.require_device_approval ? 'true' : 'false',
-        p.agent_tools ? 'true' : 'false', p.ga_tools ? 'true' : 'false', p.forms ? 'true' : 'false', p.videos ? 'true' : 'false',
+        p.agent_tools ? 'true' : 'false', p.onboarding_resources ? 'true' : 'false', p.loa_resources ? 'true' : 'false', p.ga_tools ? 'true' : 'false', p.ga_resources ? 'true' : 'false', p.forms ? 'true' : 'false', p.videos ? 'true' : 'false',
         p.cert_tracker ? 'true' : 'false', p.trip_tracker ? 'true' : 'false', p.roth_calculator ? 'true' : 'false', p.rtb_leads ? 'true' : 'false', p.leaderboard ? 'true' : 'false',
         p.carrier_directory_view ? 'true' : 'false', p.carrier_directory_scope || 'self',
-        p.carrier_directory_upload ? 'true' : 'false', p.carrier_directory_edit ? 'true' : 'false', p.device_approvals ? 'true' : 'false', p.admin ? 'true' : 'false',
+        p.carrier_directory_upload ? 'true' : 'false', p.carrier_directory_edit ? 'true' : 'false', p.device_approvals ? 'true' : 'false', p.manager_onboarding_view ? 'true' : 'false', p.admin ? 'true' : 'false',
         p.agency || 'Medi-Solutions Insurance Agency, LLC'
       ]);
     });
@@ -20077,7 +20079,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     if (['admin','internal','ga','manager','agent'].indexOf(role) < 0) role = 'agent';
     var preset = presetFor(role);
     var perms = Object.assign({}, normalizePerms(preset.permissions));
-    ['agent_tools','ga_tools','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_upload','carrier_directory_edit','device_approvals','admin'].forEach(function(key){
+    ['agent_tools','onboarding_resources','loa_resources','ga_tools','ga_resources','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_upload','carrier_directory_edit','device_approvals','manager_onboarding_view','admin'].forEach(function(key){
       if (Object.prototype.hasOwnProperty.call(row, key) && String(row[key]).trim() !== '') perms[key] = hpBool(row[key], !!perms[key]);
     });
     if (String(row.carrier_directory_scope || '').trim()) perms.carrier_directory_scope = String(row.carrier_directory_scope).trim().toLowerCase() === 'all' ? 'all' : 'self';
@@ -23651,5 +23653,6 @@ URL.revokeObjectURL(url);
 
 
 <!-- Phase 89: Cert CSV global Supabase update + verification applied to Phase 88 base -->
+<!-- Phase 89: Shared Onboarding permission isolation fix -->
 </body>
 </html>
