@@ -5080,12 +5080,12 @@ Agent Command Center
 <p>See prospects who filled out the Retirement Tax Bill landing page — their inputs, computed tax bill, and contact info.</p>
 <span class="card-tag">Lead Gen</span>
 </div>
-<div class="card hub-permission-hidden" data-card-id="rtb-link" data-color="rose" data-permission-required="rtb_leads" style="cursor:pointer;" onclick="copyMyRtbLink()">
+<div class="card hub-permission-hidden" data-card-id="rtb-link" data-color="rose" data-permission-required="rtb_leads" style="cursor:pointer;" onclick="openMyRtbLink()">
 <span class="card-arrow">↗</span>
 <div class="card-shimmer"></div>
 <div class="card-icon-wrap">🔗</div>
 <h3>My Retirement Tax Bill Link</h3>
-<p>Copy your personal link to share with prospects — any leads it generates are automatically credited to you.</p>
+<p>Open your personal Retirement Tax Bill page in a new tab — any leads it generates are automatically credited to you.</p>
 <span class="card-tag">Lead Gen</span>
 </div>
 <div class="card" data-card-id="sep-rules" data-color="teal" style="cursor:pointer;" onclick="openSepModal()">
@@ -23550,7 +23550,7 @@ if (statusEl){ statusEl.style.color = '#fb7185'; statusEl.textContent = 'Save fa
 }
 };
 
-window.copyMyRtbLink = async function(){
+window.openMyRtbLink = async function(){
 var sess = {}; try{ sess = JSON.parse(sessionStorage.getItem('medi_hub_session')||'{}')||{}; }catch(e){}
 if (typeof hubHasPermission === 'function' && !hubHasPermission(sess, 'rtb_leads')){
 if (typeof showSnuToast==='function') showSnuToast('⚠ You don\'t have access to this. Ask an admin to enable it under Permissions.');
@@ -23561,18 +23561,29 @@ if (!email){
 alert('Could not find your logged-in email. Please log in again and retry.');
 return;
 }
-var baseUrl = await rtbFetchLandingUrl();
-var link = baseUrl + '?a=' + encodeURIComponent(email);
-function done(copied){
-if (typeof showSnuToast==='function') showSnuToast(copied ? '✓ Link copied to clipboard!' : 'Link ready — copy it below:');
-if (!copied) window.prompt('Copy your Retirement Tax Bill link:', link);
+
+// Open immediately from the click so browsers do not block the new tab while the saved URL loads.
+var newTab = window.open('about:blank', '_blank');
+if (!newTab){
+if (typeof showSnuToast==='function') showSnuToast('⚠ Popup blocked. Please allow popups for the HUB and try again.');
+return;
 }
-if (navigator.clipboard && navigator.clipboard.writeText){
-navigator.clipboard.writeText(link).then(function(){ done(true); }).catch(function(){ done(false); });
-} else {
-done(false);
+try { newTab.opener = null; } catch(e){}
+
+try{
+var baseUrl = await rtbFetchLandingUrl();
+var url = new URL(baseUrl, window.location.href);
+url.searchParams.set('a', email);
+newTab.location.replace(url.toString());
+if (typeof showSnuToast==='function') showSnuToast('✓ Retirement Tax Bill opened in a new tab.');
+}catch(e){
+try { newTab.close(); } catch(closeErr){}
+if (typeof showSnuToast==='function') showSnuToast('⚠ Could not open the Retirement Tax Bill page. Please try again.');
 }
 };
+
+// Backward-compatible alias in case an older cached card still calls the prior function name.
+window.copyMyRtbLink = window.openMyRtbLink;
 
 window.rtbLoadLeads = async function(){
 const listEl = document.getElementById('rtbLeadsList');
