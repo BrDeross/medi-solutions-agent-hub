@@ -4877,7 +4877,9 @@ cursor: pointer; white-space: nowrap;
   align-items:center;
   width:max-content;
   min-width:100%;
+  flex:none;
   will-change:transform;
+  transform:translate3d(0,0,0);
   animation:certAlertScroll var(--cert-alert-duration,22s) linear infinite;
 }
 #certAlertBanner:hover .cert-alert-track,
@@ -4885,6 +4887,8 @@ cursor: pointer; white-space: nowrap;
 .cert-alert-message{
   display:inline-flex;
   align-items:center;
+  flex:0 0 auto;
+  min-width:max-content;
   min-height:54px;
   padding:8px 42px;
   color:#fff;
@@ -4904,7 +4908,7 @@ cursor: pointer; white-space: nowrap;
 }
 #certAlertBanner[data-flash="strong"]{animation:certAlertStrong 1.05s steps(2,end) infinite;}
 #certAlertBanner[data-flash="soft"]{animation:certAlertSoft 1.45s ease-in-out infinite;}
-@keyframes certAlertScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes certAlertScroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(var(--cert-alert-distance,-50%),0,0)}}
 @keyframes certAlertBlink{0%,44%{opacity:1;transform:scale(1)}45%,100%{opacity:.25;transform:scale(.88)}}
 @keyframes certAlertGlow{0%,100%{opacity:.36;transform:scale(.995)}50%{opacity:1;transform:scale(1.006)}}
 @keyframes certAlertSoft{0%,100%{filter:brightness(.92)}50%{filter:brightness(1.16)}}
@@ -7147,14 +7151,14 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
     <div>
       <div class="cert-alert-admin-title">🚨 Certification Alert Banner</div>
-      <div class="cert-alert-admin-help">Enter one or more comments. New lines are converted to separators in the scrolling alert shown above the Cert Tracker.</div>
+      <div class="cert-alert-admin-help">Enter one or more comments of any practical length. New lines are converted to separators in the scrolling alert shown above the Cert Tracker.</div>
     </div>
     <div id="certAlertAdminStatus" class="cert-alert-admin-status"></div>
   </div>
   <div class="cert-alert-admin-grid">
     <div>
       <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Alert comments</label>
-      <textarea id="certAlertMessageInput" class="admin-input" maxlength="900" placeholder="Example: Aetna certifications open August 12. Complete AHIP before starting carrier certifications."></textarea>
+      <textarea id="certAlertMessageInput" class="admin-input" placeholder="Example: Aetna certifications open August 12. Complete AHIP before starting carrier certifications."></textarea>
     </div>
     <div>
       <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Scroll speed</label>
@@ -23915,7 +23919,8 @@ URL.revokeObjectURL(url);
   var HUB = 'medi';
   var KEY = 'cert_alert_banner';
   var current = {message:'', enabled:false, speed:'normal', flash:'strong'};
-  var speedSeconds = {slow:32, normal:22, fast:14};
+  var speedPixelsPerSecond = {slow:34, normal:52, fast:78};
+  var marqueeResizeTimer = null;
 
   function headers(extra){
     return Object.assign({'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}, extra || {});
@@ -23940,6 +23945,21 @@ URL.revokeObjectURL(url);
     el.textContent = message || '';
     el.style.color = ok === true ? '#86efac' : (ok === false ? '#fca5a5' : '#fcd34d');
   }
+  function updateMarqueeMetrics(){
+    var banner = document.getElementById('certAlertBanner');
+    var track = document.getElementById('certAlertTrack');
+    var first = document.getElementById('certAlertMessageA');
+    if(!banner || !track || !first || banner.hidden) return;
+    var distance = Math.ceil(first.getBoundingClientRect().width);
+    if(!distance) return;
+    var pixelsPerSecond = speedPixelsPerSecond[current.speed] || speedPixelsPerSecond.normal;
+    var duration = Math.max(8, distance / pixelsPerSecond);
+    banner.style.setProperty('--cert-alert-distance', '-' + distance + 'px');
+    banner.style.setProperty('--cert-alert-duration', duration.toFixed(2) + 's');
+    track.style.animation = 'none';
+    void track.offsetWidth;
+    track.style.animation = '';
+  }
   function renderBanner(data){
     current = parseData(data || current);
     var banner = document.getElementById('certAlertBanner');
@@ -23956,8 +23976,11 @@ URL.revokeObjectURL(url);
     a.textContent = message;
     b.textContent = message;
     banner.dataset.flash = current.flash;
-    banner.style.setProperty('--cert-alert-duration', (speedSeconds[current.speed] || speedSeconds.normal) + 's');
     banner.hidden = false;
+    updateMarqueeMetrics();
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(updateMarqueeMetrics).catch(function(){});
+    }
   }
   function fillAdmin(data){
     var d = parseData(data || current);
@@ -24088,6 +24111,10 @@ URL.revokeObjectURL(url);
       var el = document.getElementById(id);
       if(el){ el.addEventListener('input',renderAdminPreview); el.addEventListener('change',renderAdminPreview); }
     });
+    window.addEventListener('resize',function(){
+      clearTimeout(marqueeResizeTimer);
+      marqueeResizeTimer = setTimeout(updateMarqueeMetrics,120);
+    },{passive:true});
     load();
   }
   window.loadCertAlertBanner = load;
