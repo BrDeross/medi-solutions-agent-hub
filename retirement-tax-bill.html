@@ -478,7 +478,7 @@ input[type="range"]::-moz-range-track{
   <div class="hero">
     <div class="eyebrow">Every retirement account has a bill attached</div>
     <h1 class="serif">What's <em>your</em><br>Retirement Tax Bill?</h1>
-    <p>Your IRA or 401(k) has grown tax-deferred — which means the IRS has a bill coming due. Answer four quick questions to see your number.</p>
+    <p>Your IRA or 401(k) has grown tax-deferred — which means the IRS has a bill coming due. Answer three quick questions to see your number.</p>
   </div>
 
   <div class="trust-bar">
@@ -514,16 +514,6 @@ input[type="range"]::-moz-range-track{
     <h2 class="serif">Tell us about your account</h2>
 
     <div class="field">
-      <label for="rtbAge">Your Current Age</label>
-      <input type="number" id="rtbAge" placeholder="e.g. 58" min="18" max="90">
-    </div>
-
-    <div class="field">
-      <label for="rtbRetireAge">Planned Retirement Age</label>
-      <input type="number" id="rtbRetireAge" placeholder="e.g. 65" min="18" max="90">
-    </div>
-
-    <div class="field">
       <label for="rtbBalance">Current IRA / 401(k) Balance</label>
       <input type="number" id="rtbBalance" placeholder="e.g. 500000" min="0">
     </div>
@@ -535,6 +525,7 @@ input[type="range"]::-moz-range-track{
         <div class="slider-value" id="rtbGrowthSliderValue">6%</div>
       </div>
       <div class="slider-ticks"><span>2%</span><span>6%</span><span>10%</span></div>
+      <div class="helptext" style="text-align:left;margin-top:10px;">Projection uses a 10-year tax-planning horizon.</div>
     </div>
 
     <div class="field">
@@ -554,7 +545,7 @@ input[type="range"]::-moz-range-track{
   <div class="bill" id="rtbBill">
     <div class="bill-head"><span>Notice of Estimated Tax Liability</span><span id="rtbBillDate"></span></div>
     <div class="bill-body">
-      <div class="bill-row"><span>Projected Account Balance at Retirement</span><span id="rtbProjBalance">$0</span></div>
+      <div class="bill-row"><span>Projected Account Balance in 10 Years</span><span id="rtbProjBalance">$0</span></div>
       <div class="bill-row"><span>Assumed Growth Rate</span><span id="rtbUsedRate">0%</span></div>
       <div class="bill-row"><span>Assumed Tax Rate in Retirement</span><span id="rtbUsedTax">0%</span></div>
       <div class="bill-total"><span class="label">Your Estimated Retirement Tax Bill</span><span class="amount" id="rtbTaxBill">$0</span></div>
@@ -616,7 +607,7 @@ input[type="range"]::-moz-range-track{
   </div>
 
   <div class="disclosure">
-    This report is a hypothetical, educational illustration based on the inputs provided and general assumptions about tax rates and investment growth. It is not intended to predict future performance, taxes, or fees, and is not a guarantee of any kind. This material does not constitute tax, legal, or investment advice. Please consult a qualified tax professional before making any decisions about your retirement accounts. <span id="agencyNameFooter">Medi Solutions Insurance Agency</span> is not a CPA firm.
+    This report is a hypothetical, educational illustration based on the inputs provided, a 10-year planning horizon, and general assumptions about tax rates and investment growth. It is not intended to predict future performance, taxes, or fees, and is not a guarantee of any kind. This material does not constitute tax, legal, or investment advice. Please consult a qualified tax professional before making any decisions about your retirement accounts. <span id="agencyNameFooter">Medi Solutions Insurance Agency</span> is not a CPA firm.
   </div>
 
 </div>
@@ -678,22 +669,20 @@ return '$' + Math.round(n).toLocaleString('en-US');
 
 /* ---- calculate ---- */
 document.getElementById('rtbCalcBtn').addEventListener('click', function(){
-const age = parseInt(document.getElementById('rtbAge').value);
-const retireAge = parseInt(document.getElementById('rtbRetireAge').value);
 const balance = parseFloat(document.getElementById('rtbBalance').value);
 
-if (!age || !retireAge || !balance || retireAge <= age){
-alert('Please enter your current age, a retirement age greater than your current age, and your account balance.');
+if (!balance || balance <= 0){
+alert('Please enter your current IRA or 401(k) balance.');
 return;
 }
 
-const years = retireAge - age;
+const years = 10;
 const projectedBalance = balance * Math.pow(1 + selectedGrowthRate/100, years);
 const taxBill = projectedBalance * (selectedTaxRate/100);
 const freeApproachBill = taxBill * 0.35; // illustrative: potential reduction from a tax-free repositioning strategy
 
 lastCalc = {
-age: age, retireAge: retireAge, years: years, balance: balance,
+planningHorizonYears: years, balance: balance,
 growthRate: selectedGrowthRate, taxRate: selectedTaxRate,
 projectedBalance: projectedBalance, taxBill: taxBill, freeApproachBill: freeApproachBill
 };
