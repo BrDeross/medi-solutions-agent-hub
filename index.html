@@ -4806,6 +4806,144 @@ cursor: pointer; white-space: nowrap;
 })();
 </script>
 
+
+<style id="phase92-cert-alert-styles">
+/* Phase 92: admin-managed flashing/scrolling Cert alert */
+#certAlertBanner[hidden]{display:none!important;}
+#certAlertBanner{
+  position:relative;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:stretch;
+  width:100%;
+  margin:0 0 16px;
+  overflow:hidden;
+  border:2px solid rgba(251,191,36,.92);
+  border-radius:16px;
+  background:linear-gradient(100deg,rgba(127,29,29,.98) 0%,rgba(69,10,10,.98) 25%,rgba(17,24,39,.98) 60%,rgba(120,53,15,.98) 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 12px 28px rgba(0,0,0,.32),0 0 22px rgba(251,191,36,.28);
+  isolation:isolate;
+}
+#certAlertBanner::after{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  z-index:-1;
+  border-radius:inherit;
+  pointer-events:none;
+  box-shadow:0 0 18px 5px rgba(248,113,113,.18),0 0 32px 8px rgba(251,191,36,.12);
+  animation:certAlertGlow 1.15s ease-in-out infinite;
+}
+.cert-alert-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:54px;
+  padding:10px 16px;
+  border-right:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(135deg,#dc2626,#991b1b);
+  color:#fff7ed;
+  font-size:12px;
+  font-weight:950;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  text-shadow:0 1px 8px rgba(0,0,0,.45);
+}
+.cert-alert-icon{
+  display:inline-grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:#fef3c7;
+  color:#991b1b;
+  font-size:16px;
+  box-shadow:0 0 0 3px rgba(254,243,199,.15),0 0 16px rgba(254,243,199,.45);
+  animation:certAlertBlink 1s steps(2,end) infinite;
+}
+.cert-alert-viewport{
+  position:relative;
+  display:flex;
+  align-items:center;
+  min-width:0;
+  overflow:hidden;
+  padding:0;
+  mask-image:linear-gradient(90deg,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%);
+}
+.cert-alert-track{
+  display:flex;
+  align-items:center;
+  width:max-content;
+  min-width:100%;
+  will-change:transform;
+  animation:certAlertScroll var(--cert-alert-duration,22s) linear infinite;
+}
+#certAlertBanner:hover .cert-alert-track,
+#certAlertBanner:focus-within .cert-alert-track{animation-play-state:paused;}
+.cert-alert-message{
+  display:inline-flex;
+  align-items:center;
+  min-height:54px;
+  padding:8px 42px;
+  color:#fff;
+  font-size:15px;
+  font-weight:900;
+  line-height:1.4;
+  letter-spacing:.015em;
+  white-space:nowrap;
+  text-shadow:0 2px 8px rgba(0,0,0,.72);
+}
+.cert-alert-message::after{
+  content:"◆";
+  margin-left:42px;
+  color:#fbbf24;
+  font-size:10px;
+  text-shadow:0 0 10px rgba(251,191,36,.75);
+}
+#certAlertBanner[data-flash="strong"]{animation:certAlertStrong 1.05s steps(2,end) infinite;}
+#certAlertBanner[data-flash="soft"]{animation:certAlertSoft 1.45s ease-in-out infinite;}
+@keyframes certAlertScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes certAlertBlink{0%,44%{opacity:1;transform:scale(1)}45%,100%{opacity:.25;transform:scale(.88)}}
+@keyframes certAlertGlow{0%,100%{opacity:.36;transform:scale(.995)}50%{opacity:1;transform:scale(1.006)}}
+@keyframes certAlertSoft{0%,100%{filter:brightness(.92)}50%{filter:brightness(1.16)}}
+@keyframes certAlertStrong{0%,49%{filter:brightness(1)}50%,100%{filter:brightness(1.22)}}
+.cert-alert-admin-box{
+  margin:0 0 16px;
+  padding:15px;
+  border:1px solid rgba(248,113,113,.38);
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(127,29,29,.18),rgba(15,23,42,.72));
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+.cert-alert-admin-title{font-size:13px;font-weight:950;color:#fee2e2;letter-spacing:.02em;}
+.cert-alert-admin-help{font-size:11px;color:var(--muted-2);margin-top:3px;line-height:1.5;}
+.cert-alert-admin-grid{display:grid;grid-template-columns:minmax(0,1fr) 150px 150px;gap:10px;margin-top:12px;align-items:end;}
+#certAlertMessageInput{min-height:88px;resize:vertical;line-height:1.5;}
+.cert-alert-admin-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;}
+.cert-alert-admin-actions .admin-save-btn{width:auto!important;flex:0 0 auto!important;min-width:190px;}
+.cert-alert-admin-status{font-size:11px;font-weight:850;min-height:16px;color:#fcd34d;}
+.cert-alert-admin-preview{margin-top:12px;padding:10px 12px;border:1px dashed rgba(251,191,36,.35);border-radius:10px;background:rgba(0,0,0,.15);font-size:11px;color:#fde68a;line-height:1.5;overflow-wrap:anywhere;}
+.cert-alert-toggle{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.04);color:var(--text);font-size:12px;font-weight:800;}
+@media(max-width:760px){
+  #certAlertBanner{grid-template-columns:1fr;border-radius:14px;}
+  .cert-alert-label{min-height:40px;justify-content:center;border-right:0;border-bottom:1px solid rgba(255,255,255,.18);padding:7px 12px;}
+  .cert-alert-icon{width:24px;height:24px;font-size:14px;}
+  .cert-alert-message{min-height:48px;padding:7px 28px;font-size:13px;}
+  .cert-alert-message::after{margin-left:28px;}
+  .cert-alert-admin-grid{grid-template-columns:1fr;}
+  .cert-alert-admin-actions .admin-save-btn{width:100%!important;min-width:0;}
+  .cert-alert-toggle{width:100%;box-sizing:border-box;}
+}
+@media(prefers-reduced-motion:reduce){
+  #certAlertBanner,#certAlertBanner::after,.cert-alert-icon,.cert-alert-track{animation:none!important;}
+  .cert-alert-track{width:100%;transform:none!important;}
+  .cert-alert-message:first-child{white-space:normal;width:100%;justify-content:center;text-align:center;}
+  .cert-alert-message:nth-child(2){display:none;}
+}
+</style>
+
 </head>
 <body class="hub-login-pending">
 <div id="hubLoginGate" style="position:fixed;inset:0;z-index:12000;background:rgba(8,15,32,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -5573,6 +5711,16 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 </div>
 <span class="count-chip" id="certAgentCount">0 agents</span>
+</div>
+
+<div id="certAlertBanner" role="status" aria-live="polite" aria-label="Certification alert" data-flash="strong" hidden>
+  <div class="cert-alert-label"><span class="cert-alert-icon" aria-hidden="true">!</span><span>Cert Alert</span></div>
+  <div class="cert-alert-viewport">
+    <div class="cert-alert-track" id="certAlertTrack">
+      <span class="cert-alert-message" id="certAlertMessageA"></span>
+      <span class="cert-alert-message" id="certAlertMessageB" aria-hidden="true"></span>
+    </div>
+  </div>
 </div>
 <div id="certTrackerContent">
 <div class="trip-empty">No certification data yet — admin can upload a CSV below.</div>
@@ -6994,6 +7142,43 @@ Upload your certification CSV or Excel file. Columns: <code>Agent Name</code>, <
 Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <strong>N</strong> for not certified.<br>
 <strong>Save &amp; Publish replaces the shared Cert Tracker data in Supabase for every HUB user and verifies the cloud update before reporting success.</strong><br><strong style="color:#fbbf24;">After installing this correction, upload the source CSV once and confirm the status identifies the ANTHEM header before clicking Save &amp; Publish.</strong>
 </p>
+
+<div id="certAlertAdminBox" class="cert-alert-admin-box">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <div>
+      <div class="cert-alert-admin-title">🚨 Certification Alert Banner</div>
+      <div class="cert-alert-admin-help">Enter one or more comments. New lines are converted to separators in the scrolling alert shown above the Cert Tracker.</div>
+    </div>
+    <div id="certAlertAdminStatus" class="cert-alert-admin-status"></div>
+  </div>
+  <div class="cert-alert-admin-grid">
+    <div>
+      <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Alert comments</label>
+      <textarea id="certAlertMessageInput" class="admin-input" maxlength="900" placeholder="Example: Aetna certifications open August 12. Complete AHIP before starting carrier certifications."></textarea>
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Scroll speed</label>
+      <select id="certAlertSpeedInput" class="admin-input" style="width:100%;">
+        <option value="slow">Slow</option>
+        <option value="normal" selected>Normal</option>
+        <option value="fast">Fast</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Flash intensity</label>
+      <select id="certAlertFlashInput" class="admin-input" style="width:100%;">
+        <option value="soft">Soft</option>
+        <option value="strong" selected>Strong</option>
+      </select>
+    </div>
+  </div>
+  <div class="cert-alert-admin-actions">
+    <label class="cert-alert-toggle"><input id="certAlertEnabledInput" type="checkbox" checked> Show alert to agents</label>
+    <button type="button" id="certAlertSaveBtn" class="admin-save-btn">💾 Save &amp; Publish Alert</button>
+    <button type="button" id="certAlertHideBtn" class="admin-save-btn" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;">Hide &amp; Clear Alert</button>
+  </div>
+  <div id="certAlertAdminPreview" class="cert-alert-admin-preview">Preview will appear here as you type.</div>
+</div>
 <div id="certReleaseAdminBox" class="cert-release-admin-box" style="margin:0 0 16px 0;padding:14px;border:1px solid rgba(0,194,184,.30);background:rgba(15,23,42,.55);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.14);">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
     <div>
@@ -23721,5 +23906,196 @@ URL.revokeObjectURL(url);
 <!-- Phase 89: Cert CSV global Supabase update + verification applied to Phase 88 base -->
 <!-- Phase 89: Shared Onboarding permission isolation fix -->
 <!-- Phase 91: Retirement Tax Bill leads isolated by logged-in agent source_agent; admin-only global view retained -->
+
+<script id="phase92-cert-alert-script">
+(function(){
+  'use strict';
+  var SUPA_URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
+  var HUB = 'medi';
+  var KEY = 'cert_alert_banner';
+  var current = {message:'', enabled:false, speed:'normal', flash:'strong'};
+  var speedSeconds = {slow:32, normal:22, fast:14};
+
+  function headers(extra){
+    return Object.assign({'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}, extra || {});
+  }
+  function parseData(value){
+    var out = value;
+    for(var i=0;i<3 && typeof out === 'string';i++){
+      try{ out = JSON.parse(out); }catch(e){ break; }
+    }
+    if(!out || typeof out !== 'object' || Array.isArray(out)) out = {};
+    var message = String(out.message || out.text || '').replace(/\r\n?/g,'\n').trim();
+    var speed = /^(slow|normal|fast)$/.test(String(out.speed || '')) ? String(out.speed) : 'normal';
+    var flash = /^(soft|strong)$/.test(String(out.flash || '')) ? String(out.flash) : 'strong';
+    return {message:message, enabled:out.enabled !== false && !!message, speed:speed, flash:flash, updatedAt:out.updatedAt || ''};
+  }
+  function displayText(value){
+    return String(value || '').split(/\n+/).map(function(s){return s.trim();}).filter(Boolean).join('   •   ');
+  }
+  function status(message, ok){
+    var el = document.getElementById('certAlertAdminStatus');
+    if(!el) return;
+    el.textContent = message || '';
+    el.style.color = ok === true ? '#86efac' : (ok === false ? '#fca5a5' : '#fcd34d');
+  }
+  function renderBanner(data){
+    current = parseData(data || current);
+    var banner = document.getElementById('certAlertBanner');
+    var a = document.getElementById('certAlertMessageA');
+    var b = document.getElementById('certAlertMessageB');
+    if(!banner || !a || !b) return;
+    var message = displayText(current.message);
+    if(!current.enabled || !message){
+      banner.hidden = true;
+      a.textContent = '';
+      b.textContent = '';
+      return;
+    }
+    a.textContent = message;
+    b.textContent = message;
+    banner.dataset.flash = current.flash;
+    banner.style.setProperty('--cert-alert-duration', (speedSeconds[current.speed] || speedSeconds.normal) + 's');
+    banner.hidden = false;
+  }
+  function fillAdmin(data){
+    var d = parseData(data || current);
+    var msg = document.getElementById('certAlertMessageInput');
+    var enabled = document.getElementById('certAlertEnabledInput');
+    var speed = document.getElementById('certAlertSpeedInput');
+    var flash = document.getElementById('certAlertFlashInput');
+    if(msg) msg.value = d.message;
+    if(enabled) enabled.checked = d.message ? d.enabled : true;
+    if(speed) speed.value = d.speed;
+    if(flash) flash.value = d.flash;
+    renderAdminPreview();
+  }
+  function adminDraft(){
+    var msg = document.getElementById('certAlertMessageInput');
+    var enabled = document.getElementById('certAlertEnabledInput');
+    var speed = document.getElementById('certAlertSpeedInput');
+    var flash = document.getElementById('certAlertFlashInput');
+    return parseData({
+      message:msg ? msg.value : '',
+      enabled:enabled ? enabled.checked : true,
+      speed:speed ? speed.value : 'normal',
+      flash:flash ? flash.value : 'strong'
+    });
+  }
+  function renderAdminPreview(){
+    var preview = document.getElementById('certAlertAdminPreview');
+    if(!preview) return;
+    var d = adminDraft();
+    var text = displayText(d.message);
+    preview.textContent = text ? ((d.enabled ? 'Visible: ' : 'Hidden: ') + text) : 'Preview will appear here as you type.';
+  }
+  async function readCloud(){
+    var url = SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(HUB) + '&key=eq.' + encodeURIComponent(KEY) + '&select=data';
+    var response = await fetch(url,{cache:'no-store',headers:headers({'Cache-Control':'no-cache'})});
+    var body = await response.text();
+    if(!response.ok) throw new Error('Alert read failed ' + response.status + ': ' + body.slice(0,220));
+    var rows = body ? JSON.parse(body) : [];
+    if(!Array.isArray(rows) || !rows.length) return parseData({});
+    return parseData(rows[rows.length-1].data);
+  }
+  async function writeCloud(data){
+    var base = SUPA_URL + '/rest/v1/tile_content';
+    var query = '?hub=eq.' + encodeURIComponent(HUB) + '&key=eq.' + encodeURIComponent(KEY);
+    var del = await fetch(base + query,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
+    var delText = await del.text();
+    if(!del.ok) throw new Error('Alert cleanup failed ' + del.status + ': ' + delText.slice(0,220));
+    var payload = Object.assign({},parseData(data),{updatedAt:new Date().toISOString(),source:'phase92_cert_alert_admin'});
+    var post = await fetch(base,{
+      method:'POST',
+      headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
+      body:JSON.stringify({hub:HUB,key:KEY,data:payload})
+    });
+    var postText = await post.text();
+    if(!post.ok) throw new Error('Alert save failed ' + post.status + ': ' + postText.slice(0,260));
+    var verify = await readCloud();
+    if(verify.message !== payload.message || verify.enabled !== payload.enabled || verify.speed !== payload.speed || verify.flash !== payload.flash){
+      throw new Error('Alert verification failed: Supabase returned different settings.');
+    }
+    return verify;
+  }
+  async function deleteCloud(){
+    var base = SUPA_URL + '/rest/v1/tile_content';
+    var query = '?hub=eq.' + encodeURIComponent(HUB) + '&key=eq.' + encodeURIComponent(KEY);
+    var response = await fetch(base + query,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
+    var body = await response.text();
+    if(!response.ok) throw new Error('Alert clear failed ' + response.status + ': ' + body.slice(0,220));
+    var verify = await readCloud();
+    if(verify.message) throw new Error('Alert clear verification failed.');
+  }
+  async function saveFromAdmin(){
+    var draft = adminDraft();
+    if(!draft.message){ alert('Enter an alert comment before publishing.'); return; }
+    var btn = document.getElementById('certAlertSaveBtn');
+    if(btn) btn.disabled = true;
+    status('Saving alert globally...', null);
+    try{
+      var saved = await writeCloud(draft);
+      current = saved;
+      renderBanner(saved);
+      fillAdmin(saved);
+      status('Alert saved globally and verified.', true);
+      if(typeof window.showSnuToast === 'function') window.showSnuToast('✓ Certification alert published.');
+    }catch(err){
+      console.error('[CERT ALERT SAVE ERROR]',err);
+      status(err.message || String(err), false);
+      alert('Certification alert was not published: ' + (err.message || err));
+    }finally{ if(btn) btn.disabled = false; }
+  }
+  async function hideAndClear(){
+    if(!confirm('Hide and remove the Certification Alert for every agent?')) return;
+    var btn = document.getElementById('certAlertHideBtn');
+    if(btn) btn.disabled = true;
+    status('Clearing alert globally...', null);
+    try{
+      await deleteCloud();
+      current = parseData({});
+      renderBanner(current);
+      fillAdmin(current);
+      status('Alert hidden and cleared globally.', true);
+      if(typeof window.showSnuToast === 'function') window.showSnuToast('✓ Certification alert cleared.');
+    }catch(err){
+      console.error('[CERT ALERT CLEAR ERROR]',err);
+      status(err.message || String(err), false);
+      alert('Certification alert was not cleared: ' + (err.message || err));
+    }finally{ if(btn) btn.disabled = false; }
+  }
+  async function load(){
+    try{
+      var data = await readCloud();
+      current = data;
+      renderBanner(data);
+      fillAdmin(data);
+      if(data.message) status('Current alert loaded.', true);
+    }catch(err){
+      console.warn('[CERT ALERT LOAD ERROR]',err);
+      renderBanner(current);
+      fillAdmin(current);
+      status('Alert could not load: ' + (err.message || err), false);
+    }
+  }
+  function init(){
+    var save = document.getElementById('certAlertSaveBtn');
+    var hide = document.getElementById('certAlertHideBtn');
+    if(save) save.addEventListener('click',saveFromAdmin);
+    if(hide) hide.addEventListener('click',hideAndClear);
+    ['certAlertMessageInput','certAlertEnabledInput','certAlertSpeedInput','certAlertFlashInput'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el){ el.addEventListener('input',renderAdminPreview); el.addEventListener('change',renderAdminPreview); }
+    });
+    load();
+  }
+  window.loadCertAlertBanner = load;
+  window.renderCertAlertBanner = renderBanner;
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+})();
+</script>
+
 </body>
 </html>
