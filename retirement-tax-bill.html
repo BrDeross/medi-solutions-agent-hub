@@ -478,7 +478,7 @@ input[type="range"]::-moz-range-track{
   <div class="hero">
     <div class="eyebrow">Every retirement account has a bill attached</div>
     <h1 class="serif">What's <em>your</em><br>Retirement Tax Bill?</h1>
-    <p>Your IRA or 401(k) has grown tax-deferred — which means the IRS has a bill coming due. Answer three quick questions to see your number.</p>
+    <p>Your IRA or 401(k) has grown tax-deferred — which means the IRS has a bill coming due. Answer four quick questions to see your number.</p>
   </div>
 
   <div class="trust-bar">
@@ -512,6 +512,11 @@ input[type="range"]::-moz-range-track{
   <div class="card">
     <div class="card-label">Step 1</div>
     <h2 class="serif">Tell us about your account</h2>
+
+    <div class="field">
+      <label for="rtbAge">Your Current Age</label>
+      <input type="number" id="rtbAge" placeholder="e.g. 58" min="18" max="90">
+    </div>
 
     <div class="field">
       <label for="rtbBalance">Current IRA / 401(k) Balance</label>
@@ -669,10 +674,11 @@ return '$' + Math.round(n).toLocaleString('en-US');
 
 /* ---- calculate ---- */
 document.getElementById('rtbCalcBtn').addEventListener('click', function(){
+const age = parseInt(document.getElementById('rtbAge').value, 10);
 const balance = parseFloat(document.getElementById('rtbBalance').value);
 
-if (!balance || balance <= 0){
-alert('Please enter your current IRA or 401(k) balance.');
+if (!age || age < 18 || age > 90 || !balance || balance <= 0){
+alert('Please enter your current age and current IRA or 401(k) balance.');
 return;
 }
 
@@ -682,7 +688,7 @@ const taxBill = projectedBalance * (selectedTaxRate/100);
 const freeApproachBill = taxBill * 0.35; // illustrative: potential reduction from a tax-free repositioning strategy
 
 lastCalc = {
-planningHorizonYears: years, balance: balance,
+age: age, planningHorizonYears: years, balance: balance,
 growthRate: selectedGrowthRate, taxRate: selectedTaxRate,
 projectedBalance: projectedBalance, taxBill: taxBill, freeApproachBill: freeApproachBill
 };
