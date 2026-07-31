@@ -4808,7 +4808,7 @@ cursor: pointer; white-space: nowrap;
 
 
 <style id="phase92-cert-alert-styles">
-/* Phase 96: full-width admin Cert alert with urgency colors */
+/* Phase 98: full-width Cert alert controls, urgency colors, and selectable icon */
 #certAlertBanner[hidden]{display:none!important;}
 #certAlertBanner{
   --cert-alert-border:rgba(248,113,113,.96);
@@ -4976,8 +4976,8 @@ cursor: pointer; white-space: nowrap;
 }
 .cert-alert-admin-title{font-size:19px;font-weight:950;color:#fff1f2;letter-spacing:.015em;line-height:1.2;}
 .cert-alert-admin-help{font-size:13px;color:#cbd5e1;margin-top:6px;line-height:1.55;max-width:980px;}
-.cert-alert-admin-grid{display:grid;grid-template-columns:170px 170px minmax(360px,1fr);gap:14px;margin-top:18px;align-items:end;}
-.cert-alert-message-field{grid-column:1 / -1;}
+.cert-alert-admin-grid{display:grid;grid-template-columns:repeat(3,minmax(190px,1fr));gap:16px;margin-top:18px;align-items:end;width:100%;}
+.cert-alert-message-field,.cert-alert-urgency-field{grid-column:1 / -1;}
 .cert-alert-field-label{font-size:13px;font-weight:900;color:#e2e8f0;display:block;margin-bottom:7px;}
 #certAlertMessageInput{width:100%;min-height:145px;resize:vertical;line-height:1.55;font-size:16px;font-weight:650;padding:15px 16px;}
 .cert-alert-admin-grid select.admin-input{font-size:14px;min-height:44px;}
@@ -4990,20 +4990,20 @@ cursor: pointer; white-space: nowrap;
 .cert-alert-admin-preview[data-urgency="blue"]{border-color:rgba(96,165,250,.72);background:linear-gradient(100deg,rgba(30,64,175,.86),rgba(17,24,39,.94));}
 .cert-alert-admin-preview[data-urgency="purple"]{border-color:rgba(192,132,252,.72);background:linear-gradient(100deg,rgba(88,28,135,.86),rgba(17,24,39,.94));}
 .cert-alert-toggle{display:flex;align-items:center;gap:9px;min-height:44px;padding:0 14px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.055);color:var(--text);font-size:13px;font-weight:850;}
-.cert-alert-urgency-options{display:grid;grid-template-columns:repeat(5,minmax(92px,1fr));gap:8px;}
-.cert-alert-color-option{position:relative;display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 10px;border:1px solid rgba(148,163,184,.28);border-radius:10px;background:rgba(255,255,255,.04);cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.cert-alert-urgency-options{display:grid;grid-template-columns:repeat(5,minmax(145px,1fr));gap:12px;width:100%;}
+.cert-alert-color-option{position:relative;display:flex;align-items:center;gap:11px;min-height:58px;padding:10px 14px;border:1px solid rgba(148,163,184,.28);border-radius:10px;background:rgba(255,255,255,.04);cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease;}
 .cert-alert-color-option:hover{transform:translateY(-2px);background:rgba(255,255,255,.075);}
 .cert-alert-color-option input{position:absolute;opacity:0;pointer-events:none;}
 .cert-alert-color-option:has(input:checked){border-color:rgba(255,255,255,.82);box-shadow:0 0 0 2px rgba(255,255,255,.12),0 8px 18px rgba(0,0,0,.18);background:rgba(255,255,255,.11);}
-.cert-alert-color-swatch{width:18px;height:18px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.10);}
+.cert-alert-color-swatch{width:22px;height:22px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.10);}
 .cert-alert-color-option[data-urgency="red"] .cert-alert-color-swatch{background:#ef4444;}
 .cert-alert-color-option[data-urgency="amber"] .cert-alert-color-swatch{background:#f59e0b;}
 .cert-alert-color-option[data-urgency="green"] .cert-alert-color-swatch{background:#22c55e;}
 .cert-alert-color-option[data-urgency="blue"] .cert-alert-color-swatch{background:#3b82f6;}
 .cert-alert-color-option[data-urgency="purple"] .cert-alert-color-swatch{background:#a855f7;}
 .cert-alert-color-copy{display:flex;flex-direction:column;line-height:1.08;min-width:0;}
-.cert-alert-color-copy strong{font-size:12px;color:#f8fafc;}
-.cert-alert-color-copy small{font-size:9px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
+.cert-alert-color-copy strong{font-size:14px;color:#f8fafc;white-space:normal;overflow:visible;text-overflow:clip;}
+.cert-alert-color-copy small{font-size:10px;color:#cbd5e1;margin-top:4px;text-transform:uppercase;letter-spacing:.055em;white-space:normal;overflow:visible;text-overflow:clip;}
 @media(max-width:760px){
   #certAlertBanner{grid-template-columns:1fr;border-radius:14px;}
   .cert-alert-label{min-height:40px;justify-content:center;border-right:0;border-bottom:1px solid rgba(255,255,255,.18);padding:7px 12px;}
@@ -5013,7 +5013,7 @@ cursor: pointer; white-space: nowrap;
   .cert-alert-admin-box{padding:16px;}
   .cert-alert-admin-title{font-size:17px;}
   .cert-alert-admin-grid{grid-template-columns:1fr;}
-  .cert-alert-message-field{grid-column:1;}
+  .cert-alert-message-field,.cert-alert-urgency-field{grid-column:1;}
   #certAlertMessageInput{min-height:130px;font-size:15px;}
   .cert-alert-urgency-options{grid-template-columns:repeat(2,minmax(0,1fr));}
   .cert-alert-color-option:last-child{grid-column:1 / -1;}
@@ -5798,7 +5798,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 </div>
 
 <div id="certAlertBanner" role="status" aria-live="polite" aria-label="Certification alert" data-flash="strong" hidden>
-  <div class="cert-alert-label"><span class="cert-alert-icon" aria-hidden="true">!</span><span>Cert Alert</span></div>
+  <div class="cert-alert-label"><span class="cert-alert-icon" id="certAlertIcon" aria-hidden="true">🚨</span><span>Cert Alert</span></div>
   <div class="cert-alert-viewport">
     <div class="cert-alert-track" id="certAlertTrack">
       <span class="cert-alert-message" id="certAlertMessageA"></span>
@@ -7255,7 +7255,58 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
         <option value="strong" selected>Strong</option>
       </select>
     </div>
-    <div>
+    <div class="cert-alert-icon-field">
+      <label class="cert-alert-field-label" for="certAlertIconInput">Alert icon</label>
+      <select id="certAlertIconInput" class="admin-input" style="width:100%;">
+        <optgroup label="Professional &amp; attention">
+          <option value="siren" selected>🚨 Siren — Urgent alert</option>
+          <option value="warning">⚠️ Warning — Action needed</option>
+          <option value="announcement">📣 Announcement — New notice</option>
+          <option value="bell">🔔 Bell — Reminder</option>
+          <option value="check">✅ Check — Completed or available</option>
+          <option value="calendar">📅 Calendar — Date or deadline</option>
+          <option value="info">ℹ️ Information — General update</option>
+          <option value="star">⭐ Star — Important item</option>
+        </optgroup>
+        <optgroup label="Animals">
+          <option value="dog">🐶 Dog</option>
+          <option value="cat">🐱 Cat</option>
+          <option value="chicken">🐔 Chicken</option>
+          <option value="owl">🦉 Owl</option>
+          <option value="fox">🦊 Fox</option>
+          <option value="lion">🦁 Lion</option>
+          <option value="tiger">🐯 Tiger</option>
+          <option value="bear">🐻 Bear</option>
+          <option value="panda">🐼 Panda</option>
+          <option value="unicorn">🦄 Unicorn</option>
+          <option value="butterfly">🦋 Butterfly</option>
+          <option value="bee">🐝 Bee</option>
+          <option value="turtle">🐢 Turtle</option>
+          <option value="frog">🐸 Frog</option>
+          <option value="monkey">🐵 Monkey</option>
+          <option value="penguin">🐧 Penguin</option>
+          <option value="octopus">🐙 Octopus</option>
+          <option value="whale">🐳 Whale</option>
+          <option value="shark">🦈 Shark</option>
+          <option value="horse">🐴 Horse</option>
+        </optgroup>
+        <optgroup label="Fun &amp; celebration">
+          <option value="rocket">🚀 Rocket</option>
+          <option value="party">🎉 Party</option>
+          <option value="fire">🔥 Fire</option>
+          <option value="lightbulb">💡 Light bulb</option>
+          <option value="target">🎯 Target</option>
+          <option value="trophy">🏆 Trophy</option>
+          <option value="gift">🎁 Gift</option>
+          <option value="sparkles">✨ Sparkles</option>
+          <option value="rainbow">🌈 Rainbow</option>
+          <option value="sun">☀️ Sun</option>
+          <option value="heart">❤️ Heart</option>
+          <option value="smile">😊 Smile</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="cert-alert-urgency-field">
       <span class="cert-alert-field-label" id="certAlertUrgencyLabel">Urgency color</span>
       <div class="cert-alert-urgency-options" id="certAlertUrgencyOptions" role="radiogroup" aria-labelledby="certAlertUrgencyLabel">
         <label class="cert-alert-color-option" data-urgency="red"><input type="radio" name="certAlertUrgencyInput" value="red" checked><span class="cert-alert-color-swatch"></span><span class="cert-alert-color-copy"><strong>Red</strong><small>Urgent</small></span></label>
@@ -9982,6 +10033,8 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 <!-- Cert release dates: locked admin + restored working save v72 -->
 
 <!-- Phase 75: carrier release-date scripts removed to stop raw code rendering. No other Hub feature intentionally changed. -->
+
+<!-- Phase 99: Expanded Cert Alert icon library with animals/fun icons; icon persistence verification fixed. -->
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -24008,7 +24061,7 @@ URL.revokeObjectURL(url);
   var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
   var HUB = 'medi';
   var KEY = 'cert_alert_banner';
-  var current = {message:'', enabled:false, speed:'normal', flash:'strong', urgency:'red'};
+  var current = {message:'', enabled:false, speed:'normal', flash:'strong', urgency:'red', icon:'siren'};
   var speedPixelsPerSecond = {slow:34, normal:52, fast:78};
   var marqueeResizeTimer = null;
 
@@ -24026,7 +24079,9 @@ URL.revokeObjectURL(url);
     var flash = /^(soft|strong)$/.test(String(out.flash || '')) ? String(out.flash) : 'strong';
     var urgencyRaw = String(out.urgency || out.color || '').toLowerCase();
     var urgency = /^(red|amber|green|blue|purple)$/.test(urgencyRaw) ? urgencyRaw : 'red';
-    return {message:message, enabled:out.enabled !== false && !!message, speed:speed, flash:flash, urgency:urgency, updatedAt:out.updatedAt || ''};
+    var iconRaw = String(out.icon || '').toLowerCase();
+    var icon = /^(siren|warning|announcement|bell|check|calendar|info|star|dog|cat|chicken|owl|fox|lion|tiger|bear|panda|unicorn|butterfly|bee|turtle|frog|monkey|penguin|octopus|whale|shark|horse|rocket|party|fire|lightbulb|target|trophy|gift|sparkles|rainbow|sun|heart|smile)$/.test(iconRaw) ? iconRaw : 'siren';
+    return {message:message, enabled:out.enabled !== false && !!message, speed:speed, flash:flash, urgency:urgency, icon:icon, updatedAt:out.updatedAt || ''};
   }
   function displayText(value){
     return String(value || '').split(/\n+/).map(function(s){return s.trim();}).filter(Boolean).join('   •   ');
@@ -24057,6 +24112,7 @@ URL.revokeObjectURL(url);
     var banner = document.getElementById('certAlertBanner');
     var a = document.getElementById('certAlertMessageA');
     var b = document.getElementById('certAlertMessageB');
+    var iconEl = document.getElementById('certAlertIcon');
     if(!banner || !a || !b) return;
     var message = displayText(current.message);
     if(!current.enabled || !message){
@@ -24067,6 +24123,8 @@ URL.revokeObjectURL(url);
     }
     a.textContent = message;
     b.textContent = message;
+    var iconMap = {siren:'🚨',warning:'⚠️',announcement:'📣',bell:'🔔',check:'✅',calendar:'📅',info:'ℹ️',star:'⭐',dog:'🐶',cat:'🐱',chicken:'🐔',owl:'🦉',fox:'🦊',lion:'🦁',tiger:'🐯',bear:'🐻',panda:'🐼',unicorn:'🦄',butterfly:'🦋',bee:'🐝',turtle:'🐢',frog:'🐸',monkey:'🐵',penguin:'🐧',octopus:'🐙',whale:'🐳',shark:'🦈',horse:'🐴',rocket:'🚀',party:'🎉',fire:'🔥',lightbulb:'💡',target:'🎯',trophy:'🏆',gift:'🎁',sparkles:'✨',rainbow:'🌈',sun:'☀️',heart:'❤️',smile:'😊'};
+    if(iconEl) iconEl.textContent = iconMap[current.icon] || iconMap.siren;
     banner.dataset.flash = current.flash;
     banner.dataset.urgency = current.urgency;
     banner.hidden = false;
@@ -24081,11 +24139,13 @@ URL.revokeObjectURL(url);
     var enabled = document.getElementById('certAlertEnabledInput');
     var speed = document.getElementById('certAlertSpeedInput');
     var flash = document.getElementById('certAlertFlashInput');
+    var icon = document.getElementById('certAlertIconInput');
     var urgency = document.querySelector('input[name="certAlertUrgencyInput"][value="' + d.urgency + '"]');
     if(msg) msg.value = d.message;
     if(enabled) enabled.checked = d.message ? d.enabled : true;
     if(speed) speed.value = d.speed;
     if(flash) flash.value = d.flash;
+    if(icon) icon.value = d.icon;
     if(urgency) urgency.checked = true;
     renderAdminPreview();
   }
@@ -24094,13 +24154,15 @@ URL.revokeObjectURL(url);
     var enabled = document.getElementById('certAlertEnabledInput');
     var speed = document.getElementById('certAlertSpeedInput');
     var flash = document.getElementById('certAlertFlashInput');
+    var icon = document.getElementById('certAlertIconInput');
     var urgency = document.querySelector('input[name="certAlertUrgencyInput"]:checked');
     return parseData({
       message:msg ? msg.value : '',
       enabled:enabled ? enabled.checked : true,
       speed:speed ? speed.value : 'normal',
       flash:flash ? flash.value : 'strong',
-      urgency:urgency ? urgency.value : 'red'
+      urgency:urgency ? urgency.value : 'red',
+      icon:icon ? icon.value : 'siren'
     });
   }
   function renderAdminPreview(){
@@ -24109,8 +24171,9 @@ URL.revokeObjectURL(url);
     var d = adminDraft();
     var text = displayText(d.message);
     var labels = {red:'RED • URGENT',amber:'AMBER • ATTENTION',green:'GREEN • UPDATE',blue:'BLUE • INFORMATION',purple:'PURPLE • REMINDER'};
+    var iconMap = {siren:'🚨',warning:'⚠️',announcement:'📣',bell:'🔔',check:'✅',calendar:'📅',info:'ℹ️',star:'⭐',dog:'🐶',cat:'🐱',chicken:'🐔',owl:'🦉',fox:'🦊',lion:'🦁',tiger:'🐯',bear:'🐻',panda:'🐼',unicorn:'🦄',butterfly:'🦋',bee:'🐝',turtle:'🐢',frog:'🐸',monkey:'🐵',penguin:'🐧',octopus:'🐙',whale:'🐳',shark:'🦈',horse:'🐴',rocket:'🚀',party:'🎉',fire:'🔥',lightbulb:'💡',target:'🎯',trophy:'🏆',gift:'🎁',sparkles:'✨',rainbow:'🌈',sun:'☀️',heart:'❤️',smile:'😊'};
     preview.dataset.urgency = d.urgency;
-    preview.textContent = text ? ((labels[d.urgency] || 'ALERT') + ' — ' + (d.enabled ? 'VISIBLE: ' : 'HIDDEN: ') + text) : 'Preview will appear here as you type.';
+    preview.textContent = text ? ((iconMap[d.icon] || iconMap.siren) + ' ' + (labels[d.urgency] || 'ALERT') + ' — ' + (d.enabled ? 'VISIBLE: ' : 'HIDDEN: ') + text) : 'Preview will appear here as you type.';
   }
   async function readCloud(){
     var url = SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(HUB) + '&key=eq.' + encodeURIComponent(KEY) + '&select=data';
@@ -24127,7 +24190,7 @@ URL.revokeObjectURL(url);
     var del = await fetch(base + query,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
     var delText = await del.text();
     if(!del.ok) throw new Error('Alert cleanup failed ' + del.status + ': ' + delText.slice(0,220));
-    var payload = Object.assign({},parseData(data),{updatedAt:new Date().toISOString(),source:'phase96_cert_alert_admin_urgency_colors'});
+    var payload = Object.assign({},parseData(data),{updatedAt:new Date().toISOString(),source:'phase99_cert_alert_fun_animal_icons'});
     var post = await fetch(base,{
       method:'POST',
       headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
@@ -24136,7 +24199,7 @@ URL.revokeObjectURL(url);
     var postText = await post.text();
     if(!post.ok) throw new Error('Alert save failed ' + post.status + ': ' + postText.slice(0,260));
     var verify = await readCloud();
-    if(verify.message !== payload.message || verify.enabled !== payload.enabled || verify.speed !== payload.speed || verify.flash !== payload.flash || verify.urgency !== payload.urgency){
+    if(verify.message !== payload.message || verify.enabled !== payload.enabled || verify.speed !== payload.speed || verify.flash !== payload.flash || verify.urgency !== payload.urgency || verify.icon !== payload.icon){
       throw new Error('Alert verification failed: Supabase returned different settings.');
     }
     return verify;
@@ -24206,7 +24269,7 @@ URL.revokeObjectURL(url);
     var hide = document.getElementById('certAlertHideBtn');
     if(save) save.addEventListener('click',saveFromAdmin);
     if(hide) hide.addEventListener('click',hideAndClear);
-    ['certAlertMessageInput','certAlertEnabledInput','certAlertSpeedInput','certAlertFlashInput'].forEach(function(id){
+    ['certAlertMessageInput','certAlertEnabledInput','certAlertSpeedInput','certAlertFlashInput','certAlertIconInput'].forEach(function(id){
       var el = document.getElementById(id);
       if(el){ el.addEventListener('input',renderAdminPreview); el.addEventListener('change',renderAdminPreview); }
     });
@@ -24271,28 +24334,27 @@ URL.revokeObjectURL(url);
 /* Message spans the full row; speed/flash sit together; urgency spans the next full row. */
 #adminTabCerts .cert-alert-admin-grid{
   display:grid !important;
-  grid-template-columns:minmax(160px, 210px) minmax(160px, 210px) !important;
-  gap:14px !important;
+  grid-template-columns:repeat(3, minmax(190px, 1fr)) !important;
+  gap:16px !important;
   width:100% !important;
 }
-#adminTabCerts .cert-alert-message-field{
-  grid-column:1 / -1 !important;
-}
-#adminTabCerts .cert-alert-admin-grid > div:nth-child(4){
+#adminTabCerts .cert-alert-message-field,
+#adminTabCerts .cert-alert-urgency-field{
   grid-column:1 / -1 !important;
 }
 #adminTabCerts .cert-alert-urgency-options{
   width:100% !important;
   min-width:0 !important;
-  grid-template-columns:repeat(5, minmax(0, 1fr)) !important;
+  grid-template-columns:repeat(5, minmax(145px, 1fr)) !important;
 }
 #adminTabCerts .cert-alert-color-option{
   min-width:0 !important;
 }
 #adminTabCerts .cert-alert-color-copy strong,
 #adminTabCerts .cert-alert-color-copy small{
-  overflow:hidden;
-  text-overflow:ellipsis;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  white-space:normal !important;
 }
 #adminTabCerts #certAlertMessageInput{
   width:100% !important;
@@ -24306,12 +24368,20 @@ URL.revokeObjectURL(url);
   word-break:break-word !important;
 }
 
+@media (max-width: 1200px){
+  #adminTabCerts .cert-alert-admin-grid{
+    grid-template-columns:repeat(2, minmax(190px, 1fr)) !important;
+  }
+  #adminTabCerts .cert-alert-icon-field{
+    grid-column:1 / -1 !important;
+  }
+  #adminTabCerts .cert-alert-urgency-options{
+    grid-template-columns:repeat(3, minmax(150px, 1fr)) !important;
+  }
+}
 @media (max-width: 900px){
   #adminTabCerts{
     padding:20px 18px 28px !important;
-  }
-  #adminTabCerts .cert-alert-urgency-options{
-    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
   }
 }
 
@@ -24337,7 +24407,8 @@ URL.revokeObjectURL(url);
     grid-template-columns:1fr !important;
   }
   #adminTabCerts .cert-alert-message-field,
-  #adminTabCerts .cert-alert-admin-grid > div:nth-child(4){
+  #adminTabCerts .cert-alert-icon-field,
+  #adminTabCerts .cert-alert-urgency-field{
     grid-column:1 !important;
   }
   #adminTabCerts .cert-alert-urgency-options{
@@ -24345,6 +24416,14 @@ URL.revokeObjectURL(url);
   }
   #adminTabCerts .cert-alert-color-option:last-child{
     grid-column:1 / -1 !important;
+  }
+}
+@media (max-width: 520px){
+  #adminTabCerts .cert-alert-urgency-options{
+    grid-template-columns:1fr !important;
+  }
+  #adminTabCerts .cert-alert-color-option:last-child{
+    grid-column:auto !important;
   }
 }
 </style>
