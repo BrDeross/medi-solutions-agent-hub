@@ -6251,7 +6251,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
     <div class="hub-login-icon-global">
       <div class="hub-login-icon-global-copy">
         <strong>Agent Login Button Icon</strong>
-        <span>Controls the icon shown beside <em>Agent Login</em> before anyone signs in.</span>
+        <span>Controls only the icon shown beside <em>Agent Login</em> before anyone signs in. It does not change a logged-in agent's personal icon.</span>
       </div>
       <div class="hub-login-icon-global-controls">
         <select id="hubDefaultLoginIconSelect" class="admin-input" aria-label="Default Agent Login icon">
@@ -6427,7 +6427,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <option value="🌻">🌻 Sunflower</option>
 <option value="🎸">🎸 Guitar</option>
             </select>
-            <div class="hub-login-icon-preview" id="hubPermLoginIconPreview"><span>👤</span> Icon shown beside this agent's name after login</div>
+            <div class="hub-login-icon-preview" id="hubPermLoginIconPreview"><span>👤</span> Appears beside this agent's name in the top-right login badge</div>
           </div>
           <div class="admin-field"><label>Preset</label>
             <select class="admin-input" id="hubPermPreset" onchange="applyHubPermPreset(this.value); this.value='';">
@@ -10153,6 +10153,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 <!-- Phase 99: Expanded Cert Alert icon library with animals/fun icons; icon persistence verification fixed. -->
 <!-- Phase 100: Removed confusing login helper copy; added global Agent Login icon and per-agent name icons in Admin > Permissions. -->
 <!-- Phase 101: added sea otter icon to Cert Alert and agent/login icon selectors -->
+<!-- Phase 102: personal agent icons now refresh immediately for the currently logged-in user; clarified display locations. -->
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -20393,9 +20394,13 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       if (!r.ok) return r.text().then(function(t){ throw new Error('Save failed: ' + r.status + ' ' + t); });
       return r.json();
     }).then(function(rows){
-      setPermStatus('Saved permissions for ' + email + '.', true);
       hubUsersAdminSelected = rows && rows[0] ? rows[0] : payload;
       hubUsersAdminSelected.permissions = normalizePerms(hubUsersAdminSelected.permissions);
+      var savedIcon = String((hubUsersAdminSelected.permissions && hubUsersAdminSelected.permissions.login_icon) || permissions.login_icon || '👤');
+      var updatedCurrentUser = typeof window.hubSyncSavedAgentIcon === 'function' && window.hubSyncSavedAgentIcon(email, savedIcon, hubUsersAdminSelected.permissions);
+      setPermStatus(updatedCurrentUser
+        ? ('Saved permissions for ' + email + '. Your top name icon changed to ' + savedIcon + ' immediately.')
+        : ('Saved permissions for ' + email + '. That agent will see ' + savedIcon + ' after refreshing or logging in.'), true);
       loadHubUsersAdmin();
     }).catch(function(err){
       setPermStatus(err && err.message ? err.message : String(err), false);
@@ -24618,7 +24623,28 @@ URL.revokeObjectURL(url);
     var preview = document.getElementById('hubPermLoginIconPreview');
     if (!preview) return;
     var icon = cleanIcon(select && select.value);
-    preview.innerHTML = "<span>" + icon + "</span> Icon shown beside this agent's name after login";
+    preview.innerHTML = "<span>" + icon + "</span> Appears beside this agent's name in the top-right login badge";
+  };
+
+  window.hubSyncSavedAgentIcon = function(email, icon, savedPermissions){
+    email = String(email || '').trim().toLowerCase();
+    icon = cleanIcon(icon);
+    var session = readSession();
+    if (!session || String(session.email || '').trim().toLowerCase() !== email) return false;
+    var perms = session.permissions;
+    if (typeof perms === 'string') { try{ perms=JSON.parse(perms); }catch(e){ perms={}; } }
+    perms = Object.assign({}, perms || {}, savedPermissions || {}, {login_icon:icon});
+    session.permissions = perms;
+    session.loginIcon = icon;
+    session.login_icon = icon;
+    try { sessionStorage.setItem('medi_hub_session', JSON.stringify(session)); } catch(e) {}
+    try { sessionStorage.setItem('medi_hub_current_user', JSON.stringify(session)); } catch(e) {}
+    try { window.HUB_CURRENT_USER = Object.assign({}, window.HUB_CURRENT_USER || {}, session); } catch(e) {}
+    try { if (window.currentHubUser) window.currentHubUser = Object.assign({}, window.currentHubUser, session); } catch(e) {}
+    try { if (window.__hubUserProfile) window.__hubUserProfile = Object.assign({}, window.__hubUserProfile, session); } catch(e) {}
+    window.hubApplyLoginIconUi();
+    try { document.dispatchEvent(new CustomEvent('hub-agent-icon-changed',{detail:{email:email,icon:icon}})); } catch(e) {}
+    return true;
   };
 
   window.loadHubDefaultLoginIcon = function(){
