@@ -5028,6 +5028,21 @@ cursor: pointer; white-space: nowrap;
 }
 </style>
 
+
+<style id="phase100AgentLoginIconStyles">
+.hub-login-icon-global{margin:0 0 16px;padding:16px 18px;border:1px solid rgba(96,165,250,.32);border-radius:16px;background:linear-gradient(135deg,rgba(30,64,175,.18),rgba(15,23,42,.28));display:grid;grid-template-columns:minmax(240px,1fr) minmax(340px,1.35fr);gap:12px 18px;align-items:center;}
+.hub-login-icon-global-copy{display:flex;flex-direction:column;gap:5px;}
+.hub-login-icon-global-copy strong{font-size:16px;color:#fff;}
+.hub-login-icon-global-copy span{font-size:12px;line-height:1.45;color:var(--muted-2);}
+.hub-login-icon-global-controls{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:10px;align-items:center;}
+.hub-login-icon-global-controls .admin-save-btn{width:auto;white-space:nowrap;}
+#hubDefaultLoginIconStatus{grid-column:1/-1;margin:0;min-height:18px;}
+.hub-login-icon-preview{margin-top:7px;padding:8px 10px;border-radius:10px;background:rgba(15,23,42,.34);border:1px solid rgba(148,163,184,.18);font-size:11px;color:var(--muted-2);display:flex;gap:8px;align-items:center;}
+.hub-login-icon-preview span{font-size:22px;line-height:1;}
+.hub-perm-list-icon{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-right:8px;border-radius:50%;background:rgba(59,130,246,.16);font-size:18px;vertical-align:middle;}
+@media(max-width:850px){.hub-login-icon-global{grid-template-columns:1fr}.hub-login-icon-global-controls{grid-template-columns:1fr auto}}
+@media(max-width:560px){.hub-login-icon-global-controls{grid-template-columns:1fr}.hub-login-icon-global-controls .admin-save-btn{width:100%}}
+</style>
 </head>
 <body class="hub-login-pending">
 <div id="hubLoginGate" style="position:fixed;inset:0;z-index:12000;background:rgba(8,15,32,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -6120,8 +6135,8 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <div class="feature-modal" style="max-width:460px;">
 <div class="feature-modal-header">
 <div class="feature-modal-title">
-<div class="feature-modal-title-icon" style="background:rgba(59,130,246,.2);">👤</div>
-<div><h3>Agent Login</h3><p>Use a non-persistent page-only login label</p></div>
+<div class="feature-modal-title-icon" id="agentLoginModalIcon" style="background:rgba(59,130,246,.2);">👤</div>
+<div><h3>Agent Login</h3><p>Sign in with your approved Hub email.</p></div>
 </div>
 <button class="feature-close" onclick="closeAgentLogin()">✕</button>
 </div>
@@ -6233,6 +6248,59 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
       Manage which Hub sections each email can see. Changes save to <strong>hub_users</strong> and take effect the next time that user logs in or refreshes their Hub session.
     </p>
 
+    <div class="hub-login-icon-global">
+      <div class="hub-login-icon-global-copy">
+        <strong>Agent Login Button Icon</strong>
+        <span>Controls the icon shown beside <em>Agent Login</em> before anyone signs in.</span>
+      </div>
+      <div class="hub-login-icon-global-controls">
+        <select id="hubDefaultLoginIconSelect" class="admin-input" aria-label="Default Agent Login icon">
+          <option value="👤">👤 Standard person</option>
+<option value="🧑‍💼">🧑‍💼 Professional</option>
+<option value="👔">👔 Executive</option>
+<option value="🛡️">🛡️ Admin shield</option>
+<option value="⭐">⭐ Star</option>
+<option value="🚀">🚀 Rocket</option>
+<option value="🏆">🏆 Trophy</option>
+<option value="🔥">🔥 Fire</option>
+<option value="💎">💎 Diamond</option>
+<option value="🎯">🎯 Target</option>
+<option value="🐶">🐶 Dog</option>
+<option value="🐱">🐱 Cat</option>
+<option value="🐔">🐔 Chicken</option>
+<option value="🦉">🦉 Owl</option>
+<option value="🦊">🦊 Fox</option>
+<option value="🦁">🦁 Lion</option>
+<option value="🐼">🐼 Panda</option>
+<option value="🦄">🦄 Unicorn</option>
+<option value="🦋">🦋 Butterfly</option>
+<option value="🐧">🐧 Penguin</option>
+<option value="🦈">🦈 Shark</option>
+<option value="🐴">🐴 Horse</option>
+<option value="🐸">🐸 Frog</option>
+<option value="🐵">🐵 Monkey</option>
+<option value="🐻">🐻 Bear</option>
+<option value="🐨">🐨 Koala</option>
+<option value="🐯">🐯 Tiger</option>
+<option value="🐙">🐙 Octopus</option>
+<option value="🐬">🐬 Dolphin</option>
+<option value="🦅">🦅 Eagle</option>
+<option value="🌈">🌈 Rainbow</option>
+<option value="🎉">🎉 Celebration</option>
+<option value="💜">💜 Heart</option>
+<option value="😊">😊 Smile</option>
+<option value="☀️">☀️ Sunshine</option>
+<option value="🌙">🌙 Moon</option>
+<option value="⚡">⚡ Lightning</option>
+<option value="🍀">🍀 Lucky clover</option>
+<option value="🌻">🌻 Sunflower</option>
+<option value="🎸">🎸 Guitar</option>
+        </select>
+        <button class="admin-save-btn" type="button" onclick="saveHubDefaultLoginIcon()">Save Login Icon</button>
+      </div>
+      <div id="hubDefaultLoginIconStatus" class="hub-perm-status">Loading current icon…</div>
+    </div>
+
     <div class="hub-perm-admin-grid">
       <div class="hub-perm-card">
         <div class="hub-perm-toolbar">
@@ -6313,6 +6381,51 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
               <option value="Medi-Solutions Insurance Agency, LLC">Medi-Solutions Insurance Agency, LLC</option>
               <option value="Buckley Insurance Group">Buckley Insurance Group</option>
             </select>
+          </div>
+          <div class="admin-field"><label>Agent Name Icon</label>
+            <select class="admin-input" id="hubPermLoginIcon" onchange="updateHubPermLoginIconPreview()">
+              <option value="👤">👤 Standard person</option>
+<option value="🧑‍💼">🧑‍💼 Professional</option>
+<option value="👔">👔 Executive</option>
+<option value="🛡️">🛡️ Admin shield</option>
+<option value="⭐">⭐ Star</option>
+<option value="🚀">🚀 Rocket</option>
+<option value="🏆">🏆 Trophy</option>
+<option value="🔥">🔥 Fire</option>
+<option value="💎">💎 Diamond</option>
+<option value="🎯">🎯 Target</option>
+<option value="🐶">🐶 Dog</option>
+<option value="🐱">🐱 Cat</option>
+<option value="🐔">🐔 Chicken</option>
+<option value="🦉">🦉 Owl</option>
+<option value="🦊">🦊 Fox</option>
+<option value="🦁">🦁 Lion</option>
+<option value="🐼">🐼 Panda</option>
+<option value="🦄">🦄 Unicorn</option>
+<option value="🦋">🦋 Butterfly</option>
+<option value="🐧">🐧 Penguin</option>
+<option value="🦈">🦈 Shark</option>
+<option value="🐴">🐴 Horse</option>
+<option value="🐸">🐸 Frog</option>
+<option value="🐵">🐵 Monkey</option>
+<option value="🐻">🐻 Bear</option>
+<option value="🐨">🐨 Koala</option>
+<option value="🐯">🐯 Tiger</option>
+<option value="🐙">🐙 Octopus</option>
+<option value="🐬">🐬 Dolphin</option>
+<option value="🦅">🦅 Eagle</option>
+<option value="🌈">🌈 Rainbow</option>
+<option value="🎉">🎉 Celebration</option>
+<option value="💜">💜 Heart</option>
+<option value="😊">😊 Smile</option>
+<option value="☀️">☀️ Sunshine</option>
+<option value="🌙">🌙 Moon</option>
+<option value="⚡">⚡ Lightning</option>
+<option value="🍀">🍀 Lucky clover</option>
+<option value="🌻">🌻 Sunflower</option>
+<option value="🎸">🎸 Guitar</option>
+            </select>
+            <div class="hub-login-icon-preview" id="hubPermLoginIconPreview"><span>👤</span> Icon shown beside this agent's name after login</div>
           </div>
           <div class="admin-field"><label>Preset</label>
             <select class="admin-input" id="hubPermPreset" onchange="applyHubPermPreset(this.value); this.value='';">
@@ -10035,6 +10148,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 <!-- Phase 75: carrier release-date scripts removed to stop raw code rendering. No other Hub feature intentionally changed. -->
 
 <!-- Phase 99: Expanded Cert Alert icon library with animals/fun icons; icon persistence verification fixed. -->
+<!-- Phase 100: Removed confusing login helper copy; added global Agent Login icon and per-agent name icons in Admin > Permissions. -->
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -10089,7 +10203,7 @@ const badge = document.getElementById('agentLoginBadge');
 const btn = document.getElementById('agentLoginBtn');
 const data = readAgentLogin();
 if (badge) badge.textContent = data && data.email ? data.email : '';
-if (btn) btn.textContent = data && data.name ? '\ud83d\udc64 ' + data.name : '\ud83d\udc64 Agent Login';
+if (btn) { var icon = window.hubResolveLoginIcon ? window.hubResolveLoginIcon(data) : '👤'; btn.textContent = data && data.name ? icon + ' ' + data.name : icon + ' Agent Login'; }
 }
 window.openAgentLogin = function() {
 const overlay = document.getElementById('agentLoginOverlay');
@@ -10158,12 +10272,12 @@ if (session && session.name) {
 if (gate) { gate.style.display = 'none'; }
 document.body.classList.remove('hub-login-pending');
 if (badge) badge.textContent = session.email || '';
-if (btn) btn.textContent = '\ud83d\udc64 ' + session.name;
+if (btn) { var icon = window.hubResolveLoginIcon ? window.hubResolveLoginIcon(session) : '👤'; btn.textContent = icon + ' ' + session.name; }
 } else {
 if (gate) { gate.style.display = 'flex'; }
 document.body.classList.add('hub-login-pending');
 if (badge) badge.textContent = '';
-if (btn) btn.textContent = '\ud83d\udc64 Agent Login';
+if (btn) { var icon = window.hubResolveLoginIcon ? window.hubResolveLoginIcon(null) : '👤'; btn.textContent = icon + ' Agent Login'; }
 }
 }
 window.submitHubGateLogin = function() {
@@ -10184,6 +10298,7 @@ function normalizeHubUserRow(row, fallbackEmail) {
     role: row.role || 'agent',
     status: row.status || 'active',
     permissions: perms || {},
+    loginIcon: String((perms && perms.login_icon) || row.login_icon || '').trim(),
     allowedDevices: Number(row.allowed_devices || row.allowedDevices || 1),
     requireDeviceApproval: !!(row.require_device_approval || row.requireDeviceApproval),
     source: 'hub_users'
@@ -10445,6 +10560,7 @@ loadHubUserProfile(email).then(function(hubUser) {
       role: hubUser.role || 'agent',
       status: hubUser.status || 'active',
       permissions: hubUser.permissions || {},
+      loginIcon: hubUser.loginIcon || (hubUser.permissions && hubUser.permissions.login_icon) || '',
       allowedDevices: hubUser.allowedDevices || 1,
       requireDeviceApproval: !!hubUser.requireDeviceApproval,
       permissionSource: 'hub_users',
@@ -10577,6 +10693,7 @@ if (existingSession && existingSession.email) {
       role: freshProfile.role || existingSession.role || 'agent',
       status: freshProfile.status || 'active',
       permissions: freshProfile.permissions || {},
+      loginIcon: freshProfile.loginIcon || (freshProfile.permissions && freshProfile.permissions.login_icon) || existingSession.loginIcon || '',
       allowedDevices: freshProfile.allowedDevices || 1,
       requireDeviceApproval: !!freshProfile.requireDeviceApproval,
       permissionSource: 'hub_users',
@@ -10678,7 +10795,7 @@ if (existingSession && existingSession.email) {
     var badge = document.getElementById('agentLoginBadge');
     var btn = document.getElementById('agentLoginBtn');
     if (badge) badge.textContent = '';
-    if (btn) btn.textContent = '👤 Agent Login';
+    if (btn) { var icon = window.hubResolveLoginIcon ? window.hubResolveLoginIcon(null) : '👤'; btn.textContent = icon + ' Agent Login'; }
   }
   function performLogout(reason){
     var s = readSession();
@@ -20159,8 +20276,9 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       var group = roleLabel(r.role || 'agent');
       var header = '';
       if (sortBy !== 'email' && group !== lastGroup) { header = '<div class="hub-perm-group-title">' + escapeHtml(group) + '</div>'; lastGroup = group; }
+      var loginIcon = String(perms.login_icon || '👤');
       return header + '<div class="hub-perm-user-item' + active + inactiveClass + '" onclick="selectHubUserAdmin(\'' + encodeURIComponent(r.email || '') + '\')">'
-        + '<div class="hub-perm-user-name">' + escapeHtml(r.name || '(No name)') + '</div>'
+        + '<div class="hub-perm-user-name"><span class="hub-perm-list-icon">' + escapeHtml(loginIcon) + '</span>' + escapeHtml(r.name || '(No name)') + '</div>'
         + '<div class="hub-perm-user-meta">' + escapeHtml(r.email || '') + '</div>'
         + '<div class="hub-perm-user-meta">Role: ' + escapeHtml(r.role || 'agent') + ' · Status: ' + escapeHtml(status) + '</div>'
         + '<div class="hub-perm-badge">' + escapeHtml(flags.join(' / ') || 'Limited') + '</div>'
@@ -20200,6 +20318,8 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     setVal('hubPermDeviceApproval', String(!!(row.require_device_approval || row.requireDeviceApproval)));
     setVal('hubPermCarrierScope', perms.carrier_directory_scope || 'self');
     setVal('hubPermAgency', perms.agency || 'Medi-Solutions Insurance Agency, LLC');
+    setVal('hubPermLoginIcon', perms.login_icon || '👤');
+    if (typeof window.updateHubPermLoginIconPreview === 'function') window.updateHubPermLoginIconPreview();
     document.querySelectorAll('[data-hub-perm]').forEach(function(cb){
       var key = cb.getAttribute('data-hub-perm');
       cb.checked = perms[key] === true || perms[key] === 'true' || perms[key] === 'all';
@@ -20218,6 +20338,8 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     var def = presetFor(role);
     var currentEmail = getCurrentEditorEmail();
     var currentName = String(document.getElementById('hubPermName')?.value || '').trim();
+    var currentIcon = String(document.getElementById('hubPermLoginIcon')?.value || '👤');
+    var presetPermissions = Object.assign({}, def.permissions || {}, { login_icon: currentIcon });
     fillHubUserEditor({
       name: currentName,
       email: currentEmail,
@@ -20225,7 +20347,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
       status: def.status,
       allowed_devices: def.allowed_devices,
       require_device_approval: def.require_device_approval,
-      permissions: def.permissions
+      permissions: presetPermissions
     });
   };
 
@@ -20238,6 +20360,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     document.querySelectorAll('[data-hub-perm]').forEach(function(cb){ permissions[cb.getAttribute('data-hub-perm')] = !!cb.checked; });
     permissions.carrier_directory_scope = String(document.getElementById('hubPermCarrierScope')?.value || 'self');
     permissions.agency = String(document.getElementById('hubPermAgency')?.value || 'Medi-Solutions Insurance Agency, LLC');
+    permissions.login_icon = String(document.getElementById('hubPermLoginIcon')?.value || '👤');
     var payload = {
       hub: HP_HUB,
       name: name || email,
@@ -20379,14 +20502,14 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     return Number.isFinite(n) ? n : fallback;
   }
   function hubPermCsvHeaders(){
-    return ['name','email','role','status','allowed_devices','require_device_approval','agent_tools','onboarding_resources','loa_resources','ga_tools','ga_resources','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_scope','carrier_directory_upload','carrier_directory_edit','device_approvals','manager_onboarding_view','admin','agency'];
+    return ['name','email','role','status','allowed_devices','require_device_approval','login_icon','agent_tools','onboarding_resources','loa_resources','ga_tools','ga_resources','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_scope','carrier_directory_upload','carrier_directory_edit','device_approvals','manager_onboarding_view','admin','agency'];
   }
   function downloadHubUserTemplate(){
     var headers = hubPermCsvHeaders();
     hpDownloadCsv('hub_user_permissions_template.csv', [
       headers,
-      ['Jane Internal','jane.internal@example.com','internal','active','2','false','true','true','true','false','false','true','true','true','true','true','true','true','true','self','false','false','false','false','false','Medi-Solutions Insurance Agency, LLC'],
-      ['John GA','john.ga@example.com','ga','active','1','true','false','true','false','true','true','true','true','false','false','false','false','false','true','self','false','false','false','false','false','Buckley Insurance Group']
+      ['Jane Internal','jane.internal@example.com','internal','active','2','false','🦉','true','true','true','false','false','true','true','true','true','true','true','true','true','self','false','false','false','false','false','Medi-Solutions Insurance Agency, LLC'],
+      ['John GA','john.ga@example.com','ga','active','1','true','🚀','false','true','false','true','true','true','true','false','false','false','false','false','true','self','false','false','false','false','false','Buckley Insurance Group']
     ]);
   }
   function exportHubUsersCsv(){
@@ -20394,7 +20517,7 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     (hubUsersAdminRows || []).forEach(function(u){
       var p = normalizePerms(u.permissions);
       rows.push([
-        u.name || '', u.email || '', u.role || '', u.status || '', u.allowed_devices || '', u.require_device_approval ? 'true' : 'false',
+        u.name || '', u.email || '', u.role || '', u.status || '', u.allowed_devices || '', u.require_device_approval ? 'true' : 'false', p.login_icon || '👤',
         p.agent_tools ? 'true' : 'false', p.onboarding_resources ? 'true' : 'false', p.loa_resources ? 'true' : 'false', p.ga_tools ? 'true' : 'false', p.ga_resources ? 'true' : 'false', p.forms ? 'true' : 'false', p.videos ? 'true' : 'false',
         p.cert_tracker ? 'true' : 'false', p.trip_tracker ? 'true' : 'false', p.roth_calculator ? 'true' : 'false', p.rtb_leads ? 'true' : 'false', p.leaderboard ? 'true' : 'false',
         p.carrier_directory_view ? 'true' : 'false', p.carrier_directory_scope || 'self',
@@ -20411,6 +20534,8 @@ window.MEDI_HUB_CALENDAR_FIX = 'no-ics-visible-20260706';
     if (['admin','internal','ga','manager','agent'].indexOf(role) < 0) role = 'agent';
     var preset = presetFor(role);
     var perms = Object.assign({}, normalizePerms(preset.permissions));
+    if (String(row.login_icon || '').trim()) perms.login_icon = String(row.login_icon).trim();
+    else if (!perms.login_icon) perms.login_icon = '👤';
     ['agent_tools','onboarding_resources','loa_resources','ga_tools','ga_resources','forms','videos','cert_tracker','trip_tracker','roth_calculator','rtb_leads','leaderboard','carrier_directory_view','carrier_directory_upload','carrier_directory_edit','device_approvals','manager_onboarding_view','admin'].forEach(function(key){
       if (Object.prototype.hasOwnProperty.call(row, key) && String(row[key]).trim() !== '') perms[key] = hpBool(row[key], !!perms[key]);
     });
@@ -24450,6 +24575,93 @@ URL.revokeObjectURL(url);
   window.addEventListener('resize',resizeCertAlertInput);
   setTimeout(resizeCertAlertInput,700);
   setTimeout(resizeCertAlertInput,1800);
+})();
+</script>
+
+<script id="phase100AgentLoginIconScript">
+(function(){
+  var URL = 'https://bjlzwmoogypfefjxvgyt.supabase.co';
+  var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjUzNDAsImV4cCI6MjA4OTQ0MTM0MH0.HbYn4njaUvTt8JKqVylzITeeXl7Wh57XdthtFdclGVw';
+  var HUB = 'medi';
+  var SETTING_KEY = 'agent_login_default_icon';
+  var defaultIcon = '👤';
+
+  function headers(extra){ return Object.assign({'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},extra||{}); }
+  function cleanIcon(v){ v=String(v||'').trim(); return v || '👤'; }
+  function readSession(){ try{ return JSON.parse(sessionStorage.getItem('medi_hub_session')||'null'); }catch(e){ return null; } }
+  function parseData(v){ if(typeof v==='string'){try{v=JSON.parse(v);}catch(e){}} return v||{}; }
+
+  window.hubResolveLoginIcon = function(session){
+    session = session || null;
+    var perms = session && session.permissions;
+    if (typeof perms === 'string') { try{ perms=JSON.parse(perms); }catch(e){ perms={}; } }
+    return cleanIcon((session && (session.loginIcon || session.login_icon)) || (perms && perms.login_icon) || defaultIcon);
+  };
+
+  window.hubApplyLoginIconUi = function(){
+    var session = readSession();
+    var icon = window.hubResolveLoginIcon(session);
+    var btn = document.getElementById('agentLoginBtn');
+    if (btn) btn.textContent = icon + ' ' + (session && session.name ? session.name : 'Agent Login');
+    var modalIcon = document.getElementById('agentLoginModalIcon');
+    if (modalIcon) modalIcon.textContent = icon;
+    var select = document.getElementById('hubDefaultLoginIconSelect');
+    if (select && !select.matches(':focus')) select.value = defaultIcon;
+  };
+
+  window.updateHubPermLoginIconPreview = function(){
+    var select = document.getElementById('hubPermLoginIcon');
+    var preview = document.getElementById('hubPermLoginIconPreview');
+    if (!preview) return;
+    var icon = cleanIcon(select && select.value);
+    preview.innerHTML = "<span>" + icon + "</span> Icon shown beside this agent's name after login";
+  };
+
+  window.loadHubDefaultLoginIcon = function(){
+    var status = document.getElementById('hubDefaultLoginIconStatus');
+    if (status) status.textContent = 'Loading current icon…';
+    return fetch(URL + '/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(SETTING_KEY)+'&select=data&limit=1',{headers:headers({'Cache-Control':'no-cache'})})
+      .then(function(r){ if(!r.ok) throw new Error('Load failed: '+r.status); return r.json(); })
+      .then(function(rows){
+        var data = parseData(rows && rows[0] && rows[0].data);
+        defaultIcon = cleanIcon(data.icon || data.login_icon || '👤');
+        var select = document.getElementById('hubDefaultLoginIconSelect');
+        if (select) select.value = defaultIcon;
+        if (status) { status.textContent = 'Current login icon: ' + defaultIcon; status.style.color='#86efac'; }
+        window.hubApplyLoginIconUi();
+        return defaultIcon;
+      })
+      .catch(function(err){
+        if (status) { status.textContent = 'Using the standard icon until a new icon is saved.'; status.style.color='var(--muted-2)'; }
+        window.hubApplyLoginIconUi();
+        console.warn('[Agent Login Icon] load unavailable',err);
+        return defaultIcon;
+      });
+  };
+
+  window.saveHubDefaultLoginIcon = function(){
+    var select = document.getElementById('hubDefaultLoginIconSelect');
+    var status = document.getElementById('hubDefaultLoginIconStatus');
+    var icon = cleanIcon(select && select.value);
+    if (status) { status.textContent='Saving '+icon+'…'; status.style.color='var(--muted-2)'; }
+    var payload={hub:HUB,key:SETTING_KEY,data:{icon:icon,updatedAt:new Date().toISOString(),source:'phase100_agent_login_icon'}};
+    var lookup=URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(SETTING_KEY)+'&select=key';
+    return fetch(lookup,{headers:headers({'Cache-Control':'no-cache'})})
+      .then(function(r){ if(!r.ok) throw new Error('Lookup failed: '+r.status); return r.json(); })
+      .then(function(rows){
+        if(rows && rows.length) return fetch(URL+'/rest/v1/tile_content?hub=eq.'+encodeURIComponent(HUB)+'&key=eq.'+encodeURIComponent(SETTING_KEY),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({data:payload.data})});
+        return fetch(URL+'/rest/v1/tile_content',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify(payload)});
+      })
+      .then(function(r){ if(!r.ok) return r.text().then(function(t){throw new Error('Save failed: '+r.status+' '+t.slice(0,160));}); defaultIcon=icon; window.hubApplyLoginIconUi(); if(status){status.textContent='Saved. Agent Login now uses '+icon;status.style.color='#86efac';} })
+      .catch(function(err){ if(status){status.textContent=err.message||String(err);status.style.color='#fda4af';} alert('Agent Login icon save failed: '+(err.message||err)); });
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    window.updateHubPermLoginIconPreview();
+    window.loadHubDefaultLoginIcon();
+    var btn=document.getElementById('agentLoginBtn');
+    if(btn) btn.addEventListener('click',function(){ setTimeout(window.hubApplyLoginIconUi,0); });
+  });
 })();
 </script>
 </body>
