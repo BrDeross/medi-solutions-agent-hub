@@ -6284,6 +6284,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <option value="🐯">🐯 Tiger</option>
 <option value="🐙">🐙 Octopus</option>
 <option value="🐬">🐬 Dolphin</option>
+<option value="🦦">🦦 Sea otter</option>
 <option value="🦅">🦅 Eagle</option>
 <option value="🌈">🌈 Rainbow</option>
 <option value="🎉">🎉 Celebration</option>
@@ -6413,6 +6414,7 @@ style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;backgro
 <option value="🐯">🐯 Tiger</option>
 <option value="🐙">🐙 Octopus</option>
 <option value="🐬">🐬 Dolphin</option>
+<option value="🦦">🦦 Sea otter</option>
 <option value="🦅">🦅 Eagle</option>
 <option value="🌈">🌈 Rainbow</option>
 <option value="🎉">🎉 Celebration</option>
@@ -7400,6 +7402,7 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
           <option value="penguin">🐧 Penguin</option>
           <option value="octopus">🐙 Octopus</option>
           <option value="whale">🐳 Whale</option>
+          <option value="otter">🦦 Sea otter</option>
           <option value="shark">🦈 Shark</option>
           <option value="horse">🐴 Horse</option>
         </optgroup>
@@ -10149,6 +10152,7 @@ ${notes ? '<p style="font-size:13px;color:#475569;"><strong>Notes:</strong> ' + 
 
 <!-- Phase 99: Expanded Cert Alert icon library with animals/fun icons; icon persistence verification fixed. -->
 <!-- Phase 100: Removed confusing login helper copy; added global Agent Login icon and per-agent name icons in Admin > Permissions. -->
+<!-- Phase 101: added sea otter icon to Cert Alert and agent/login icon selectors -->
 </body></html>`;
 const w = window.open('', '_blank', 'width=820,height=700,scrollbars=yes');
 if (!w) { showSnuToast('\u26a0 Allow pop-ups for this site to print.'); return; }
@@ -24248,7 +24252,7 @@ URL.revokeObjectURL(url);
     }
     a.textContent = message;
     b.textContent = message;
-    var iconMap = {siren:'🚨',warning:'⚠️',announcement:'📣',bell:'🔔',check:'✅',calendar:'📅',info:'ℹ️',star:'⭐',dog:'🐶',cat:'🐱',chicken:'🐔',owl:'🦉',fox:'🦊',lion:'🦁',tiger:'🐯',bear:'🐻',panda:'🐼',unicorn:'🦄',butterfly:'🦋',bee:'🐝',turtle:'🐢',frog:'🐸',monkey:'🐵',penguin:'🐧',octopus:'🐙',whale:'🐳',shark:'🦈',horse:'🐴',rocket:'🚀',party:'🎉',fire:'🔥',lightbulb:'💡',target:'🎯',trophy:'🏆',gift:'🎁',sparkles:'✨',rainbow:'🌈',sun:'☀️',heart:'❤️',smile:'😊'};
+    var iconMap = {siren:'🚨',warning:'⚠️',announcement:'📣',bell:'🔔',check:'✅',calendar:'📅',info:'ℹ️',star:'⭐',dog:'🐶',cat:'🐱',chicken:'🐔',owl:'🦉',fox:'🦊',lion:'🦁',tiger:'🐯',bear:'🐻',panda:'🐼',unicorn:'🦄',butterfly:'🦋',bee:'🐝',turtle:'🐢',frog:'🐸',monkey:'🐵',penguin:'🐧',octopus:'🐙',whale:'🐳',otter:'🦦',shark:'🦈',horse:'🐴',rocket:'🚀',party:'🎉',fire:'🔥',lightbulb:'💡',target:'🎯',trophy:'🏆',gift:'🎁',sparkles:'✨',rainbow:'🌈',sun:'☀️',heart:'❤️',smile:'😊'};
     if(iconEl) iconEl.textContent = iconMap[current.icon] || iconMap.siren;
     banner.dataset.flash = current.flash;
     banner.dataset.urgency = current.urgency;
@@ -24296,7 +24300,7 @@ URL.revokeObjectURL(url);
     var d = adminDraft();
     var text = displayText(d.message);
     var labels = {red:'RED • URGENT',amber:'AMBER • ATTENTION',green:'GREEN • UPDATE',blue:'BLUE • INFORMATION',purple:'PURPLE • REMINDER'};
-    var iconMap = {siren:'🚨',warning:'⚠️',announcement:'📣',bell:'🔔',check:'✅',calendar:'📅',info:'ℹ️',star:'⭐',dog:'🐶',cat:'🐱',chicken:'🐔',owl:'🦉',fox:'🦊',lion:'🦁',tiger:'🐯',bear:'🐻',panda:'🐼',unicorn:'🦄',butterfly:'🦋',bee:'🐝',turtle:'🐢',frog:'🐸',monkey:'🐵',penguin:'🐧',octopus:'🐙',whale:'🐳',shark:'🦈',horse:'🐴',rocket:'🚀',party:'🎉',fire:'🔥',lightbulb:'💡',target:'🎯',trophy:'🏆',gift:'🎁',sparkles:'✨',rainbow:'🌈',sun:'☀️',heart:'❤️',smile:'😊'};
+    var iconMap = {siren:'🚨',warning:'⚠️',announcement:'📣',bell:'🔔',check:'✅',calendar:'📅',info:'ℹ️',star:'⭐',dog:'🐶',cat:'🐱',chicken:'🐔',owl:'🦉',fox:'🦊',lion:'🦁',tiger:'🐯',bear:'🐻',panda:'🐼',unicorn:'🦄',butterfly:'🦋',bee:'🐝',turtle:'🐢',frog:'🐸',monkey:'🐵',penguin:'🐧',octopus:'🐙',whale:'🐳',otter:'🦦',shark:'🦈',horse:'🐴',rocket:'🚀',party:'🎉',fire:'🔥',lightbulb:'💡',target:'🎯',trophy:'🏆',gift:'🎁',sparkles:'✨',rainbow:'🌈',sun:'☀️',heart:'❤️',smile:'😊'};
     preview.dataset.urgency = d.urgency;
     preview.textContent = text ? ((iconMap[d.icon] || iconMap.siren) + ' ' + (labels[d.urgency] || 'ALERT') + ' — ' + (d.enabled ? 'VISIBLE: ' : 'HIDDEN: ') + text) : 'Preview will appear here as you type.';
   }
