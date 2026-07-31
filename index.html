@@ -4808,9 +4808,17 @@ cursor: pointer; white-space: nowrap;
 
 
 <style id="phase92-cert-alert-styles">
-/* Phase 92: admin-managed flashing/scrolling Cert alert */
+/* Phase 96: full-width admin Cert alert with urgency colors */
 #certAlertBanner[hidden]{display:none!important;}
 #certAlertBanner{
+  --cert-alert-border:rgba(248,113,113,.96);
+  --cert-alert-glow:rgba(248,113,113,.30);
+  --cert-alert-glow-soft:rgba(251,191,36,.15);
+  --cert-alert-bg:linear-gradient(100deg,rgba(127,29,29,.98) 0%,rgba(69,10,10,.98) 27%,rgba(17,24,39,.98) 68%,rgba(127,29,29,.98) 100%);
+  --cert-alert-label-bg:linear-gradient(135deg,#dc2626,#991b1b);
+  --cert-alert-icon-bg:#fee2e2;
+  --cert-alert-icon-color:#991b1b;
+  --cert-alert-separator:#fca5a5;
   position:relative;
   display:grid;
   grid-template-columns:auto minmax(0,1fr);
@@ -4818,11 +4826,51 @@ cursor: pointer; white-space: nowrap;
   width:100%;
   margin:0 0 16px;
   overflow:hidden;
-  border:2px solid rgba(251,191,36,.92);
+  border:2px solid var(--cert-alert-border);
   border-radius:16px;
-  background:linear-gradient(100deg,rgba(127,29,29,.98) 0%,rgba(69,10,10,.98) 25%,rgba(17,24,39,.98) 60%,rgba(120,53,15,.98) 100%);
-  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 12px 28px rgba(0,0,0,.32),0 0 22px rgba(251,191,36,.28);
+  background:var(--cert-alert-bg);
+  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 12px 28px rgba(0,0,0,.32),0 0 22px var(--cert-alert-glow);
   isolation:isolate;
+}
+#certAlertBanner[data-urgency="amber"]{
+  --cert-alert-border:rgba(251,191,36,.96);
+  --cert-alert-glow:rgba(251,191,36,.30);
+  --cert-alert-glow-soft:rgba(245,158,11,.15);
+  --cert-alert-bg:linear-gradient(100deg,rgba(120,53,15,.98) 0%,rgba(69,26,3,.98) 27%,rgba(17,24,39,.98) 68%,rgba(120,53,15,.98) 100%);
+  --cert-alert-label-bg:linear-gradient(135deg,#f59e0b,#b45309);
+  --cert-alert-icon-bg:#fef3c7;
+  --cert-alert-icon-color:#92400e;
+  --cert-alert-separator:#fbbf24;
+}
+#certAlertBanner[data-urgency="green"]{
+  --cert-alert-border:rgba(74,222,128,.96);
+  --cert-alert-glow:rgba(74,222,128,.28);
+  --cert-alert-glow-soft:rgba(34,197,94,.14);
+  --cert-alert-bg:linear-gradient(100deg,rgba(20,83,45,.98) 0%,rgba(5,46,22,.98) 27%,rgba(17,24,39,.98) 68%,rgba(20,83,45,.98) 100%);
+  --cert-alert-label-bg:linear-gradient(135deg,#22c55e,#15803d);
+  --cert-alert-icon-bg:#dcfce7;
+  --cert-alert-icon-color:#166534;
+  --cert-alert-separator:#86efac;
+}
+#certAlertBanner[data-urgency="blue"]{
+  --cert-alert-border:rgba(96,165,250,.96);
+  --cert-alert-glow:rgba(96,165,250,.28);
+  --cert-alert-glow-soft:rgba(59,130,246,.14);
+  --cert-alert-bg:linear-gradient(100deg,rgba(30,64,175,.98) 0%,rgba(30,58,138,.98) 27%,rgba(17,24,39,.98) 68%,rgba(30,64,175,.98) 100%);
+  --cert-alert-label-bg:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  --cert-alert-icon-bg:#dbeafe;
+  --cert-alert-icon-color:#1e40af;
+  --cert-alert-separator:#93c5fd;
+}
+#certAlertBanner[data-urgency="purple"]{
+  --cert-alert-border:rgba(192,132,252,.96);
+  --cert-alert-glow:rgba(192,132,252,.28);
+  --cert-alert-glow-soft:rgba(168,85,247,.14);
+  --cert-alert-bg:linear-gradient(100deg,rgba(88,28,135,.98) 0%,rgba(59,7,100,.98) 27%,rgba(17,24,39,.98) 68%,rgba(88,28,135,.98) 100%);
+  --cert-alert-label-bg:linear-gradient(135deg,#a855f7,#7e22ce);
+  --cert-alert-icon-bg:#f3e8ff;
+  --cert-alert-icon-color:#6b21a8;
+  --cert-alert-separator:#d8b4fe;
 }
 #certAlertBanner::after{
   content:"";
@@ -4831,7 +4879,7 @@ cursor: pointer; white-space: nowrap;
   z-index:-1;
   border-radius:inherit;
   pointer-events:none;
-  box-shadow:0 0 18px 5px rgba(248,113,113,.18),0 0 32px 8px rgba(251,191,36,.12);
+  box-shadow:0 0 18px 5px var(--cert-alert-glow),0 0 32px 8px var(--cert-alert-glow-soft);
   animation:certAlertGlow 1.15s ease-in-out infinite;
 }
 .cert-alert-label{
@@ -4841,7 +4889,7 @@ cursor: pointer; white-space: nowrap;
   min-height:54px;
   padding:10px 16px;
   border-right:1px solid rgba(255,255,255,.18);
-  background:linear-gradient(135deg,#dc2626,#991b1b);
+  background:var(--cert-alert-label-bg);
   color:#fff7ed;
   font-size:12px;
   font-weight:950;
@@ -4856,8 +4904,8 @@ cursor: pointer; white-space: nowrap;
   width:28px;
   height:28px;
   border-radius:50%;
-  background:#fef3c7;
-  color:#991b1b;
+  background:var(--cert-alert-icon-bg);
+  color:var(--cert-alert-icon-color);
   font-size:16px;
   box-shadow:0 0 0 3px rgba(254,243,199,.15),0 0 16px rgba(254,243,199,.45);
   animation:certAlertBlink 1s steps(2,end) infinite;
@@ -4902,7 +4950,7 @@ cursor: pointer; white-space: nowrap;
 .cert-alert-message::after{
   content:"◆";
   margin-left:42px;
-  color:#fbbf24;
+  color:var(--cert-alert-separator);
   font-size:10px;
   text-shadow:0 0 10px rgba(251,191,36,.75);
 }
@@ -4913,30 +4961,62 @@ cursor: pointer; white-space: nowrap;
 @keyframes certAlertGlow{0%,100%{opacity:.36;transform:scale(.995)}50%{opacity:1;transform:scale(1.006)}}
 @keyframes certAlertSoft{0%,100%{filter:brightness(.92)}50%{filter:brightness(1.16)}}
 @keyframes certAlertStrong{0%,49%{filter:brightness(1)}50%,100%{filter:brightness(1.22)}}
-.cert-alert-admin-box{
-  margin:0 0 16px;
-  padding:15px;
-  border:1px solid rgba(248,113,113,.38);
-  border-radius:14px;
-  background:linear-gradient(135deg,rgba(127,29,29,.18),rgba(15,23,42,.72));
-  box-shadow:0 10px 28px rgba(0,0,0,.18);
+#adminTabCerts .cert-alert-admin-box{
+  width:100%;
+  max-width:none;
+  box-sizing:border-box;
 }
-.cert-alert-admin-title{font-size:13px;font-weight:950;color:#fee2e2;letter-spacing:.02em;}
-.cert-alert-admin-help{font-size:11px;color:var(--muted-2);margin-top:3px;line-height:1.5;}
-.cert-alert-admin-grid{display:grid;grid-template-columns:minmax(0,1fr) 150px 150px;gap:10px;margin-top:12px;align-items:end;}
-#certAlertMessageInput{min-height:88px;resize:vertical;line-height:1.5;}
-.cert-alert-admin-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;}
-.cert-alert-admin-actions .admin-save-btn{width:auto!important;flex:0 0 auto!important;min-width:190px;}
-.cert-alert-admin-status{font-size:11px;font-weight:850;min-height:16px;color:#fcd34d;}
-.cert-alert-admin-preview{margin-top:12px;padding:10px 12px;border:1px dashed rgba(251,191,36,.35);border-radius:10px;background:rgba(0,0,0,.15);font-size:11px;color:#fde68a;line-height:1.5;overflow-wrap:anywhere;}
-.cert-alert-toggle{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.04);color:var(--text);font-size:12px;font-weight:800;}
+.cert-alert-admin-box{
+  margin:0 0 20px;
+  padding:22px;
+  border:2px solid rgba(248,113,113,.48);
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(127,29,29,.22),rgba(15,23,42,.84));
+  box-shadow:0 14px 36px rgba(0,0,0,.24),0 0 0 1px rgba(255,255,255,.035) inset;
+}
+.cert-alert-admin-title{font-size:19px;font-weight:950;color:#fff1f2;letter-spacing:.015em;line-height:1.2;}
+.cert-alert-admin-help{font-size:13px;color:#cbd5e1;margin-top:6px;line-height:1.55;max-width:980px;}
+.cert-alert-admin-grid{display:grid;grid-template-columns:170px 170px minmax(360px,1fr);gap:14px;margin-top:18px;align-items:end;}
+.cert-alert-message-field{grid-column:1 / -1;}
+.cert-alert-field-label{font-size:13px;font-weight:900;color:#e2e8f0;display:block;margin-bottom:7px;}
+#certAlertMessageInput{width:100%;min-height:145px;resize:vertical;line-height:1.55;font-size:16px;font-weight:650;padding:15px 16px;}
+.cert-alert-admin-grid select.admin-input{font-size:14px;min-height:44px;}
+.cert-alert-admin-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px;}
+.cert-alert-admin-actions .admin-save-btn{width:auto!important;flex:0 0 auto!important;min-width:210px;min-height:44px;font-size:13px;}
+.cert-alert-admin-status{font-size:13px;font-weight:900;min-height:18px;color:#fcd34d;}
+.cert-alert-admin-preview{margin-top:16px;padding:16px 18px;border:2px solid rgba(248,113,113,.48);border-radius:12px;background:linear-gradient(100deg,rgba(127,29,29,.82),rgba(17,24,39,.94));font-size:15px;font-weight:850;color:#fff;line-height:1.55;overflow-wrap:anywhere;box-shadow:0 8px 24px rgba(0,0,0,.18);}
+.cert-alert-admin-preview[data-urgency="amber"]{border-color:rgba(251,191,36,.72);background:linear-gradient(100deg,rgba(120,53,15,.86),rgba(17,24,39,.94));}
+.cert-alert-admin-preview[data-urgency="green"]{border-color:rgba(74,222,128,.72);background:linear-gradient(100deg,rgba(20,83,45,.86),rgba(17,24,39,.94));}
+.cert-alert-admin-preview[data-urgency="blue"]{border-color:rgba(96,165,250,.72);background:linear-gradient(100deg,rgba(30,64,175,.86),rgba(17,24,39,.94));}
+.cert-alert-admin-preview[data-urgency="purple"]{border-color:rgba(192,132,252,.72);background:linear-gradient(100deg,rgba(88,28,135,.86),rgba(17,24,39,.94));}
+.cert-alert-toggle{display:flex;align-items:center;gap:9px;min-height:44px;padding:0 14px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.055);color:var(--text);font-size:13px;font-weight:850;}
+.cert-alert-urgency-options{display:grid;grid-template-columns:repeat(5,minmax(92px,1fr));gap:8px;}
+.cert-alert-color-option{position:relative;display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 10px;border:1px solid rgba(148,163,184,.28);border-radius:10px;background:rgba(255,255,255,.04);cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.cert-alert-color-option:hover{transform:translateY(-2px);background:rgba(255,255,255,.075);}
+.cert-alert-color-option input{position:absolute;opacity:0;pointer-events:none;}
+.cert-alert-color-option:has(input:checked){border-color:rgba(255,255,255,.82);box-shadow:0 0 0 2px rgba(255,255,255,.12),0 8px 18px rgba(0,0,0,.18);background:rgba(255,255,255,.11);}
+.cert-alert-color-swatch{width:18px;height:18px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.10);}
+.cert-alert-color-option[data-urgency="red"] .cert-alert-color-swatch{background:#ef4444;}
+.cert-alert-color-option[data-urgency="amber"] .cert-alert-color-swatch{background:#f59e0b;}
+.cert-alert-color-option[data-urgency="green"] .cert-alert-color-swatch{background:#22c55e;}
+.cert-alert-color-option[data-urgency="blue"] .cert-alert-color-swatch{background:#3b82f6;}
+.cert-alert-color-option[data-urgency="purple"] .cert-alert-color-swatch{background:#a855f7;}
+.cert-alert-color-copy{display:flex;flex-direction:column;line-height:1.08;min-width:0;}
+.cert-alert-color-copy strong{font-size:12px;color:#f8fafc;}
+.cert-alert-color-copy small{font-size:9px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
 @media(max-width:760px){
   #certAlertBanner{grid-template-columns:1fr;border-radius:14px;}
   .cert-alert-label{min-height:40px;justify-content:center;border-right:0;border-bottom:1px solid rgba(255,255,255,.18);padding:7px 12px;}
   .cert-alert-icon{width:24px;height:24px;font-size:14px;}
   .cert-alert-message{min-height:48px;padding:7px 28px;font-size:13px;}
   .cert-alert-message::after{margin-left:28px;}
+  .cert-alert-admin-box{padding:16px;}
+  .cert-alert-admin-title{font-size:17px;}
   .cert-alert-admin-grid{grid-template-columns:1fr;}
+  .cert-alert-message-field{grid-column:1;}
+  #certAlertMessageInput{min-height:130px;font-size:15px;}
+  .cert-alert-urgency-options{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .cert-alert-color-option:last-child{grid-column:1 / -1;}
   .cert-alert-admin-actions .admin-save-btn{width:100%!important;min-width:0;}
   .cert-alert-toggle{width:100%;box-sizing:border-box;}
 }
@@ -7156,12 +7236,12 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
     <div id="certAlertAdminStatus" class="cert-alert-admin-status"></div>
   </div>
   <div class="cert-alert-admin-grid">
-    <div>
-      <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Alert comments</label>
+    <div class="cert-alert-message-field">
+      <label class="cert-alert-field-label" for="certAlertMessageInput">Alert comments</label>
       <textarea id="certAlertMessageInput" class="admin-input" placeholder="Example: Aetna certifications open August 12. Complete AHIP before starting carrier certifications."></textarea>
     </div>
     <div>
-      <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Scroll speed</label>
+      <label class="cert-alert-field-label" for="certAlertSpeedInput">Scroll speed</label>
       <select id="certAlertSpeedInput" class="admin-input" style="width:100%;">
         <option value="slow">Slow</option>
         <option value="normal" selected>Normal</option>
@@ -7169,11 +7249,21 @@ Use <strong>Y</strong> or <strong>✓</strong> for certified, leave blank or <st
       </select>
     </div>
     <div>
-      <label style="font-size:11px;font-weight:800;color:var(--muted);display:block;margin-bottom:5px;">Flash intensity</label>
+      <label class="cert-alert-field-label" for="certAlertFlashInput">Flash intensity</label>
       <select id="certAlertFlashInput" class="admin-input" style="width:100%;">
         <option value="soft">Soft</option>
         <option value="strong" selected>Strong</option>
       </select>
+    </div>
+    <div>
+      <span class="cert-alert-field-label" id="certAlertUrgencyLabel">Urgency color</span>
+      <div class="cert-alert-urgency-options" id="certAlertUrgencyOptions" role="radiogroup" aria-labelledby="certAlertUrgencyLabel">
+        <label class="cert-alert-color-option" data-urgency="red"><input type="radio" name="certAlertUrgencyInput" value="red" checked><span class="cert-alert-color-swatch"></span><span class="cert-alert-color-copy"><strong>Red</strong><small>Urgent</small></span></label>
+        <label class="cert-alert-color-option" data-urgency="amber"><input type="radio" name="certAlertUrgencyInput" value="amber"><span class="cert-alert-color-swatch"></span><span class="cert-alert-color-copy"><strong>Amber</strong><small>Attention</small></span></label>
+        <label class="cert-alert-color-option" data-urgency="green"><input type="radio" name="certAlertUrgencyInput" value="green"><span class="cert-alert-color-swatch"></span><span class="cert-alert-color-copy"><strong>Green</strong><small>Update</small></span></label>
+        <label class="cert-alert-color-option" data-urgency="blue"><input type="radio" name="certAlertUrgencyInput" value="blue"><span class="cert-alert-color-swatch"></span><span class="cert-alert-color-copy"><strong>Blue</strong><small>Information</small></span></label>
+        <label class="cert-alert-color-option" data-urgency="purple"><input type="radio" name="certAlertUrgencyInput" value="purple"><span class="cert-alert-color-swatch"></span><span class="cert-alert-color-copy"><strong>Purple</strong><small>Reminder</small></span></label>
+      </div>
     </div>
   </div>
   <div class="cert-alert-admin-actions">
@@ -23918,7 +24008,7 @@ URL.revokeObjectURL(url);
   var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbHp3bW9vZ3lwZmVmanh2Z3l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzg2NTM0MCwiZXhwIjoyMDg5NDQxMzQwfQ.B4Q9AwLnKUcywJHE-yljbYzKDDwXW8o4HrY7kxrpG-Q';
   var HUB = 'medi';
   var KEY = 'cert_alert_banner';
-  var current = {message:'', enabled:false, speed:'normal', flash:'strong'};
+  var current = {message:'', enabled:false, speed:'normal', flash:'strong', urgency:'red'};
   var speedPixelsPerSecond = {slow:34, normal:52, fast:78};
   var marqueeResizeTimer = null;
 
@@ -23934,7 +24024,9 @@ URL.revokeObjectURL(url);
     var message = String(out.message || out.text || '').replace(/\r\n?/g,'\n').trim();
     var speed = /^(slow|normal|fast)$/.test(String(out.speed || '')) ? String(out.speed) : 'normal';
     var flash = /^(soft|strong)$/.test(String(out.flash || '')) ? String(out.flash) : 'strong';
-    return {message:message, enabled:out.enabled !== false && !!message, speed:speed, flash:flash, updatedAt:out.updatedAt || ''};
+    var urgencyRaw = String(out.urgency || out.color || '').toLowerCase();
+    var urgency = /^(red|amber|green|blue|purple)$/.test(urgencyRaw) ? urgencyRaw : 'red';
+    return {message:message, enabled:out.enabled !== false && !!message, speed:speed, flash:flash, urgency:urgency, updatedAt:out.updatedAt || ''};
   }
   function displayText(value){
     return String(value || '').split(/\n+/).map(function(s){return s.trim();}).filter(Boolean).join('   •   ');
@@ -23976,6 +24068,7 @@ URL.revokeObjectURL(url);
     a.textContent = message;
     b.textContent = message;
     banner.dataset.flash = current.flash;
+    banner.dataset.urgency = current.urgency;
     banner.hidden = false;
     updateMarqueeMetrics();
     if(document.fonts && document.fonts.ready){
@@ -23988,10 +24081,12 @@ URL.revokeObjectURL(url);
     var enabled = document.getElementById('certAlertEnabledInput');
     var speed = document.getElementById('certAlertSpeedInput');
     var flash = document.getElementById('certAlertFlashInput');
+    var urgency = document.querySelector('input[name="certAlertUrgencyInput"][value="' + d.urgency + '"]');
     if(msg) msg.value = d.message;
     if(enabled) enabled.checked = d.message ? d.enabled : true;
     if(speed) speed.value = d.speed;
     if(flash) flash.value = d.flash;
+    if(urgency) urgency.checked = true;
     renderAdminPreview();
   }
   function adminDraft(){
@@ -23999,11 +24094,13 @@ URL.revokeObjectURL(url);
     var enabled = document.getElementById('certAlertEnabledInput');
     var speed = document.getElementById('certAlertSpeedInput');
     var flash = document.getElementById('certAlertFlashInput');
+    var urgency = document.querySelector('input[name="certAlertUrgencyInput"]:checked');
     return parseData({
       message:msg ? msg.value : '',
       enabled:enabled ? enabled.checked : true,
       speed:speed ? speed.value : 'normal',
-      flash:flash ? flash.value : 'strong'
+      flash:flash ? flash.value : 'strong',
+      urgency:urgency ? urgency.value : 'red'
     });
   }
   function renderAdminPreview(){
@@ -24011,7 +24108,9 @@ URL.revokeObjectURL(url);
     if(!preview) return;
     var d = adminDraft();
     var text = displayText(d.message);
-    preview.textContent = text ? ((d.enabled ? 'Visible: ' : 'Hidden: ') + text) : 'Preview will appear here as you type.';
+    var labels = {red:'RED • URGENT',amber:'AMBER • ATTENTION',green:'GREEN • UPDATE',blue:'BLUE • INFORMATION',purple:'PURPLE • REMINDER'};
+    preview.dataset.urgency = d.urgency;
+    preview.textContent = text ? ((labels[d.urgency] || 'ALERT') + ' — ' + (d.enabled ? 'VISIBLE: ' : 'HIDDEN: ') + text) : 'Preview will appear here as you type.';
   }
   async function readCloud(){
     var url = SUPA_URL + '/rest/v1/tile_content?hub=eq.' + encodeURIComponent(HUB) + '&key=eq.' + encodeURIComponent(KEY) + '&select=data';
@@ -24028,7 +24127,7 @@ URL.revokeObjectURL(url);
     var del = await fetch(base + query,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
     var delText = await del.text();
     if(!del.ok) throw new Error('Alert cleanup failed ' + del.status + ': ' + delText.slice(0,220));
-    var payload = Object.assign({},parseData(data),{updatedAt:new Date().toISOString(),source:'phase92_cert_alert_admin'});
+    var payload = Object.assign({},parseData(data),{updatedAt:new Date().toISOString(),source:'phase96_cert_alert_admin_urgency_colors'});
     var post = await fetch(base,{
       method:'POST',
       headers:headers({'Content-Type':'application/json','Prefer':'return=minimal'}),
@@ -24037,7 +24136,7 @@ URL.revokeObjectURL(url);
     var postText = await post.text();
     if(!post.ok) throw new Error('Alert save failed ' + post.status + ': ' + postText.slice(0,260));
     var verify = await readCloud();
-    if(verify.message !== payload.message || verify.enabled !== payload.enabled || verify.speed !== payload.speed || verify.flash !== payload.flash){
+    if(verify.message !== payload.message || verify.enabled !== payload.enabled || verify.speed !== payload.speed || verify.flash !== payload.flash || verify.urgency !== payload.urgency){
       throw new Error('Alert verification failed: Supabase returned different settings.');
     }
     return verify;
@@ -24110,6 +24209,9 @@ URL.revokeObjectURL(url);
     ['certAlertMessageInput','certAlertEnabledInput','certAlertSpeedInput','certAlertFlashInput'].forEach(function(id){
       var el = document.getElementById(id);
       if(el){ el.addEventListener('input',renderAdminPreview); el.addEventListener('change',renderAdminPreview); }
+    });
+    document.querySelectorAll('input[name="certAlertUrgencyInput"]').forEach(function(el){
+      el.addEventListener('change',renderAdminPreview);
     });
     window.addEventListener('resize',function(){
       clearTimeout(marqueeResizeTimer);
